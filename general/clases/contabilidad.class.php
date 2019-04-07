@@ -4,7 +4,17 @@ if(file_exists("../../modelo/php_conexion.php")){
 }
 
 class contabilidad extends ProcesoVenta{
-   
+   /**
+    * Crea un comprobante de ingreso
+    * @param type $Fecha
+    * @param type $idCliente
+    * @param type $Tercero
+    * @param type $Valor
+    * @param type $Tipo
+    * @param type $Concepto
+    * @param type $Estado
+    * @return type
+    */
     function CrearComprobanteIngreso($Fecha,$idCliente,$Tercero,$Valor,$Tipo,$Concepto,$Estado) {
         $Tabla="comprobantes_ingreso";
         $Datos["Fecha"]=$Fecha;
@@ -20,7 +30,16 @@ class contabilidad extends ProcesoVenta{
         $idComprobante=$this->ObtenerMAX($Tabla, "ID", 1, "");
         return($idComprobante);
     }
-    
+    /**
+     * Contabiliza un comprobante de ingreso
+     * @param type $idComprobante
+     * @param type $Tercero
+     * @param type $CuentaDebito
+     * @param type $CuentaCredito
+     * @param type $idEmpresa
+     * @param type $idSede
+     * @param type $idCentroCostos
+     */
     function ContabilizarComprobanteIngreso($idComprobante,$Tercero,$CuentaDebito,$CuentaCredito,$idEmpresa,$idSede,$idCentroCostos) {
         $DatosComprobante=$this->DevuelveValores("comprobantes_ingreso", "ID", $idComprobante);
         $DatosCuentaDebito= $this->DevuelveValores("subcuentas", "PUC", $CuentaDebito);

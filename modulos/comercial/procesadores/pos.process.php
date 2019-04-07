@@ -10,6 +10,7 @@ $fecha=date("Y-m-d");
 
 include_once("../clases/Facturacion.class.php");
 include_once("../../../modelo/PrintPos.php");
+include_once("../../../general/clases/contabilidad.class.php");
 if( !empty($_REQUEST["Accion"]) ){
     $obCon = new Facturacion($idUser);
     
@@ -232,7 +233,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Tarjetas=$obCon->normalizar($_REQUEST["Tarjetas"]);
             $CmbPrint=$obCon->normalizar($_REQUEST["CmbPrint"]);
             $FormaPagoFactura=$CmbFormaPago;
-            if($CmbFormaPago<>"Contado"){
+            if(is_numeric($FormaPagoFactura)){
                 $FormaPagoFactura="Credito a $CmbFormaPago dias";
             }
             
@@ -249,9 +250,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $TotalCostos=$DatosTotalesCotizacion["TotalCostos"];
             $SaldoFactura=$Total;
             $Descuentos=0;
-            
+            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
             if($AnticiposCruzados>0){
-                $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $DatosCotizacion["Clientes_idClientes"]);            
+                            
                 $NIT=$DatosCliente["Num_Identificacion"];
                 $ParametrosAnticipos=$obCon->DevuelveValores("parametros_contables", "ID", 20);//Aqui se encuentra la cuenta para los anticipos
                 $CuentaAnticipos=$ParametrosAnticipos["CuentaPUC"];
@@ -305,6 +306,15 @@ if( !empty($_REQUEST["Accion"]) ){
             $obCon->DescargueFacturaInventarios($idFactura, "");
             if($CmbFormaPago<>'Contado'){
                 $obFactura->IngreseCartera($idFactura, $Fecha, $idCliente, $CmbFormaPago, $SaldoFactura, "");
+            }
+            if($CmbFormaPago=='SisteCredito' or $CmbFormaPago=='KUPY'){
+                if($CmbFormaPago=='SisteCredito'){
+                    $idPlataforma=1;
+                }
+                if($CmbFormaPago=='KUPY'){
+                    $idPlataforma=2;
+                }
+                $obFactura->PlataformasPagoVentas($idPlataforma,$fecha,$Hora,$DatosCliente["Num_Identificacion"],$idFactura,$Total,$idUser);
             }
             if($AnticiposCruzados>0){
                 
@@ -511,7 +521,7 @@ if( !empty($_REQUEST["Accion"]) ){
         case 14:// Cerrar turno
             $obPrint = new PrintPos($idUser);
             $idCaja=1;
-            $idCierre=$obCon->CierreTurno($idUser,$idCaja,"");
+            $idCierre=$obCon->CierreTurnoPos($idUser,$idCaja,"");
             $VectorCierre["idCierre"]=$idCierre;
             $DatosImpresora=$obCon->DevuelveValores("config_puertos", "ID", 1);
                         
@@ -768,8 +778,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $fecha=date("Y-m-d");
             $Hora=date("H:i:s");
             $idCartera=$obCon->normalizar($_REQUEST['idCredito']);
-            $idFactura=$obCon->normalizar($_REQUEST['idFactura']);
-            
+            $idFactura=$obCon->normalizar($_REQUEST['idFactura']);            
             $Valor=$obCon->normalizar($_REQUEST["Abono"]);
             $Intereses=$obCon->normalizar($_REQUEST["Intereses"]);
             $AbonoTarjetas=$obCon->normalizar($_REQUEST["Tarjetas"]);
@@ -823,7 +832,30 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit();
             }
             
-        break;
+        break;//Fin caso 23
+        
+        case 24://Fin caso 24
+            $obContabilidad = new contabilidad($idUser);
+            $Fecha=date("Y-m-d");
+            $Hora=date("H:i:s");
+            $Tercero=$obCon->normalizar($_REQUEST['Tercero']);
+            $CmbPlataforma=$obCon->normalizar($_REQUEST['CmbPlataforma']);            
+            $Abono=$obCon->normalizar($_REQUEST["Abono"]);
+            
+            $DatosPlataforma=$obCon->DevuelveValores("comercial_plataformas_pago", "ID", $CmbPlataforma);
+            $DatosCaja=$obCon->DevuelveValores("cajas", "idUsuario", $idUser);
+            $CuentaDestino=$DatosCaja["CuentaPUCEfectivo"];
+            $CentroCosto=$DatosCaja["CentroCostos"];
+            $idTerceroInteres=$DatosPlataforma["NIT"];
+            
+            $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 19);
+            $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $idTerceroInteres, $Abono, "PlataformasPago", "Ingreso por Plataforma de Pago $CmbPlataforma", "CERRADO");
+            $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $idTerceroInteres, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
+            
+            $obCon->IngresoPlataformasPago($CmbPlataforma,$Fecha, $Hora, $Tercero, $Abono, $idComprobante, $idUser);
+            print("OK;Ingreso registrado en Comprobante $idComprobante");
+            
+        break;    
         
     }
     

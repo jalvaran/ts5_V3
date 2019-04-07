@@ -142,9 +142,8 @@ class Facturacion extends ProcesoVenta{
     public function IngreseCartera($idFactura,$Fecha,$idCliente,$CmbFormaPago,$SaldoFactura,$Vector) {
         
         $SumaDias=$CmbFormaPago;        
-        if($CmbFormaPago=="SisteCredito"){
-            $SumaDias=30;
-            $Datos["SisteCredito"]=1;
+        if($CmbFormaPago=="SisteCredito" or $CmbFormaPago=="KUPY"){
+            return;
         }
            
         $Datos["Fecha"]=$Fecha; 
@@ -602,6 +601,164 @@ class Facturacion extends ProcesoVenta{
         }
         $sqlFactura = substr($sqlFactura, 0, -1);       
         return($sqlFactura);
+    }
+    
+    public function IngresoPlataformasPago($idPlataforma,$Fecha,$Hora,$Tercero,$Valor,$idComprobanteIngreso,$idUser) {
+        
+        $Datos["Fecha"]=$Fecha;
+        $Datos["Hora"]=$Hora;
+        $Datos["Tercero"]=$Tercero;
+        $Datos["Valor"]=$Valor;
+        $Datos["idComprobanteIngreso"]=$idComprobanteIngreso;
+        $Datos["idUser"]=$idUser;
+        $Datos["idPlataformaPago"]=$idPlataforma;
+        
+        $sql=$this->getSQLInsert("comercial_plataformas_pago_ingresos", $Datos);
+        $this->Query($sql);
+        
+    }
+    
+    public function PlataformasPagoVentas($idPlataforma,$Fecha,$Hora,$Tercero,$idFactura,$Valor,$idUser) {
+        
+        $Datos["Fecha"]=$Fecha;
+        $Datos["Hora"]=$Hora;
+        $Datos["Tercero"]=$Tercero;
+        $Datos["Valor"]=$Valor;
+        $Datos["idFactura"]=$idFactura;
+        $Datos["idUser"]=$idUser;
+        $Datos["idPlataformaPago"]=$idPlataforma;
+        
+        $sql=$this->getSQLInsert("comercial_plataformas_pago_ventas", $Datos);
+        $this->Query($sql);
+        
+    }
+    
+    public function CierreTurnoPos($idUser,$idCaja,$VectorCierre) {
+        
+        $fecha=date("Y-m-d");
+        $Hora=date("H:i:s");
+       
+        //Calculo las ventas
+        
+        $sql="SELECT SUM(Total) as Total, SUM(Efectivo) as Efectivo, SUM(Devuelve) as Devuelve, SUM(Cheques) as Cheques, SUM(Otros) as Otros, SUM(Tarjetas) as Tarjetas FROM facturas "
+                . "WHERE Usuarios_idUsuarios='$idUser' AND CerradoDiario = '' AND FormaPago='Contado'";
+        
+        $Consulta=$this->Query($sql);
+        $DatosSumatorias=$this->FetchArray($Consulta);
+        
+        $TotalVentasContado=$DatosSumatorias["Total"];
+        $TotalEfectivo=$DatosSumatorias["Efectivo"];
+        $TotalDevueltas=$DatosSumatorias["Devuelve"];
+        $TotalCheques=$DatosSumatorias["Cheques"];
+        $TotalOtros=$DatosSumatorias["Otros"];
+        $TotalTarjetas=$DatosSumatorias["Tarjetas"];
+        
+        
+        //Calculo las ventas a credito
+        //
+        $sql="SELECT SUM(Total) as Total FROM facturas "
+                . "WHERE Usuarios_idUsuarios='$idUser' AND CerradoDiario = '' AND FormaPago<>'ANULADA' AND FormaPago<>'Contado' AND FormaPago<>'SisteCredito' AND FormaPago<>'Separado'";
+        
+        $Consulta=$this->Query($sql);
+        $DatosSumatorias=$this->FetchArray($Consulta);
+        
+        $TotalVentasCredito=$DatosSumatorias["Total"]; 
+        
+        
+        //Calculo las ventas de SisteCredito
+        //
+        $sql="SELECT SUM(Total) as Total FROM facturas "
+                . "WHERE Usuarios_idUsuarios='$idUser' AND CerradoDiario = '' AND FormaPago = 'SisteCredito'";
+        
+        $Consulta=$this->Query($sql);
+        $DatosSumatorias=$this->FetchArray($Consulta);
+        
+        $TotalVentasSisteCredito=$DatosSumatorias["Total"]; 
+        
+        //Calculo los retiros de separados
+        //
+        $sql="SELECT SUM(Total) as Total FROM facturas "
+                . "WHERE Usuarios_idUsuarios='$idUser' AND CerradoDiario = '' AND FormaPago = 'Separado'";
+        
+        $Consulta=$this->Query($sql);
+        $DatosSumatorias=$this->FetchArray($Consulta);
+        
+        $TotalRetiroSeparados=$DatosSumatorias["Total"]; 
+        
+        //Calculo las devoluciones
+        
+        $sql="SELECT SUM(TotalItem) as TotalDevoluciones FROM facturas_items "
+                . "WHERE idUsuarios='$idUser' AND idCierre = '' AND Cantidad < 0";
+        
+        $Consulta=$this->Query($sql);
+        $DatosDevoluciones=$this->FetchArray($Consulta);
+        
+        $TotalDevoluciones=$DatosDevoluciones["TotalDevoluciones"];
+        
+        //Calculo los egresos
+        
+        $sql="SELECT SUM(Valor) as Valor, SUM(Retenciones) as Retenciones FROM egresos "
+                . "WHERE Usuario_idUsuario='$idUser' AND CerradoDiario = '' AND PagoProg='Contado'";
+        
+        $Consulta=$this->Query($sql);
+        $DatosEgresos=$this->FetchArray($Consulta);
+        
+        $TotalEgresos=$DatosEgresos["Valor"];
+        $TotalRetenciones=$DatosEgresos["Retenciones"];
+        $TotalEgresos=$TotalEgresos-$TotalRetenciones;
+        
+        
+        //Calculo los abonos de separados
+        
+        $TotalAbonos=$this->Sume("separados_abonos", "Valor", "WHERE idUsuarios='$idUser' AND idCierre=''");
+        //Calculo los abonos de Creditos
+        
+        $TotalAbonosCreditos=$this->Sume("facturas_abonos", "Valor", "WHERE Usuarios_idUsuarios='$idUser' AND idCierre='' AND FormaPago <> 'SisteCredito'");
+        $TotalAbonosSisteCredito=$this->Sume("comercial_plataformas_pago_ingresos", "Valor", "WHERE idUser='$idUser' AND idCierre='0' AND idPlataformaPago=1");
+        //$TotalAbonosKupy=$this->Sume("comercial_plataformas_pago_ingresos", "Valor", "WHERE idUser='$idUser' AND idCierre='0' AND idPlataformaPago=2");
+        //Ingreso datos en tabla cierres
+        
+        $tab="cajas_aperturas_cierres";
+        $NumRegistros=23;
+        $Columnas[0]="ID";                  $Valores[0]="";
+        $Columnas[1]="Fecha";               $Valores[1]=$fecha;
+        $Columnas[2]="Hora";                $Valores[2]=$Hora;
+        $Columnas[3]="Movimiento";           $Valores[3]="Cierre";
+        $Columnas[4]="Usuario";               $Valores[4]=$idUser;
+        $Columnas[5]="idCaja";            $Valores[5]=$idCaja;
+        $Columnas[6]="TotalVentas";           $Valores[6]=$TotalVentasContado+$TotalVentasCredito+$TotalVentasSisteCredito-$TotalDevoluciones;
+        $Columnas[7]="TotalVentasContado";    $Valores[7]=$TotalVentasContado;
+        $Columnas[8]="TotalVentasCredito";    $Valores[8]=$TotalVentasCredito;
+        $Columnas[9]="TotalAbonos";           $Valores[9]=$TotalAbonos;
+        $Columnas[10]="TotalDevoluciones";    $Valores[10]=$TotalDevoluciones;
+        $Columnas[11]="TotalEntrega";         $Valores[11]=$TotalVentasContado+$TotalAbonos+$TotalAbonosCreditos+$TotalAbonosSisteCredito-$TotalEgresos;
+        $Columnas[12]="TotalEfectivo";        $Valores[12]=$TotalVentasContado-$TotalEgresos+$TotalAbonos+$TotalAbonosCreditos+$TotalAbonosSisteCredito-$TotalTarjetas-$TotalCheques-$TotalOtros;
+        $Columnas[13]="TotalTarjetas";        $Valores[13]=$TotalTarjetas;
+        $Columnas[14]="TotalCheques";         $Valores[14]=$TotalCheques;
+        $Columnas[15]="TotalOtros";           $Valores[15]=$TotalOtros;
+        $Columnas[16]="TotalEgresos";         $Valores[16]=$TotalEgresos;
+        $Columnas[17]="Efectivo";             $Valores[17]=$TotalEfectivo;
+        $Columnas[18]="Devueltas";            $Valores[18]=$TotalDevueltas;
+        $Columnas[19]="AbonosCreditos";       $Valores[19]=$TotalAbonosCreditos;
+        $Columnas[20]="AbonosSisteCredito";           $Valores[20]=$TotalAbonosSisteCredito;
+        $Columnas[21]="TotalVentasSisteCredito";      $Valores[21]=$TotalVentasSisteCredito;
+        $Columnas[22]="TotalRetiroSeparados";      $Valores[22]=$TotalRetiroSeparados;
+        $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
+        $idCierre=$this->ObtenerMAX($tab, "ID", 1, "");
+        
+        //UPDATES
+        
+        $this->update("facturas", "CerradoDiario", $idCierre, "WHERE CerradoDiario='' AND Usuarios_idUsuarios='$idUser'");
+        $this->update("egresos", "CerradoDiario", $idCierre, "WHERE CerradoDiario='' AND Usuario_idUsuario='$idUser'");
+        $this->update("separados_abonos", "idCierre", $idCierre, "WHERE idCierre='' AND idUsuarios='$idUser'");
+        $this->update("facturas_abonos", "idCierre", $idCierre, "WHERE idCierre='' AND Usuarios_idUsuarios='$idUser'");
+        $this->update("facturas_items", "idCierre", $idCierre, "WHERE idCierre='' AND idUsuarios='$idUser'");
+        $this->update("facturas_intereses_sistecredito", "idCierre", $idCierre, "WHERE idCierre='' AND idUsuario='$idUser'"); 
+        $this->update("comprobantes_ingreso", "idCierre", $idCierre, "WHERE idCierre='' AND Usuarios_idUsuarios='$idUser'"); 
+        $this->update("comercial_plataformas_pago_ingresos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'"); 
+         
+        return ($idCierre);
+        
     }
     
     /**

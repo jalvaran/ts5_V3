@@ -90,14 +90,14 @@ if( !empty($_REQUEST["Accion"]) ){
         case 2://Dibujo los Totales
             $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);
             
-            $sql="SELECT SUM(Cantidad) as TotalItems,SUM(Subtotal) AS Subtotal, SUM(Impuestos) as IVA, round(SUM(TotalVenta)) as Total FROM preventa WHERE VestasActivas_idVestasActivas = '$idPreventa'";
+            $sql="SELECT COUNT(*) AS CantidadRegistros,SUM(Cantidad) as TotalItems,SUM(Subtotal) AS Subtotal, SUM(Impuestos) as IVA, round(SUM(TotalVenta)) as Total FROM preventa WHERE VestasActivas_idVestasActivas = '$idPreventa'";
             $Consulta=$obCon->Query($sql);
             $Totales=$obCon->FetchAssoc($Consulta);
             
             $Subtotal=$Totales["Subtotal"];
             $IVA=$Totales["IVA"];
             $Total=$Totales["Total"];
-            
+            $CantidadRegistros=$Totales["CantidadRegistros"];
             $sql="SELECT Devuelve FROM facturas WHERE Usuarios_idUsuarios='$idUser' ORDER BY idFacturas DESC LIMIT 1";
             $consulta=$obCon->Query($sql);
             $DatosDevuelta=$obCon->FetchArray($consulta);
@@ -135,7 +135,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->FilaTabla(16);
                         print("<td colspan=3 style='text-align:center'>");
                             $habilitaBotones=0;
-                             if($Total>0){ //Verifico que hayan productos, servicios o insumos agregados
+                             if($CantidadRegistros>0){ //Verifico que hayan productos, servicios o insumos agregados
                                  $habilitaBotones=1;
                              }
                              $css->CrearBotonEvento("BtnFacturar", "Facturar", $habilitaBotones, "onclick", "AbrirModalFacturarPOS()", "naranja", "");
@@ -732,7 +732,67 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CierraFilaTabla();
             }
             $css->CerrarTabla();
-        break;    
+        break;    //fin caso 13
+        
+        case 14://Formulario para recibir el ingreso de una plataforma de pagos
+        
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 4, "", "", "", ""); //4 sirve para indicarle al sistema que debe guardar el formulario de crear un ingreso de una plataforma
+            
+            $css->CrearTabla();
+                $css->FilaTabla(22);
+                    $css->ColTabla("<strong>INGRESOS POR PLATAFORMAS</strong>", 5);
+                $css->CierraFilaTabla();
+                
+                
+                $css->FilaTabla(14);
+                    
+                    $css->ColTabla("<strong>Plataforma</strong>", 1);
+                    $css->ColTabla("<strong>Tercero</strong>", 3);
+                    $css->ColTabla("<strong>Valor</strong>", 1);
+                                        
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(14);
+                print("<td>");
+                        $css->select("CmbPlataforma", "form-control", "CmbPlataforma", "", "", "", "");
+
+                            $sql="SELECT * FROM comercial_plataformas_pago WHERE Activa=1";
+                            $Consulta=$obCon->Query($sql);
+                            
+                            while($DatosFormaPago=$obCon->FetchAssoc($Consulta)){
+                                
+                                $css->option("", "",'' , $DatosFormaPago["ID"], "", "", "", "");
+                                    print($DatosFormaPago["Nombre"]);
+                                $css->Coption();
+                                
+                            }
+
+
+                        $css->Cselect();
+                    print("</td>");
+                    
+                print("<td colspan=3>");
+                        $css->select("CmbTerceroIngresoPlataformas", "form-control", "CmbTerceroIngresoPlataformas", "", "", "", "style=width:400px");
+
+                            
+                            $css->option("", "",'' , '', "", "", "", "");
+                                print("Seleccione un Tercero");
+                            $css->Coption();
+                        $css->Cselect();
+                    print("</td>");
+                    
+                    
+                    print("<td>");
+                        
+                        $css->input("number", "TxtIngresoPlataforma", "form-control input-md", "TxtIngresoPlataforma", "", 0, "", "", "", "style=width:300px");
+                    print("</td>");
+                    
+                    
+                    $css->CierraFilaTabla();
+                    
+            $css->CerrarTabla();
+            
+        break;//Fin caso 14
         
     }
     

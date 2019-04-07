@@ -102,12 +102,16 @@ $css->PageInit($myTitulo);
             $css->legend("", "");
                 print("<a href='#'>Opciones Adicionales:</a>");
             $css->Clegend();  
-            $css->CrearDiv("", "col-md-3", "left", 1, 1);
+            $css->CrearDiv("", "col-md-2", "left", 1, 1);
                 $css->CrearBotonEvento("BtnAgregarPreventa", "Agregar Preventa", 1, "onclick", "AgregarPreventa();", "azulclaro", "");
             $css->CerrarDiv();
             
-            $css->CrearDiv("", "col-md-3", "left", 1, 1);
+            $css->CrearDiv("", "col-md-2", "left", 1, 1);
                 $css->CrearBotonEvento("BtnCrearTercero", "Crear Tercero", 1, "onclick", "ModalCrearTercero();", "verde", "");
+            $css->CerrarDiv();
+            
+            $css->CrearDiv("", "col-md-2", "left", 1, 1);
+                $css->CrearBotonEvento("BtnRegistrarIngreso", "Ingresos", 1, "onclick", "ModalIngresosPlataformas();", "azulclaro", "");
             $css->CerrarDiv();
             
             $css->CrearDiv("", "col-md-2", "left", 1, 1);

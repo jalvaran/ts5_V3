@@ -656,6 +656,10 @@ function AccionesPOS(){
         CrearEgreso();
     }
     
+    if(idFormulario==4){
+        GuardarIngresoPlataformasPago();
+    }
+    
 }
 /**
  * Crear un tercero
@@ -989,7 +993,7 @@ function GuardarFactura(){
         document.getElementById("AnticiposCruzados").style.backgroundColor="white";
     }
     */
-    if( AnticiposCruzados > TxtTotalFactura){
+    if( AnticiposCruzados > TxtTotalFactura && AnticiposCruzados>0){
         alertify.alert("El Anticipo no puede ser mayor al total de la Factura");
         document.getElementById("AnticiposCruzados").style.backgroundColor="pink";
         document.getElementById("BntModalPOS").disabled=false;
@@ -2285,6 +2289,128 @@ function AbonarCredito(idCredito,idFactura){
       })  
 }
 
+/**
+ * Dibuja el formulario para recibir un ingreso por medio de una plataforma
+ * @returns {undefined}
+ */
+function ModalIngresosPlataformas(){
+    
+    $("#ModalAccionesPOS").modal();
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 14);
+        
+        $.ajax({
+        url: './Consultas/pos.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivFrmPOS').innerHTML=data;
+            
+            $('#CmbTerceroIngresoPlataformas').select2({
+            
+                placeholder: 'Seleccione un Tercero',
+                ajax: {
+                  url: 'buscadores/terceros.search.php',
+                  dataType: 'json',
+                  delay: 250,
+                  processResults: function (data) {
+
+                    return {                     
+                      results: data
+                    };
+                  },
+                 cache: true
+                }
+              });
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+
+function GuardarIngresoPlataformasPago(){
+    
+    var Abono = parseFloat(document.getElementById("TxtIngresoPlataforma").value);
+    var Tercero = (document.getElementById("CmbTerceroIngresoPlataformas").value);
+    var CmbPlataforma = (document.getElementById("CmbPlataforma").value);
+        
+         
+    if(!$.isNumeric(Abono) ||  Abono<=0){
+        
+        alertify.error("El Ingreso debe ser un número mayor a cero");
+        document.getElementById("TxtIngresoPlataforma").style.backgroundColor="pink";   
+        document.getElementById("BntModalPOS").disabled=false;
+        document.getElementById("BntModalPOS").value="Guardar";
+        posiciona("TxtIngresoPlataforma"); 
+        return;
+    }else{
+        document.getElementById("TxtIngresoPlataforma").style.backgroundColor="white";
+    }
+    
+           
+    if(Tercero==''){
+        
+        alertify.error("Debes seleccionar un tercero");
+        document.getElementById("select2-CmbTerceroIngresoPlataformas-container").style.backgroundColor="pink";   
+        document.getElementById("BntModalPOS").disabled=false;
+        document.getElementById("BntModalPOS").value="Guardar";
+        posiciona("select2-CmbTerceroIngresoPlataformas-container"); 
+        return;
+    }else{
+        document.getElementById("select2-CmbTerceroIngresoPlataformas-container").style.backgroundColor="white";
+    }
+    
+          
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 24);
+        form_data.append('Tercero', Tercero); 
+        form_data.append('CmbPlataforma', CmbPlataforma); 
+        form_data.append('Abono', Abono);
+        document.getElementById("TxtIngresoPlataforma").value="";              
+        $.ajax({
+        url: './procesadores/pos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+                
+            }else if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+                            
+            }else{
+                alertify.alert(data);
+            }
+            CierraModal('ModalAccionesPOS');
+            document.getElementById("BntModalPOS").disabled=false;
+            document.getElementById("BntModalPOS").value="Guardar";
+            
+            posiciona('Codigo');       
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
 atajosPOS();
 ConvertirSelectBusquedas();
 document.getElementById("BtnMuestraMenuLateral").click();
@@ -2302,4 +2428,6 @@ $('#CmbListado').bind('change', function() {
         ModoBacula();
     }
 });
+
+
 

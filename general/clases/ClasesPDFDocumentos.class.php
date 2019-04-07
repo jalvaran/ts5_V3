@@ -915,6 +915,7 @@ $this->PDF->MultiCell(93, 25, $tbl, 0, 'R', 1, 0, '', '', true,0, true, true, 10
         }
         
         $html= $this->HTML_Totales_Factura($idFactura, $DatosFactura["ObservacionesFact"], $DatosEmpresaPro["ObservacionesLegales"]);
+       
         if($VistaFactura==1)
         $this->PDF->SetY(239);
         $this->PDF_Write($html);
@@ -1124,11 +1125,11 @@ EOD;
             
             foreach($TiposIVA as $PorcentajeIVA){
                 
-                if($Bases[$PorcentajeIVA]["Valor"]>0){
+                if(isset($Bases[$PorcentajeIVA]["Valor"])){
                     $tbl.='<td align="rigth" style="border-bottom: 1px solid #ddd;background-color: white;"><strong>Base '.$PorcentajeIVA.': $ '.number_format($Bases[$PorcentajeIVA]["Valor"]).'</strong></td>';
 
                 }
-                if($IVA[$PorcentajeIVA]["Valor"]>0){
+                if(isset($IVA[$PorcentajeIVA]["Valor"])){
 
                    $tbl.='<td align="rigth" style="border-bottom: 1px solid #ddd;background-color: white;"><strong>IVA '.$PorcentajeIVA.': $ '.number_format($IVA[$PorcentajeIVA]["Valor"]).'</strong></td>';
 
