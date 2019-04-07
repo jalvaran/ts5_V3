@@ -1,0 +1,6 @@
+runtime: php72
+
+handlers:
+- url: /user_guide/
+  static_files: user_guide/index.html
+  upload: user_guide/index.html
