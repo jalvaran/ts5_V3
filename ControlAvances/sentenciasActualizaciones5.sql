@@ -172,5 +172,54 @@ CREATE TABLE `prestamos_terceros_abonos` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
+CREATE TABLE `comercial_plataformas_pago` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `NIT` bigint(20) NOT NULL,
+  `Activa` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `comercial_plataformas_pago_ingresos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `Hora` time NOT NULL,
+  `idPlataformaPago` int(11) NOT NULL,
+  `Tercero` bigint(20) NOT NULL,
+  `Valor` double NOT NULL,
+  `idComprobanteIngreso` bigint(20) NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `idCierre` bigint(20) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `Tercero` (`Tercero`),
+  KEY `idComprobanteIngreso` (`idComprobanteIngreso`),
+  KEY `idCierre` (`idCierre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `comercial_plataformas_pago_ventas` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `Hora` time NOT NULL,
+  `idPlataformaPago` int(11) NOT NULL,
+  `Tercero` bigint(20) NOT NULL,
+  `idFactura` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Valor` double NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `Tercero` (`Tercero`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
 INSERT INTO `menu_carpetas` (`ID`, `Ruta`, `Updated`, `Sync`) VALUES
 (11,	'../modulos/reportes/',	'2019-04-07 08:27:38',	'2018-04-07 08:27:38');
+
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+(188,	'Reporte de Ingresos y Ventas por plataformas',	18,	11,	0,	'',	1,	'',	'ReportesPlataformas.php',	'_SELF',	1,	'reportes.jpg',	3,	'2019-04-08 09:14:07',	'2018-04-08 09:14:07');
+
