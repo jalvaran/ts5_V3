@@ -170,3 +170,7 @@ CREATE TABLE `prestamos_terceros_abonos` (
   KEY `idPrestamo` (`idPrestamo`),
   KEY `idComprobanteIngreso` (`idComprobanteIngreso`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+INSERT INTO `menu_carpetas` (`ID`, `Ruta`, `Updated`, `Sync`) VALUES
+(11,	'../modulos/reportes/',	'2019-04-07 08:27:38',	'2018-04-07 08:27:38');
