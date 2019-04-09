@@ -478,7 +478,7 @@ class Compra extends ProcesoVenta{
         $Datos= $this->ConsultarTabla("factura_compra_items", " WHERE idFacturaCompra='$idCompra'");
         while($DatosItems=$this->FetchArray($Datos)){
             $tab="factura_compra_items";
-            $NumRegistros=8;
+            $NumRegistros=12;
 
             $Columnas[0]="idFacturaCompra";     $Valores[0]=$idCompraNew;
             $Columnas[1]="idProducto";          $Valores[1]=$DatosItems["idProducto"];
@@ -488,6 +488,10 @@ class Compra extends ProcesoVenta{
             $Columnas[5]="ImpuestoCompra";      $Valores[5]=$DatosItems["ImpuestoCompra"];
             $Columnas[6]="TotalCompra";         $Valores[6]=$DatosItems["TotalCompra"];
             $Columnas[7]="Tipo_Impuesto";       $Valores[7]=$DatosItems["Tipo_Impuesto"];
+            $Columnas[8]="ProcentajeDescuento";       $Valores[8]=$DatosItems["ProcentajeDescuento"];
+            $Columnas[9]="ValorDescuento";       $Valores[9]=$DatosItems["ValorDescuento"];
+            $Columnas[10]="SubtotalDescuento";       $Valores[10]=$DatosItems["SubtotalDescuento"];
+            $Columnas[11]="PrecioVenta";       $Valores[11]=$DatosItems["PrecioVenta"];
 
             $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
         }

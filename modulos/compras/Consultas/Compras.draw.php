@@ -174,7 +174,7 @@ if( !empty($_REQUEST["Accion"]) ){
         case 3://Dibuja los items de una compra
             $idCompra=$obCon->normalizar($_REQUEST["idCompra"]);
             $css->CrearTabla();
-                $css->FilaTabla(12);
+                $css->FilaTabla(14);
                     $css->ColTabla("<strong>ID</strong>", 1, "C");
                     
                     print("<td style=text-align:center;width:100px>");
@@ -189,6 +189,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>Impuestos</strong>", 1, "C");
                     $css->ColTabla("<strong>Total</strong>", 1, "C");
                     $css->ColTabla("<strong>Precio Venta</strong>", 1, "C");
+                    $css->ColTabla("<strong>Descontar %</strong>", 1, "C");
                     $css->ColTabla("<strong>% Impuestos</strong>", 1, "C");
                     print("<td style=text-align:center;width:100px>");
                         print("<strong>Devolver</strong>");
@@ -205,7 +206,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 while ($DatosItems = $obCon->FetchAssoc($Consulta)) {
                     $idItem=$DatosItems["ID"];
                     $idProducto=$DatosItems["idProducto"];
-                    $css->FilaTabla(12);
+                    $css->FilaTabla(14);
                         $css->ColTabla($DatosItems["Referencia"], 1, "C");
                         
                         print("<td onclick=PrintEtiqueta($idProducto) style='font-size:16px;cursor:pointer;text-align:center;color:green' title='Imprimir Tiquete'>");
@@ -226,6 +227,22 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla(number_format($DatosItems["ImpuestoCompra"],2,",","."), 1, "C");
                         $css->ColTabla(number_format($DatosItems["TotalCompra"],2,",","."), 1, "C");
                         $css->ColTabla(number_format($DatosItems["PrecioVenta"],2,",","."), 1, "C");
+                        
+                        
+                        print("<td>");
+                            print('<div class="input-group input-group-md" style=width:100px>');
+                            
+                                $css->input("number", "TxtDescuentoItem_$idItem", "form-control", "TxtDescuentoItem_$idItem", "Descuento", 0, "", "off", "", "");
+                                print('<span class="input-group-btn">');
+                                    print('<button type="button" id="BtnEditarDescuento_'.$idItem.'" class="btn btn-info btn-flat" onclick=AplicarDescuentoItem('.$idItem.')>E</button>');
+                                    
+                                print('</span>');
+                            print('</div>');
+                            
+                            
+                        print("</td>");
+                        
+                        
                         $css->ColTabla($PorcentajeImpuestos, 1, "C");
                         
                        print("<td style='font-size:16px;text-align:center;color:red' title='Devolver'>");   
@@ -268,7 +285,9 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla(number_format($DatosItems["ImpuestoCompra"],2,",","."), 1, "C");
                         $css->ColTabla(number_format($DatosItems["TotalCompra"],2,",","."), 1, "C");
                         $css->ColTabla("NA", 1, "C");
+                        $css->ColTabla("NA", 1, "C");
                         $css->ColTabla($PorcentajeImpuestos, 1, "C");
+                        
                         $css->ColTabla("NA", 1, "C");
                         print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");   
                             
@@ -305,7 +324,9 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla(number_format($DatosItems["Impuesto_Servicio"],2,",","."), 1, "C");
                         $css->ColTabla(number_format($DatosItems["Total_Servicio"],2,",","."), 1, "C");
                         $css->ColTabla("NA", 1, "C");
+                        $css->ColTabla("NA", 1, "C");
                         $css->ColTabla($PorcentajeImpuestos, 1, "C");
+                        
                         $css->ColTabla("NA", 1, "C");
                         print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");   
                             
@@ -347,6 +368,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla(number_format($DatosItems["SubtotalCompra"],2,",","."), 1, "C");
                         $css->ColTabla(number_format($DatosItems["ImpuestoCompra"],2,",","."), 1, "C");
                         $css->ColTabla(number_format($DatosItems["TotalCompra"],2,",","."), 1, "C");
+                        $css->ColTabla("NA", 1, "C");
                         $css->ColTabla("NA", 1, "C");
                         $css->ColTabla($PorcentajeImpuestos, 1, "C");
                         

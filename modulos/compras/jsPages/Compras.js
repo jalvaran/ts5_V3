@@ -1455,6 +1455,130 @@ function BusquePrecioVentaCosto(){
       
 }
 
+function AplicarDescuentoItem(idItem){
+    var idCaja="TxtDescuentoItem_"+idItem;
+    var idBoton="BtnEditarDescuento_"+idItem;
+    var Descuento=document.getElementById(idCaja).value;
+    var idCompra = document.getElementById('idCompra').value;
+    document.getElementById(idBoton).disabled=true;  
+        
+    if(Descuento==''){
+        alertify.alert("El campo Descuento no puede estar vacío");
+        document.getElementById(idCaja).style.backgroundColor="pink";
+        document.getElementById(idBoton).disabled=false;
+        return;
+    }else{
+        document.getElementById(idCaja).style.backgroundColor="white";
+    }
+            
+    var form_data = new FormData();
+        form_data.append('Accion', '11'); 
+        form_data.append('idCompra', idCompra);
+        form_data.append('idItem', idItem);
+        form_data.append('Descuento', Descuento);
+                
+        
+        $.ajax({
+        url: './procesadores/Compras.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                var mensaje=respuestas[1];
+                alertify.success(mensaje);
+                
+                
+            }else if(respuestas[0]=="E1"){
+                var mensaje=respuestas[1];
+                alertify.error(mensaje);             
+                
+            }else{
+                alertify.alert(data);
+            }
+            document.getElementById(idBoton).disabled=false;
+            DibujeCompra();
+            //DibujeTotalesCompra(idCompra);
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+}
+/**
+ * Copia una factura de compra
+ * @param {type} idOrdenCompra
+ * @returns {undefined}
+ */
+function CopiarFacturaCompra(idFacturaCopiar=''){
+    var idCompra = document.getElementById('idCompra').value;
+    if(idFacturaCopiar==''){
+        var idFacturaCopiar = document.getElementById('idCompraAcciones').value;
+    }
+        
+        
+    if(idCompra==''){
+        alertify.alert("Debes seleccionar una compra");
+        document.getElementById("idCompra").style.backgroundColor="pink";
+        return;
+    }else{
+        document.getElementById("idCompra").style.backgroundColor="white";
+    }
+    
+    if(idFacturaCopiar==''){
+        alertify.alert("Debe digitar una valor");
+        document.getElementById("idCompraAcciones").style.backgroundColor="pink";
+        return;
+    }else{
+        document.getElementById("idCompraAcciones").style.backgroundColor="white";
+    }
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '12'); 
+        form_data.append('idCompra', idCompra);
+        form_data.append('idFacturaCopiar', idFacturaCopiar);
+                
+        document.getElementById("idCompraAcciones").value='';
+        $.ajax({
+        url: './procesadores/Compras.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                var mensaje=respuestas[1];
+                alertify.success(mensaje);
+                
+                
+            }else{
+                alertify.error(data,10000);
+                
+            }
+            DibujeCompra();
+            //DibujeTotalesCompra(idCompra);
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
+
 ConvertirSelectBusquedas();
 
 $('#CmbBusquedas').bind('change', function() {

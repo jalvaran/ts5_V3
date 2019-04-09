@@ -217,7 +217,51 @@ if( !empty($_REQUEST["Accion"]) ){
             $Mensaje="Items Copiados";
             print("OK;$Mensaje");
         break;//Fin caso 10
+    
+        case 11://Aplico descuento a un item de una compra
+            $idCompra=$obCon->normalizar($_REQUEST["idCompra"]);  
+            $idFacturaItems=$obCon->normalizar($_REQUEST["idItem"]);   
+            $Descuento=$obCon->normalizar($_REQUEST["Descuento"]);  
+            if(!is_numeric($Descuento)){
+                print("E1;El Valor del descuento debe ser númerico");
+                exit();
+            }
+            if($Descuento>100){
+                print("E1;El Valor del descuento no puede ser mayor a 100");
+                exit();
+            }
+            
+            if($Descuento<=0){
+                print("E1;El Valor del descuento no puede ser menor o igual a cero");
+                exit();
+            }
+            $DatosItem=$obCon->DevuelveValores("factura_compra_items", "ID", $idFacturaItems);
+    
+            $ValorDescuento=round($DatosItem["CostoUnitarioCompra"]*($Descuento/100),2);
+            $SubtotalDescuento=$ValorDescuento*$DatosItem["Cantidad"];
+            $ValorUnitario=$DatosItem["CostoUnitarioCompra"]-$ValorDescuento;
+            $Subtotal=$ValorUnitario*$DatosItem["Cantidad"];
+            $IVA=round($Subtotal*$DatosItem["Tipo_Impuesto"],2);
+            $Total=$Subtotal+$IVA;
+            $obCon->ActualizaRegistro("factura_compra_items", "ProcentajeDescuento", $Descuento, "ID", $idFacturaItems); 
+            $obCon->ActualizaRegistro("factura_compra_items", "ValorDescuento", $ValorDescuento, "ID", $idFacturaItems);
+            $obCon->ActualizaRegistro("factura_compra_items", "SubtotalDescuento", $SubtotalDescuento, "ID", $idFacturaItems);
+            $obCon->ActualizaRegistro("factura_compra_items", "CostoUnitarioCompra", $ValorUnitario, "ID", $idFacturaItems); 
+            $obCon->ActualizaRegistro("factura_compra_items", "SubtotalCompra", $Subtotal, "ID", $idFacturaItems); 
+            $obCon->ActualizaRegistro("factura_compra_items", "ImpuestoCompra", $IVA, "ID", $idFacturaItems); 
+            $obCon->ActualizaRegistro("factura_compra_items", "TotalCompra", $Total, "ID", $idFacturaItems); 
+            $Mensaje="Descuento aplicado";
+            print("OK;$Mensaje");
+        break;//Fin caso 11
         
+        case 12://copio los items de una factura a otra
+            $idCompra=$obCon->normalizar($_REQUEST["idCompra"]);
+            $idFacturaCopiar=$obCon->normalizar($_REQUEST["idFacturaCopiar"]); 
+            $idCompraNew=$obCon->CopiarFacturaCompra($idFacturaCopiar,$idCompra,$idUser, "");
+            
+            $Mensaje="Factura $idCompra copiada";
+            print("OK;$Mensaje");
+        break;//Fin caso 12
     }
     
     

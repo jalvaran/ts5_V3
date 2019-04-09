@@ -202,6 +202,7 @@ class Compras extends ProcesoVenta{
                     . " WHERE idFacturaCompra='$idCompra'";
         $consulta= $this->Query($sql);
         $TotalesItemsDevueltos=$this->FetchArray($consulta);
+        
         $TotalRetenciones= $this->SumeColumna("factura_compra_retenciones", "ValorRetencion", "idCompra", $idCompra);
         $TotalDescuentosGlobales= $this->SumeColumna("factura_compra_descuentos", "ValorDescuento", "idCompra", $idCompra);
         $TotalImpuestosAdicionales= $this->SumeColumna("factura_compra_impuestos_adicionales", "Valor", "idCompra", $idCompra);
@@ -636,7 +637,109 @@ class Compras extends ProcesoVenta{
             
         }
     }
+      
+    /**
+     * Copiar una factura de compra
+     * @param type $idCompra->Numero de la factura que se copiará
+     * @param type $idCompraNew -> Numero de la nueva factura
+     * @param type $idUser->id del usuario creador
+     * @param type $Vector->Futuro
+     */
+    public function CopiarFacturaCompra($idCompra,$idCompraNew,$idUser, $Vector) {
+        $Datos= $this->ConsultarTabla("factura_compra_items", " WHERE idFacturaCompra='$idCompra'");
+        while($DatosItems=$this->FetchArray($Datos)){
+            $tab="factura_compra_items";
+            $NumRegistros=12;
+
+            $Columnas[0]="idFacturaCompra";     $Valores[0]=$idCompraNew;
+            $Columnas[1]="idProducto";          $Valores[1]=$DatosItems["idProducto"];
+            $Columnas[2]="Cantidad";            $Valores[2]=$DatosItems["Cantidad"];
+            $Columnas[3]="CostoUnitarioCompra"; $Valores[3]=$DatosItems["CostoUnitarioCompra"];
+            $Columnas[4]="SubtotalCompra";      $Valores[4]=$DatosItems["SubtotalCompra"];
+            $Columnas[5]="ImpuestoCompra";      $Valores[5]=$DatosItems["ImpuestoCompra"];
+            $Columnas[6]="TotalCompra";         $Valores[6]=$DatosItems["TotalCompra"];
+            $Columnas[7]="Tipo_Impuesto";       $Valores[7]=$DatosItems["Tipo_Impuesto"];
+            $Columnas[8]="ProcentajeDescuento";       $Valores[8]=$DatosItems["ProcentajeDescuento"];
+            $Columnas[9]="ValorDescuento";       $Valores[9]=$DatosItems["ValorDescuento"];
+            $Columnas[10]="SubtotalDescuento";       $Valores[10]=$DatosItems["SubtotalDescuento"];
+            $Columnas[11]="PrecioVenta";       $Valores[11]=$DatosItems["PrecioVenta"];
+            
+            $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
+        }
         
+         //Copio los items de los insumos agregados
+        $Datos= $this->ConsultarTabla("factura_compra_insumos", " WHERE idFacturaCompra='$idCompra'");
+        while($DatosItems=$this->FetchArray($Datos)){
+            $tab="factura_compra_insumos";
+            $NumRegistros=8;
+
+            $Columnas[0]="idFacturaCompra";     $Valores[0]=$idCompraNew;
+            $Columnas[1]="idProducto";          $Valores[1]=$DatosItems["idProducto"];
+            $Columnas[2]="Cantidad";            $Valores[2]=$DatosItems["Cantidad"];
+            $Columnas[3]="CostoUnitarioCompra"; $Valores[3]=$DatosItems["CostoUnitarioCompra"];
+            $Columnas[4]="SubtotalCompra";      $Valores[4]=$DatosItems["SubtotalCompra"];
+            $Columnas[5]="ImpuestoCompra";      $Valores[5]=$DatosItems["ImpuestoCompra"];
+            $Columnas[6]="TotalCompra";         $Valores[6]=$DatosItems["TotalCompra"];
+            $Columnas[7]="Tipo_Impuesto";       $Valores[7]=$DatosItems["Tipo_Impuesto"];
+
+            $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
+        }
+        /*
+        //Copio los items de los productos devueltos
+        $Datos= $this->ConsultarTabla("factura_compra_items_devoluciones", " WHERE idFacturaCompra='$idCompra'");
+        while($DatosItems=$this->FetchArray($Datos)){
+            $tab="factura_compra_items_devoluciones";
+            $NumRegistros=8;
+
+            $Columnas[0]="idFacturaCompra";     $Valores[0]=$idCompraNew;
+            $Columnas[1]="idProducto";          $Valores[1]=$DatosItems["idProducto"];
+            $Columnas[2]="Cantidad";            $Valores[2]=$DatosItems["Cantidad"];
+            $Columnas[3]="CostoUnitarioCompra"; $Valores[3]=$DatosItems["CostoUnitarioCompra"];
+            $Columnas[4]="SubtotalCompra";      $Valores[4]=$DatosItems["SubtotalCompra"];
+            $Columnas[5]="ImpuestoCompra";      $Valores[5]=$DatosItems["ImpuestoCompra"];
+            $Columnas[6]="TotalCompra";         $Valores[6]=$DatosItems["TotalCompra"];
+            $Columnas[7]="Tipo_Impuesto";       $Valores[7]=$DatosItems["Tipo_Impuesto"];
+
+            $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
+        }
+        */
+        //Copio los items de los servicios
+        $Datos= $this->ConsultarTabla("factura_compra_servicios", " WHERE idFacturaCompra='$idCompra'");
+        while($DatosItems=$this->FetchArray($Datos)){
+            //////Agrego el registro           
+            $tab="factura_compra_servicios";
+            $NumRegistros=8;
+
+            $Columnas[0]="idFacturaCompra";     $Valores[0]=$idCompraNew;
+            $Columnas[1]="CuentaPUC_Servicio";  $Valores[1]=$DatosItems["CuentaPUC_Servicio"];
+            $Columnas[2]="Nombre_Cuenta";       $Valores[2]=$DatosItems["Nombre_Cuenta"];
+            $Columnas[3]="Concepto_Servicio";   $Valores[3]=$DatosItems["Concepto_Servicio"];
+            $Columnas[4]="Subtotal_Servicio";   $Valores[4]=$DatosItems["Subtotal_Servicio"];
+            $Columnas[5]="Impuesto_Servicio";   $Valores[5]=$DatosItems["Impuesto_Servicio"];
+            $Columnas[6]="Total_Servicio";      $Valores[6]=$DatosItems["Total_Servicio"];
+            $Columnas[7]="Tipo_Impuesto";       $Valores[7]=$DatosItems["Tipo_Impuesto"];
+
+            $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
+        }
+        /*
+        //Copio los items de las retenciones
+        $Datos= $this->ConsultarTabla("factura_compra_retenciones", " WHERE idCompra='$idCompra'");
+        while($DatosItems=$this->FetchArray($Datos)){
+            //////Agrego el registro           
+            $tab="factura_compra_retenciones";
+            $NumRegistros=5;
+
+            $Columnas[0]="idCompra";            $Valores[0]=$idCompraNew;
+            $Columnas[1]="CuentaPUC";           $Valores[1]=$DatosItems["CuentaPUC"];
+            $Columnas[2]="NombreCuenta";        $Valores[2]=$DatosItems["NombreCuenta"];
+            $Columnas[3]="ValorRetencion";      $Valores[3]=$DatosItems["ValorRetencion"];
+            $Columnas[4]="PorcentajeRetenido";  $Valores[4]=$DatosItems["PorcentajeRetenido"];     
+
+            $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
+        }
+         * 
+         */
+    }
         
     /**
      * Fin Clase

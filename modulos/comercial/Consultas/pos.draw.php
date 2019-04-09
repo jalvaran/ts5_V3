@@ -271,7 +271,7 @@ if( !empty($_REQUEST["Accion"]) ){
                                     print("Seleccione un colaborador");
                                 $css->Coption();
                             while($DatosColaboradores=$obCon->FetchAssoc($Consulta)){
-                                $css->option("", "",'' , $DatosColaboradores["idColaboradores"], "", "", "", "");
+                                $css->option("", "",'' , $DatosColaboradores["Identificacion"], "", "", "", "");
                                     print($DatosColaboradores["Nombre"]." ".$DatosColaboradores["Identificacion"]);
                                 $css->Coption();
                             }
@@ -539,7 +539,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 print("Digite una palabra de más de 3 carácteres");
                 exit();
             }
-            $sql="SELECT sp.ID, cl.RazonSocial, cl.Num_Identificacion, sp.Total, sp.Saldo, sp.idCliente FROM separados sp"
+            $sql="SELECT sp.Fecha,sp.ID, cl.RazonSocial, cl.Num_Identificacion, sp.Total, sp.Saldo, sp.idCliente FROM separados sp"
                     . " INNER JOIN clientes cl ON sp.idCliente = cl.idClientes "
                     . " WHERE (sp.Estado<>'Cerrado' AND sp.Estado<>'ANULADO' AND sp.Saldo>0) AND (cl.RazonSocial LIKE '%$key%' OR cl.Num_Identificacion LIKE '%$key%') LIMIT 20";
             $Datos=$obCon->Query($sql);
@@ -548,7 +548,7 @@ if( !empty($_REQUEST["Accion"]) ){
 
                 while($DatosSeparado=$obCon->FetchArray($Datos)){
                     $css->FilaTabla(14);
-                    $css->ColTabla("<strong>Separado No. $DatosSeparado[ID]<strong>", 6);
+                    $css->ColTabla("<strong>Separado No. $DatosSeparado[ID]</strong>, del <strong>$DatosSeparado[Fecha]</strong>", 6);
                     $css->CierraFilaTabla();
                     $css->FilaTabla(14);
                     print("<td>");

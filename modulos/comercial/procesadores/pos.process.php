@@ -373,7 +373,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $idPreventa=$obCon->normalizar($_REQUEST['idPreventa']);            
             $pw=$obCon->normalizar($_REQUEST['TxtAutorizaciones']);
-            $pw=md5($pw);
+            //$pw=md5($pw);
             $sql="SELECT Identificacion FROM usuarios WHERE Password='$pw' AND (Role='ADMINISTRADOR' or Role='SUPERVISOR') LIMIT 1";
             $Datos=$obCon->Query($sql);
             $DatosAutorizacion=$obCon->FetchArray($Datos);
@@ -391,7 +391,7 @@ if( !empty($_REQUEST["Accion"]) ){
         case 10:// Colocar todos los precios de venta como mayoristas
             $idPreventa=$obCon->normalizar($_REQUEST['idPreventa']);            
             $pw=$obCon->normalizar($_REQUEST['TxtAutorizaciones']);
-            $pw=md5($pw);
+            //$pw=md5($pw);
             $sql="SELECT Identificacion FROM usuarios WHERE Password='$pw' AND (Role='ADMINISTRADOR' or Role='SUPERVISOR') LIMIT 1";
             $Datos=$obCon->Query($sql);
             $DatosAutorizacion=$obCon->FetchArray($Datos);
@@ -414,7 +414,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $idPreventa=$obCon->normalizar($_REQUEST['idPreventa']);            
             $pw=$obCon->normalizar($_REQUEST['TxtAutorizaciones']);
             $Descuento=$obCon->normalizar($_REQUEST['TxtPorcentajeDescuento']);
-            $pw=md5($pw);
+            //$pw=md5($pw);
             $sql="SELECT Identificacion FROM usuarios WHERE Password='$pw' AND (Role='ADMINISTRADOR' or Role='SUPERVISOR') LIMIT 1";
             $Datos=$obCon->Query($sql);
             $DatosAutorizacion=$obCon->FetchArray($Datos);
@@ -441,7 +441,7 @@ if( !empty($_REQUEST["Accion"]) ){
         case 12:// Colocar todos los precios segun una lista de precios
             $idPreventa=$obCon->normalizar($_REQUEST['idPreventa']);            
             $pw=$obCon->normalizar($_REQUEST['TxtAutorizaciones']);
-            $pw=md5($pw);
+            //$pw=md5($pw);
             $sql="SELECT Identificacion FROM usuarios WHERE Password='$pw' AND (Role='ADMINISTRADOR' or Role='SUPERVISOR') LIMIT 1";
             $Datos=$obCon->Query($sql);
             $DatosAutorizacion=$obCon->FetchArray($Datos);
@@ -493,7 +493,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $idPreventa=$obCon->normalizar($_REQUEST['idPreventa']);            
             $pw=$obCon->normalizar($_REQUEST['TxtAutorizaciones']);
             
-            $pw=md5($pw);
+            //$pw=md5($pw);
             $sql="SELECT Identificacion FROM usuarios WHERE Password='$pw' AND (Role='ADMINISTRADOR' or Role='SUPERVISOR') LIMIT 1";
             $Datos=$obCon->Query($sql);
             $DatosAutorizacion=$obCon->FetchArray($Datos);
