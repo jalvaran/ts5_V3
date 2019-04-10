@@ -223,3 +223,37 @@ INSERT INTO `menu_carpetas` (`ID`, `Ruta`, `Updated`, `Sync`) VALUES
 INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
 (188,	'Reporte de Ingresos y Ventas por plataformas',	18,	11,	0,	'',	1,	'',	'ReportesPlataformas.php',	'_SELF',	1,	'reportes.jpg',	3,	'2019-04-08 09:14:07',	'2018-04-08 09:14:07');
 
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+(189,	'Reportes',	32,	11,	0,	'',	1,	'',	'ReportesTitulos.php',	'_SELF',	1,	'reportes.jpg',	13,	'2019-04-08 09:14:07',	'2018-04-08 09:14:07');
+
+ALTER TABLE `documentos_contables` ADD `Prefijo` VARCHAR(20) NOT NULL AFTER `ID`;
+
+DROP TABLE IF EXISTS `documentos_contables`;
+CREATE TABLE `documentos_contables` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Prefijo` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
+  `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Descripcion` text COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `documentos_contables` (`ID`, `Prefijo`, `Nombre`, `Descripcion`, `Updated`, `Sync`) VALUES
+(1,	'CC-1',	'AJUSTE CONTABLE',	'Documento para generar ajustes a la contabilidad',	'2019-04-09 18:14:02',	'2018-04-09 13:10:53'),
+(2,	'CC-2',	'MOVIMIENTO DE CUENTAS',	'',	'2019-04-09 18:14:02',	'2018-04-09 13:13:00'),
+(3,	'CC-3',	'COSTEO',	'',	'2019-04-09 18:14:02',	'2018-04-09 13:13:00'),
+(4,	'CC-4',	'DIFERIDOS',	'',	'2019-04-09 18:14:02',	'2018-04-09 13:13:00'),
+(5,	'CC-5',	'LEGALIZACION DE VIATICOS',	'',	'2019-04-09 18:14:23',	'2018-04-09 13:13:00'),
+(6,	'CC-6',	'LEGALIZACION DE CAJAS MENORES',	'',	'2019-04-09 18:14:23',	'2018-04-09 13:13:00'),
+(7,	'CC-7',	'OBLIGACIONES FINANCIERAS',	'',	'2019-04-09 18:14:23',	'2018-04-09 13:13:00'),
+(8,	'CC-8',	'NOMINA',	'',	'2019-04-09 18:16:44',	'2018-04-09 13:13:00'),
+(9,	'CC-9',	'CIERRE CONTABLE',	'',	'2019-04-09 18:19:10',	'2018-04-09 13:13:00'),
+(10,	'CC-10',	'SALDOS INICIALES',	'',	'2019-04-09 18:17:12',	'2018-04-09 13:13:00'),
+(11,	'CC-11',	'DEPRECIACION',	'Para realizar depreciacion a los activos',	'2019-04-09 18:19:43',	'2018-04-09 13:11:57');
+
+ALTER TABLE `documentos_contables_control` ADD `idEmpresa` INT NOT NULL AFTER `idUser`, ADD `idSucursal` INT NOT NULL AFTER `idEmpresa`, ADD `idCentroCostos` INT NOT NULL AFTER `idSucursal`;
+ALTER TABLE `documentos_contables_control` ADD INDEX(`idEmpresa`);
+ALTER TABLE `documentos_contables_control` ADD INDEX(`idSucursal`);
+ALTER TABLE `documentos_contables_control` ADD INDEX(`idCentroCostos`);
+

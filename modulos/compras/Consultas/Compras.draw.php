@@ -399,8 +399,23 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CierraFilaTabla();
                     $css->FilaTabla(16);
                         $css->ColTabla("<strong>Subtotal:</strong>", 1,'R');
-                        $css->input("hidden", "TxtSubtotalProductos", "", "", "", $TotalesCompras["Subtotal_Productos_Add"], "", "", "", "");
-                        $css->ColTabla(number_format($TotalesCompras["Subtotal_Productos_Add"]), 1,'R');
+                        
+                        $css->ColTabla(number_format($TotalesCompras["Subtotal_Productos_Add"]+$TotalesCompras["Subtotal_Descuentos_Productos_Add"]), 1,'R');
+                    $css->CierraFilaTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Descuentos:</strong>", 1,'R');
+                        
+                        $css->ColTabla(number_format($TotalesCompras["Subtotal_Descuentos_Productos_Add"]), 1,'R');
+                    $css->CierraFilaTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Devoluciones:</strong>", 1,'R');
+                        
+                        $css->ColTabla(number_format($TotalesCompras["Subtotal_Productos_Dev"]), 1,'R');
+                    $css->CierraFilaTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Subtotal - Devoluciones - Descuentos:</strong>", 1,'R');
+                        $css->input("hidden", "TxtSubtotalProductos", "", "", "", $TotalesCompras["Subtotal_Productos"], "", "", "", "");
+                        $css->ColTabla(number_format($TotalesCompras["Subtotal_Productos"]), 1,'R');
                         print("<td>");
                             
                             $css->select("CmbImpRetDesProductos", "form-control", "CmbImpRetDesProductos", "", "", "", "onclick=MuestreOpcionesEnTotales(1)");
