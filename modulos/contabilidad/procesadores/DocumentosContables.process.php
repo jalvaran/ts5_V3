@@ -45,7 +45,49 @@ if( !empty($_REQUEST["Accion"]) ){
             $obCon->ActualizaRegistro("documentos_contables_control", "idCentroCostos", $CmbCentroCosto, "ID", $idDocumento,0);
             $DatosDocumento=$obCon->DevuelveValores("vista_documentos_contables", "ID", $idDocumento);
             print("OK;Documento $idDocumento editado;$DatosDocumento[Prefijo] $DatosDocumento[Nombre] $DatosDocumento[Consecutivo] $DatosDocumento[Descripcion]");
-        break; 
+        break; //Fin caso 2
+    
+        case 3: //Agrega un movimiento a un documento
+            $idDocumento=$obCon->normalizar($_REQUEST["idDocumento"]); 
+            $CuentaPUC=$obCon->normalizar($_REQUEST["CuentaPUC"]);            
+            $Tercero=$obCon->normalizar($_REQUEST["Tercero"]);
+            $TxtConcepto=$obCon->normalizar($_REQUEST["TxtConcepto"]);
+            $TipoMovimiento=$obCon->normalizar($_REQUEST["TipoMovimiento"]);
+            $Valor=$obCon->normalizar($_REQUEST["Valor"]);
+            if(!is_numeric($Valor)){
+                print("E1;El Campo Valor debe ser númerico");
+                exit();
+            }
+            $obCon->AgregaMovimientoDocumentoContable($idDocumento, $Tercero, $CuentaPUC, $TipoMovimiento, $Valor, $TxtConcepto, "", "");
+            print("OK;Movimiento Agregado");
+        break; //Fin caso 3
+        
+        case 4: //Eliminar un item de un documento
+            $idTabla=$obCon->normalizar($_REQUEST["Tabla"]);
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]); 
+            $Tabla="";
+            if($idTabla==1){
+                $Tabla="documentos_contables_items";
+            }
+            $obCon->BorraReg($Tabla, "ID", $idItem);
+            print("Item Eliminado");
+        break; //Fin caso 4
+        
+        case 5: //Guardar un documento contable
+            $idDocumento=$obCon->normalizar($_REQUEST["idDocumento"]);
+            
+            $Debitos=$obCon->Sume("documentos_contables_items", "Debito", "WHERE idDocumento='$idDocumento'");
+            $Creditos=$obCon->Sume("documentos_contables_items", "Credito", "WHERE idDocumento='$idDocumento'");
+            $Diferencia=$Debitos-$Creditos;
+            if($Diferencia<>0){
+                print("E1;El documento no está balanceado");
+                exit();
+            }
+            $obCon->GuardarDocumentoContable($idDocumento); 
+            $Ruta="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=32&idDocumentoContable=$idDocumento";
+            $Mensaje="Documento Guardado <a href='$Ruta' target='_blank'>Imprimir</>";
+            print("OK;$Mensaje");
+        break; //Fin caso 4
         
         
         

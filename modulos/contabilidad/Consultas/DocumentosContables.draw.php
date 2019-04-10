@@ -234,6 +234,93 @@ if( !empty($_REQUEST["Accion"]) ){
             print("<br><br><br><br><br><br><br><br><br>");
         break;//Fin caso 2
         
+        case 3://Dibuja los movimientos de un documento contable
+            
+            $idDocumento=$obCon->normalizar($_REQUEST["idDocumento"]);
+            if($idDocumento<=0 or $idDocumento==''){
+                print(" ");
+                exit();
+            }
+            $css->CrearTabla();
+                $css->FilaTabla(14);
+                    $css->ColTabla("<strong>TERCERO</strong>", 1);
+                    $css->ColTabla("<strong>CUENTA CONTABLE</strong>", 1);
+                    $css->ColTabla("<strong>NOMBRE DE LA CUENTA</strong>", 1);
+                    $css->ColTabla("<strong>DÉBITO</strong>", 1);
+                    $css->ColTabla("<strong>CRÉDITO</strong>", 1);
+                    $css->ColTabla("<strong>CONCEPTO</strong>", 1);
+                    $css->ColTabla("<strong>ACCIÓNES</strong>", 1);
+                $css->CierraFilaTabla();
+                
+                $Consulta=$obCon->ConsultarTabla("documentos_contables_items", "WHERE idDocumento='$idDocumento' ORDER BY ID DESC");
+                while($DatosItems=$obCon->FetchAssoc($Consulta)){
+                   $idItem=$DatosItems["ID"];
+                    $css->FilaTabla(14);
+                        $css->ColTabla($DatosItems["Tercero"], 1);
+                        $css->ColTabla($DatosItems["CuentaPUC"], 1);
+                        $css->ColTabla($DatosItems["NombreCuenta"], 1);
+                        $css->ColTabla($DatosItems["Debito"], 1);
+                        $css->ColTabla($DatosItems["Credito"], 1);
+                        $css->ColTabla($DatosItems["Concepto"], 1);
+                        print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");   
+                            
+                            $css->li("", "fa  fa-remove", "", "onclick=EliminarItem(`1`,`$idItem`) style=font-size:16px;cursor:pointer;text-align:center;color:red");
+                            $css->Cli();
+                        print("</td>");
+                    $css->CierraFilaTabla();
+                }
+            $css->CerrarTabla();
+            
+        break;//Fin caso 3
+        
+        case 4://Dibuja totales del documento
+            
+            $idDocumento=$obCon->normalizar($_REQUEST["idDocumento"]);
+            if($idDocumento<=0 or $idDocumento==''){
+                print(" ");
+                exit();
+            }
+            $Debitos=$obCon->Sume("documentos_contables_items", "Debito", "WHERE idDocumento='$idDocumento'");
+            $Creditos=$obCon->Sume("documentos_contables_items", "Credito", "WHERE idDocumento='$idDocumento'");
+            $Diferencia=$Debitos-$Creditos;
+            $sql="SELECT COUNT(*) as TotalItems FROM documentos_contables_items WHERE idDocumento='$idDocumento'";
+            $Consulta=$obCon->Query($sql);
+            $DatosConteo=$obCon->FetchAssoc($Consulta);
+            $TotalItems=$DatosConteo["TotalItems"];
+            $css->CrearTabla();
+                $css->FilaTabla(14);
+                    $css->ColTabla("<strong>MOVIMIENTOS</strong>", 1);
+                    $css->ColTabla(number_format($TotalItems), 1);
+                    
+                $css->CierraFilaTabla();
+                $css->FilaTabla(14);
+                    $css->ColTabla("<strong>DÉBITOS</strong>", 1);
+                    $css->ColTabla(number_format($Debitos), 1);
+                    
+                $css->CierraFilaTabla();
+                $css->FilaTabla(14);
+                    $css->ColTabla("<strong>CRÉDITOS</strong>", 1);
+                    $css->ColTabla(number_format($Creditos), 1);
+                    
+                $css->CierraFilaTabla();
+                $css->FilaTabla(14);
+                    $css->ColTabla("<strong>DIFERENCIA</strong>", 1);
+                    $css->ColTabla(number_format($Diferencia), 1);
+                    
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(14);
+                    print("<td colspan=2>");
+                        $enabled=0;
+                        if($Diferencia==0 and $TotalItems>0){
+                            $enabled=1;
+                        }
+                        $css->CrearBotonEvento("BtnGuardar", "Guardar", $enabled, "onclick", "GuardarDocumento()", "rojo", "");
+                    print("</td>");
+                $css->CierraFilaTabla();
+            $css->CerrarTabla();
+            
+        break;//Fin caso 4
         
     }
     

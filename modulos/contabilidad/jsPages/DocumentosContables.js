@@ -157,8 +157,124 @@ function CrearEditarDocumento(Accion){
 
 }
 
+/**
+ * Agrega un movimiento a un documento contablee
+ * @returns {undefined}
+ */
+function AgregarItem(){ 
+       
+    var idDocumento=document.getElementById('idDocumento').value;
+    var CuentaPUC = document.getElementById('CuentaPUC').value;
+    var Tercero = document.getElementById('Tercero').value;
+    var TxtConcepto = document.getElementById('TxtConcepto').value;
+    var TipoMovimiento = document.getElementById('TipoMovimiento').value;
+    var Valor = parseFloat(document.getElementById('Valor').value);
+    document.getElementById("BtnAgregarItem").disabled=true;
+    document.getElementById("BtnAgregarItem").value="Agregando";
+    
+    if(idDocumento==""){
+        alertify.alert("Debe seleccionar un Documento");
+        document.getElementById('idDocumento').style.backgroundColor="pink";
+        document.getElementById("BtnAgregarItem").disabled=false;
+        document.getElementById("BtnAgregarItem").value="Agregar";   
+        return;
+    }else{
+        document.getElementById('idDocumento').style.backgroundColor="white";
+    }
+    
+    
+    if(CuentaPUC==""){
+        alertify.alert("Debe seleccionar una Cuenta Contable");
+        document.getElementById('select2-CuentaPUC-container').style.backgroundColor="pink";
+        document.getElementById("BtnAgregarItem").disabled=false;
+        document.getElementById("BtnAgregarItem").value="Agregar";   
+        return;
+    }else{
+        document.getElementById('select2-CuentaPUC-container').style.backgroundColor="white";
+    }
+    
+    if(Tercero==""){
+        alertify.alert("Debe seleccionar una Tercero");
+        document.getElementById('select2-Tercero-container').style.backgroundColor="pink";
+        document.getElementById("BtnAgregarItem").disabled=false;
+        document.getElementById("BtnAgregarItem").value="Agregar";   
+        return;
+    }else{
+        document.getElementById('select2-Tercero-container').style.backgroundColor="white";
+    }
+    
+    if(TxtConcepto==""){
+        alertify.alert("El campo Concepto no puede estar vacío");
+        document.getElementById('TxtConcepto').style.backgroundColor="pink";
+        document.getElementById("BtnAgregarItem").disabled=false;
+        document.getElementById("BtnAgregarItem").value="Agregar";   
+        return;
+    }else{
+        document.getElementById('TxtConcepto').style.backgroundColor="white";
+    }
+    
+    if(!$.isNumeric(Valor) ||  Valor<=0){
+        
+        alertify.error("El Valor debe ser un número mayor a cero");
+        document.getElementById("Valor").style.backgroundColor="pink";   
+        document.getElementById("BtnAgregarItem").disabled=false;
+        document.getElementById("BtnAgregarItem").value="Agregar";   
+         
+        return;
+    }else{
+        document.getElementById("Valor").style.backgroundColor="white";
+    }
+    
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 3);        
+        form_data.append('idDocumento', idDocumento);
+        form_data.append('CuentaPUC', CuentaPUC);
+        form_data.append('Tercero', Tercero );
+        form_data.append('TxtConcepto', TxtConcepto);
+        form_data.append('TipoMovimiento', TipoMovimiento );
+        form_data.append('Valor', Valor );
+        
+         
+        $.ajax({
+        url: './procesadores/DocumentosContables.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+          var respuestas = data.split(';'); 
+          if (respuestas[0] == "OK"){ 
+              
+                var idDocumento=respuestas[1];                
+                alertify.success(respuestas[1]);                
+                document.getElementById('select2-CuentaPUC-container').innerHTML="Seleccione una Cuenta";
+                document.getElementById('CuentaPUC').value="";
+          }else{
+              alertify.alert("Error: "+data);
+              
+          }
+          document.getElementById("BtnAgregarItem").disabled=false;
+          document.getElementById("BtnAgregarItem").value="Agregar";
+          DibujeDocumento();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+            document.getElementById("BtnAgregarItem").disabled=false;
+            document.getElementById("BtnAgregarItem").value="Agregar";  
+          }
+      })  
 
-function DibujeDocumento(idDocumento){
+}
+/**
+ * Dibuja todos los elementos de un documento contable
+ * @param {type} idDocumento
+ * @returns {undefined}
+ */
+function DibujeDocumento(idDocumento=''){
     
     if(document.getElementById('idDocumento').value==""){
         document.getElementById('BtnEditar').disabled=true;
@@ -174,6 +290,145 @@ function DibujeDocumento(idDocumento){
     DibujeTotales(idDocumento);
     
 }
+/**
+ * Dibuja los movimientos de un documento contable
+ * @param {type} idDocumento
+ * @returns {undefined}
+ */
+function DibujeItems(idDocumento){
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 3);
+        form_data.append('idDocumento', idDocumento);
+        $.ajax({
+        url: './Consultas/DocumentosContables.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivItems').innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+/**
+ * Dibuja los totales del documento
+ * @param {type} idDocumento
+ * @returns {undefined}
+ */
+function DibujeTotales(idDocumento){
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 4);
+        form_data.append('idDocumento', idDocumento);
+        $.ajax({
+        url: './Consultas/DocumentosContables.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivTotales').innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+/**
+ * 
+ * @param {type} idTabla
+ * @param {type} idItem
+ * @returns {undefined}
+ */
+function EliminarItem(Tabla,idItem){
+    var form_data = new FormData();
+        form_data.append('Accion', 4);
+        form_data.append('Tabla', Tabla);
+        form_data.append('idItem', idItem);
+        $.ajax({
+        url: './procesadores/DocumentosContables.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            alertify.error(data);
+            DibujeDocumento();
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function GuardarDocumento(idDocumento=''){
+    document.getElementById('BtnGuardar').disabled=true;
+    document.getElementById('BtnGuardar').value="Guardando...";
+    if(idDocumento==''){
+        var idDocumento = document.getElementById('idDocumento').value;
+    }
+        
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '5'); 
+        form_data.append('idDocumento', idDocumento);
+        
+        
+        $.ajax({
+        url: './procesadores/DocumentosContables.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                var mensaje=respuestas[1];
+                LimpiarDivs();
+                var x = document.getElementById("idDocumento");
+                x.remove(x.selectedIndex);
+                document.getElementById('BtnEditar').disabled=true;
+                alertify.alert(mensaje);
+                
+            }else{
+                alertify.alert("Error: <br>"+data);
+                document.getElementById('BtnGuardar').disabled=false;
+                document.getElementById('BtnGuardar').value="Guardar";
+            }
+            
+            //DibujeTotalesCompra(idCompra);
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function LimpiarDivs(){
+    document.getElementById('DivItems').innerHTML='';
+    document.getElementById('DivTotales').innerHTML='';
+}
+
 /**
  * Inicializa el modulo
  * @returns {undefined}

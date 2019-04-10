@@ -257,3 +257,9 @@ ALTER TABLE `documentos_contables_control` ADD INDEX(`idEmpresa`);
 ALTER TABLE `documentos_contables_control` ADD INDEX(`idSucursal`);
 ALTER TABLE `documentos_contables_control` ADD INDEX(`idCentroCostos`);
 
+ALTER TABLE `documentos_contables_items`
+  DROP `Nombre_Documento`,
+  DROP `Numero_Documento`,
+  DROP `Fecha`,
+  DROP `CentroCostos`;
+

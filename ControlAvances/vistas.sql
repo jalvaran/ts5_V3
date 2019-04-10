@@ -240,7 +240,7 @@ WHERE s.Estado='Abierto' ;
 
 DROP VIEW IF EXISTS `vista_documentos_contables`;
 CREATE VIEW vista_documentos_contables AS
-SELECT  dcc.`ID`,dcc.`Fecha`,dc.`Prefijo` as Prefijo,dc.`Nombre` as Nombre,dcc.`Consecutivo`,dcc.`Descripcion`,dcc.Estado,dcc.idUser,dcc.`idDocumento`
+SELECT  dcc.`ID`,dcc.`Fecha`,dc.`Prefijo` as Prefijo,dc.`Nombre` as Nombre,dcc.`Consecutivo`,dcc.`Descripcion`,dcc.Estado,dcc.idUser,dcc.`idDocumento`,dcc.`idEmpresa`,dcc.`idSucursal`,dcc.`idCentroCostos`
 FROM `documentos_contables_control` dcc INNER JOIN documentos_contables dc ON dc.ID=dcc.`idDocumento`;
 
 
