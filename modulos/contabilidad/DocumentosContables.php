@@ -37,31 +37,40 @@ $css->PageInit($myTitulo);
                 print("<a href='#'>Opciones Adicionales:</a>");
             $css->Clegend();   
             $css->CrearDiv("", "col-md-3", "left", 1, 1);
-                $css->CrearBotonEvento("BtnCrearTercero", "Crear Tercero", 1, "onclick", "ModalCrearTercero(`ModalAccionesGrande`,`DivFrmModalAccionesGrande`);", "azul", "");
+                $css->CrearBotonEvento("BtnCrearTercero", "Crear Tercero", 1, "onclick", "ModalCrearTercero(`ModalAcciones`,`DivFrmModalAcciones`);", "azul", "");
                 
                 
             $css->CerrarDiv();
             
             $css->CrearDiv("", "col-md-3", "left", 1, 1);
-                $css->CrearBotonEvento("BtnHistorialDocumentos", "Historial de Documentos", 1, "onclick", "SeleccioneTablaDB(`vista_documentos_contables_control`);", "azul", "");
+                $css->CrearBotonEvento("BtnHistorialDocumentos", "Historial de Documentos", 1, "onclick", "SeleccioneTablaDB(`vista_documentos_contables`);", "azul", "");
             $css->CerrarDiv();
             
             $css->CrearDiv("", "col-md-3", "left", 1, 1);
-                $css->CrearBotonEvento("BtnHistorialAbonos", "Historial de Abonos", 1, "onclick", "SeleccioneTablaDB(`comprobantes_ingreso`);", "azul", "");
+                $css->select("CmbTipoDocumentoAcciones", "form-control", "CmbTipoDocumentoAcciones", "", "", "", "");
+                    
+                    $Consulta=$obCon->ConsultarTabla("documentos_contables", "");
+                    while($DatosDocumentos=$obCon->FetchAssoc($Consulta)){
+                        $css->option("", "", "", $DatosDocumentos["ID"], "", "");
+                            print($DatosDocumentos["Prefijo"]." ".$DatosDocumentos["Nombre"]);
+                        
+                        $css->Coption();
+                    }
+                $css->Cselect();
+                
             $css->CerrarDiv();
             
             $css->CrearDiv("", "col-md-3", "left", 1, 1);
             
-            print('<div class="input-group input-group-lg">
-                <input type="text" id="idCotizacionAcciones" class="form-control" placeholder="Cotización">
+            print('<div class="input-group input-group-md">
+                <input type="text" id="idDocumentoAcciones" class="form-control" placeholder="id Documento">
                 <div class="input-group-btn">
                   <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-expanded="false" >Acción
                     <span class="fa fa-caret-down"></span></button>
                     <ul class="dropdown-menu">
                     
-                        <li><a href="#" onclick="AbrirCotizacion()">Abrir</a></li>
-                        <li><a href="#" onclick="ClonarCotizacion()">Clonar</a></li>
-                        <li><a href="#" onclick="CopiarCotizacion()">Copiar</a></li>
+                        <li><a href="#" onclick="CopiarDocumento()">Copiar</a></li>
+                        
                     
                   </ul>
                 </div>
@@ -74,104 +83,108 @@ $css->PageInit($myTitulo);
         $css->Cfieldset();
         print("<br><br>");
     $css->CerrarDiv();  
-    $css->CrearDiv("DivOpcionesCrearCotizaciones", "col-md-12", "left", 1, 1); 
+    $css->CrearDiv("DivOpcionesCrear", "col-md-12", "left", 1, 1); 
     $css->CrearDiv("DivMensajesModulo", "", "center", 1, 1); 
     $css->CerrarDiv();  
     
-        $css->fieldset("", "", "FieldDatosCotizacion", "DatosCotizacion", "", "");
+        $css->fieldset("", "", "FieldDatos", "Datos", "", "");
             $css->legend("", "");
-                print("<a href='#'>Cree, Seleccione o imprima una Cotización</a>");
+                print("<a href='#'>Cree, Seleccione un documento</a>");
             $css->Clegend();   
             
         $css->CrearDiv("DivBtnCrear", "col-md-2", "left", 1, 1); 
-            $css->CrearBotonEvento("BtnNuevaCotizacion", "Crear Cotizacion", 1, "onClick", "AbrirModalNuevaCotizacion()", "azul", "");
+            $css->CrearBotonEvento("BtnNuevo", "Crear Documento", 1, "onClick", "AbrirModalNuevoDocumento()", "azul", "");
         $css->CerrarDiv();
-        $css->CrearDiv("DivDatosCotizacion", "col-md-8", "left", 1, 1); 
-            $css->select("idCotizacion", "form-control", "idCotizacion", "", "", "onchange=DibujeCotizacion()", "");
+        $css->CrearDiv("DivDatosDocumento", "col-md-8", "left", 1, 1); 
+            $css->select("idDocumento", "form-control", "idDocumento", "", "", "onchange=DibujeDocumento()", "");
             $css->option("", "", "","", "", "");
-                print("Seleccione una Cotización");
+                print("Seleccione un Documento");
             $css->Coption();
-            $consulta = $obCon->ConsultarTabla("cotizacionesv5","WHERE Estado='ABIERTA'");
-            while($DatosCotizacion=$obCon->FetchArray($consulta)){
+            $consulta = $obCon->ConsultarTabla("vista_documentos_contables","WHERE Estado='ABIERTO'");
+            while($DatosDocumento=$obCon->FetchArray($consulta)){
                 
-                $DatosTercero=$obCon->DevuelveValores("clientes", "idClientes", $DatosCotizacion['Clientes_idClientes']);
-                $css->option("", "", "", $DatosCotizacion['ID'], "", "");
-                    print($DatosCotizacion['ID']." ".$DatosTercero["RazonSocial"]);
+                
+                $css->option("", "", "", $DatosDocumento['ID'], "", "");
+                    print($DatosDocumento['Prefijo']." ".$DatosDocumento["Nombre"]." ".$DatosDocumento["Consecutivo"]." ".$DatosDocumento["Descripcion"]);
                 $css->Coption();
             }
             $css->Cselect();
            
         $css->CerrarDiv();
         $css->CrearDiv("DivBtnEditar", "col-md-2", "left", 1, 1); 
-            $css->CrearBotonEvento("BtnEditar", "Editar Datos", 0, "onClick", "AbrirModalNuevaCotizacion('Editar')", "azul", "");
+            $css->CrearBotonEvento("BtnEditar", "Editar Datos", 0, "onClick", "AbrirModalNuevoDocumento('Editar')", "azul", "");
         $css->CerrarDiv();
         
         $css->Cfieldset(); 
     $css->CerrarDiv();
     print("<br><br><br><br><br><br><br><br><br>");
-    $css->CrearDiv("DivDatos", "col-md-12", "left", 1, 1); //Datos para la creacion de la compra
+    $css->CrearDiv("DivDatos", "col-md-12", "left", 1, 1); //Datos para la creacion del documento
         $css->fieldset("", "", "FieldDatos", "Datos", "", "");
                     $css->legend("", "");
-                        print("<a href='#'>Agregar items</a>");
+                        print("<a href='#'>Agregar Conceptos</a>");
                     $css->Clegend();    
         $css->CrearDiv("DivAgregarItems", "", "center", 1, 1);   
             $css->CrearDiv("", "col-md-3", "center", 1, 1);
-                $css->select("CmbListado", "form-control", "CmbListado", "Listado", "", "", "onchange=ConvertirSelectBusquedas()");
-                    $css->option("", "", "", 1, "", "");
-                        print("Productos para la venta");
+                $css->select("CuentaPUC", "form-control", "CuentaPUC", "Cuenta PUC", "", "", "");
+                    $css->option("", "", "", "", "", "");
+                        print("Seleccione una Cuenta");
                     $css->Coption();
-                    $css->option("", "", "", 2, "", "");
-                        print("Servicios");
-                    $css->Coption();
-                    $css->option("", "", "", 3, "", "");
-                        print("Productos para alquilar");
-                    $css->Coption();
-                    //$css->option("", "", "", 4, "", "");
-                      //  print("Otros");
-                    //$css->Coption();
+                    
                 $css->Cselect();
             $css->CerrarDiv();
             
-            $css->CrearDiv("", "col-md-5", "center", 1, 1);
-                $css->select("CmbBusquedas", "form-control", "CmbBusquedas", "Búsquedas<br>", "", "", "style=width:100%");
+            $css->CrearDiv("", "col-md-3", "center", 1, 1);
+                $css->select("Tercero", "form-control", "Tercero", "Tercero<br>", "", "", "style=width:100%");
                    
                     $css->option("", "", "", "", "", "");
-                        print("Buscar");
+                        print("Tercero");
                     $css->Coption();
                     
                     
                 $css->Cselect();
             $css->CerrarDiv();            
             
-                        
             $css->CrearDiv("", "col-md-2", "center", 1, 1);
-               print("<strong>Cantidad</strong>");
-               $css->input("number", "Cantidad", "form-control", "Cantidad", "Cantidad", "", "Cantidad", "off", "", "");
-            $css->CerrarDiv();
+                print("<strong>Concepto</strong><br>");
+                $css->textarea("TxtConcepto", "form-control", "TxtConcepto", "<strong>Concepto</strong>", "Concepto", "", "");
+                $css->Ctextarea();
+            $css->CerrarDiv();  
             
             $css->CrearDiv("", "col-md-2", "center", 1, 1);
-               print("<strong>Valor Unitario</strong>");
-               $css->input("text", "ValorUnitario", "form-control", "ValorUnitario", "Valor Unitario", "", "Valor Unitario", "off", "", "");
+            
+                $css->select("TipoMovimiento", "form-control", "TipoMovimiento", "Movimiento<br>", "", "", "");
+                    
+                    $css->option("", "", "", "DB", "", "");
+                        print("Débito");
+                    $css->Coption();
+                    
+                    $css->option("", "", "", "CR", "", "");
+                        print("Crédito");
+                    $css->Coption();
+                    
+                    
+                $css->Cselect();
+             $css->CerrarDiv();  
+            
+            $css->CrearDiv("", "col-md-2", "center", 1, 1);
+               print("<strong>Valor</strong>");
+               $css->input("number", "Valor", "form-control", "Valor", "Valor", "", "Valor", "off", "", "");
+            
+                
+                $css->CrearBotonEvento("BtnAgregarItem", "Agregar", 1, "onClick", "AgregarItem()", "verde", "");
             $css->CerrarDiv();
-            //print("<br><br><br><br>");
-            $css->CrearDiv("", "col-md-3", "center", 1, 1);
-            $css->CerrarDiv();
-            $css->CrearDiv("DivBtnAregar", "col-md-5", "left", 1, 1); 
-                $css->CrearBotonEvento("BtnAgregarItem", "Agregar Item", 1, "onClick", "AgregarItem()", "verde", "");
-            $css->CerrarDiv();
-            $css->CrearDiv("", "col-md-4", "center", 1, 1);
-            $css->CerrarDiv();
+            
         
         $css->CerrarDiv();       
             $css->Cfieldset();
     $css->CerrarDiv();
     //$css->CerrarDiv();
 
-    print("<br>");
-    $css->CrearDiv("DivDatosCompras", "col-md-8", "left", 1, 1); //Datos para la creacion de la compra
-        $css->fieldset("", "", "FieldDatosCompra", "items en esta compra", "", "");
+    print("<br><br><br><br><br><br><br><br>");
+    $css->CrearDiv("DivDatosDocumento", "col-md-8", "left", 1, 1); //Datos para la creacion de la compra
+        $css->fieldset("", "", "FieldDatosDocumento", "Movimiento agregados", "", "");
             $css->legend("", "");
-                print("<a href='#'>Items Agregados</a>");
+                print("<a href='#'>Movimientos Agregados</a>");
             $css->Clegend();    
             $css->CrearDiv("DivItems", "", "center", 1, 1,"","height: 400px;overflow: auto;");   
 
@@ -180,7 +193,7 @@ $css->PageInit($myTitulo);
         $css->CerrarDiv();
         
         $css->CrearDiv("DivInfoTotales", "col-md-4", "left", 1, 1); //Datos para la creacion de la compra
-        $css->fieldset("", "", "FieldDatosCompra", "Totales", "", "");
+        $css->fieldset("", "", "FieldDatosDocumento", "Totales", "", "");
             $css->legend("", "");
                 print("<a href='#'>Totales y Opciones del Documento</a>");
             $css->Clegend();    
@@ -196,7 +209,7 @@ $css->PageInit($myTitulo);
 
 $css->PageFin();
 
-print('<script src="jsPages/Cotizaciones.js"></script>');  //script propio de la pagina
+print('<script src="jsPages/DocumentosContables.js"></script>');  //script propio de la pagina
 
 $css->Cbody();
 $css->Chtml();

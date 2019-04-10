@@ -786,14 +786,17 @@ $tbl.= "</table>";
         $this->PDF_Encabezado_Documento_Contable($DatosDocumento, $DescripcionDocumento, "");
         
         
-        $Position=$this->PDF->SetY(60);
+        $Position=$this->PDF->SetY(65);
         
         
         $sql="SELECT Tercero_Identificacion,NombreCuenta,Tercero_Razon_Social ,CuentaPUC,Debito,Credito FROM librodiario "
                 . "WHERE Tipo_Documento_Intero='$NombreDocumento' AND Num_Documento_Interno='$Consecutivo'";
         $html=$this->HTML_Movimientos_Resumen($sql, $Vector);
         $this->PDF_Write("<BR><BR><BR><strong>MOVIMIENTOS CONTABLES:</strong><BR>".$html);
-                
+        
+
+        $html=$this->FirmaDocumentos();
+        $this->PDF_Write("<BR>".$html);
         $this->PDF_Output("$Documento");
     }
     

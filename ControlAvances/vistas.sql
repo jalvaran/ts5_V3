@@ -238,3 +238,9 @@ SELECT si.`ID`,si.`idSeparado` as idSeparado,`Referencia`,`Nombre`,si.ValorUnita
 FROM `separados_items` si INNER JOIN separados s ON s.ID=si.`idSeparado` 
 WHERE s.Estado='Abierto' ;
 
+DROP VIEW IF EXISTS `vista_documentos_contables`;
+CREATE VIEW vista_documentos_contables AS
+SELECT  dcc.`ID`,dcc.`Fecha`,dc.`Prefijo` as Prefijo,dc.`Nombre` as Nombre,dcc.`Consecutivo`,dcc.`Descripcion`,dcc.Estado,dcc.idUser,dcc.`idDocumento`
+FROM `documentos_contables_control` dcc INNER JOIN documentos_contables dc ON dc.ID=dcc.`idDocumento`;
+
+
