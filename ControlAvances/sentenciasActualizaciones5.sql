@@ -263,3 +263,6 @@ ALTER TABLE `documentos_contables_items`
   DROP `Fecha`,
   DROP `CentroCostos`;
 
+INSERT INTO `comercial_plataformas_pago` (`ID`, `Nombre`, `NIT`, `Activa`, `Updated`, `Sync`) VALUES
+(1,	'SisteCredito',	811007713,	1,	'2019-04-11 09:17:16',	'0000-00-00 00:00:00');
+

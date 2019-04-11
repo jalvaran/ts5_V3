@@ -161,7 +161,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                         while($DatosCuenta=$obCon->FetchAssoc($consulta)){
                             $Sel=0;
-                            if($DatosDocumentoGeneral["idEmpresa"]==$DatosCuenta["idEmpresa"]){
+                            if($DatosDocumentoGeneral["idEmpresa"]==$DatosCuenta["idEmpresaPro"]){
                                 $Sel=1;
                             }
                             $css->option("", "", "", $DatosCuenta["idEmpresaPro"], "", "",$Sel);
@@ -184,7 +184,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                         while($DatosCuenta=$obCon->FetchAssoc($consulta)){
                             $Sel=0;
-                            if($DatosDocumentoGeneral["idSucursal"]==$DatosCuenta["idSucursal"]){
+                            if($DatosDocumentoGeneral["idSucursal"]==$DatosCuenta["ID"]){
                                 $Sel=1;
                             }
                             $css->option("", "", "", $DatosCuenta["ID"], "", "",$Sel);
@@ -207,7 +207,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                         while($DatosCuenta=$obCon->FetchAssoc($consulta)){
                             $Sel=0;
-                            if($DatosDocumentoGeneral["idCentroCostos"]==$DatosCuenta["idCentroCostos"]){
+                            if($DatosDocumentoGeneral["idCentroCostos"]==$DatosCuenta["ID"]){
                                 $Sel=1;
                             }
                             $css->option("", "", "", $DatosCuenta["ID"], "", "");
@@ -245,7 +245,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->FilaTabla(14);
                     $css->ColTabla("<strong>TERCERO</strong>", 1);
                     $css->ColTabla("<strong>CUENTA CONTABLE</strong>", 1);
-                    $css->ColTabla("<strong>NOMBRE DE LA CUENTA</strong>", 1);
+                    
                     $css->ColTabla("<strong>DÉBITO</strong>", 1);
                     $css->ColTabla("<strong>CRÉDITO</strong>", 1);
                     $css->ColTabla("<strong>CONCEPTO</strong>", 1);
@@ -256,11 +256,38 @@ if( !empty($_REQUEST["Accion"]) ){
                 while($DatosItems=$obCon->FetchAssoc($Consulta)){
                    $idItem=$DatosItems["ID"];
                     $css->FilaTabla(14);
-                        $css->ColTabla($DatosItems["Tercero"], 1);
-                        $css->ColTabla($DatosItems["CuentaPUC"], 1);
-                        $css->ColTabla($DatosItems["NombreCuenta"], 1);
-                        $css->ColTabla($DatosItems["Debito"], 1);
-                        $css->ColTabla($DatosItems["Credito"], 1);
+                        print("<td>");
+                            $css->select("CmbTerceroItems_$idItem","form-control", "CmbTerceroItems_$idItem", "", "", "onclick=ConviertaSelectTerceroItems($idItem)", "style=width:100%");
+                                $css->option("", "", "", $DatosItems["Tercero"], "", "");
+                                    print($DatosItems["Tercero"]);
+                                $css->Coption();
+                            $css->Cselect();
+                        print("</td>");
+                        print("<td>");
+                            $css->select("CmbCuentaPUCItems_$idItem","form-control", "CmbCuentaPUCItems_$idItem", "", "", "onclick=ConviertaSelectItems($idItem)", "style=width:100%");
+                                $css->option("", "", "", $DatosItems["CuentaPUC"], "", "");
+                                    print($DatosItems["CuentaPUC"]." ".$DatosItems["NombreCuenta"]);
+                                $css->Coption();
+                            $css->Cselect();
+                        print("</td>");
+                        
+                        if($DatosItems["Debito"]>0){
+                            print("<td>");
+                                $css->input("number", "TxtValorItems_$idItem", "form-control", "TxtValorItems_$idItem", "", $DatosItems["Debito"], "Débito", "off", "", "onchange=EditeDebitoCredito(`DB`,`$idItem`)");
+                            print("</td>");
+                        }else{
+                            $css->ColTabla($DatosItems["Debito"], 1);
+                        }
+                        
+                        if($DatosItems["Credito"]>0){
+                            print("<td>");
+                                $css->input("number", "TxtValorItems_$idItem", "form-control", "TxtValorItems_$idItem", "", $DatosItems["Credito"], "Credito", "off", "", "onchange=EditeDebitoCredito(`CR`,`$idItem`)");
+                            print("</td>");
+                        }else{
+                            $css->ColTabla($DatosItems["Credito"], 1);
+                        }
+                        
+                        
                         $css->ColTabla($DatosItems["Concepto"], 1);
                         print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");   
                             

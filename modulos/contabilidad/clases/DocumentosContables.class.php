@@ -130,13 +130,31 @@ class DocumentosContables extends ProcesoVenta{
         return($sqlValores);
         
     }
-    
+    /**
+     * Guarda un documento contable
+     * @param type $idDocumento
+     */
     function GuardarDocumentoContable($idDocumento) {
         $sql=$this->getSQLDocumentoContableLibroDiario($idDocumento);
         //print($sql);
         $this->Query($sql);
         $this->ActualizaRegistro("documentos_contables_control", "Estado", "CERRADO", "ID", $idDocumento);
     }
+    
+    public function CopiarItemsDocumento($idDocumentoACopiar,$idDocumentoDestino) {
+            
+        $Consulta=$this->ConsultarTabla("documentos_contables_items", "WHERE idDocumento='$idDocumentoACopiar'");
+        while($DatosMovimiento= $this->FetchAssoc($Consulta)){
+            $TipoMovimiento="CR";
+            $Valor=$DatosMovimiento["Credito"];
+            if($DatosMovimiento["Debito"]<>0){
+                $TipoMovimiento="DB";
+                $Valor=$DatosMovimiento["Debito"];
+            }
+            $this->AgregaMovimientoDocumentoContable($idDocumentoDestino, $DatosMovimiento["Tercero"], $DatosMovimiento["CuentaPUC"], $TipoMovimiento, $Valor, $DatosMovimiento["Concepto"], $DatosMovimiento["NumDocSoporte"], $DatosMovimiento["Soporte"]);
+        }
+            
+        }
     /**
      * Fin Clase
      */

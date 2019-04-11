@@ -181,7 +181,7 @@ $css->PageInit($myTitulo);
     //$css->CerrarDiv();
 
     print("<br><br><br><br><br><br><br><br>");
-    $css->CrearDiv("DivDatosDocumento", "col-md-8", "left", 1, 1); //Datos para la creacion de la compra
+    $css->CrearDiv("DivDatosDocumento", "col-md-9", "left", 1, 1); //Datos para la creacion de la compra
         $css->fieldset("", "", "FieldDatosDocumento", "Movimiento agregados", "", "");
             $css->legend("", "");
                 print("<a href='#'>Movimientos Agregados</a>");
@@ -192,10 +192,10 @@ $css->PageInit($myTitulo);
         $css->Cfieldset();
         $css->CerrarDiv();
         
-        $css->CrearDiv("DivInfoTotales", "col-md-4", "left", 1, 1); //Datos para la creacion de la compra
+        $css->CrearDiv("DivInfoTotales", "col-md-3", "left", 1, 1); //Datos para la creacion de la compra
         $css->fieldset("", "", "FieldDatosDocumento", "Totales", "", "");
             $css->legend("", "");
-                print("<a href='#'>Totales y Opciones del Documento</a>");
+                print("<a href='#'>Totales</a>");
             $css->Clegend();    
            
             $css->CrearDiv("DivTotales", "", "center", 1, 1);   

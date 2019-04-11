@@ -87,7 +87,79 @@ if( !empty($_REQUEST["Accion"]) ){
             $Ruta="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=32&idDocumentoContable=$idDocumento";
             $Mensaje="Documento Guardado <a href='$Ruta' target='_blank'>Imprimir</>";
             print("OK;$Mensaje");
-        break; //Fin caso 4
+        break; //Fin caso 5
+        
+        case 6: //Guardar un documento contable
+            $idDocumentoDestino=$obCon->normalizar($_REQUEST["idDocumento"]);
+            $idDocumentoACopiar=$obCon->normalizar($_REQUEST["idDocumentoACopiar"]);
+            if($idDocumentoDestino==''){
+                print("Debe seleccionar un documento destino");
+                exit();
+            }
+            if($idDocumentoACopiar==''){
+                print("Debe seleccionar un documento a copiar");
+                exit();
+            }
+            $obCon->CopiarItemsDocumento($idDocumentoACopiar, $idDocumentoDestino);
+            print("OK");
+        break; //Fin caso 6
+        
+        case 7: //Editar el valor de un debito o un Credito en un movimiento de un documento contable
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $Valor=$obCon->normalizar($_REQUEST["Valor"]);
+            $TipoMovimiento=$obCon->normalizar($_REQUEST["TipoMovimiento"]);
+            if($Valor==''){
+                print("Debe Escribir un valor");
+                exit();
+            }
+            if(!is_numeric($Valor)){
+                print("El valor debe ser númerico");
+                exit();
+            }
+            if($TipoMovimiento=="DB"){
+                $CampoEditar="Debito";
+            }else{
+                $CampoEditar="Credito";
+            }
+            $obCon->ActualizaRegistro("documentos_contables_items", $CampoEditar, $Valor, "ID", $idItem);
+            print("OK");
+        break; //Fin caso 7
+        
+        case 8: //Editar el valor de un debito o un Credito en un movimiento de un documento contable
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $CuentaPUC=$obCon->normalizar($_REQUEST["CuentaPUC"]);
+            
+            if($CuentaPUC==''){
+                print("Debe Escribir un valor");
+                exit();
+            }
+            if(!is_numeric($CuentaPUC)){
+                print("El valor debe ser númerico");
+                exit();
+            }
+            $DatosCuentas=$obCon->DevuelveValores("subcuentas", "PUC", $CuentaPUC);
+            $obCon->ActualizaRegistro("documentos_contables_items", "CuentaPUC", $CuentaPUC, "ID", $idItem);
+            $obCon->ActualizaRegistro("documentos_contables_items", "NombreCuenta", $DatosCuentas["Nombre"], "ID", $idItem);
+            print("OK");
+        break; //Fin caso 8
+        
+        case 9: //Editar el un tercero 
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $Tercero=$obCon->normalizar($_REQUEST["Tercero"]);
+            
+            if($Tercero==''){
+                print("Debe Escribir un valor");
+                exit();
+            }
+            if(!is_numeric($Tercero)){
+                print("El valor debe ser númerico");
+                exit();
+            }
+            
+            $obCon->ActualizaRegistro("documentos_contables_items", "Tercero", $Tercero, "ID", $idItem);
+           
+            print("OK");
+        break; //Fin caso 9
         
         
         
