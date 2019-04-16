@@ -105,7 +105,7 @@ $css->PageInit($myTitulo);
                 
                 
                 $css->option("", "", "", $DatosDocumento['ID'], "", "");
-                    print($DatosDocumento['Prefijo']." ".$DatosDocumento["Nombre"]." ".$DatosDocumento["Consecutivo"]." ".$DatosDocumento["Descripcion"]);
+                    print($DatosDocumento['Fecha']." ".$DatosDocumento['Prefijo']." ".$DatosDocumento["Nombre"]." ".$DatosDocumento["Consecutivo"]." ".$DatosDocumento["Descripcion"]);
                 $css->Coption();
             }
             $css->Cselect();

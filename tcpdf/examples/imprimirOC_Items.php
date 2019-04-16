@@ -100,6 +100,7 @@ $tbl = <<<EOD
         
 EOD;
 
+
 $pdf->MultiCell(180, 30, $tbl, 1, 'L', 1, 0, '', '', true,0, true, true, 10, 'M');
 
 ?>

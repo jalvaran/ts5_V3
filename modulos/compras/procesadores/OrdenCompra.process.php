@@ -185,7 +185,7 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK");
         break;//Fin caso 8
         
-        case 9://Guardo la factura
+        case 9://Guardo la orden de compra
             $idCompra=$obCon->normalizar($_REQUEST["idCompra"]);
             
             $obCon->ActualizaRegistro("ordenesdecompra", "Estado", "CERRADA", "ID", $idCompra);
@@ -196,6 +196,50 @@ if( !empty($_REQUEST["Accion"]) ){
             
             print("OK;$Mensaje");
         break;//Fin caso 9
+    
+        case 10://Copio una orden de compra
+            $idCompra=$obCon->normalizar($_REQUEST["idCompra"]);
+            $idOrdenACopiar=$obCon->normalizar($_REQUEST["idOrdenCompra"]);
+            if(!is_numeric($idCompra) or $idCompra==""){
+                print("E1;La orden Debe ser un número mayor a cero");
+                exit();
+            }
+            
+            if(!is_numeric($idOrdenACopiar) or $idOrdenACopiar==""){
+                print("E1;La orden a Copiar Debe ser un número mayor a cero");
+                exit();
+            }
+            
+            $obCon->CopiarItemsOrdenCompra($idOrdenACopiar, $idCompra);
+            
+            print("OK;La Orden No. $idOrdenACopiar fue Copiada en la Orden $idCompra");
+        break;//Fin caso 10
+        
+        
+        case 11://edito la cantidad de un item
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            
+            $Valor=$obCon->normalizar($_REQUEST["Valor"]); 
+            if(!isset($Valor) or $Valor<=0){
+                print("el valor digitado debe ser un numero mayor a cero");
+                exit();
+            }
+            $sql="UPDATE ordenesdecompra_items SET Cantidad=round('$Valor',2),Subtotal=ValorUnitario*Cantidad,IVA=round(Subtotal*Tipo_Impuesto,2), Total=Subtotal+IVA WHERE ID='$idItem'";
+            $obCon->Query($sql);
+            print("OK");
+        break;//Fin caso 11
+        
+        case 12://edito el valor unitario de un item
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);            
+            $Valor=$obCon->normalizar($_REQUEST["Valor"]); 
+            if(!isset($Valor) or $Valor<=0){
+                print("el valor digitado debe ser un numero mayor a cero");
+                exit();
+            }
+            $sql="UPDATE ordenesdecompra_items SET ValorUnitario=round('$Valor',2),Subtotal=ValorUnitario*Cantidad,IVA=round(Subtotal*Tipo_Impuesto,2), Total=Subtotal+IVA WHERE ID='$idItem'";
+            $obCon->Query($sql);
+            print("OK");
+        break;//Fin caso 12
         
     }
     

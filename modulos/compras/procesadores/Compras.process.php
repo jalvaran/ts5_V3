@@ -262,6 +262,32 @@ if( !empty($_REQUEST["Accion"]) ){
             $Mensaje="Factura $idCompra copiada";
             print("OK;$Mensaje");
         break;//Fin caso 12
+    
+        case 13://edito el Valor unitario de un item
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $idTabla=$obCon->normalizar($_REQUEST["idTabla"]); 
+            $Valor=$obCon->normalizar($_REQUEST["Valor"]); 
+            if(!isset($Valor) or $Valor<=0){
+                print("el valor debe ser un numero mayor a cero back");
+                exit();
+            }
+            $sql="UPDATE factura_compra_items SET CostoUnitarioCompra=round('$Valor',2),SubtotalCompra=CostoUnitarioCompra*Cantidad,ImpuestoCompra=round(SubtotalCompra*Tipo_Impuesto,2), TotalCompra=SubtotalCompra+ImpuestoCompra WHERE ID='$idItem'";
+            $obCon->Query($sql);
+            print("OK");
+        break;//Fin caso 13
+        
+        case 14://edito la cantidad de un item
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $idTabla=$obCon->normalizar($_REQUEST["idTabla"]); 
+            $Valor=$obCon->normalizar($_REQUEST["Valor"]); 
+            if(!isset($Valor) or $Valor<=0){
+                print("el valor digitado debe ser un numero mayor a cero");
+                exit();
+            }
+            $sql="UPDATE factura_compra_items SET Cantidad=round('$Valor',2),SubtotalCompra=CostoUnitarioCompra*Cantidad,ImpuestoCompra=round(SubtotalCompra*Tipo_Impuesto,2), TotalCompra=SubtotalCompra+ImpuestoCompra WHERE ID='$idItem'";
+            $obCon->Query($sql);
+            print("OK");
+        break;//Fin caso 14
     }
     
     

@@ -176,7 +176,7 @@ if( !empty($_REQUEST["Accion"]) ){
         case 3://Dibuja los items de una compra
             $idCompra=$obCon->normalizar($_REQUEST["idCompra"]);
             $css->CrearTabla();
-                $css->FilaTabla(12);
+                $css->FilaTabla(14);
                     $css->ColTabla("<strong>ID</strong>", 1, "C");                    
                     $css->ColTabla("<strong>Nombre</strong>", 1, "C");
                     $css->ColTabla("<strong>Cantidad</strong>", 1, "C");
@@ -194,7 +194,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 while ($DatosItems = $obCon->FetchAssoc($Consulta)) {
                     $idItem=$DatosItems["ID"];
                     $idProducto=$DatosItems["idProducto"];
-                    $css->FilaTabla(12);
+                    $css->FilaTabla(14);
                         $css->ColTabla($DatosItems["Referencia"], 1, "C");
                         if(is_numeric($DatosItems["Tipo_Impuesto"])){
                             $PorcentajeImpuestos=$DatosItems["Tipo_Impuesto"]*100;
@@ -203,8 +203,16 @@ if( !empty($_REQUEST["Accion"]) ){
                             $PorcentajeImpuestos=$DatosItems["Tipo_Impuesto"];
                         }
                         $css->ColTabla($DatosItems["Descripcion"], 1, "C");
-                        $css->ColTabla(number_format($DatosItems["Cantidad"]), 1, "C");
-                        $css->ColTabla(number_format($DatosItems["ValorUnitario"],2,",","."), 1, "C");
+                        print("<td>");
+                            $idCaja="TxtCantidadItem_".$idItem;
+                            $css->input("number", $idCaja, "form-control", $idCaja, "", $DatosItems["Cantidad"], "Cantidad", "off", "", "onchange=EditarValorItem(`11`,`$idCaja`,`$idItem`)");
+                        print("</td>");
+                        
+                        print("<td>");
+                            $idCaja="TxtValorUnitario_".$idItem;
+                            $css->input("number", $idCaja, "form-control", $idCaja, "", $DatosItems["ValorUnitario"], "Cantidad", "off", "", "onchange=EditarValorItem(`12`,`$idCaja`,`$idItem`)");
+                        print("</td>");
+                        //$css->ColTabla(number_format($DatosItems["ValorUnitario"],2,",","."), 1, "C");
                         $css->ColTabla(number_format($DatosItems["Subtotal"],2,",","."), 1, "C");
                         $css->ColTabla(number_format($DatosItems["IVA"],2,",","."), 1, "C");
                         $css->ColTabla(number_format($DatosItems["Total"],2,",","."), 1, "C");

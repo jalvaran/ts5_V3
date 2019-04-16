@@ -739,8 +739,27 @@ class Compras extends ProcesoVenta{
         }
          * 
          */
-    }
         
+        
+        
+    }
+     
+    /**
+     * Copiar los items de una orden a otra
+     * @param type $idOrdenACopiar
+     * @param type $idOrdenDestino
+     */
+    public function CopiarItemsOrdenCompra($idOrdenACopiar,$idOrdenDestino) {
+       
+        $Consulta=$this->ConsultarTabla("ordenesdecompra_items", "WHERE NumOrden='$idOrdenACopiar'");
+        while($DatosOrden=$this->FetchAssoc($Consulta)){
+            $this->IngresaItemOrdenCompra($idOrdenDestino, $DatosOrden["idProducto"], $DatosOrden["Cantidad"], $DatosOrden["ValorUnitario"], $DatosOrden["Tipo_Impuesto"], "NO", "");
+        
+        }
+        
+    }
+    
+    
     /**
      * Fin Clase
      */

@@ -1578,6 +1578,114 @@ function CopiarFacturaCompra(idFacturaCopiar=''){
     
 }
 
+function EditarCostoUnitario(idCaja,idTabla,idItem){
+    
+    var Valor = document.getElementById(idCaja).value;
+    
+    if(Valor==''){
+        
+        alertify.error("El valor no puede estar vacío");
+        document.getElementById(idCaja).style.backgroundColor="pink"; 
+        
+        return;
+    }else{
+        document.getElementById(idCaja).style.backgroundColor="white";
+    }
+    
+    if(!$.isNumeric(Valor) ||  Valor<=0){
+        
+        alertify.error("El Valor debe se un número mayor a Cero");
+        document.getElementById(idCaja).style.backgroundColor="pink";   
+        
+        return;
+    }else{
+        document.getElementById(idCaja).style.backgroundColor="white";
+    }
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 13);
+        form_data.append('idItem', idItem);
+        form_data.append('Valor', Valor);
+        form_data.append('idTabla', idTabla);
+        $.ajax({
+        url: './procesadores/Compras.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            if(data=='OK'){
+                alertify.success("Valor Editado");
+            }else{
+                alertify.alert(data);
+            }
+            
+            DibujeCompra();
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function EditarCantidadItem(idCaja,idTabla,idItem){
+    
+    var Valor = document.getElementById(idCaja).value;
+    
+    if(Valor==''){
+        
+        alertify.error("El valor no puede estar vacío");
+        document.getElementById(idCaja).style.backgroundColor="pink"; 
+        
+        return;
+    }else{
+        document.getElementById(idCaja).style.backgroundColor="white";
+    }
+    
+    if(!$.isNumeric(Valor) ||  Valor<=0){
+        
+        alertify.error("El Valor debe se un número mayor a Cero");
+        document.getElementById(idCaja).style.backgroundColor="pink";   
+        
+        return;
+    }else{
+        document.getElementById(idCaja).style.backgroundColor="white";
+    }
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 14);
+        form_data.append('idItem', idItem);
+        form_data.append('Valor', Valor);
+        form_data.append('idTabla', idTabla);
+        $.ajax({
+        url: './procesadores/Compras.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            if(data=='OK'){
+                alertify.success("Cantidad Editada");
+            }else{
+                alertify.alert(data);
+            }
+            
+            DibujeCompra();
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
 
 ConvertirSelectBusquedas();
 

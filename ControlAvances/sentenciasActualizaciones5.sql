@@ -252,7 +252,7 @@ INSERT INTO `documentos_contables` (`ID`, `Prefijo`, `Nombre`, `Descripcion`, `U
 (10,	'CC-10',	'SALDOS INICIALES',	'',	'2019-04-09 18:17:12',	'2018-04-09 13:13:00'),
 (11,	'CC-11',	'DEPRECIACION',	'Para realizar depreciacion a los activos',	'2019-04-09 18:19:43',	'2018-04-09 13:11:57');
 
-ALTER TABLE `documentos_contables_control` ADD `idEmpresa` INT NOT NULL AFTER `idUser`, ADD `idSucursal` INT NOT NULL AFTER `idEmpresa`, ADD `idCentroCostos` INT NOT NULL AFTER `idSucursal`;
+ALTER TABLE `documentos_contables_control` ADD `idEmpresa` INT NOT NULL AFTER `idUser`, ADD `idSucursal` INT NOT NULL AFTER `idEmpresa`, ADD `idCentroCostos` INT NOT NULL AFTER `idSucursal`, ADD `Soporte` INT NOT NULL AFTER `idCentroCostos`;
 ALTER TABLE `documentos_contables_control` ADD INDEX(`idEmpresa`);
 ALTER TABLE `documentos_contables_control` ADD INDEX(`idSucursal`);
 ALTER TABLE `documentos_contables_control` ADD INDEX(`idCentroCostos`);
@@ -265,4 +265,8 @@ ALTER TABLE `documentos_contables_items`
 
 INSERT INTO `comercial_plataformas_pago` (`ID`, `Nombre`, `NIT`, `Activa`, `Updated`, `Sync`) VALUES
 (1,	'SisteCredito',	811007713,	1,	'2019-04-11 09:17:16',	'0000-00-00 00:00:00');
+
+UPDATE `menu_submenus` SET `idCarpeta` = '10' WHERE `menu_submenus`.`ID` = 173;
+UPDATE `menu_submenus` SET `Pagina` = 'DocumentosContables.php' WHERE `menu_submenus`.`ID` = 173;
+UPDATE `menu_submenus` SET `Estado` = '0' WHERE `menu_submenus`.`ID` = 172;
 

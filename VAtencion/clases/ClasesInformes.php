@@ -47,7 +47,7 @@ class Informes extends Tabla{
         
         $sql="SELECT SUM(fi.`SubtotalItem`) as Subtotal,SUM(fi.`IVAItem`) as IVA,SUM(fi.`TotalItem`) as Total,"
                 . "SUM(fi.`ValorOtrosImpuestos`) as OtrosImpuestos, fi.`PorcentajeIVA` "
-                . "FROM facturas f INNER JOIN `ori_facturas_items` fi ON f.idFacturas=fi.`idFactura` "
+                . "FROM facturas f INNER JOIN `facturas_items` fi ON f.idFacturas=fi.`idFactura` "
                 . "WHERE fi.`FechaFactura`>='$FechaIni' AND fi.`FechaFactura`<='$FechaFin' AND f.FormaPago<>'ANULADA' "
                 . "AND f.EmpresaPro_idEmpresaPro='$Empresa' $CondicionAdicional"
                 . "GROUP BY `PorcentajeIVA` ";

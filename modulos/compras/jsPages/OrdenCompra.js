@@ -1350,6 +1350,124 @@ function BusquePrecioVentaCosto(){
       
 }
 
+function CopiarOrden(idOrdenCompra=''){
+    var idCompra = document.getElementById('idCompra').value;
+    if(idOrdenCompra==''){
+        var idOrdenCompra = document.getElementById('idCompraAcciones').value;
+    }
+        
+        
+    if(idCompra==''){
+        alertify.alert("Debes seleccionar una orden de compra");
+        document.getElementById("idCompra").style.backgroundColor="pink";
+        return;
+    }else{
+        document.getElementById("idCompra").style.backgroundColor="white";
+    }
+    
+    if(idOrdenCompra==''){
+        alertify.alert("Debes digitar una valor");
+        document.getElementById("idCompraAcciones").style.backgroundColor="pink";
+        return;
+    }else{
+        document.getElementById("idCompraAcciones").style.backgroundColor="white";
+    }
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '10'); 
+        form_data.append('idCompra', idCompra);
+        form_data.append('idOrdenCompra', idOrdenCompra);
+                
+        document.getElementById("idCompraAcciones").value='';
+        $.ajax({
+        url: './procesadores/OrdenCompra.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                var mensaje=respuestas[1];
+                alertify.success(mensaje);
+                
+                
+            }else{
+                alertify.alert(data);
+                
+            }
+            DibujeCompra();
+           
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
+
+function EditarValorItem(Accion,idCaja,idItem){
+    
+    var Valor = document.getElementById(idCaja).value;
+    
+    if(Valor==''){
+        
+        alertify.error("El valor no puede estar vacío");
+        document.getElementById(idCaja).style.backgroundColor="pink"; 
+        
+        return;
+    }else{
+        document.getElementById(idCaja).style.backgroundColor="white";
+    }
+    
+    if(!$.isNumeric(Valor) ||  Valor<=0){
+        
+        alertify.error("El Valor debe se un número mayor a Cero");
+        document.getElementById(idCaja).style.backgroundColor="pink";   
+        
+        return;
+    }else{
+        document.getElementById(idCaja).style.backgroundColor="white";
+    }
+    
+    var form_data = new FormData();
+        form_data.append('Accion', Accion);
+        form_data.append('idItem', idItem);
+        form_data.append('Valor', Valor);
+        
+        $.ajax({
+        url: './procesadores/OrdenCompra.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            if(data=='OK'){
+                alertify.success("Cantidad Editada");
+            }else{
+                alertify.alert(data);
+            }
+            
+            DibujeCompra();
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+
 ConvertirSelectBusquedas();
 
 $('#CmbBusquedas').bind('change', function() {
@@ -1359,7 +1477,28 @@ $('#CmbBusquedas').bind('change', function() {
     
 });
 
+
+function ConvertirEnBuscadorSelectOrden(){
+    $('#idCompra').select2({
+
+        placeholder: 'Selecciona una Orden de Compra',
+        ajax: {
+          url: 'buscadores/ordenesdecompra.search.php',
+          dataType: 'json',
+          delay: 250,
+          processResults: function (data) {
+
+            return {                     
+              results: data
+            };
+          },
+         cache: true
+        }
+      });
+}
 document.getElementById("BtnMuestraMenuLateral").click();
+
+
 
 //$('#ValorUnitario').mask('1.999.999.##0,00', {reverse: true});
 //$('#Cantidad').mask('9.999.##0,00', {reverse: true});

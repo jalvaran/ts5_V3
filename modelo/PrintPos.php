@@ -1182,7 +1182,7 @@ class PrintPos extends ProcesoVenta{
     }
     fclose($handle); // cierra el fichero PRN
     $salida = shell_exec('lpr $COMPrinter');
-    $this->ImprimeCierreDepartamentos($idUser,$VectorCierre,$COMPrinter,$Copias);
+    //$this->ImprimeCierreDepartamentos($idUser,$VectorCierre,$COMPrinter,$Copias);
     }
     
      //Imprime el dato de los departamentos en un cierre

@@ -1537,7 +1537,11 @@ EOD;
 
     }
     
-    
+    /**
+     * Comprobante de prestamos a terceros
+     * @param type $idPrestamo
+     * @param type $Vector
+     */
     public function ComprobantePrestamoPDF($idPrestamo,$Vector) {
         $DatosDocumento=$this->obCon->DevuelveValores("prestamos_terceros", "ID", $idPrestamo);
         $Documento="CERTIFICADO DE PRESTAMO No. $idPrestamo";
@@ -1567,6 +1571,163 @@ EOD;
         $this->PDF_Output("CDP_$idPrestamo");
     }
     
+    public function OrdenCompraPDF($IDOC) {
+        $DatosOC=$this->obCon->DevuelveValores("ordenesdecompra","ID",$IDOC);
+        $Documento="<strong>ORDEN DE COMPRA No. $IDOC</strong>";
+        
+        $this->PDF_Ini("OC_$IDOC", 8, "");
+        $idFormato=5;
+        $this->PDF_Encabezado($DatosOC["Fecha"],1, $idFormato, "",$Documento);
+        
+        $fecha=$DatosOC["Fecha"];
+        $observaciones=$DatosOC["Descripcion"];
+        $Tercero=$DatosOC["Tercero"];
+        $Usuarios_idUsuarios=$DatosOC["UsuarioCreador"];
+        
+        $DatosUsuario=$this->obCon->ValorActual("usuarios", " Nombre , Apellido ", " idUsuarios='$Usuarios_idUsuarios'");
+        
+        $DatosTercero=$this->obCon->DevuelveValores("proveedores","idProveedores",$Tercero);
+        $this->HTML_EncabezadoOrdenDeCompra($DatosTercero,$DatosOC,$fecha);
+        
+        $html=$this->HTML_ItemsOrdenCompra($IDOC,$DatosOC);
+        $this->PDF_Write("<br><br><br><br><br><br><br><br><br>".$html);
+        $this->PDF_Output("CDP_$IDOC");
+    }
+    
+    
+    function HTML_EncabezadoOrdenDeCompra($DatosTercero,$DatosOC,$fecha) {
+        $html1 = '      
+        <table cellpadding="1" border="1">
+            <tr>
+                <td><strong>Tercero:</strong></td>
+                <td colspan="3">'.$DatosTercero["RazonSocial"].'</td>
+
+            </tr>
+            <tr>
+                <td><strong>NIT:</strong></td>
+                <td colspan="3">'.$DatosTercero["Num_Identificacion"].' - '.$DatosTercero["DV"].'</td>
+            </tr>
+            <tr>
+                <td colspan="2"><strong>Dirección:</strong></td>
+                <td><strong>Ciudad:</strong></td>
+                <td><strong>Telefono:</strong></td>
+            </tr>
+            <tr>
+                <td colspan="2">'.$DatosTercero["Direccion"].'</td>
+                <td>'.$DatosTercero["Ciudad"].'</td>
+                <td>'.$DatosTercero["Telefono"].'</td>
+            </tr>
+            <tr>
+                <td colspan="2"><strong>Fecha: </strong></td>
+                <td colspan="2">'.$fecha.'</td>
+            </tr>
+
+        </table> ';
+        
+        $html2 = '      
+            <table cellpadding="1" border="1">
+                <tr>
+                    <td colspan="3"><strong>Descripcion:</strong></td>
+
+
+                </tr>
+                <tr>
+                    <td colspan="3" height="36">'.$DatosOC["Descripcion"].'<br><strong>Plazo de Entrega:</strong> '.$DatosOC["PlazoEntrega"].'  </td>
+
+                </tr>
+                <tr>
+                    <td colspan="3"><strong>No Cotizacion:</strong> '.$DatosOC["NoCotizacion"].' </td>
+
+                </tr>
+
+
+            </table> ';
+        $this->PDF->MultiCell(93, 25, $html1, 0, 'L', 1, 0, '', '', true,0, true, true, 10, 'M');
+        $this->PDF->MultiCell(92, 25, $html2, 0, 'L', 1, 0, '', '', true,0, true, true, 10, 'M');
+        
+    }
+    
+    function HTML_ItemsOrdenCompra($IDOC,$DatosOC) {
+        $html = ' 
+        <table cellspacing="1" cellpadding="2" border="0">
+            <tr>
+                <td align="center" style="border-bottom: 2px solid #ddd;"><strong>Referencia</strong></td>
+                <td align="center" colspan="3" style="border-bottom: 2px solid #ddd;"><strong>Producto o Servicio</strong></td>
+                <td align="center" style="border-bottom: 2px solid #ddd;"><strong>Precio Unitario</strong></td>
+                <td align="center" style="border-bottom: 2px solid #ddd;"><strong>Cantidad</strong></td>
+                <td align="center" style="border-bottom: 2px solid #ddd;"><strong>Valor Total</strong></td>
+            </tr>
+
+        ';
+        
+        $sql="SELECT * FROM ordenesdecompra_items WHERE NumOrden='$IDOC'";
+        $Consulta=$this->obCon->Query($sql);
+         $h=1;  
+         $SubtotalFinal=0;
+         $IVAFinal=0;
+         $TotalFinal=0;
+        while($DatosItemFactura=$this->obCon->FetchArray($Consulta)){
+            $SubtotalFinal=$SubtotalFinal+$DatosItemFactura["Subtotal"];
+            $IVAFinal=$IVAFinal+$DatosItemFactura["IVA"];
+            $ValorUnitario=  number_format($DatosItemFactura["ValorUnitario"]);
+            $SubTotalItem=  number_format($DatosItemFactura["Subtotal"]);
+            $Multiplicador=$DatosItemFactura["Cantidad"];
+
+            if($h==0){
+                $Back="#f2f2f2";
+                $h=1;
+            }else{
+                $Back="white";
+                $h=0;
+            }
+            $html .=' <tr>
+                <td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosItemFactura["Referencia"].'</td>
+                <td align="left" colspan="3" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosItemFactura["Descripcion"].'</td>
+                <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$ValorUnitario.'</td>
+                <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$Multiplicador.'</td>
+                <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$SubTotalItem.'</td>
+            </tr>
+        ';
+
+        }
+
+        $html .= '</table>';
+
+        $Subtotal=number_format($SubtotalFinal);
+        $IVA=number_format($IVAFinal);
+        $Total=number_format($SubtotalFinal+$IVAFinal);
+        //$TotalLetras=numtoletras($TotalFactura, "PESOS COLOMBIANOS");
+
+
+        $html .= ' <br><br><br>
+
+            <table  cellpadding="2" border="0">
+                <tr>
+                    <td height="25" colspan="4" style="border-bottom: 1px solid #ddd;background-color: white;"></td> 
+
+                    <td align="rigth" style="border-bottom: 1px solid #ddd;background-color: white;"><h3>SUBTOTAL:</h3></td>
+                    <td align="rigth" style="border-bottom: 1px solid #ddd;background-color: white;"><h3>$ '.$Subtotal.'</h3></td>
+                </tr>
+                <tr>
+                    <td colspan="4" height="25" border="1" style="border-bottom: 1px solid #ddd;background-color: white;"><strong>Términos y Condiciones:</strong> <br>'.$DatosOC["Condiciones"].'</td> 
+                    <td align="rigth" style="border-bottom: 1px solid #ddd;background-color: white;"><h3>IVA:</h3></td>
+                    <td align="rigth" style="border-bottom: 1px solid #ddd;background-color: white;"><h3>$ '.$IVA.'</h3></td>
+                </tr>
+                <tr>
+                    <td colspan="2" height="50" align="center" style="border-bottom: 1px solid #ddd;background-color: white;"><br/><br/><br/><br/><br/>Autoriza: ________________</td> 
+                    <td  height="50" align="center" style="border-bottom: 1px solid #ddd;background-color: white;"><br/><br/><br/><br/><br/>Cargo:  _______</td> 
+                    <td  height="50" align="center" style="border-bottom: 1px solid #ddd;background-color: white;"><br/><br/><br/><br/><br/>Firma:  _________</td> 
+                    <td align="rigth" style="border-bottom: 1px solid #ddd;background-color: white;"><h3>TOTAL:</h3></td>
+                    <td align="rigth" style="border-bottom: 1px solid #ddd;background-color: white;"><h3>$ '.$Total.'</h3></td>
+                </tr>
+
+            </table>
+
+
+            ';
+
+        return($html);
+    }
     
    //Fin Clases
 }

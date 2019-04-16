@@ -221,8 +221,15 @@ if( !empty($_REQUEST["Accion"]) ){
                             $PorcentajeImpuestos=$DatosItems["Tipo_Impuesto"];
                         }
                         $css->ColTabla($DatosItems["NombreProducto"], 1, "C");
-                        $css->ColTabla(number_format($DatosItems["Cantidad"]), 1, "C");
-                        $css->ColTabla(number_format($DatosItems["CostoUnitarioCompra"],2,",","."), 1, "C");
+                        print("<td>");
+                            $NombreCaja="CantidadItem_$idItem";
+                            $css->input("text", $NombreCaja, "form-control", $NombreCaja, "", $DatosItems["Cantidad"], "Costo", "off", "", "onchange=EditarCantidadItem(`$NombreCaja`,`1`,`$idItem`)");
+                        print("</td>");
+                        print("<td>");
+                            $NombreCaja="CostoProducto_$idItem";
+                            $css->input("text", $NombreCaja, "form-control", $NombreCaja, "", $DatosItems["CostoUnitarioCompra"], "Costo", "off", "", "onchange=EditarCostoUnitario(`$NombreCaja`,`1`,`$idItem`)");
+                        print("</td>");
+                        //$css->ColTabla(number_format($DatosItems["CostoUnitarioCompra"],2,",","."), 1, "C");
                         $css->ColTabla(number_format($DatosItems["SubtotalCompra"],2,",","."), 1, "C");
                         $css->ColTabla(number_format($DatosItems["ImpuestoCompra"],2,",","."), 1, "C");
                         $css->ColTabla(number_format($DatosItems["TotalCompra"],2,",","."), 1, "C");

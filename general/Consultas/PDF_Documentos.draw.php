@@ -44,6 +44,11 @@ if(isset($_REQUEST["idDocumento"])){
             $obDoc->PDF_CompIngreso($idIngreso);
             $obPrint->ComprobanteIngresoPOS($idIngreso, $DatosImpresora["Puerto"], 1);
             break;
+        case 5: //Orden de Compra
+            $idOC=$obCon->normalizar($_REQUEST["ID"]);
+            $obDoc->OrdenCompraPDF($idOC);
+            
+            break;
         case 25: //Comprobante de altas y bajas
             $idComprobante=$obCon->normalizar($_REQUEST["idComprobante"]);
             $obDoc->PDF_CompBajasAltas($idComprobante);     
