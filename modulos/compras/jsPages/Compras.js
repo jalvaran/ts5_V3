@@ -1686,6 +1686,13 @@ function EditarCantidadItem(idCaja,idTabla,idItem){
       });
 }
 
+function SeleccioneAccionFormularios(){
+    var Accion = document.getElementById("idFormulario").value;
+        
+    if(Accion==100){
+        CrearTercero('ModalAcciones','BntModalAcciones');
+    }
+}
 
 ConvertirSelectBusquedas();
 

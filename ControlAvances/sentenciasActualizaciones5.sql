@@ -270,3 +270,9 @@ UPDATE `menu_submenus` SET `idCarpeta` = '10' WHERE `menu_submenus`.`ID` = 173;
 UPDATE `menu_submenus` SET `Pagina` = 'DocumentosContables.php' WHERE `menu_submenus`.`ID` = 173;
 UPDATE `menu_submenus` SET `Estado` = '0' WHERE `menu_submenus`.`ID` = 172;
 
+INSERT INTO `configuracion_control_tablas` (`ID`, `TablaDB`, `Agregar`, `Editar`, `Ver`, `LinkVer`, `Exportar`, `AccionesAdicionales`, `Eliminar`, `Updated`, `Sync`) VALUES
+(11,	'ordenesdecompra',	0,	0,	1,	'PDF_Documentos.draw.php?idDocumento=5&ID=',	1,	1,	0,	'2019-03-01 23:38:30',	'2018-03-01 23:38:30');
+
+INSERT INTO `configuracion_control_tablas` (`ID`, `TablaDB`, `Agregar`, `Editar`, `Ver`, `LinkVer`, `Exportar`, `AccionesAdicionales`, `Eliminar`, `Updated`, `Sync`) VALUES
+(12,	'vista_factura_compra_totales',	0,	0,	1,	'PDF_Documentos.draw.php?idDocumento=23&ID=',	1,	1,	0,	'2019-03-01 23:38:30',	'2018-03-01 23:38:30');
+

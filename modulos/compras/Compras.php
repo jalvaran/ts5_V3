@@ -16,12 +16,50 @@ $css->PageInit($myTitulo);
         $css->Cdiv();
         
     $css->CModal("BntModalCompras", "onclick=CrearCompra(event)", "button", "Guardar");
-    $css->div("", "", "", "", "", "", "");
+    
+    $css->Modal("ModalAcciones", "TS5", "", 1);
+        $css->div("DivFrmModalAcciones", "", "", "", "", "", "");
+        $css->Cdiv();
+        
+    $css->CModal("BntModalAcciones", "onclick=SeleccioneAccionFormularios()", "button", "Guardar");
+    //$css->div("", "container", "", "", "", "", "");
+    $css->CrearDiv("", "col-md-10", "left", 1, 1); 
+        $css->h3("", "", "", "");
+                print("<strong>Registrar Compra</strong>");
+        $css->Ch3();
+    $css->CerrarDiv(); 
+    $css->CrearDiv("", "col-md-2", "right", 1, 1); 
+        $css->h3("", "", "", "");
+            print("<a onclick=MuestraOcultaXID('DivOpcionesGenerales') style='cursor:pointer'><strong>Opciones</strong>");
+            print('<i class="fa fa-fw fa-bars"></i></a>');
+                
+        $css->Ch3();
+    $css->CerrarDiv();
+    
+    $css->CrearDiv("DivOpcionesGenerales", "col-md-12", "left", 0, 0);
+        $css->fieldset("", "", "FieldDatosCotizacion", "DatosCotizacion", "", "");
+            $css->legend("", "");
+                print("<a href='#'>Opciones Adicionales:</a>");
+            $css->Clegend();   
+            $css->CrearDiv("", "col-md-3", "left", 1, 1);
+                $css->CrearBotonEvento("BtnCrearTercero", "Crear Tercero", 1, "onclick", "ModalCrearTercero(`ModalAcciones`,`DivFrmModalAcciones`);", "azul", "");
+                
+                
+            $css->CerrarDiv();
+            
+            $css->CrearDiv("", "col-md-3", "left", 1, 1);
+                $css->CrearBotonEvento("BtnHistorialDocumentos", "Historial de Compras", 1, "onclick", "SeleccioneTablaDB(`vista_factura_compra_totales`);", "azul", "");
+            $css->CerrarDiv();
+            
+            
+            
+        $css->Cfieldset();
+        print("<br><br>");
+    $css->CerrarDiv();  
+    
     
     $css->CrearDiv("DivOpcionesCrearCompras", "col-md-12", "left", 1, 1); 
-        $css->h3("", "", "", "");
-                    print("<strong>Registro de Compras</strong>");
-        $css->Ch3();
+        
         $css->fieldset("", "", "FieldDatosCompra", "DatosCompra", "", "");
             $css->legend("", "");
                 print("<a href='#'>Cree, Seleccione o imprima una Factura de Compra</a>");

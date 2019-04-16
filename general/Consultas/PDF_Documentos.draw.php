@@ -49,6 +49,12 @@ if(isset($_REQUEST["idDocumento"])){
             $obDoc->OrdenCompraPDF($idOC);
             
             break;
+        
+        case 23: //Factura de Compra
+            $idOC=$obCon->normalizar($_REQUEST["ID"]);
+            $obDoc->PDF_FacturaCompra($idOC);
+            
+            break;
         case 25: //Comprobante de altas y bajas
             $idComprobante=$obCon->normalizar($_REQUEST["idComprobante"]);
             $obDoc->PDF_CompBajasAltas($idComprobante);     

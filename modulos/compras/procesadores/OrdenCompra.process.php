@@ -190,7 +190,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $obCon->ActualizaRegistro("ordenesdecompra", "Estado", "CERRADA", "ID", $idCompra);
             
-            $LinkOrden="../../tcpdf/examples/imprimirOC.php?idOT=$idCompra";
+            $LinkOrden="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=5&ID=$idCompra";
             
             $Mensaje="<strong>Orden de Compra $idCompra Creada Correctamente </strong><a href='$LinkOrden'  target='blank'> Imprimir</a>";
             
