@@ -339,7 +339,7 @@ class PageConstruct extends html_estruct_class{
         $JSBoton="onsubmit=GuardarRegistro(event);";
         $this->form("FrmModal", "", "", "", "", "", "", $JSBoton);
         
-            $this->Modal("ModalAcciones", "TSS", "", 0, 0, 1);
+            $this->Modal("ModalAccionesConstructor", "TSS", "", 0, 0, 1);
 
                     $this->CrearDiv("DivFormularios", "", "", 1, 1);
                     $this->CerrarDiv();

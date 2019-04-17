@@ -423,7 +423,7 @@ function OcultaMuestraCampoTabla(Tabla,Campo,DivTablas){
  * @param {type} Tabla
  * @returns {undefined}
  */
-function DibujaFormularioNuevoRegistro(Tabla,idDivTabla,idModal='ModalAcciones',DivFormularios='DivFormularios'){
+function DibujaFormularioNuevoRegistro(Tabla,idDivTabla,idModal='ModalAccionesConstructor',DivFormularios='DivFormularios'){
     
     $("#"+idModal).modal()
 
@@ -467,7 +467,7 @@ function DibujaFormularioNuevoRegistro(Tabla,idDivTabla,idModal='ModalAcciones',
  */
 function DibujaFormularioEditarRegistro(Tabla,DivTabla,idEditar){
     
-    $("#ModalAcciones").modal()
+    $("#ModalAccionesConstructor").modal()
 
     var form_data = new FormData();
         form_data.append('Accion', 10);
@@ -604,7 +604,7 @@ function GuardarRegistro(event){
               alertify.success("Datos Registrados correctamente");
               document.getElementById('DivFormularios').innerHTML="";
               
-              CierraModal("ModalAcciones");
+              CierraModal("ModalAccionesConstructor");
               DibujeTablaDB(Tabla,DivTabla);
               
           }else {
