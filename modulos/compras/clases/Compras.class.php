@@ -58,10 +58,13 @@ class Compras extends ProcesoVenta{
     }
     
     //Clase para agregar un item a una compra
-    public function AgregueProductoCompra($idCompra,$idProducto,$Cantidad,$CostoUnitario,$PrecioVenta,$TipoIVA,$IVAIncluido,$Vector) {
+    public function AgregueProductoCompra($idCompra,$idProducto,$Cantidad,$CostoUnitario,$PrecioVenta,$TipoIVA,$IVAIncluido,$Vector,$IVACalculado=0) {
+        if($IVACalculado==0){
+            $DatosTipoImpuesto= $this->DevuelveValores("porcentajes_iva", "ID", $TipoIVA);
+            $TipoIVA=$DatosTipoImpuesto["Valor"];
+        }
         
-        $DatosTipoImpuesto= $this->DevuelveValores("porcentajes_iva", "ID", $TipoIVA);
-        $TipoIVA=$DatosTipoImpuesto["Valor"];
+        
         if($IVAIncluido==1){
             if(is_numeric($TipoIVA)){
                 $CostoUnitario=round($CostoUnitario/(1+$TipoIVA),2);
@@ -759,6 +762,47 @@ class Compras extends ProcesoVenta{
         
     }
     
+    
+    public function AgregueItemDesdeOrdenCompraVerificada($idCompra,$idOrdenCompra,$Vector) {
+        $sql="SELECT oc.idProducto,oc.Cantidad,oc.Recibido,(oc.Cantidad-oc.Recibido) as Diferencia,oc.ValorUnitario,oc.Tipo_Impuesto,pv.PrecioVenta"
+                . " FROM ordenesdecompra_items oc INNER JOIN productosventa pv ON pv.idProductosVenta=oc.idProducto "
+                . "WHERE oc.NumOrden='$idOrdenCompra'";
+        $Consulta=$this->Query($sql);
+        //////Agrego los registros           
+        
+        while($DatosOC=$this->FetchAssoc($Consulta)){
+            if($DatosOC["Cantidad"]>0){
+                $this->AgregueProductoCompra($idCompra, $DatosOC["idProducto"], $DatosOC["Cantidad"], $DatosOC["ValorUnitario"], $DatosOC["PrecioVenta"], $DatosOC["Tipo_Impuesto"], "NO", "",1);
+            }
+            if($DatosOC["Diferencia"]>0){
+                $this->DevolverProductoDesdeOrden($idCompra,$DatosOC["idProducto"],$DatosOC["Diferencia"],$DatosOC["ValorUnitario"],$DatosOC["Tipo_Impuesto"]);
+            }
+            
+        }
+    }
+    
+    //Clase para devolver un item a una compra
+    public function DevolverProductoDesdeOrden($idCompra,$idProducto,$Cantidad,$CostoUnitario,$TipoIVA) {
+        //Proceso la informacion
+        
+        $Subtotal=round($CostoUnitario*$Cantidad);
+        $Impuestos= round($Subtotal*$TipoIVA);
+        $Total=$Subtotal+$Impuestos;
+        //////Agrego el registro           
+        $tab="factura_compra_items_devoluciones";
+        $NumRegistros=8;
+
+        $Columnas[0]="idFacturaCompra";     $Valores[0]=$idCompra;
+        $Columnas[1]="idProducto";          $Valores[1]=$idProducto;
+        $Columnas[2]="Cantidad";            $Valores[2]=$Cantidad;
+        $Columnas[3]="CostoUnitarioCompra"; $Valores[3]=$CostoUnitario;
+        $Columnas[4]="SubtotalCompra";      $Valores[4]=$Subtotal;
+        $Columnas[5]="ImpuestoCompra";      $Valores[5]=$Impuestos;
+        $Columnas[6]="TotalCompra";         $Valores[6]=$Total;
+        $Columnas[7]="Tipo_Impuesto";       $Valores[7]=$TipoIVA;
+                    
+        $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
+    }
     
     /**
      * Fin Clase

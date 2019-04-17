@@ -288,6 +288,14 @@ if( !empty($_REQUEST["Accion"]) ){
             $obCon->Query($sql);
             print("OK");
         break;//Fin caso 14
+        
+        case 15://copio los items de una orden a una compra verificada
+            $idCompra=$obCon->normalizar($_REQUEST["idCompra"]);  
+            $idOrdenCompra=$obCon->normalizar($_REQUEST["idOrdenCompra"]);    
+            $obCon->AgregueItemDesdeOrdenCompraVerificada($idCompra, $idOrdenCompra, "");
+            $Mensaje="Items Copiados";
+            print("OK;$Mensaje");
+        break;//Fin caso 15
     }
     
     

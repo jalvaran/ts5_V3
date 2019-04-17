@@ -96,7 +96,7 @@ $css->PageInit($myTitulo);
                     <ul class="dropdown-menu">
                         <li><a href="#" onclick="CopiarFacturaCompra()">Copiar una Factura de Compra</a></li>
                         <li><a href="#" onclick="CopiarItemsDesdeOrden()">Copiar Items desde Orden de Compra</a></li>
-                       
+                        <li><a href="#" onclick="CopiarItemsDesdeOrdenVerificada()">Copiar Items desde Orden de Compra Verificada</a></li>
                   </ul>
                 </div>
                <input type="text" id="idCompraAcciones" class="form-control" placeholder="ID opción">
