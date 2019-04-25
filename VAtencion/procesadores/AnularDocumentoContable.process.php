@@ -12,8 +12,12 @@ if(!empty($_REQUEST["BtnAnular"])){
     $fecha=$obVenta->normalizar($_REQUEST["TxtFechaAnulacion"]);
     $ConceptoAnulacion=$obVenta->normalizar($_REQUEST["TxtConceptoAnulacion"]);
     $obVenta->AnularMovimientoLibroDiario($NombreDocumento, $ConsecutivoDocumento, "");
+    $obVenta->ActualizaRegistro("documentos_contables_registro_bases", "Base", 0, "idDocumentoContable", $idComprobante);
+    $obVenta->ActualizaRegistro("documentos_contables_registro_bases", "Estado", "ANULADO", "idDocumentoContable", $idComprobante);
+    $obVenta->ActualizaRegistro("documentos_contables_control", "Estado", "ANULADO", "ID", $idComprobante);
+    
     //$idAnulacion=$obVenta->RegistraAnulacionNotaContable($fecha, $ConceptoAnulacion, $idComprobante, "");
-    header("location:AnularNota.php?TxtidComprobante=1");
+    header("location:AnularDocumentoContable.php?TxtidComprobante=$idComprobante");
         
 }
 ?>
