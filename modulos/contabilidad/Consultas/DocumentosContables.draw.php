@@ -251,10 +251,17 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>CONCEPTO</strong>", 1);
                     $css->ColTabla("<strong>ACCIÓNES</strong>", 1);
                 $css->CierraFilaTabla();
-                
-                $Consulta=$obCon->ConsultarTabla("documentos_contables_items", "WHERE idDocumento='$idDocumento' ORDER BY ID DESC");
+                $sql="SELECT *,"
+                        . "(SELECT Base FROM documentos_contables_registro_bases WHERE documentos_contables_items.ID=documentos_contables_registro_bases.idItemDocumentoContable) AS Base,"
+                        . "(SELECT Porcentaje FROM documentos_contables_registro_bases WHERE documentos_contables_items.ID=documentos_contables_registro_bases.idItemDocumentoContable) AS Porcentaje,"
+                        . "(SELECT Valor FROM documentos_contables_registro_bases WHERE documentos_contables_items.ID=documentos_contables_registro_bases.idItemDocumentoContable) AS Valor,"
+                        . "(SELECT ID FROM documentos_contables_registro_bases WHERE documentos_contables_items.ID=documentos_contables_registro_bases.idItemDocumentoContable) AS idBase"
+                        
+                        . " FROM documentos_contables_items WHERE idDocumento='$idDocumento' ORDER BY ID DESC";
+                $Consulta=$obCon->Query($sql);
                 while($DatosItems=$obCon->FetchAssoc($Consulta)){
                    $idItem=$DatosItems["ID"];
+                   
                     $css->FilaTabla(14);
                         print("<td>");
                             $css->select("CmbTerceroItems_$idItem","form-control", "CmbTerceroItems_$idItem", "", "", "onclick=ConviertaSelectTerceroItems($idItem)", "style=width:100%");
@@ -289,12 +296,34 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                         
                         $css->ColTabla($DatosItems["Concepto"], 1);
+                        
                         print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");   
                             
                             $css->li("", "fa  fa-remove", "", "onclick=EliminarItem(`1`,`$idItem`) style=font-size:16px;cursor:pointer;text-align:center;color:red");
                             $css->Cli();
                         print("</td>");
                     $css->CierraFilaTabla();
+                    
+                    if($DatosItems["Base"]>0){
+                        $idBase=$DatosItems["idBase"];
+                        $css->FilaTabla(13);
+                            
+                            print("<td><label for='TxtBaseItems_$idBase'>Base:</label>");
+                            $css->input("text", "TxtBaseItems_$idBase", "form-control", "TxtBaseItems_$idBase", "", $DatosItems["Base"], "Base", "off", "", "onchange=EditeBase(`Base`,`$idBase`)");
+                            print("</td>");
+                            print("<td><label for='TxtPorcentajeItems_$idBase'>Porcentaje:</label>");
+                            
+                            $css->input("text", "TxtPorcentajeItems_$idBase", "form-control", "TxtPorcentajeItems_$idBase", "", $DatosItems["Porcentaje"], "Base", "off", "", "onchange=EditeBase(`Porcentaje`,`$idBase`)");
+                            print("</td>");
+                            
+                            
+                        $css->CierraFilaTabla();
+                        
+                        $css->FilaTabla(13);
+                            $css->ColTabla(" ---------------- ", 6,'C');
+                        $css->CierraFilaTabla();
+                    }
+                    
                 }
             $css->CerrarTabla();
             

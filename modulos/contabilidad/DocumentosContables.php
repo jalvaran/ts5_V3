@@ -167,6 +167,19 @@ $css->PageInit($myTitulo);
              $css->CerrarDiv();  
             
             $css->CrearDiv("", "col-md-2", "center", 1, 1);
+               $css->CrearDiv("DivBases", "", "", 0, 1);
+               $css->input("hidden", "TxtSolicitaBase", "form-control", "TxtSolicitaBase", "", "", "", "", "", "");
+
+                
+                print("<strong>Porcentaje %</strong>");
+                $css->input("text", "Porcentaje", "form-control", "Porcentaje", "Porcentaje", "0", "Porcentaje", "off", "", "onkeyup=CalculeBase()");
+            
+                print("<strong>Base</strong>");
+                $css->input("text", "Base", "form-control", "Base", "Base", "0", "Base", "off", "", "onkeyup=CalculeBase()");
+
+
+                
+               $css->Cdiv();
                print("<strong>Valor</strong>");
                $css->input("number", "Valor", "form-control", "Valor", "Valor", "", "Valor", "off", "", "");
             

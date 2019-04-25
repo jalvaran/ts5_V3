@@ -4,6 +4,24 @@
  * TECHNO SOLUCIONES SAS 
  * 317 774 0609
  */
+
+function MuestraXID(id){
+    
+    
+    document.getElementById(id).style.display="block";
+    
+    
+}
+
+
+function OcultaXID(id){
+    
+    
+    document.getElementById(id).style.display="none";
+    
+    
+}
+
 /**
  * Cierra una ventana modal
  * @param {type} idModal
@@ -169,6 +187,8 @@ function AgregarItem(){
     var TxtConcepto = document.getElementById('TxtConcepto').value;
     var TipoMovimiento = document.getElementById('TipoMovimiento').value;
     var Valor = parseFloat(document.getElementById('Valor').value);
+    var Base = parseFloat(document.getElementById('Base').value);
+    var Porcentaje = parseFloat(document.getElementById('Porcentaje').value);
     document.getElementById("BtnAgregarItem").disabled=true;
     document.getElementById("BtnAgregarItem").value="Agregando";
     
@@ -234,6 +254,8 @@ function AgregarItem(){
         form_data.append('TxtConcepto', TxtConcepto);
         form_data.append('TipoMovimiento', TipoMovimiento );
         form_data.append('Valor', Valor );
+        form_data.append('Base', Base );
+        form_data.append('Porcentaje', Porcentaje );
         
          
         $.ajax({
@@ -247,7 +269,9 @@ function AgregarItem(){
         success: function(data){
           var respuestas = data.split(';'); 
           if (respuestas[0] == "OK"){ 
-              
+                //OcultaXID('DivBases');
+                document.getElementById("Base").value=0;
+                document.getElementById("Porcentaje").value=0;
                 var idDocumento=respuestas[1];                
                 alertify.success(respuestas[1]);                
                 document.getElementById('select2-CuentaPUC-container').innerHTML="Seleccione una Cuenta";
@@ -434,7 +458,7 @@ function GuardarDocumento(idDocumento=''){
 function CopiarDocumento(){
     var idDocumento = document.getElementById('idDocumento').value;
     var idDocumentoACopiar = document.getElementById('idDocumentoAcciones').value;
-    
+    var TipoDocumento = document.getElementById('CmbTipoDocumentoAcciones').value;
     if(idDocumento==''){
         
         alertify.error("Debe Seleccionar un Documento");
@@ -459,6 +483,7 @@ function CopiarDocumento(){
         form_data.append('Accion', 6);
         form_data.append('idDocumento', idDocumento);
         form_data.append('idDocumentoACopiar', idDocumentoACopiar);
+        form_data.append('TipoDocumento', TipoDocumento);
         $.ajax({
         url: './procesadores/DocumentosContables.process.php',
         //dataType: 'json',
@@ -581,6 +606,51 @@ function EditarCuentaPUC(idItem,idSelect){
       });
 }
 
+
+function EditeBase(TipoCaja,idItem){
+    if(TipoCaja=="Base"){
+        var Accion=11;
+        var idCaja="TxtBaseItems_"+idItem;
+        var Valor = document.getElementById(idCaja).value;
+    }else if(TipoCaja=="Porcentaje"){
+        var Accion=12;
+        var idCaja="TxtPorcentajeItems_"+idItem;
+        var Valor = document.getElementById(idCaja).value;
+    }else{
+        return;
+    }
+    
+    
+    var form_data = new FormData();
+        form_data.append('Accion', Accion);
+        form_data.append('idItem', idItem);
+        form_data.append('Valor', Valor);
+        
+        $.ajax({
+        url: './procesadores/DocumentosContables.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            if(data=='OK'){
+                alertify.success("Valores editados");
+            }else{
+                alertify.alert(data);
+            }
+            
+            DibujeDocumento();
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
 function EditarTercero(idItem,idSelect){
     
     var Tercero = document.getElementById(idSelect).value;
@@ -677,6 +747,59 @@ function ConviertaSelectTerceroItems(idItem){
     */
 }
 
+function VerifiqueSolicitaBase(){
+    
+    var CuentaPUC = document.getElementById('CuentaPUC').value;
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 10);
+        form_data.append('CuentaPUC', CuentaPUC);
+                
+        $.ajax({
+        url: './procesadores/DocumentosContables.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            console.log(data)
+            if(data=='1'){
+                MuestraXID('DivBases');
+                document.getElementById("Valor").disabled=true;
+                document.getElementById("Valor").value=0;
+                document.getElementById("TxtSolicitaBase").value=1;
+            }else{
+                OcultaXID('DivBases');
+                document.getElementById("Valor").disabled=false;
+                document.getElementById("Valor").value=0;
+                document.getElementById("TxtSolicitaBase").value=0;
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function CalculeBase(){
+    
+    var base = document.getElementById("Base").value;
+    var porcentaje = document.getElementById("Porcentaje").value;
+    
+    if(porcentaje==0 || porcentaje==0 || porcentaje>100){
+        var multiplo=1;
+        document.getElementById("Porcentaje").value=100
+    }else{
+        var multiplo=porcentaje/100;
+    }
+    document.getElementById("Valor").value=base*multiplo;
+}
+
 /**
  * Inicializa el modulo
  * @returns {undefined}
@@ -716,6 +839,10 @@ function initModule(){
           },
          cache: true
         }
+      });
+      
+      $('#CuentaPUC').bind('change', function() {
+        VerifiqueSolicitaBase();
       });
 }
 

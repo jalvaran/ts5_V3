@@ -1481,10 +1481,10 @@ EOD;
         $obCon= new ProcesoVenta(1);
         $CondicionAdicional="";
         if($idEmpresa<>'ALL'){
-            $CondicionAdicional.=" AND idEmpresa=$idEmpresa ";
+            $CondicionAdicional.=" AND idEmpresa='$idEmpresa' ";
         }
         if($idCentroCostos<>'ALL'){
-            $CondicionAdicional.=" AND idCentroCostos=$idCentroCostos ";
+            $CondicionAdicional.=" AND idCentroCostos='$idCentroCostos' ";
         }
         
         $html='<table cellspacing="1" cellpadding="2" border="0">

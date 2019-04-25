@@ -72,7 +72,8 @@ class DocumentosContables extends ProcesoVenta{
         
         $sql= $this->getSQLInsert($Tabla, $Datos);
         $this->Query($sql);
-                
+        $id= $this->ObtenerMAX($Tabla, "ID", 1, "");
+        return ($id);       
     }
     /**
      * Devuelve el sql para insertar los movimientos de un documento contable al librodiario
@@ -141,9 +142,10 @@ class DocumentosContables extends ProcesoVenta{
         $this->ActualizaRegistro("documentos_contables_control", "Estado", "CERRADO", "ID", $idDocumento);
     }
     
-    public function CopiarItemsDocumento($idDocumentoACopiar,$idDocumentoDestino) {
-            
-        $Consulta=$this->ConsultarTabla("documentos_contables_items", "WHERE idDocumento='$idDocumentoACopiar'");
+    public function CopiarItemsDocumento($TipoDocumento,$idDocumentoACopiar,$idDocumentoDestino) {
+        $sql="SELECT ite.Tercero,ite.Credito,ite.Debito,ite.CuentaPUC,ite.Concepto,ite.NumDocSoporte,ite.Soporte FROM documentos_contables_items ite "
+                . "INNER JOIN documentos_contables_control c ON ite.idDocumento=c.ID WHERE c.idDocumento='$TipoDocumento' AND c.Consecutivo='$idDocumentoACopiar'";    
+        $Consulta=$this->Query($sql);
         while($DatosMovimiento= $this->FetchAssoc($Consulta)){
             $TipoMovimiento="CR";
             $Valor=$DatosMovimiento["Credito"];
@@ -154,6 +156,31 @@ class DocumentosContables extends ProcesoVenta{
             $this->AgregaMovimientoDocumentoContable($idDocumentoDestino, $DatosMovimiento["Tercero"], $DatosMovimiento["CuentaPUC"], $TipoMovimiento, $Valor, $DatosMovimiento["Concepto"], $DatosMovimiento["NumDocSoporte"], $DatosMovimiento["Soporte"]);
         }
             
+        }
+        
+        function AgregueBaseAMovimientoContable($idDocumento,$Concepto,$Base,$Porcentaje,$Valor,$idUser,$idItem){
+        
+            $Tabla="documentos_contables_registro_bases";
+            
+            $Datos["idDocumentoContable"]=$idDocumento;
+            
+            $Datos["Concepto"]=$Concepto;
+            $Datos["Base"]=$Base;
+            $Datos["Porcentaje"]=$Porcentaje;
+            $Datos["ValorPorcentaje"]=$Porcentaje/100;
+            $Datos["Valor"]=$Valor;
+            $Datos["idUser"]=$idUser;
+            $Datos["idItemDocumentoContable"]=$idItem;
+            $Datos["Estado"]="ABIERTO";
+            $sql= $this->getSQLInsert($Tabla, $Datos);
+            $this->Query($sql);
+
+
+        }
+        
+        public function VerificaSiCuentaSolicitaBase($CuentaPUC) {
+            $DatosCuenta=$this->DevuelveValores("subcuentas","PUC",$CuentaPUC);
+            return($DatosCuenta["SolicitaBase"]);
         }
     /**
      * Fin Clase

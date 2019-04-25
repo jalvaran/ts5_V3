@@ -54,11 +54,27 @@ if( !empty($_REQUEST["Accion"]) ){
             $TxtConcepto=$obCon->normalizar($_REQUEST["TxtConcepto"]);
             $TipoMovimiento=$obCon->normalizar($_REQUEST["TipoMovimiento"]);
             $Valor=$obCon->normalizar($_REQUEST["Valor"]);
+            $Base=$obCon->normalizar($_REQUEST["Base"]);
+            $Porcentaje=$obCon->normalizar($_REQUEST["Porcentaje"]);
             if(!is_numeric($Valor)){
                 print("E1;El Campo Valor debe ser númerico");
                 exit();
             }
-            $obCon->AgregaMovimientoDocumentoContable($idDocumento, $Tercero, $CuentaPUC, $TipoMovimiento, $Valor, $TxtConcepto, "", "");
+            
+            if(!is_numeric($Base)){
+                print("E1;El Campo Base debe ser númerico");
+                exit();
+            }
+            
+            if(!is_numeric($Porcentaje)){
+                print("E1;El Campo Porcentaje debe ser númerico");
+                exit();
+            }
+            
+            $idItem=$obCon->AgregaMovimientoDocumentoContable($idDocumento, $Tercero, $CuentaPUC, $TipoMovimiento, $Valor, $TxtConcepto, "", "");
+            if($Base>0){
+                $obCon->AgregueBaseAMovimientoContable($idDocumento, $TxtConcepto, $Base, $Porcentaje, $Valor, $idUser, $idItem);
+            }
             print("OK;Movimiento Agregado");
         break; //Fin caso 3
         
@@ -89,9 +105,10 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;$Mensaje");
         break; //Fin caso 5
         
-        case 6: //Guardar un documento contable
+        case 6: //Copiar un documento contable
             $idDocumentoDestino=$obCon->normalizar($_REQUEST["idDocumento"]);
             $idDocumentoACopiar=$obCon->normalizar($_REQUEST["idDocumentoACopiar"]);
+            $TipoDocumento=$obCon->normalizar($_REQUEST["TipoDocumento"]);
             if($idDocumentoDestino==''){
                 print("Debe seleccionar un documento destino");
                 exit();
@@ -100,7 +117,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 print("Debe seleccionar un documento a copiar");
                 exit();
             }
-            $obCon->CopiarItemsDocumento($idDocumentoACopiar, $idDocumentoDestino);
+            $obCon->CopiarItemsDocumento($TipoDocumento,$idDocumentoACopiar, $idDocumentoDestino);
             print("OK");
         break; //Fin caso 6
         
@@ -121,11 +138,16 @@ if( !empty($_REQUEST["Accion"]) ){
             }else{
                 $CampoEditar="Credito";
             }
+            
+            $DatosBase=$obCon->DevuelveValores("documentos_contables_registro_bases", "idItemDocumentoContable", $idItem);
+            $Base=$Valor/$DatosBase["ValorPorcentaje"];
+            $obCon->ActualizaRegistro("documentos_contables_registro_bases", "Base", $Base, "idItemDocumentoContable", $idItem);
+            
             $obCon->ActualizaRegistro("documentos_contables_items", $CampoEditar, $Valor, "ID", $idItem);
             print("OK");
         break; //Fin caso 7
         
-        case 8: //Editar el valor de un debito o un Credito en un movimiento de un documento contable
+        case 8: //Editar la cuenta en un movimiento de un documento contable
             $idItem=$obCon->normalizar($_REQUEST["idItem"]);
             $CuentaPUC=$obCon->normalizar($_REQUEST["CuentaPUC"]);
             
@@ -137,9 +159,23 @@ if( !empty($_REQUEST["Accion"]) ){
                 print("El valor debe ser númerico");
                 exit();
             }
+            
             $DatosCuentas=$obCon->DevuelveValores("subcuentas", "PUC", $CuentaPUC);
+            $SolicitaBase=$obCon->VerificaSiCuentaSolicitaBase($CuentaPUC);
+            $DatosBase=$obCon->DevuelveValores("documentos_contables_registro_bases", "idItemDocumentoContable", $idItem);
+            if(($DatosBase["Base"]=='' or $DatosBase["Base"]=='0') and $SolicitaBase==1){
+                print("La Cuenta $CuentaPUC Solicita una Base, no puedes editar este movimiento, se debe eliminar el movimiento y hacerlo nuevamente");
+                exit();
+            }
+            
             $obCon->ActualizaRegistro("documentos_contables_items", "CuentaPUC", $CuentaPUC, "ID", $idItem);
             $obCon->ActualizaRegistro("documentos_contables_items", "NombreCuenta", $DatosCuentas["Nombre"], "ID", $idItem);
+            
+            if($DatosCuentas["SolicitaBase"]==0){
+                $obCon->ActualizaRegistro("documentos_contables_registro_bases", "Base", 0, "idItemDocumentoContable", $idItem);
+                $obCon->ActualizaRegistro("documentos_contables_registro_bases", "Estado", 'ANULADO', "idItemDocumentoContable", $idItem);
+            }
+            
             print("OK");
         break; //Fin caso 8
         
@@ -160,6 +196,75 @@ if( !empty($_REQUEST["Accion"]) ){
            
             print("OK");
         break; //Fin caso 9
+        
+        case 10: //Consulta si la cuenta solicita Base
+            $CuentaPUC=$obCon->normalizar($_REQUEST["CuentaPUC"]);
+          
+            print($obCon->VerificaSiCuentaSolicitaBase($CuentaPUC));
+        break; //Fin caso 10
+    
+        case 11: //Editar la base
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $Base=$obCon->normalizar($_REQUEST["Valor"]);
+            
+            if($Base==''){
+                print("Debe Escribir un valor");
+                exit();
+            }
+            if(!is_numeric($Base)){
+                print("El valor debe ser númerico");
+                exit();
+            }
+            
+            if($Base<=0){
+                print("El valor debe ser un número mayor a cero");
+                exit();
+            }
+            
+            $DatosBase=$obCon->DevuelveValores("documentos_contables_registro_bases", "ID", $idItem);
+            
+            $Valor=$Base*$DatosBase["ValorPorcentaje"];
+            $obCon->ActualizaRegistro("documentos_contables_registro_bases", "Valor", $Valor, "ID", $idItem);
+            $obCon->ActualizaRegistro("documentos_contables_registro_bases", "Base", $Base, "ID", $idItem);
+            $Columna="Debito";
+            if($DatosBase["TipoMovimiento"]=='CR'){
+                $Columna="Credito";
+            }
+            $obCon->ActualizaRegistro("documentos_contables_items", $Columna, $Valor, "ID", $DatosBase["idItemDocumentoContable"]);
+            print("OK");
+        break; //Fin caso 11
+        
+        case 12: //Editar el porcentaje
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $Porcentaje=$obCon->normalizar($_REQUEST["Valor"]);
+            
+            if($Porcentaje==''){
+                print("Debe Escribir un Porcentaje");
+                exit();
+            }
+            if(!is_numeric($Porcentaje)){
+                print("El Porcenje debe ser númerico");
+                exit();
+            }
+            
+            if($Porcentaje<=0 or $Porcentaje>100){
+                print("El porcentaje debe ser un número mayor a cero y menor a 100");
+                exit();
+            }
+            $Porcentaje=round($Porcentaje,2);
+            $DatosBase=$obCon->DevuelveValores("documentos_contables_registro_bases", "ID", $idItem);
+            $multiplo=round($Porcentaje/100,2);
+            $Valor=$DatosBase["Base"]*$multiplo;
+            $obCon->ActualizaRegistro("documentos_contables_registro_bases", "Valor", $Valor, "ID", $idItem);
+            $obCon->ActualizaRegistro("documentos_contables_registro_bases", "Porcentaje", $Porcentaje, "ID", $idItem);
+            $obCon->ActualizaRegistro("documentos_contables_registro_bases", "ValorPorcentaje", $multiplo, "ID", $idItem);
+            $Columna="Debito";
+            if($DatosBase["TipoMovimiento"]=='CR'){
+                $Columna="Credito";
+            }
+            $obCon->ActualizaRegistro("documentos_contables_items", $Columna, $Valor, "ID", $DatosBase["idItemDocumentoContable"]);
+            print("OK");
+        break; //Fin caso 12
         
         
         

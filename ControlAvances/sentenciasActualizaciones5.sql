@@ -276,3 +276,13 @@ INSERT INTO `configuracion_control_tablas` (`ID`, `TablaDB`, `Agregar`, `Editar`
 INSERT INTO `configuracion_control_tablas` (`ID`, `TablaDB`, `Agregar`, `Editar`, `Ver`, `LinkVer`, `Exportar`, `AccionesAdicionales`, `Eliminar`, `Updated`, `Sync`) VALUES
 (12,	'vista_factura_compra_totales',	0,	0,	1,	'PDF_Documentos.draw.php?idDocumento=23&ID=',	1,	1,	0,	'2019-03-01 23:38:30',	'2018-03-01 23:38:30');
 
+ALTER TABLE `subcuentas`
+  DROP `Cuentas_idPUC`;
+
+ALTER TABLE `subcuentas` ADD `SolicitaBase` INT NOT NULL AFTER `Valor`;
+UPDATE `subcuentas` SET `SolicitaBase`=1 WHERE SUBSTRING(`PUC`, 1, 4) = '2365';
+UPDATE `subcuentas` SET `SolicitaBase`=1 WHERE SUBSTRING(`PUC`, 1, 4) = '2367';
+UPDATE `subcuentas` SET `SolicitaBase`=1 WHERE SUBSTRING(`PUC`, 1, 4) = '2368';
+UPDATE `subcuentas` SET `SolicitaBase`=1 WHERE SUBSTRING(`PUC`, 1, 4) = '1355';
+
+
