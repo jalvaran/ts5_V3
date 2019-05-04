@@ -103,7 +103,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $Empresa=$obCon->normalizar($_REQUEST["CmbCentroCosto"]);
             $CentroCostos=$obCon->normalizar($_REQUEST["CmbEmpresa"]);                        
             $obCon->ConstruirVistaBalanceTercero($Tipo, $FechaInicial, $FechaFinal, $Empresa, $CentroCostos, "");
-            print("OKBXT");
+            $link="procesadores/ReportesContables.process.php?Accion=1";
+            $html="<a id='LinkExport' href='$link' target='_BLANK' >Ver</a>";
+            print($html);
         break; 
     
         case 3: //Crea las opciones para el certificado de retenciones

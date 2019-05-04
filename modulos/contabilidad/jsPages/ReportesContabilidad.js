@@ -79,12 +79,12 @@ function GenereBalanceXTerceros(){
         type: 'post',
         success: function(data){
            
-          if (data == "OKBXT") { 
-              SeleccioneTablaDB("vista_balancextercero2","DivReportesContables","DivOpcionesReportes");              
-          }else{
-              document.getElementById("DivOpcionesReportes").innerHTML="";
-              document.getElementById("DivReportesContables").innerHTML=data;
-          }
+
+        //SeleccioneTablaDB("vista_balancextercero2","DivReportesContables","DivOpcionesReportes");      
+          document.getElementById("DivOpcionesReportes").innerHTML="";
+          document.getElementById("DivReportesContables").innerHTML=data;
+          //document.getElementById("LinkExport").click();
+          
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.status);

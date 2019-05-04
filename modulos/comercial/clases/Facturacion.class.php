@@ -331,7 +331,7 @@ class Facturacion extends ProcesoVenta{
             
             $Total=$Subtotal+$impuesto;
             
-            $Insert["Fecha"]=$fecha;
+            $Insert["Fecha"]=date("Y-m-d");
             $Insert["Cantidad"]=$Cantidad;
             $Insert["VestasActivas_idVestasActivas"]=$idPreventa;
             $Insert["ProductosVenta_idProductosVenta"]=$idProducto;
@@ -364,6 +364,7 @@ class Facturacion extends ProcesoVenta{
         $idProducto=$DatosPreventa["ProductosVenta_idProductosVenta"];
         $Tabla=$DatosPreventa["TablaItem"];
         $DatosProductos=$this->DevuelveValores($Tabla,"idProductosVenta",$idProducto);
+        $Descuento=($DatosProductos["PrecioVenta"]-$ValorAcordado)*$Cantidad;
         if($Mayorista==1){
             $ValorAcordado=$DatosProductos["PrecioMayorista"];
         }
@@ -373,8 +374,8 @@ class Facturacion extends ProcesoVenta{
             $ValorAcordado=round($ValorAcordado/($DatosProductos["IVA"]+1),2);
 
         }
-        $Subtotal=$ValorAcordado*$Cantidad;
-        $IVA=$Subtotal*$DatosProductos["IVA"];
+        $Subtotal=round($ValorAcordado*$Cantidad,2);
+        $IVA=round($Subtotal*$DatosProductos["IVA"],2);
         $Total=$Subtotal+$IVA;
         $filtro="idPrecotizacion";
 
@@ -382,6 +383,7 @@ class Facturacion extends ProcesoVenta{
         $this->ActualizaRegistro("preventa","Impuestos", $IVA, $filtro, $idItem);
         $this->ActualizaRegistro("preventa","TotalVenta", $Total, $filtro, $idItem);
         $this->ActualizaRegistro("preventa","ValorAcordado", $ValorAcordado, $filtro, $idItem);
+        $this->ActualizaRegistro("preventa","Descuento", $Descuento, $filtro, $idItem);
 
     }
     
@@ -756,7 +758,7 @@ class Facturacion extends ProcesoVenta{
         $this->update("facturas_intereses_sistecredito", "idCierre", $idCierre, "WHERE idCierre='' AND idUsuario='$idUser'"); 
         $this->update("comprobantes_ingreso", "idCierre", $idCierre, "WHERE idCierre='' AND Usuarios_idUsuarios='$idUser'"); 
         $this->update("comercial_plataformas_pago_ingresos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'"); 
-         
+        $this->update("pos_registro_descuentos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUsuario='$idUser'");  
         return ($idCierre);
         
     }

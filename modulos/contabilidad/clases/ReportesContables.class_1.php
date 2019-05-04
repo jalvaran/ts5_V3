@@ -18,19 +18,12 @@ class Contabilidad extends conexion{
         
         $sql="DROP VIEW IF EXISTS `vista_balancextercero2`;";
         $this->Query($sql);
-        
-        $sql="DROP VIEW IF EXISTS `vista_saldo_inicial_cuentapuc`;";
-        $this->Query($sql);
-        
         $CondicionEmpresa="";
         $Condicion=" WHERE ";
-        $CondicionSaldos=" WHERE Fecha <'$FechaInicial'";
         if($Tipo==1){
             $Condicion.="Fecha>='$FechaInicial' AND Fecha <='$FechaFinal'";
-            
         }else{
             $Condicion.="Fecha <='$FechaFinal'";
-            
         }
         if($Empresa<>"ALL"){
             $CondicionEmpresa=" AND idEmpresa = '$Empresa'";
@@ -40,41 +33,15 @@ class Contabilidad extends conexion{
         if($CentroCostos<>"ALL"){
             $CondicionCentroCostos=" AND idCentroCosto = '$CentroCostos'";
         }
-        
-        
-        
-        
-        $sql="CREATE VIEW vista_saldo_inicial_cuentapuc AS
-            SELECT CuentaPUC as ID,Tercero_Identificacion,SUM(Debito-Credito) as SaldoInicial
-            FROM `librodiario`
-            $Condicion $CondicionEmpresa $CondicionCentroCostos
-            GROUP BY CuentaPUC,Tercero_Identificacion";         
-        $this->Query($sql);
-        
-        
-        
         $sql="CREATE VIEW vista_balancextercero2 AS
-            SELECT (SUBSTRING(CuentaPUC,1,8)) as ID,Fecha,`Tercero_Identificacion` as Identificacion,`Tercero_Razon_Social` AS Razon_Social,
-            `CuentaPUC` , `NombreCuenta`,  
-            (SELECT SaldoInicial FROM vista_saldo_inicial_cuentapuc WHERE librodiario.CuentaPUC=vista_saldo_inicial_cuentapuc.ID AND librodiario.Tercero_Identificacion=vista_saldo_inicial_cuentapuc.Tercero_Identificacion LIMIT 1) AS SaldoInicialSubCuenta, 
-            
-            SUBSTRING(CuentaPUC,1,1) AS Clase,
-            (SELECT Clase FROM clasecuenta WHERE PUC=SUBSTRING(CuentaPUC,1,1)) AS NombreClase, 
-            
-            SUBSTRING(CuentaPUC,1,2) AS Grupo,
-            (SELECT Nombre FROM gupocuentas WHERE PUC=SUBSTRING(CuentaPUC,1,2)) AS NombreGrupo,
-            
-            SUBSTRING(CuentaPUC,1,4) AS CuentaPadre,
-            (SELECT Nombre FROM cuentas WHERE idPUC=SUBSTRING(CuentaPUC,1,4)) AS NombreCuentaPadre,
-            
-            `Debito`,`Credito`,
+            SELECT '' as ID,`Tercero_Identificacion` as Identificacion,`Tercero_Razon_Social` AS Razon_Social,
+            `CuentaPUC` as Cuenta, `NombreCuenta` as Nombre_Cuenta,            
+            SUM(`Debito`) AS Debitos,SUM(`Credito`) AS Creditos,(SUM(`Debito`)-SUM(`Credito`)) AS Neto,
             idEmpresa,idCentroCosto
             FROM `librodiario`
             $Condicion $CondicionEmpresa $CondicionCentroCostos
-            ORDER BY SUBSTRING(CuentaPUC,1,8),Identificacion,CuentaPUC,Fecha ASC";         
+            GROUP BY `Tercero_Identificacion` ORDER BY SUBSTRING(`CuentaPUC`,1,8),Tercero_Razon_Social;";         
         $this->Query($sql);
-        
-        
         
     }
     /**

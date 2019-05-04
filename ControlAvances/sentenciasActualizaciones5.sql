@@ -285,4 +285,24 @@ UPDATE `subcuentas` SET `SolicitaBase`=1 WHERE SUBSTRING(`PUC`, 1, 4) = '2367';
 UPDATE `subcuentas` SET `SolicitaBase`=1 WHERE SUBSTRING(`PUC`, 1, 4) = '2368';
 UPDATE `subcuentas` SET `SolicitaBase`=1 WHERE SUBSTRING(`PUC`, 1, 4) = '1355';
 
+INSERT INTO `cuentas` (`idPUC`, `Nombre`, `Valor`, `GupoCuentas_PUC`, `Updated`, `Sync`) VALUES
+('1235',	'TITULOS',	NULL,	'',	'2019-04-25 13:03:10',	'0000-00-00 00:00:00');
 
+CREATE TABLE `pos_registro_descuentos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `idFactura` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `TablaItem` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `idProducto` bigint(20) NOT NULL,
+  `Cantidad` double NOT NULL,
+  `ValorDescuento` double NOT NULL,
+  `idUsuario` int(11) NOT NULL,
+  `idCierre` bigint(20) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+(190,	'Configuracion General',	1,	3,	0,	'configuracion_general',	1,	'onclick=\"SeleccioneTablaDB(`configuracion_general`)\";',	'configuracion_general.php',	'_SELF',	1,	'configuracion.png',	7,	'2019-05-01 11:17:41',	'2018-05-01 11:17:41');

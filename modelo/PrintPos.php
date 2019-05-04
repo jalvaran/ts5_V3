@@ -1075,6 +1075,31 @@ class PrintPos extends ProcesoVenta{
         }
 
         fwrite($handle,str_pad("Total Devoluciones $TotalDevoluciones",10," ",STR_PAD_LEFT));
+        
+        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        
+        /////////////////////////////DESCUENTOS
+        
+        $sql = "SELECT Cantidad, ValorDescuento as Total, idProducto"
+                . " FROM pos_registro_descuentos "
+                . " WHERE idCierre='$idCierre'";
+	
+        $consulta=$this->Query($sql);
+	$TotalDescuentos=0;						
+	while($DatosVenta=$this->FetchArray($consulta)){
+	
+            $TotalDescuentos=$TotalDescuentos+$DatosVenta["Total"];
+           
+            fwrite($handle,str_pad($DatosVenta["Cantidad"],4," ",STR_PAD_RIGHT));
+
+            fwrite($handle,str_pad(substr($DatosVenta["idProducto"],0,20),20," ",STR_PAD_BOTH)."   ");
+
+            fwrite($handle,str_pad("$".number_format($DatosVenta["Total"]),10," ",STR_PAD_LEFT));
+
+            fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        }
+
+        fwrite($handle,str_pad("Total Descuentos $TotalDescuentos",10," ",STR_PAD_LEFT));
     
     /////////////////////////////TOTALES
     

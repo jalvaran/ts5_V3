@@ -232,6 +232,11 @@ if( !empty($_REQUEST["Accion"]) ){
             $Otros=$obCon->normalizar($_REQUEST["Otros"]);
             $Tarjetas=$obCon->normalizar($_REQUEST["Tarjetas"]);
             $CmbPrint=$obCon->normalizar($_REQUEST["CmbPrint"]);
+            $idCajero=$obCon->normalizar($_REQUEST["idCajero"]);
+            if($idCajero<>$idUser){
+                print("Se ha iniciado sesion por un usario diferente al cajero actual, por favor inicie sesion nuevamente");
+                exit();
+            }
             $FormaPagoFactura=$CmbFormaPago;
             if(is_numeric($FormaPagoFactura)){
                 $FormaPagoFactura="Credito a $CmbFormaPago dias";
@@ -268,6 +273,12 @@ if( !empty($_REQUEST["Accion"]) ){
                 }
                 
             }
+            
+            if($FormaPagoFactura<>'Contado' and $idCliente<=1){
+                print("E5;No se puede crear una factura tipo $FormaPagoFactura asignada al cliente $idCliente");
+                    exit();
+            }
+            
             $idFactura=$obFactura->idFactura();
                         
             $NumFactura=$obFactura->CrearFactura($idFactura, $Fecha, $Hora, $CmbResolucion, "", "", $FormaPagoFactura, $Subtotal, $IVA, $Total, $Descuentos, $SaldoFactura, "", $idEmpresa, $idCentroCostos, $idSucursal, $idUser, $idCliente, $TotalCostos, $Observaciones, $Efectivo, $Devuelta, $Cheques, $Otros, $Tarjetas, 0, 0, "");
@@ -324,7 +335,7 @@ if( !empty($_REQUEST["Accion"]) ){
             if($CmbColaboradores>0){
                 $obCon->AgregueVentaColaborador($idFactura,$CmbColaboradores);
             }
-            $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);
+            
             
             $DatosImpresora=$obCon->DevuelveValores("config_puertos", "ID", 1);
             if($DatosImpresora["Habilitado"]=="SI" AND $CmbPrint=='SI'){
@@ -340,6 +351,13 @@ if( !empty($_REQUEST["Accion"]) ){
                 }
             }
             
+            $sql="INSERT INTO pos_registro_descuentos (Fecha,idFactura,TablaItem,idProducto,Cantidad,ValorDescuento,idUsuario) "
+                    . "SELECT Fecha,'$idFactura',TablaItem,ProductosVenta_idProductosVenta,Cantidad,Descuento,'$idUser' "
+                    . " FROM preventa WHERE VestasActivas_idVestasActivas='$idPreventa' AND Descuento <> 0;";
+            $obCon->Query($sql);
+            
+            $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);
+            
             $LinkFactura="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2&ID=$idFactura";
             $Mensaje="<br><strong>Factura $NumFactura Creada Correctamente </strong><a href='$LinkFactura'  target='blank'> Imprimir</a>";
             $Mensaje.="<br><h3>Devuelta: ".number_format($Devuelta)."</h3>";
@@ -351,7 +369,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;//fin case 7
         
-        case 8:
+        case 8://Cotizar
             $obPrint = new PrintPos($idUser);            
             $fecha=date("Y-m-d");
             $idPreventa=$obCon->normalizar($_REQUEST['idPreventa']);
@@ -369,7 +387,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;//fin caso 8
         
-        case 9:
+        case 9://Autorizar una preventa
             
             $idPreventa=$obCon->normalizar($_REQUEST['idPreventa']);            
             $pw=$obCon->normalizar($_REQUEST['TxtAutorizaciones']);
@@ -432,7 +450,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Descuento=(100-$Descuento)/100;
             
             $sql="UPDATE preventa SET Subtotal=round(Subtotal*$Descuento), Impuestos=round(Impuestos*$Descuento),"
-                    . " TotalVenta=round(TotalVenta*$Descuento), ValorAcordado=round(ValorAcordado*$Descuento) "
+                    . " TotalVenta=round(TotalVenta*$Descuento), ValorAcordado=round(ValorAcordado*$Descuento), Descuento=round((ValorUnitario-ValorAcordado)*Cantidad) "
                     . " WHERE VestasActivas_idVestasActivas='$idPreventa'";
             $obCon->Query($sql);
             print("OK;Descuento Aplicado");

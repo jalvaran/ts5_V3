@@ -125,8 +125,11 @@ class Administrador extends conexion{
          
          
         $TotalRegistros=$DatosConteo["TotalRegistros"];
-
+        
         $Orden=" ORDER BY $OrdenColumna $AscDesc ";
+        if($Tabla=='vista_balancextercero2'){
+            $Orden=='';
+        }
         $Limite="LIMIT $startpoint,$limit";
         
         $QueryCompleto=$sql." ".$Condicion." ".$Orden." ".$Limite;

@@ -29,6 +29,7 @@ $css->PageInit($myTitulo);
         print("<h3>  No tienes una caja asignada, no puedes continuar</h3>");
         $Habilita=0;
     }
+    $css->input("hidden", "idCajero", "", "idCajero", "", $idUser, "", "", "", "");
     $css->CrearDiv("", "col-md-12", "left", $Habilita, 1); 
         $css->fieldset("", "", "FieldDatosCotizacion", "DatosCotizacion", "", "");
             $css->legend("", "");

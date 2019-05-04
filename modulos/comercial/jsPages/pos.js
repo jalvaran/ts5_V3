@@ -921,6 +921,7 @@ function GuardarFactura(){
     var TxtTotalFactura = parseFloat(document.getElementById('TxtTotalFactura').value);
     var TxtTotalAnticipos = parseFloat(document.getElementById('TxtTotalAnticiposFactura').value);
     var idCliente = (document.getElementById('idCliente').value);
+    var idCajero = (document.getElementById('idCajero').value);
     
     if(!$.isNumeric(Devuelta) ||  Devuelta<0){
         
@@ -1017,6 +1018,7 @@ function GuardarFactura(){
         form_data.append('idCliente', idCliente);        
         form_data.append('AnticiposCruzados', AnticiposCruzados);
         form_data.append('CmbPrint', CmbPrint);
+        form_data.append('idCajero', idCajero);
         AnticiposCruzados=0;
         $.ajax({
         url: './procesadores/pos.process.php',

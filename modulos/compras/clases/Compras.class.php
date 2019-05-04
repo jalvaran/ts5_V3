@@ -756,7 +756,8 @@ class Compras extends ProcesoVenta{
        
         $Consulta=$this->ConsultarTabla("ordenesdecompra_items", "WHERE NumOrden='$idOrdenACopiar'");
         while($DatosOrden=$this->FetchAssoc($Consulta)){
-            $this->IngresaItemOrdenCompra($idOrdenDestino, $DatosOrden["idProducto"], $DatosOrden["Cantidad"], $DatosOrden["ValorUnitario"], $DatosOrden["Tipo_Impuesto"], "NO", "");
+            $DatosTiposIVA=$this->DevuelveValores("porcentajes_iva", "Valor", $DatosOrden["Tipo_Impuesto"]);
+            $this->IngresaItemOrdenCompra($idOrdenDestino, $DatosOrden["idProducto"], $DatosOrden["Cantidad"], $DatosOrden["ValorUnitario"], $DatosTiposIVA["ID"], "NO", "");
         
         }
         
