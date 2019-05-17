@@ -14,7 +14,23 @@ class Contabilidad extends conexion{
      * @param type $vector
      * @return type
      */
-    public function ConstruirVistaBalanceTercero($Tipo,$FechaInicial,$FechaFinal,$Empresa,$CentroCostos,$vector){
+    public function ConstruirVistaBalanceTercero($Tipo,$FechaInicial,$FechaFinal,$Empresa,$CentroCostos,$Tercero,$CuentaContable,$vector){
+        
+        
+        $sql="DROP VIEW IF EXISTS `vista_saldos_iniciales_clase`;";
+        $this->Query($sql);
+        $sql="DROP VIEW IF EXISTS `vista_movimientos_clase`;";
+        $this->Query($sql);
+        
+        $sql="DROP VIEW IF EXISTS `vista_saldos_iniciales_grupo`;";
+        $this->Query($sql);
+        $sql="DROP VIEW IF EXISTS `vista_movimientos_grupo`;";
+        $this->Query($sql);
+        
+        $sql="DROP VIEW IF EXISTS `vista_saldos_iniciales_cuenta_padre`;";
+        $this->Query($sql);
+        $sql="DROP VIEW IF EXISTS `vista_movimientos_cuenta_padre`;";
+        $this->Query($sql);
         
         $sql="DROP VIEW IF EXISTS `vista_balancextercero2`;";
         $this->Query($sql);
@@ -24,16 +40,24 @@ class Contabilidad extends conexion{
         
         $CondicionEmpresa="";
         $Condicion=" WHERE ";
-        $CondicionSaldos=" WHERE Fecha <'$FechaInicial'";
+        
         if($Tipo==1){
             $Condicion.="Fecha>='$FechaInicial' AND Fecha <='$FechaFinal'";
-            
+            $CondicionSaldos=" WHERE Fecha <'$FechaInicial'";
         }else{
             $Condicion.="Fecha <='$FechaFinal'";
-            
+            $CondicionSaldos=" WHERE Fecha <'0000-00-00'";
         }
         if($Empresa<>"ALL"){
             $CondicionEmpresa=" AND idEmpresa = '$Empresa'";
+        }
+        $CondicionTercero="";
+        if($Tercero<>""){
+            $CondicionTercero=" AND Tercero_Identificacion = '$Tercero'";
+        }
+        $CondicionCuenta="";
+        if($CuentaContable<>""){
+            $CondicionCuenta=" AND CuentaPUC LIKE '$CuentaContable%'";
         }
         
         $CondicionCentroCostos="";
@@ -42,6 +66,40 @@ class Contabilidad extends conexion{
         }
         
         
+        $sql="
+            CREATE VIEW vista_saldos_iniciales_clase AS
+            SELECT SUBSTRING(CuentaPUC,1,1) as Clase,SUM(Debito - Credito) as SaldoInicialClase FROM librodiario $CondicionSaldos  
+              GROUP BY SUBSTRING(CuentaPUC,1,1);";         
+        $this->Query($sql);
+        
+        $sql="
+            CREATE VIEW vista_movimientos_clase AS
+            SELECT SUBSTRING(CuentaPUC,1,1) as Clase,SUM(Debito) as DebitosClase,SUM(Credito) as CreditosClase FROM librodiario $Condicion "
+                . " GROUP BY SUBSTRING(CuentaPUC,1,1);";         
+        $this->Query($sql);
+        
+        $sql="
+            CREATE VIEW vista_saldos_iniciales_grupo AS
+            SELECT SUBSTRING(CuentaPUC,1,2) as Grupo,SUM(Debito - Credito) as SaldoInicialGrupo FROM librodiario $CondicionSaldos  
+              GROUP BY SUBSTRING(CuentaPUC,1,2);";         
+        $this->Query($sql);
+        
+        $sql="
+            CREATE VIEW vista_movimientos_grupo AS
+            SELECT SUBSTRING(CuentaPUC,1,2) as Grupo,SUM(Debito) as DebitosGrupo,SUM(Credito) as CreditosGrupo FROM librodiario $Condicion "
+                . " GROUP BY SUBSTRING(CuentaPUC,1,2);";         
+        $this->Query($sql);
+        
+        $sql="
+            CREATE VIEW vista_saldos_iniciales_cuenta_padre AS
+            SELECT SUBSTRING(CuentaPUC,1,4) as CuentaPadre,SUM(Debito - Credito) as SaldoInicialCuentaPadre FROM librodiario $CondicionSaldos  GROUP BY SUBSTRING(CuentaPUC,1,4);";         
+        $this->Query($sql);
+        
+        $sql="
+            CREATE VIEW vista_movimientos_cuenta_padre AS
+            SELECT SUBSTRING(CuentaPUC,1,4) as CuentaPadre,SUM(Debito) as DebitosCuentaPadre,SUM(Credito) as CreditosCuentaPadre FROM librodiario $Condicion "
+                . " GROUP BY SUBSTRING(CuentaPUC,1,4);";         
+        $this->Query($sql);
         
         
         $sql="CREATE VIEW vista_saldo_inicial_cuentapuc AS
@@ -55,22 +113,35 @@ class Contabilidad extends conexion{
         
         $sql="CREATE VIEW vista_balancextercero2 AS
             SELECT (SUBSTRING(CuentaPUC,1,8)) as ID,Fecha,`Tercero_Identificacion` as Identificacion,`Tercero_Razon_Social` AS Razon_Social,
-            `CuentaPUC` , `NombreCuenta`,  
+            `CuentaPUC` , `NombreCuenta`, Tipo_Documento_Intero as TipoDocumento,Num_Documento_Interno as NumDocumento, 
             (SELECT SaldoInicial FROM vista_saldo_inicial_cuentapuc WHERE librodiario.CuentaPUC=vista_saldo_inicial_cuentapuc.ID AND librodiario.Tercero_Identificacion=vista_saldo_inicial_cuentapuc.Tercero_Identificacion LIMIT 1) AS SaldoInicialSubCuenta, 
             
             SUBSTRING(CuentaPUC,1,1) AS Clase,
             (SELECT Clase FROM clasecuenta WHERE PUC=SUBSTRING(CuentaPUC,1,1)) AS NombreClase, 
             
+            (SELECT SaldoInicialClase FROM vista_saldos_iniciales_clase WHERE Clase=SUBSTRING(CuentaPUC,1,1) LIMIT 1) AS SaldoInicialClase,
+            (SELECT DebitosClase FROM vista_movimientos_clase WHERE Clase=SUBSTRING(CuentaPUC,1,1) LIMIT 1) AS DebitosClase,
+            (SELECT CreditosClase FROM vista_movimientos_clase WHERE Clase=SUBSTRING(CuentaPUC,1,1) LIMIT 1) AS CreditosClase,
+            
             SUBSTRING(CuentaPUC,1,2) AS Grupo,
             (SELECT Nombre FROM gupocuentas WHERE PUC=SUBSTRING(CuentaPUC,1,2)) AS NombreGrupo,
             
+            (SELECT SaldoInicialGrupo FROM vista_saldos_iniciales_grupo WHERE Grupo=SUBSTRING(CuentaPUC,1,2) LIMIT 1) AS SaldoInicialGrupo,
+            (SELECT DebitosGrupo FROM vista_movimientos_grupo WHERE Grupo=SUBSTRING(CuentaPUC,1,2) LIMIT 1) AS DebitosGrupo,
+            (SELECT CreditosGrupo FROM vista_movimientos_grupo WHERE Grupo=SUBSTRING(CuentaPUC,1,2) LIMIT 1) AS CreditosGrupo,
+            
             SUBSTRING(CuentaPUC,1,4) AS CuentaPadre,
             (SELECT Nombre FROM cuentas WHERE idPUC=SUBSTRING(CuentaPUC,1,4)) AS NombreCuentaPadre,
+            (SELECT SaldoInicialCuentaPadre FROM vista_saldos_iniciales_cuenta_padre WHERE CuentaPadre=SUBSTRING(CuentaPUC,1,4) LIMIT 1) AS SaldoInicialCuentaPadre,
+            (SELECT DebitosCuentaPadre FROM vista_movimientos_cuenta_padre WHERE CuentaPadre=SUBSTRING(CuentaPUC,1,4) LIMIT 1) AS DebitosCuentaPadre,
+            (SELECT CreditosCuentaPadre FROM vista_movimientos_cuenta_padre WHERE CuentaPadre=SUBSTRING(CuentaPUC,1,4) LIMIT 1) AS CreditosCuentaPadre,
             
+
+
             `Debito`,`Credito`,
             idEmpresa,idCentroCosto
             FROM `librodiario`
-            $Condicion $CondicionEmpresa $CondicionCentroCostos
+            $Condicion $CondicionEmpresa $CondicionCentroCostos $CondicionTercero $CondicionCuenta
             ORDER BY SUBSTRING(CuentaPUC,1,8),Identificacion,CuentaPUC,Fecha ASC";         
         $this->Query($sql);
         

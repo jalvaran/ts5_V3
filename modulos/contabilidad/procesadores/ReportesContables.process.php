@@ -15,8 +15,9 @@ if( !empty($_REQUEST["Accion"]) ){
     switch ($_REQUEST["Accion"]) {
         
         case 1: //Crea un prestamo a un tercero
-            
-            $obExport->ExportarBalanceXTercerosAExcel();
+            $Opciones=$obCon->normalizar($_REQUEST["Opciones"]);
+            $Encabezado=$obCon->normalizar($_REQUEST["Encabezado"]);
+            $obExport->ExportarBalanceXTercerosAExcel($Opciones,$Encabezado);
             print("OKBXT");
            
         break; //fin caso 1

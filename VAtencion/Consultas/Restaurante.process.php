@@ -250,6 +250,7 @@ if(isset($_REQUEST["Accion"])){
                 $DatosVentaRapida["idTarjeta"]=0;
                 $DatosVentaRapida["PagaOtros"]=0;
             }
+            
             $idFactura=$obRest->RegistreVentaRestaurante($idPedido, $idCliente, $TipoPago, $Efectivo, $Devuelta, $CuentaDestino,$idUser, $DatosVentaRapida);
             if($DatosPedido["Estado"]=="DO"){
                 $Estado="FADO";

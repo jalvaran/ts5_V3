@@ -16,7 +16,7 @@ if( !empty($_REQUEST["Accion"]) ){
     $obCon = new Contabilidad($idUser);
     
     switch ($_REQUEST["Accion"]) {
-        case 1: //Crea las opciones para el reporte de Balance por terceros
+        case 1: //Crea las opciones para el reporte de Balance de comprobacion
             $css->CrearDiv("", "col-md-2", "center", 1, 1);
                 $css->fieldset("", "", "FieldReporte", "Reporte", "", "");
                     $css->legend("", "");
@@ -85,14 +85,58 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->Cfieldset();
             $css->CerrarDiv();
             print("<br><br><br><br><br>");
-            $css->CrearDiv("DivAccion", "col-md-4", "center", 1, 1);
+            $css->CrearDiv("DivAccion", "col-md-2", "center", 1, 1);
+                $css->fieldset("", "", "FieldReporte", "Reporte", "", "");
+                    $css->legend("", "");
+                        print("<a href='#'>Opciones</a>");
+                    $css->Clegend();
+                    $css->select("CmbOpciones", "form-control", "CmbOpciones", "", "", "", ""); 
+                        $css->option("", "", "", "1", "", "");
+                            print("Detallado");
+                        $css->Coption();
+                        
+                        $css->option("", "", "", "0", "", "");
+                            print("Sin Detalles");
+                        $css->Coption();
+                        
+                        
+                        
+                    $css->Cselect();
+                $css->Cfieldset();
             $css->CerrarDiv();
             $css->CrearDiv("DivAccion", "col-md-4", "center", 1, 1);
-
-                $css->CrearBotonEvento("BtnCrearReporte", "Generar", 1, "onClick", "GenereBalanceXTerceros()", "verde", "");
-
+                $css->fieldset("", "", "FieldReporte", "Reporte", "", "");
+                    $css->legend("", "");
+                        print("<a href='#'>Tercero</a>");
+                    $css->Clegend();
+                    $css->select("CmbTercero", "form-control", "CmbTercero", "", "", "", "");                
+                        $css->option("", "", "", "", "", "");
+                            print("Seleccione un tercero");
+                        $css->Coption();
+                        
+                    $css->Cselect();
+                $css->Cfieldset();
+                
             $css->CerrarDiv();
-            $css->CrearDiv("DivAccion", "col-md-4", "center", 1, 1);
+            
+            $css->CrearDiv("DivAccion", "col-md-3", "center", 1, 1);
+                $css->fieldset("", "", "FieldReporte", "Reporte", "", "");
+                    $css->legend("", "");
+                        print("<a href='#'>Cuenta</a>");
+                    $css->Clegend();
+                    $css->input("text", "TxtCuentaContable", "form-control", "TxtCuentaContable", "", "", "Cuenta Contable", "off", "", "");
+                $css->Cfieldset();
+                
+            $css->CerrarDiv();
+            $css->CrearDiv("DivAccion", "col-md-3", "center", 1, 1);
+            $css->fieldset("", "", "FieldReporte", "Reporte", "", "");
+                    $css->legend("", "");
+                        print("<a href='#'>Generar</a>");
+                    $css->Clegend();
+                    $css->CrearBotonEvento("BtnCrearReporte", "Generar", 1, "onClick", "GenereBalanceXTerceros()", "verde", "");
+
+                $css->Cfieldset();
+            
             $css->CerrarDiv();
         break; 
     
@@ -101,9 +145,16 @@ if( !empty($_REQUEST["Accion"]) ){
             $FechaInicial=$obCon->normalizar($_REQUEST["TxtFechaInicial"]);
             $FechaFinal=$obCon->normalizar($_REQUEST["TxtFechaFinal"]);
             $Empresa=$obCon->normalizar($_REQUEST["CmbCentroCosto"]);
-            $CentroCostos=$obCon->normalizar($_REQUEST["CmbEmpresa"]);                        
-            $obCon->ConstruirVistaBalanceTercero($Tipo, $FechaInicial, $FechaFinal, $Empresa, $CentroCostos, "");
-            $link="procesadores/ReportesContables.process.php?Accion=1";
+            $CentroCostos=$obCon->normalizar($_REQUEST["CmbEmpresa"]);
+            $CmbOpciones=$obCon->normalizar($_REQUEST["CmbOpciones"]);
+            $CmbTercero=$obCon->normalizar($_REQUEST["CmbTercero"]);
+            $TxtCuentaContable=$obCon->normalizar($_REQUEST["TxtCuentaContable"]);
+            $obCon->ConstruirVistaBalanceTercero($Tipo, $FechaInicial, $FechaFinal, $Empresa, $CentroCostos,$CmbTercero,$TxtCuentaContable, "");
+            $Encabezado=1;
+            if($CmbTercero<>'' or $TxtCuentaContable<>'' ){
+                $Encabezado=0;
+            }
+            $link="procesadores/ReportesContables.process.php?Accion=1&Opciones=$CmbOpciones&Encabezado=$Encabezado";
             $html="<a id='LinkExport' href='$link' target='_BLANK' >Ver</a>";
             print($html);
         break; 

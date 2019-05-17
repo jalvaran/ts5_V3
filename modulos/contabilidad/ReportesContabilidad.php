@@ -33,7 +33,7 @@ $css->PageInit($myTitulo);
                     print("Seleccione");
                 $css->Coption();
                 $css->option("", "", "Balance x Terceros", 1, "", "");
-                    print("Balance por Terceros");
+                    print("Balance de Comprobación");
                 $css->Coption();
                 
                 $css->option("", "", "Estado de resultados", 3, "", "");

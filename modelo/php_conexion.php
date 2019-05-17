@@ -1929,16 +1929,16 @@ public function CalculePesoRemision($idCotizacion)
             $this->ItemFacturaVenta($NumFactura, $DatosCotizacion, $DatosProducto, $SubtotalItem, $IVAItem, $TotalItem, $PorcentajeIVA, $SubtotalCosto, $FechaFactura, $DatosOtrosImpuestos, "");
                          
         }
-        /* para pos 1
+        
         $ID=$Datos["ID"]; 
-        $TotalSubtotal=$TotalSubtotal;
-        $TotalIVA=round($TotalIVA);
-        $GranTotal=round($GranTotal);
-        $TotalCostos=round($TotalCostos);
+        $TotalSubtotal=round($TotalSubtotal,2);
+        $TotalIVA=round($TotalIVA,2);
+        $GranTotal=round($GranTotal,2);
+        $TotalCostos=round($TotalCostos,2);
         $sql="UPDATE facturas SET Subtotal='$TotalSubtotal', IVA='$TotalIVA', Total='$GranTotal', "
                 . "SaldoFact='$GranTotal', TotalCostos='$TotalCostos' WHERE idFacturas='$ID'";
         $this->Query($sql);
-        */
+        
         
     } 
     //inserta item de factura

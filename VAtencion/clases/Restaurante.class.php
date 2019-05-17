@@ -1,4 +1,5 @@
 <?php
+include_once 'Recetas.class.php';
 /* 
  * Clase donde se realizaran procesos de compras u otros modulos.
  * Julian Alvaran
@@ -324,8 +325,16 @@ class Restaurante extends ProcesoVenta{
             $Columnas[25]="idUsuarios";         $Valores[25]= $idUser;
             
             $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
-            
+        if($DatosProducto['Existencias']<=0){
+            $DatosReceta=$this->DevuelveValores("recetas_relaciones", "ReferenciaProducto", $DatosProducto['Referencia']);  
+            if($DatosReceta["ID"]<>''){
+                $obReceta=new Recetas($idUser);
+                $obReceta->FabricarProducto($DatosCotizacion["idProducto"], $DatosCotizacion['Cantidad'], "");
+                $DatosProducto['Existencias']=$DatosProducto['Existencias']+$DatosCotizacion['Cantidad'];
                 
+            }
+        }    
+        
         $DatosKardex["Cantidad"]=$DatosCotizacion['Cantidad'];
         $DatosKardex["idProductosVenta"]=$DatosProducto["idProductosVenta"];
         $DatosKardex["CostoUnitario"]=$DatosProducto['CostoUnitario'];

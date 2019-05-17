@@ -17,6 +17,9 @@ function GenereBalanceXTerceros(){
     var TxtFechaFinal = document.getElementById('TxtFechaFinal').value;
     var CmbCentroCosto = document.getElementById('CmbCentroCosto').value;
     var CmbEmpresa = document.getElementById('CmbEmpresa').value;
+    var CmbOpciones = document.getElementById('CmbOpciones').value;
+    var CmbTercero = document.getElementById('CmbTercero').value;
+    var TxtCuentaContable = document.getElementById('TxtCuentaContable').value;
     
     if(Reporte==""){
         alertify.alert("Debe seleccionar un Reporte");
@@ -68,6 +71,9 @@ function GenereBalanceXTerceros(){
         form_data.append('TxtFechaFinal', TxtFechaFinal);
         form_data.append('CmbCentroCosto', CmbCentroCosto);
         form_data.append('CmbEmpresa', CmbEmpresa);
+        form_data.append('CmbOpciones', CmbOpciones);
+        form_data.append('CmbTercero', CmbTercero);
+        form_data.append('TxtCuentaContable', TxtCuentaContable);
         
         $.ajax({
         url: './Consultas/ReportesContables.draw.php',

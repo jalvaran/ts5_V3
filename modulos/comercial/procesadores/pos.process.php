@@ -300,7 +300,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Datos["CuentaDestino"]=$CmbCuentaIngresoFactura;
             $Datos["EmpresaPro"]=$idEmpresa;
             $Datos["CentroCostos"]=$idCentroCostos;
-            $obFactura->InsertarItemsPreventaAItemsFactura($Datos);
+            $obFactura->pos_InsertarItemsPreventaAItemsFactura($Datos,$idUser);
                 
             //$obFactura->CopiarItemsCotizacionAItemsFactura($idCotizacion, $idFactura, $Fecha,$idUser, "");
             if($CmbFormaPago=='Contado'){

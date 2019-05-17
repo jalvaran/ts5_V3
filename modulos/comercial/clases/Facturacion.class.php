@@ -39,7 +39,9 @@ class Facturacion extends ProcesoVenta{
      * @param type $Vector
      */
     public function CrearFactura($idFactura,$Fecha,$Hora,$idResolucion,$OrdenCompra,$OrdenSalida,$FormaPago,$Subtotal,$IVA,$Total,$Descuentos,$SaldoFactura,$idCotizacion,$idEmpresa,$idCentroCostos,$idSucursal,$idUsuario,$idCliente,$TotalCostos,$Observaciones,$Efectivo,$Devuelta,$Cheques,$Otros,$Tarjetas,$idTarjetas,$ReportarFacturaElectronica,$Vector) {
-        
+        if($idEmpresa==0 or $idEmpresa==''){
+            $idEmpresa=1;
+        }
         $DatosResolucion=$this->ValorActual("empresapro_resoluciones_facturacion", "Estado,Completada,Prefijo,Tipo,Desde,Hasta", " ID='$idResolucion'");        
         $Disponibilidad=$DatosResolucion["Estado"];
         if($DatosResolucion["Completada"]=="SI"){
@@ -762,6 +764,128 @@ class Facturacion extends ProcesoVenta{
         return ($idCierre);
         
     }
+    
+    
+    public function pos_InsertarItemsPreventaAItemsFactura($Datos,$idUser){
+        
+        $idPreventa=$Datos["idPreventa"];
+        $NumFactura=$Datos["ID"];
+        $FechaFactura=$Datos["FechaFactura"];
+                
+        $sql="SELECT * FROM preventa WHERE VestasActivas_idVestasActivas='$idPreventa'";
+        $Consulta=$this->Query($sql);
+        $TotalSubtotal=0;
+        $TotalIVA=0;
+        $GranTotal=0;
+        $TotalCostos=0;
+        $DatosOtrosImpuestos["ValorImpuesto"]=0;
+        $DatosOtrosImpuestos["ID"]=0;
+        $Entra=0;
+        while($DatosCotizacion=  $this->FetchArray($Consulta)){
+            $TablaItem=$DatosCotizacion["TablaItem"];
+            $idTabla='idProductosVenta';
+            
+            if($DatosCotizacion["idSistema"]>0){
+                $idSistema=$DatosCotizacion["idSistema"];
+                
+                $consulta=$this->ConsultarTabla("facturas_items", " WHERE idFactura='$NumFactura' AND TablaItems='sistemas' AND Referencia='$idSistema'");
+                $DatosItem=$this->FetchArray($consulta);
+                if($DatosItem["ID"]==''){
+                    $Entra=1;
+                    $DatosSistema=$this->DevuelveValores("sistemas", "ID", $idSistema);
+                    $DatosCotizacionLineaSistema["TablaItem"]='sistemas';
+                    $DatosCotizacionLineaSistema["ValorAcordado"]=0;
+                    $DatosCotizacionLineaSistema["CostoUnitario"]=0;
+                    $DatosCotizacionLineaSistema["TipoItem"]='MO';
+                    $DatosCotizacionLineaSistema["Cantidad"]=0;
+                    $DatosProductoLineaSistema["Referencia"]=$idSistema;
+                    $DatosProductoLineaSistema["Nombre"]=$DatosSistema["Nombre"];
+                    $DatosProductoLineaSistema["Departamento"]=0;
+                    $DatosProductoLineaSistema["Sub1"]=0;
+                    $DatosProductoLineaSistema["Sub2"]=0;
+                    $DatosProductoLineaSistema["Sub3"]=0;
+                    $DatosProductoLineaSistema["Sub4"]=0;
+                    $DatosProductoLineaSistema["Sub5"]=0;
+                    $DatosProductoLineaSistema["CuentaPUC"]='';
+                    
+                    $this->ItemFacturaVenta($NumFactura, $DatosCotizacionLineaSistema, $DatosProductoLineaSistema, 0, 0, 0, 0, 0, '', $DatosOtrosImpuestos, "");
+                    
+                }
+                 
+                //$idTabla='ID';
+                
+            }else{
+                if($Entra==1){
+                    $Entra=0;
+                    
+                    $DatosCotizacionLineaSistema["TablaItem"]='ln';
+                    $DatosCotizacionLineaSistema["ValorAcordado"]=0;
+                    $DatosCotizacionLineaSistema["CostoUnitario"]=0;
+                    $DatosCotizacionLineaSistema["TipoItem"]='MO';
+                    $DatosCotizacionLineaSistema["Cantidad"]=0;
+                    $DatosProductoLineaSistema["Referencia"]="";
+                    $DatosProductoLineaSistema["Nombre"]="";
+                    $DatosProductoLineaSistema["Departamento"]=0;
+                    $DatosProductoLineaSistema["Sub1"]=0;
+                    $DatosProductoLineaSistema["Sub2"]=0;
+                    $DatosProductoLineaSistema["Sub3"]=0;
+                    $DatosProductoLineaSistema["Sub4"]=0;
+                    $DatosProductoLineaSistema["Sub5"]=0;
+                    $DatosProductoLineaSistema["CuentaPUC"]='';
+                    
+                    $this->ItemFacturaVenta($NumFactura, $DatosCotizacionLineaSistema, $DatosProductoLineaSistema, 0, 0, 0, 0, 0, '', $DatosOtrosImpuestos, "");
+                    
+                }
+            }
+            $DatosProducto=$this->DevuelveValores($DatosCotizacion["TablaItem"], $idTabla, $DatosCotizacion["ProductosVenta_idProductosVenta"]);
+            //Reviso si hay impuestos adicionales en los productos
+            
+            if($DatosCotizacion["TablaItem"]=='productosventa'){
+                $DatosOtrosImpuestos=$this->DevuelveValores("productos_impuestos_adicionales","idProducto",$DatosCotizacion["ProductosVenta_idProductosVenta"]);
+                
+            }
+            ////Empiezo a insertar en la tabla items facturas
+            ///
+            ///
+            $SubtotalItem=$DatosCotizacion['ValorAcordado']*$DatosCotizacion['Cantidad'];
+            if(isset($DatosProducto["Especial"])){
+                if($DatosProducto["Especial"]=='SI'){
+                    $SubtotalItem=$DatosCotizacion['ValorAcordado'];
+                }
+            }
+            $TotalSubtotal=$TotalSubtotal+$SubtotalItem; //se realiza la sumatoria del subtotal
+            
+            $IVAItem=($SubtotalItem*$DatosProducto["IVA"]);
+           
+            $TotalIVA=$TotalIVA+$IVAItem; //se realiza la sumatoria del iva
+            
+            $TotalItem=$SubtotalItem+$IVAItem;
+            $GranTotal=$GranTotal+$TotalItem;//se realiza la sumatoria del total
+            
+            $SubtotalCosto=$DatosCotizacion['Cantidad']*$DatosCotizacion["CostoUnitario"];
+            $TotalCostos=$TotalCostos+$SubtotalCosto;//se realiza la sumatoria de los costos
+            if($DatosProducto["IVA"]<>"E"){
+                $PorcentajeIVA=($DatosProducto["IVA"]*100)."%";
+            }else{
+                $PorcentajeIVA="Exc";
+            }
+            $this->ItemFacturaVenta($NumFactura, $DatosCotizacion, $DatosProducto, $SubtotalItem, $IVAItem, $TotalItem, $PorcentajeIVA, $SubtotalCosto, $FechaFactura, $DatosOtrosImpuestos, "");
+                         
+        }
+        /*
+        $ID=$Datos["ID"]; 
+        $TotalSubtotal=round($TotalSubtotal,2);
+        $TotalIVA=round($TotalIVA,2);
+        $GranTotal=round($GranTotal,2);
+        $TotalCostos=round($TotalCostos,2);
+        $sql="UPDATE facturas SET Subtotal='$TotalSubtotal', IVA='$TotalIVA', Total='$GranTotal', "
+                . "SaldoFact='$GranTotal', TotalCostos='$TotalCostos' WHERE idFacturas='$ID'";
+        $this->Query($sql);
+        
+        
+         * 
+         */
+    } 
     
     /**
      * Fin Clase

@@ -306,3 +306,7 @@ CREATE TABLE `pos_registro_descuentos` (
 
 INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
 (190,	'Configuracion General',	1,	3,	0,	'configuracion_general',	1,	'onclick=\"SeleccioneTablaDB(`configuracion_general`)\";',	'configuracion_general.php',	'_SELF',	1,	'configuracion.png',	7,	'2019-05-01 11:17:41',	'2018-05-01 11:17:41');
+
+
+DROP TRIGGER IF EXISTS `insKardex`;
+
