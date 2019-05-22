@@ -308,5 +308,14 @@ INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`,
 (190,	'Configuracion General',	1,	3,	0,	'configuracion_general',	1,	'onclick=\"SeleccioneTablaDB(`configuracion_general`)\";',	'configuracion_general.php',	'_SELF',	1,	'configuracion.png',	7,	'2019-05-01 11:17:41',	'2018-05-01 11:17:41');
 
 
-DROP TRIGGER IF EXISTS `insKardex`;
+CREATE TABLE `contabilidad_parametros_cuentasxpagar` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `CuentaPUC` bigint(20) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
+INSERT INTO `contabilidad_parametros_cuentasxpagar` (`ID`, `CuentaPUC`, `Updated`, `Sync`) VALUES
+(1,	2205,	'2019-05-22 16:53:04',	'0000-00-00 00:00:00'),
+(2,	220505,	'2019-05-22 16:53:04',	'0000-00-00 00:00:00');

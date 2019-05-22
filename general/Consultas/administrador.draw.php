@@ -735,10 +735,6 @@ if( !empty($_REQUEST["Accion"]) ){
 
             
             $TotalRegistros=$DatosConteo["TotalRegistros"];
-            
-            
-
-                
                 if($TotalRegistros>$limit){      
 
                     $css->PaginadorTablas($Tabla, $limit, $NumPage, $TotalRegistros, "",$DivTablas);

@@ -243,4 +243,26 @@ CREATE VIEW vista_documentos_contables AS
 SELECT  dcc.`ID`,dcc.`Fecha`,dc.`Prefijo` as Prefijo,dc.`Nombre` as Nombre,dcc.`Consecutivo`,dcc.`Descripcion`,dcc.Estado,dcc.idUser,dcc.`idDocumento`,dcc.`idEmpresa`,dcc.`idSucursal`,dcc.`idCentroCostos`
 FROM `documentos_contables_control` dcc INNER JOIN documentos_contables dc ON dc.ID=dcc.`idDocumento`;
 
+DROP VIEW IF EXISTS `vista_cuentasxterceros_v2`;
+CREATE VIEW vista_cuentasxterceros_v2 AS
+SELECT CuentaPUC,NombreCuenta,Tercero_Identificacion,Tercero_Razon_Social,SUM(Debito) as Debitos,SUM(Credito) as Creditos,SUM(Debito-Credito) AS Total
+FROM librodiario GROUP BY Tercero_Identificacion,CuentaPUC;
+
+
+DROP VIEW IF EXISTS `vista_cuentasxpagar_v2`;
+CREATE VIEW vista_cuentasxpagar_v2 AS
+SELECT *
+FROM vista_cuentasxterceros_v2 t1 WHERE t1.Total<>0 AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Total;
+
+DROP VIEW IF EXISTS `vista_cuentasxtercerosdocumentos_v2`;
+CREATE VIEW vista_cuentasxtercerosdocumentos_v2 AS
+SELECT CuentaPUC,NombreCuenta,Tercero_Identificacion,Tercero_Razon_Social,Fecha,Num_Documento_Externo as NumeroDocumentoExterno,SUM(Debito) as Debitos,SUM(Credito) as Creditos,SUM(Debito-Credito) AS Total
+FROM librodiario GROUP BY Tercero_Identificacion,CuentaPUC,Num_Documento_Externo;
+
+
+DROP VIEW IF EXISTS `vista_cuentasxpagardetallado_v2`;
+CREATE VIEW vista_cuentasxpagardetallado_v2 AS
+SELECT *
+FROM vista_cuentasxtercerosdocumentos_v2 t1 WHERE t1.Total<>0 AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Fecha;
+
 
