@@ -23,7 +23,7 @@ $css->PageInit($myTitulo);
         $css->div("DivFrmModalAcciones", "", "", "", "", "", "");
         $css->Cdiv();        
     $css->CModal("BntModalAcciones", "onclick=SeleccioneAccionFormularios()", "button", "Guardar");
-
+    $css->input("hidden", "TxtBtnVerActivo", "", "TxtBtnVerActivo", "", "", "", "", "", "");
     print("<br>");
     $css->CrearDiv("", "col-md-12", "center", 1, 1);   
         $css->TabInit();

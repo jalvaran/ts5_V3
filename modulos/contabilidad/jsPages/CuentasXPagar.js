@@ -137,6 +137,7 @@ function BuscarTercero(){
 
 
 function DibujeCuentasXPagarDocumentos(Page=1,Busqueda='',Tercero=''){
+    document.getElementById("TxtBtnVerActivo").value="BtnVer_"+Tercero;
     document.getElementById("DivDocumentosTercero").innerHTML='<div id="GifProcess">Procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
     
     var form_data = new FormData();

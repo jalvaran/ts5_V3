@@ -138,7 +138,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla($DatosCuentasXPagar["Tercero_Razon_Social"], 1);
                         $css->ColTabla(number_format($DatosCuentasXPagar["Total"]), 1);
                         print("<td style='text-align:center'>");
-                            print('<a href="#" onclick="DibujeCuentasXPagarDocumentos(`1`,``,`'.$NIT.'`);"><i class="fa fa-fw fa-eye"></i></a>');
+                            print('<a id="BtnVer_'.$NIT.'" href="#" onclick="DibujeCuentasXPagarDocumentos(`1`,``,`'.$NIT.'`);"><i class="fa fa-fw fa-eye"></i></a>');
                         print("</td>");
                     $css->CierraFilaTabla();
                 }

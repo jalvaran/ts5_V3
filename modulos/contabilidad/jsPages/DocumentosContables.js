@@ -441,6 +441,13 @@ function GuardarDocumento(idDocumento=''){
         success: function(data){
             var respuestas = data.split(';'); 
             if(respuestas[0]=="OK"){
+                
+                if ( $("#TxtBtnVerActivo").length ) {
+                    
+                    var idBtn=document.getElementById("TxtBtnVerActivo").value;
+                    document.getElementById(idBtn).click();
+                }
+                
                 var mensaje=respuestas[1];
                 LimpiarDivs();
                 var x = document.getElementById("idDocumento");
