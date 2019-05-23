@@ -666,7 +666,7 @@ class Compra extends ProcesoVenta{
             $Datos["Fecha"]=$DatosNota["Fecha"];
             $Datos["Tipo_Documento_Intero"]="NOTA_DEVOLUCION";
             $Datos["Num_Documento_Interno"]=$idNota;
-            $Datos["Num_Documento_Externo"]="";
+            $Datos["Num_Documento_Externo"]="NOTA_DEVOLUCION_$idNota";
             $Datos["Tercero_Tipo_Documento"]=$DatosTercero["Tipo_Documento"];
             $Datos["Tercero_Identificacion"]=$DatosTercero["Num_Identificacion"];
             $Datos["Tercero_DV"]=$DatosTercero["DV"];

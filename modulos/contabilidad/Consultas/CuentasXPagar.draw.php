@@ -286,19 +286,64 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 while($DatosCuentasXPagar=$obCon->FetchAssoc($Consulta)){
                     $css->FilaTabla(14);
+                        $idItem=$DatosCuentasXPagar["ID"];
                         $css->ColTabla($DatosCuentasXPagar["Fecha"], 1);
-                        $css->ColTabla($DatosCuentasXPagar["NumeroDocumentoExterno"], 1);
+                        print("<td style='text-align:center'>");
+                            print('<a href="#" onclick="VerMovimientosCuentaXPagar('.$idItem.');">'.$DatosCuentasXPagar["NumeroDocumentoExterno"].' <i class="fa fa-eye"></i></a>');
+                        print("</td>");
+                        //$css->ColTabla($DatosCuentasXPagar["NumeroDocumentoExterno"], 1);
                         $css->ColTabla($DatosCuentasXPagar["CuentaPUC"], 1);
                         $css->ColTabla($DatosCuentasXPagar["NombreCuenta"], 1);                        
                         $css->ColTabla(number_format($DatosCuentasXPagar["Total"]), 1);
-                        $css->ColTabla("<strong>Acciones</strong>", 1);
+                        print("<td style='text-align:center'>");
+                            print('<a href="#" onclick="AgregueMovimientoDesdeCuentaXPagar(`'.$idItem.'`,`'.$DatosCuentasXPagar["NumeroDocumentoExterno"].'`);"><i class="fa fa-plus"></i></a>');
+                        print("</td>");
                     $css->CierraFilaTabla();
                 }
             $css->CerrarTabla();
             
         break; //Fin caso 2
     
-        
+        case 3:
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            
+            $DatosMovimiento=$obCon->DevuelveValores("vista_cuentasxtercerosdocumentos_v2", "ID", $idItem);
+            
+            
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Fecha</strong>", 1);
+                    $css->ColTabla("<strong>Tercero</strong>", 1);
+                    $css->ColTabla("<strong>Tipo Documento</strong>", 1);
+                    $css->ColTabla("<strong>Documento Interno</strong>", 1);
+                    $css->ColTabla("<strong>Documento Referencia</strong>", 1);
+                    $css->ColTabla("<strong>Cuenta</strong>", 1);
+                    $css->ColTabla("<strong>Nombre Cuenta</strong>", 1);
+                    $css->ColTabla("<strong>Debito</strong>", 1);
+                    $css->ColTabla("<strong>Credito</strong>", 1);
+                    
+                $css->CierraFilaTabla();
+                
+                $sql="SELECT * FROM librodiario WHERE Num_Documento_Externo='$DatosMovimiento[NumeroDocumentoExterno]' and Tercero_Identificacion='$DatosMovimiento[Tercero_Identificacion]' ";
+                $Consulta=$obCon->Query($sql);
+            
+                while($DatosLibro=$obCon->FetchAssoc($Consulta)){
+                    $css->FilaTabla(14);
+                        $css->ColTabla($DatosLibro["Fecha"], 1);
+                        $css->ColTabla($DatosLibro["Tercero_Razon_Social"]." ".$DatosLibro["Tercero_Identificacion"], 1);
+                        $css->ColTabla($DatosLibro["Tipo_Documento_Intero"], 1);
+                        $css->ColTabla($DatosLibro["Num_Documento_Interno"], 1);
+                        $css->ColTabla($DatosLibro["Num_Documento_Externo"], 1);
+                        $css->ColTabla($DatosLibro["CuentaPUC"], 1);
+                        $css->ColTabla($DatosLibro["NombreCuenta"], 1);
+                        $css->ColTabla(number_format($DatosLibro["Debito"]), 1);
+                        $css->ColTabla(number_format($DatosLibro["Credito"]), 1);
+
+                    $css->CierraFilaTabla();
+                }
+            $css->CerrarTabla();
+            
+        break;//Fin caso 3    
         
     }
     

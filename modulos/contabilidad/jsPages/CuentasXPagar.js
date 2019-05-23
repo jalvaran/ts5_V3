@@ -180,8 +180,80 @@ function BuscarDocumentoReferencia(){
     DibujeCuentasXPagarDocumentos(1,Busqueda);
 }
 
-document.getElementById("BtnMuestraMenuLateral").click();
-DibujeCuentasXPagar();
-//DibujeCuentasXPagarDocumentos();
 
-//SeleccioneTablaDB('vista_cuentasxpagar_v2','DivCuentasGeneral','DivOpcionesCuentaGeneral');
+function AgregueMovimientoDesdeCuentaXPagar(idItem,DocReferencia){
+    document.getElementById("TabCuentas2").click();
+    document.getElementById("TxtDocReferencia").value=DocReferencia;
+    var idDocumento=document.getElementById('idDocumento').value;
+    if(idDocumento==""){
+        alertify.alert("Debe seleccionar un Documento");
+        document.getElementById('idDocumento').style.backgroundColor="pink";
+         
+        return;
+    }else{
+        document.getElementById('idDocumento').style.backgroundColor="white";
+    }
+    var form_data = new FormData();
+        form_data.append('Accion', 13);        
+        form_data.append('idDocumento', idDocumento);
+        form_data.append('idItem', idItem);
+         
+        $.ajax({
+        url: './procesadores/DocumentosContables.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+          var respuestas = data.split(';'); 
+          if (respuestas[0] == "OK"){ 
+                                
+                alertify.success(respuestas[1]);                
+                
+          }else{
+              alertify.alert("Error: "+data);
+              
+          }
+          
+          DibujeDocumento();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+            
+          }
+      })  
+    
+}
+
+function VerMovimientosCuentaXPagar(idItem){
+        document.getElementById("TabCuentas3").click();
+        
+     var form_data = new FormData();
+        
+        form_data.append('Accion', 3);
+        form_data.append('idItem', idItem);
+        
+        $.ajax({
+        url: './Consultas/CuentasXPagar.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivDetallesCuentasXPagar').innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+//document.getElementById("BtnMuestraMenuLateral").click();
+DibujeCuentasXPagar();

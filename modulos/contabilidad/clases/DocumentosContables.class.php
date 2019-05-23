@@ -116,6 +116,7 @@ class DocumentosContables extends ProcesoVenta{
             $NombreCuenta=$DatosItems["NombreCuenta"];
             $Debito=$DatosItems["Debito"];
             $Credito=$DatosItems["Credito"];
+            $DocumentoReferencia=$DatosItems["NumDocSoporte"];
             $Neto=0;
             if($Debito>0){
                 $Neto=$Debito;
@@ -123,7 +124,7 @@ class DocumentosContables extends ProcesoVenta{
             if($Credito>0){
                 $Neto=$Credito*(-1);
             }
-            $sqlValores.="('$Fecha','$TipoDocumento','$Consecutivo','','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Documentos Contables','$CuentaPUC','$NombreCuenta','$Concepto',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
+            $sqlValores.="('$Fecha','$TipoDocumento','$Consecutivo','$DocumentoReferencia','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Documentos Contables','$CuentaPUC','$NombreCuenta','$Concepto',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
             
         }  
         

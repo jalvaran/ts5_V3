@@ -256,7 +256,7 @@ FROM vista_cuentasxterceros_v2 t1 WHERE t1.Total<>0 AND EXISTS (SELECT 1 FROM co
 
 DROP VIEW IF EXISTS `vista_cuentasxtercerosdocumentos_v2`;
 CREATE VIEW vista_cuentasxtercerosdocumentos_v2 AS
-SELECT CuentaPUC,NombreCuenta,Tercero_Identificacion,Tercero_Razon_Social,Fecha,Num_Documento_Externo as NumeroDocumentoExterno,SUM(Debito) as Debitos,SUM(Credito) as Creditos,SUM(Debito-Credito) AS Total
+SELECT idLibroDiario AS ID,CuentaPUC,NombreCuenta,Tercero_Identificacion,Tercero_Razon_Social,Fecha,Num_Documento_Externo as NumeroDocumentoExterno,SUM(Debito) as Debitos,SUM(Credito) as Creditos,SUM(Debito-Credito) AS Total
 FROM librodiario GROUP BY Tercero_Identificacion,CuentaPUC,Num_Documento_Externo;
 
 

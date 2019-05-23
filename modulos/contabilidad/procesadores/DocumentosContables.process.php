@@ -53,6 +53,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Tercero=$obCon->normalizar($_REQUEST["Tercero"]);
             $TxtConcepto=$obCon->normalizar($_REQUEST["TxtConcepto"]);
             $TipoMovimiento=$obCon->normalizar($_REQUEST["TipoMovimiento"]);
+            $TxtDocReferencia=$obCon->normalizar($_REQUEST["TxtDocReferencia"]);
             $Valor=$obCon->normalizar($_REQUEST["Valor"]);
             $Base=$obCon->normalizar($_REQUEST["Base"]);
             $Porcentaje=$obCon->normalizar($_REQUEST["Porcentaje"]);
@@ -71,7 +72,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit();
             }
             
-            $idItem=$obCon->AgregaMovimientoDocumentoContable($idDocumento, $Tercero, $CuentaPUC, $TipoMovimiento, $Valor, $TxtConcepto, "", "");
+            $idItem=$obCon->AgregaMovimientoDocumentoContable($idDocumento, $Tercero, $CuentaPUC, $TipoMovimiento, $Valor, $TxtConcepto,$TxtDocReferencia,  "");
             if($Base>0){
                 $obCon->AgregueBaseAMovimientoContable($idDocumento, $TxtConcepto, $Base, $Porcentaje, $Valor, $idUser, $idItem);
             }
@@ -140,7 +141,12 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             
             $DatosBase=$obCon->DevuelveValores("documentos_contables_registro_bases", "idItemDocumentoContable", $idItem);
-            $Base=$Valor/$DatosBase["ValorPorcentaje"];
+            if($DatosBase["ValorPorcentaje"]=='' or $DatosBase["ValorPorcentaje"]==0){
+                $Divisor=1;
+            }else{
+                $Divisor=$DatosBase["ValorPorcentaje"];
+            }
+            $Base=$Valor/$Divisor;
             $obCon->ActualizaRegistro("documentos_contables_registro_bases", "Base", $Base, "idItemDocumentoContable", $idItem);
             
             $obCon->ActualizaRegistro("documentos_contables_items", $CampoEditar, $Valor, "ID", $idItem);
@@ -266,6 +272,46 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK");
         break; //Fin caso 12
         
+        
+        case 13: //Agrega un movimiento a un documento desde una cuenta x pagar o x cobrar
+            $idDocumento=$obCon->normalizar($_REQUEST["idDocumento"]); 
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]); 
+            $DatosMovimiento=$obCon->DevuelveValores("vista_cuentasxtercerosdocumentos_v2", "ID", $idItem);
+            $CuentaPUC=$DatosMovimiento["CuentaPUC"];            
+            $Tercero=$DatosMovimiento["Tercero_Identificacion"];
+            $TxtConcepto="Cuenta x Pagar";
+            $Valor=abs($DatosMovimiento["Total"]); 
+            if($DatosMovimiento["Total"]>=0){
+                $TipoMovimiento="CR";
+            }else{
+                $TipoMovimiento="DB";
+            }
+            
+            $TxtDocReferencia=$DatosMovimiento["NumeroDocumentoExterno"];
+            
+            $Base=0;
+            $Porcentaje=0;
+            if(!is_numeric($Valor)){
+                print("E1;El Campo Valor debe ser númerico");
+                exit();
+            }
+            
+            if(!is_numeric($Base)){
+                print("E1;El Campo Base debe ser númerico");
+                exit();
+            }
+            
+            if(!is_numeric($Porcentaje)){
+                print("E1;El Campo Porcentaje debe ser númerico");
+                exit();
+            }
+            
+            $idItem=$obCon->AgregaMovimientoDocumentoContable($idDocumento, $Tercero, $CuentaPUC, $TipoMovimiento, $Valor, $TxtConcepto,$TxtDocReferencia,  "");
+            if($Base>0){
+                $obCon->AgregueBaseAMovimientoContable($idDocumento, $TxtConcepto, $Base, $Porcentaje, $Valor, $idUser, $idItem);
+            }
+            print("OK;Movimiento Agregado");
+        break; //Fin caso 13
         
         
     }

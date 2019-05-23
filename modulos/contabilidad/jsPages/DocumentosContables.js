@@ -186,6 +186,7 @@ function AgregarItem(){
     var Tercero = document.getElementById('Tercero').value;
     var TxtConcepto = document.getElementById('TxtConcepto').value;
     var TipoMovimiento = document.getElementById('TipoMovimiento').value;
+    var TxtDocReferencia = document.getElementById('TxtDocReferencia').value;
     var Valor = parseFloat(document.getElementById('Valor').value);
     var Base = parseFloat(document.getElementById('Base').value);
     var Porcentaje = parseFloat(document.getElementById('Porcentaje').value);
@@ -233,6 +234,16 @@ function AgregarItem(){
         document.getElementById('TxtConcepto').style.backgroundColor="white";
     }
     
+    if(TxtDocReferencia==""){
+        alertify.alert("El campo Documento Referencia no puede estar vacío");
+        document.getElementById('TxtDocReferencia').style.backgroundColor="pink";
+        document.getElementById("BtnAgregarItem").disabled=false;
+        document.getElementById("BtnAgregarItem").value="Agregar";   
+        return;
+    }else{
+        document.getElementById('TxtDocReferencia').style.backgroundColor="white";
+    }
+    
     if(!$.isNumeric(Valor) ||  Valor<=0){
         
         alertify.error("El Valor debe ser un número mayor a cero");
@@ -253,6 +264,7 @@ function AgregarItem(){
         form_data.append('Tercero', Tercero );
         form_data.append('TxtConcepto', TxtConcepto);
         form_data.append('TipoMovimiento', TipoMovimiento );
+        form_data.append('TxtDocReferencia', TxtDocReferencia );
         form_data.append('Valor', Valor );
         form_data.append('Base', Base );
         form_data.append('Porcentaje', Porcentaje );
