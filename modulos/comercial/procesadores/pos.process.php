@@ -450,7 +450,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Descuento=(100-$Descuento)/100;
             
             $sql="UPDATE preventa SET Subtotal=round(Subtotal*$Descuento), Impuestos=round(Impuestos*$Descuento),"
-                    . " TotalVenta=round(TotalVenta*$Descuento), ValorAcordado=round(ValorAcordado*$Descuento), Descuento=round((ValorUnitario-ValorAcordado)*Cantidad) "
+                    . "  ValorAcordado=round(ValorAcordado*$Descuento),Descuento=round(TotalVenta-((ValorAcordado*Cantidad+Impuestos))) ,TotalVenta=round(TotalVenta*$Descuento)"
                     . " WHERE VestasActivas_idVestasActivas='$idPreventa'";
             $obCon->Query($sql);
             print("OK;Descuento Aplicado");

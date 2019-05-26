@@ -366,10 +366,11 @@ class Facturacion extends ProcesoVenta{
         $idProducto=$DatosPreventa["ProductosVenta_idProductosVenta"];
         $Tabla=$DatosPreventa["TablaItem"];
         $DatosProductos=$this->DevuelveValores($Tabla,"idProductosVenta",$idProducto);
-        $Descuento=($DatosProductos["PrecioVenta"]-$ValorAcordado)*$Cantidad;
+        
         if($Mayorista==1){
             $ValorAcordado=$DatosProductos["PrecioMayorista"];
         }
+        $Descuento=($DatosProductos["PrecioVenta"]-$ValorAcordado)*$Cantidad;
         $DatosTablaItem=$this->DevuelveValores("tablas_ventas", "NombreTabla", $Tabla);
         if($DatosTablaItem["IVAIncluido"]=="SI"){
 
