@@ -64,6 +64,13 @@ function AgregarPreventa(){
  */
 function AgregarItem(){
     var Codigo=document.getElementById('Codigo').value; 
+    var Comando= Codigo.substr(0,1);
+    if(Comando=="C" || Comando=="c"){
+        document.getElementById('Codigo').value=Codigo.substring(1); 
+        posiciona('Cantidad');
+        
+        return;
+    }
     var idPreventa=document.getElementById('idPreventa').value; 
     var CmbListado=document.getElementById('CmbListado').value;
     var Cantidad=parseFloat(document.getElementById('Cantidad').value);

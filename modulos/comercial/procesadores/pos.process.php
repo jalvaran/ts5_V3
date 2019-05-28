@@ -39,7 +39,10 @@ if( !empty($_REQUEST["Accion"]) ){
             $CmbListado=$obCon->normalizar($_REQUEST["CmbListado"]); 
             $Codigo=$obCon->normalizar($_REQUEST["Codigo"]); 
             $Cantidad=$obCon->normalizar($_REQUEST["Cantidad"]); 
-            
+            $Comando=strtolower(substr($Codigo, 0,1));
+            if($Comando=="s"){
+                $CmbListado=4; //Para que tome el sistema
+            }
             if($CmbListado==1 or $CmbListado==5){
                 $TablaItem="productosventa";
                 $idProducto=$obCon->ObtenerIdProducto($Codigo);
@@ -92,14 +95,16 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             if($CmbListado==4){
                 $TablaItem="sistemas";
-                $DatosProducto=$obCon->ValorActual($TablaItem, "Nombre", "ID='$Codigo'");
+                $Codigo= lcfirst($Codigo);   //Convierte el primer caracter en minusculas
+                $idSistema=str_replace("s", '', $Codigo);
+                $DatosProducto=$obCon->ValorActual($TablaItem, "Nombre", "ID='$idSistema'");
                 if($DatosProducto["Nombre"]==''){
                     print("E1;El sistema $Codigo no Existe");
                     exit();
                 }
                 
-                $obCon->POS_AgregueSistemaPreventa($idPreventa,$Codigo, $Cantidad, "");
-                print("OK;Producto para alquilar $Codigo Agregado");
+                $obCon->POS_AgregueSistemaPreventa($idPreventa,$idSistema, $Cantidad, "");
+                print("OK;Sitema $idSistema Agregado");
                 exit();
             }
             
@@ -314,7 +319,7 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             
             $obFactura->InsertarFacturaLibroDiarioV2($idFactura,$CmbCuentaIngresoFactura,$idUser);
-            $obCon->DescargueFacturaInventarios($idFactura, "");
+            $obFactura->DescargueFacturaInventariosV2($idFactura, "");
             if($CmbFormaPago<>'Contado'){
                 $obFactura->IngreseCartera($idFactura, $Fecha, $idCliente, $CmbFormaPago, $SaldoFactura, "");
             }

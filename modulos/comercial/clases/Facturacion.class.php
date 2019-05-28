@@ -888,6 +888,32 @@ class Facturacion extends ProcesoVenta{
          */
     } 
     
+    
+    //descarga una factura del inventario
+     public function DescargueFacturaInventariosV2($idFactura,$Vector) {
+        $consulta=$this->ConsultarTabla("facturas_items", "WHERE idFactura='$idFactura'");
+        while($DatosItems=$this->FetchArray($consulta)){
+            
+            if($DatosItems["TipoItem"]=="PR" AND $DatosItems["TablaItems"]=="productosventa"){
+                $DatosProducto=$this->DevuelveValores($DatosItems["TablaItems"], "Referencia", $DatosItems["Referencia"]);
+                
+                $DatosKardex["Cantidad"]=$DatosItems['Cantidad'];
+                $DatosKardex["idProductosVenta"]=$DatosProducto["idProductosVenta"];
+                $DatosKardex["CostoUnitario"]=$DatosProducto['CostoUnitario'];
+                $DatosKardex["Existencias"]=$DatosProducto['Existencias'];
+                $DatosKardex["Detalle"]="Factura";
+                $DatosKardex["idDocumento"]=$idFactura;
+                $DatosKardex["TotalCosto"]=$DatosItems["SubtotalCosto"];
+                $DatosKardex["CostoUnitarioPromedio"]=$DatosProducto["CostoUnitarioPromedio"];
+                $DatosKardex["CostoTotalPromedio"]=$DatosProducto["CostoUnitarioPromedio"]*$DatosKardex["Cantidad"];
+                $DatosKardex["Movimiento"]="SALIDA";
+                
+                $this->InserteKardex($DatosKardex);
+               }
+        }
+        $this->ActualizaRegistro("facturas_kardex", "Kardex", "SI", "idFacturas", $idFactura);
+     }
+     
     /**
      * Fin Clase
      */
