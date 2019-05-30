@@ -718,7 +718,7 @@ class Facturacion extends ProcesoVenta{
         $TotalAbonos=$this->Sume("separados_abonos", "Valor", "WHERE idUsuarios='$idUser' AND idCierre=''");
         //Calculo los abonos de Creditos
         
-        $TotalAbonosCreditos=$this->Sume("facturas_abonos", "Valor", "WHERE Usuarios_idUsuarios='$idUser' AND idCierre='' AND FormaPago <> 'SisteCredito'");
+        $TotalAbonosCreditos=$this->Sume("facturas_abonos", "Valor", "WHERE Usuarios_idUsuarios='$idUser' AND idCierre='0'");
         $TotalAbonosSisteCredito=$this->Sume("comercial_plataformas_pago_ingresos", "Valor", "WHERE idUser='$idUser' AND idCierre='0' AND idPlataformaPago=1");
         //$TotalAbonosKupy=$this->Sume("comercial_plataformas_pago_ingresos", "Valor", "WHERE idUser='$idUser' AND idCierre='0' AND idPlataformaPago=2");
         //Ingreso datos en tabla cierres
