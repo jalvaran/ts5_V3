@@ -319,3 +319,25 @@ CREATE TABLE `contabilidad_parametros_cuentasxpagar` (
 INSERT INTO `contabilidad_parametros_cuentasxpagar` (`ID`, `CuentaPUC`, `Updated`, `Sync`) VALUES
 (1,	2205,	'2019-05-22 16:53:04',	'0000-00-00 00:00:00'),
 (2,	220505,	'2019-05-22 16:53:04',	'0000-00-00 00:00:00');
+
+
+
+CREATE TABLE `documentos_contables_registro_bases` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idDocumentoContable` bigint(20) NOT NULL,
+  `Concepto` text COLLATE utf8_spanish_ci NOT NULL,
+  `Base` double NOT NULL,
+  `Porcentaje` double NOT NULL,
+  `ValorPorcentaje` double NOT NULL,
+  `Valor` double NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `idItemDocumentoContable` bigint(20) NOT NULL,
+  `TipoMovimiento` varchar(2) COLLATE utf8_spanish_ci NOT NULL,
+  `Estado` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idDocumentoContable` (`idDocumentoContable`),
+  KEY `idItemDocumentoContable` (`idItemDocumentoContable`),
+  KEY `Estado` (`Estado`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
