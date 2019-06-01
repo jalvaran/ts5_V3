@@ -47,7 +47,7 @@ if(isset($_REQUEST["idAccion"])){
                         $css->ColTabla($DatosProducto["CostoUnitario"], 1);
                         $css->ColTabla($DatosProducto["Existencias"], 1);
                         print("<td>");
-                            $css->CrearInputNumber("TxtCantidadCrear", "number", "", 1, "", "", "", "", 100, 30, 0, 1, 0, "", "any");
+                            $css->CrearInputNumber("TxtCantidadCrear", "number", "", 1, "", "", "", "", 100, 30, 0, 1, 0, "any", "any");
                         print("</td>");
                         print("<td>");
                             $css->CrearBotonEvento("BtnCrearProducto", "Construir", 1, "onClick", "CrearProductoDesdeReceta('$idProducto')", "azul", "");

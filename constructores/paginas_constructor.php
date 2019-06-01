@@ -30,7 +30,7 @@ class PageConstruct extends html_estruct_class{
                 print($Titulo);
                 $this->Ctitle();
                 if($CssFramework==1){
-                    print('<link rel="stylesheet" href="../../componentes/bootstrap/dist/css/bootstrap.min.css">');
+                    print('<link rel="stylesheet" href="../../componentes/bootstrap/dist/css/bootstrap.css">');
 
                 }
                 print("<link rel='shortcut icon' href='../../images/technoIco.ico'>");

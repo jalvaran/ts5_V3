@@ -18,7 +18,7 @@ if(isset($_REQUEST["idDepartamento"])){
         $Mensaje["msg"]="Todos";
         echo json_encode($Mensaje,JSON_UNESCAPED_UNICODE);
     } else{   
-        $sql="SELECT idProductosVenta,Nombre,PrecioVenta FROM productosventa WHERE Departamento='$idDepartamento' ORDER BY `productosventa`.`Nombre` ASC LIMIT 200  ";
+        $sql="SELECT idProductosVenta,Nombre,PrecioVenta FROM productosventa WHERE Departamento='$idDepartamento' ORDER BY `productosventa`.`PrecioVenta` ASC LIMIT 200  ";
         //print($sql);
         $Datos=$obCon->Query($sql);
         $i=0;
@@ -27,7 +27,7 @@ if(isset($_REQUEST["idDepartamento"])){
         while($DatosProductos=$obCon->FetchAssoc($Datos)){
             $Mensaje[$i]["ID"]=$DatosProductos["idProductosVenta"];
             $Mensaje[$i]["Nombre"]= utf8_encode($DatosProductos["Nombre"]);
-            $Mensaje[$i]["PrecioVenta"]=$DatosProductos["PrecioVenta"];
+            $Mensaje[$i]["PrecioVenta"]= number_format($DatosProductos["PrecioVenta"]);
             $i++;        
         }
         echo json_encode($Mensaje,JSON_UNESCAPED_UNICODE);

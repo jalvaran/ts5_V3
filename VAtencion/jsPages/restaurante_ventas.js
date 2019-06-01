@@ -85,7 +85,7 @@ function CargarProductos(){
                   $("#idProducto").empty();
                 for(i=0;i < data.length; i++){
                     
-                    $("#idProducto").append('<option value='+data[i].ID+'>'+data[i].Nombre+'</option>');
+                    $("#idProducto").append('<option value='+data[i].ID+'>'+data[i].Nombre+' $'+data[i].PrecioVenta+'</option>');
                  
                 }
                              
