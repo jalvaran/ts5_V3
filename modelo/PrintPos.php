@@ -1652,7 +1652,7 @@ fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
 
     fwrite($handle,"_________________");
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-
+    /*
     $propina=$Total*0.1;
     
 	fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
@@ -1665,6 +1665,8 @@ fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
 
     fwrite($handle,"_________________");
+     * 
+     */
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea

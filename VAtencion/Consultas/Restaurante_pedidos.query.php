@@ -224,7 +224,7 @@ if($obRest->NumRows($consulta)){
                         
                         $style="style='background-color: #ffab0d;'";
                         $Mensaje="Retraso en pedido $DatosPedidos[ID]";
-                        $obRest->RegistraAlerta("restaurante_pedidos", $DatosPedidos["ID"], "Normal", $Mensaje, "");
+                        //$obRest->RegistraAlerta("restaurante_pedidos", $DatosPedidos["ID"], "Normal", $Mensaje, "");
                     }
                     print("<td $style>");
                         

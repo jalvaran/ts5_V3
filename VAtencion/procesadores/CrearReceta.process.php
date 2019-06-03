@@ -120,6 +120,22 @@ if(isset($_REQUEST["idAccion"])){
             $obReceta->FabricarProducto($idProducto, $Cantidad, "");
             print("OK");
         break;
+    
+        case 7://Dar de baja un insumo
+            $TipoMovimiento=$obReceta->normalizar($_REQUEST["TipoMovimiento"]);
+            $Cantidad=$obReceta->normalizar($_REQUEST["Cantidad"]);   
+            $idInsumo=$obReceta->normalizar($_REQUEST["idInsumo"]); 
+            $Observaciones=$obReceta->normalizar($_REQUEST["Observaciones"]);
+            $DatosInsumo=$obReceta->DevuelveValores("insumos", "ID", $idInsumo);
+            if($TipoMovimiento==1){
+                $Movimiento="SALIDA";
+            }else{
+                $Movimiento="ENTRADA";
+            }
+            $obReceta->KardexInsumo($Movimiento, $Observaciones, "", $DatosInsumo["Referencia"], $Cantidad, $DatosInsumo["CostoUnitario"], "");
+            sleep(2);
+            print("OK;Operacion realizada");
+        break;
     }
     
 }else{
