@@ -113,7 +113,7 @@ class Contabilidad extends conexion{
         
         $sql="CREATE VIEW vista_balancextercero2 AS
             SELECT (SUBSTRING(CuentaPUC,1,8)) as ID,Fecha,`Tercero_Identificacion` as Identificacion,`Tercero_Razon_Social` AS Razon_Social,
-            `CuentaPUC` , `NombreCuenta`, Tipo_Documento_Intero as TipoDocumento,Num_Documento_Interno as NumDocumento, 
+            `CuentaPUC` , `NombreCuenta`, Tipo_Documento_Intero as TipoDocumento,Num_Documento_Interno as NumDocumento,Num_Documento_Externo as DocumentoExterno, 
             (SELECT SaldoInicial FROM vista_saldo_inicial_cuentapuc WHERE librodiario.CuentaPUC=vista_saldo_inicial_cuentapuc.ID AND librodiario.Tercero_Identificacion=vista_saldo_inicial_cuentapuc.Tercero_Identificacion LIMIT 1) AS SaldoInicialSubCuenta, 
             
             SUBSTRING(CuentaPUC,1,1) AS Clase,

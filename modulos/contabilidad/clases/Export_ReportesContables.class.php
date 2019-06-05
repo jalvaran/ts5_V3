@@ -19,7 +19,7 @@ class ExportReportes extends conexion{
         $objPHPExcel = new PHPExcel();  
         
         $objPHPExcel->getActiveSheet()->getStyle('A:C')->getNumberFormat()->setFormatCode('#');
-        $objPHPExcel->getActiveSheet()->getStyle('E:L')->getNumberFormat()->setFormatCode('#,##0');
+        $objPHPExcel->getActiveSheet()->getStyle('H:L')->getNumberFormat()->setFormatCode('#,##0');
         $objPHPExcel->getActiveSheet()->getStyle("A:Z")->getFont()->setSize(10);
         
         $f=1;
@@ -36,10 +36,11 @@ class ExportReportes extends conexion{
             ->setCellValue($this->Campos[3].$f,"RAZON SOCIAL")
             ->setCellValue($this->Campos[4].$f,"FECHA")
             ->setCellValue($this->Campos[5].$f,"DOCUMENTO")
-            ->setCellValue($this->Campos[6].$f,"SALDO ANTERIOR")
-            ->setCellValue($this->Campos[7].$f,"DEBITOS")
-            ->setCellValue($this->Campos[8].$f,"CREDITOS")
-            ->setCellValue($this->Campos[9].$f,"NUEVO SALDO")
+            ->setCellValue($this->Campos[6].$f,"DOC. REFERENCIA")     
+            ->setCellValue($this->Campos[7].$f,"SALDO ANTERIOR")
+            ->setCellValue($this->Campos[8].$f,"DEBITOS")
+            ->setCellValue($this->Campos[9].$f,"CREDITOS")
+            ->setCellValue($this->Campos[10].$f,"NUEVO SALDO")
             
             
             ;
@@ -69,10 +70,10 @@ class ExportReportes extends conexion{
                     $CuentaPUCAnterior=$DatosLibro["CuentaPUC"];
                     if(($TotalDebitosTercero<>0 or $TotalCreditosTercero<>0) ){
                         $objPHPExcel->setActiveSheetIndex(0)
-                        ->setCellValue($this->Campos[6].$f,"TOTALES:")     
+                        ->setCellValue($this->Campos[7].$f,"TOTALES:")     
 
-                        ->setCellValue($this->Campos[7].$f,$TotalDebitosTercero)
-                        ->setCellValue($this->Campos[8].$f,$TotalCreditosTercero)
+                        ->setCellValue($this->Campos[8].$f,$TotalDebitosTercero)
+                        ->setCellValue($this->Campos[9].$f,$TotalCreditosTercero)
 
                         ;
                         $f++;
@@ -84,10 +85,10 @@ class ExportReportes extends conexion{
                 if($DatosLibro["Identificacion"]<>$identificacionAnterior){
                     if(($TotalDebitosTercero<>0 or $TotalCreditosTercero<>0) ){
                         $objPHPExcel->setActiveSheetIndex(0)
-                        ->setCellValue($this->Campos[6].$f,"TOTALES:")     
+                        ->setCellValue($this->Campos[7].$f,"TOTALES:")     
 
-                        ->setCellValue($this->Campos[7].$f,$TotalDebitosTercero)
-                        ->setCellValue($this->Campos[8].$f,$TotalCreditosTercero)
+                        ->setCellValue($this->Campos[8].$f,$TotalDebitosTercero)
+                        ->setCellValue($this->Campos[9].$f,$TotalCreditosTercero)
 
                         ;
                         $f++;
@@ -114,10 +115,10 @@ class ExportReportes extends conexion{
                         ->setCellValue($this->Campos[0].$f,$DatosLibro["Clase"])
                         ->setCellValue($this->Campos[1].$f,$DatosLibro["NombreClase"])
 
-                        ->setCellValue($this->Campos[6].$f,$DatosLibro["SaldoInicialClase"])
-                        ->setCellValue($this->Campos[7].$f,$DatosLibro["DebitosClase"])
-                        ->setCellValue($this->Campos[8].$f,$DatosLibro["CreditosClase"])
-                        ->setCellValue($this->Campos[9].$f,$DatosLibro["SaldoInicialClase"]+$DatosLibro["DebitosClase"]-$DatosLibro["CreditosClase"])
+                        ->setCellValue($this->Campos[7].$f,$DatosLibro["SaldoInicialClase"])
+                        ->setCellValue($this->Campos[8].$f,$DatosLibro["DebitosClase"])
+                        ->setCellValue($this->Campos[9].$f,$DatosLibro["CreditosClase"])
+                        ->setCellValue($this->Campos[10].$f,$DatosLibro["SaldoInicialClase"]+$DatosLibro["DebitosClase"]-$DatosLibro["CreditosClase"])
 
                         ;
 
@@ -131,10 +132,10 @@ class ExportReportes extends conexion{
                         ->setCellValue($this->Campos[0].$f,$DatosLibro["Grupo"])
                         ->setCellValue($this->Campos[1].$f,$DatosLibro["NombreGrupo"])
 
-                        ->setCellValue($this->Campos[6].$f,$DatosLibro["SaldoInicialGrupo"])
-                        ->setCellValue($this->Campos[7].$f,$DatosLibro["DebitosGrupo"])
-                        ->setCellValue($this->Campos[8].$f,$DatosLibro["CreditosGrupo"])
-                        ->setCellValue($this->Campos[9].$f,$DatosLibro["SaldoInicialGrupo"]+$DatosLibro["DebitosGrupo"]-$DatosLibro["CreditosGrupo"])
+                        ->setCellValue($this->Campos[7].$f,$DatosLibro["SaldoInicialGrupo"])
+                        ->setCellValue($this->Campos[8].$f,$DatosLibro["DebitosGrupo"])
+                        ->setCellValue($this->Campos[9].$f,$DatosLibro["CreditosGrupo"])
+                        ->setCellValue($this->Campos[10].$f,$DatosLibro["SaldoInicialGrupo"]+$DatosLibro["DebitosGrupo"]-$DatosLibro["CreditosGrupo"])
 
                         ;
 
@@ -148,10 +149,10 @@ class ExportReportes extends conexion{
                         ->setCellValue($this->Campos[0].$f,$DatosLibro["CuentaPadre"])
                         ->setCellValue($this->Campos[1].$f,$DatosLibro["NombreCuentaPadre"])
 
-                        ->setCellValue($this->Campos[6].$f,$DatosLibro["SaldoInicialCuentaPadre"])
-                        ->setCellValue($this->Campos[7].$f,$DatosLibro["DebitosCuentaPadre"])
-                        ->setCellValue($this->Campos[8].$f,$DatosLibro["CreditosCuentaPadre"])
-                        ->setCellValue($this->Campos[9].$f,$DatosLibro["SaldoInicialCuentaPadre"]+$DatosLibro["DebitosCuentaPadre"]-$DatosLibro["CreditosCuentaPadre"])
+                        ->setCellValue($this->Campos[7].$f,$DatosLibro["SaldoInicialCuentaPadre"])
+                        ->setCellValue($this->Campos[8].$f,$DatosLibro["DebitosCuentaPadre"])
+                        ->setCellValue($this->Campos[9].$f,$DatosLibro["CreditosCuentaPadre"])
+                        ->setCellValue($this->Campos[10].$f,$DatosLibro["SaldoInicialCuentaPadre"]+$DatosLibro["DebitosCuentaPadre"]-$DatosLibro["CreditosCuentaPadre"])
 
                         ;
 
@@ -171,11 +172,12 @@ class ExportReportes extends conexion{
                      ->setCellValue($this->Campos[2].$f,$DatosLibro["Identificacion"])
                      ->setCellValue($this->Campos[3].$f,$DatosLibro["Razon_Social"])
                      ->setCellValue($this->Campos[4].$f,$DatosLibro["Fecha"])
-                     ->setCellValue($this->Campos[5].$f,$DatosLibro["TipoDocumento"]." No. ".$DatosLibro["NumDocumento"])        
-                     ->setCellValue($this->Campos[6].$f,$SaldoAnterior)
-                     ->setCellValue($this->Campos[7].$f,$DatosLibro["Debito"])
-                     ->setCellValue($this->Campos[8].$f,$DatosLibro["Credito"])
-                     ->setCellValue($this->Campos[9].$f,$NuevoSaldo)
+                     ->setCellValue($this->Campos[5].$f,$DatosLibro["TipoDocumento"]." No. ".$DatosLibro["NumDocumento"]) 
+                     ->setCellValue($this->Campos[6].$f,$DatosLibro["DocumentoExterno"])        
+                     ->setCellValue($this->Campos[7].$f,$SaldoAnterior)
+                     ->setCellValue($this->Campos[8].$f,$DatosLibro["Debito"])
+                     ->setCellValue($this->Campos[9].$f,$DatosLibro["Credito"])
+                     ->setCellValue($this->Campos[10].$f,$NuevoSaldo)
 
                      ;
                      $f++;
@@ -198,11 +200,11 @@ class ExportReportes extends conexion{
         }
         
         $objPHPExcel->setActiveSheetIndex(0)
-            ->setCellValue($this->Campos[6].$f,"TOTALES:")
-            ->setCellValue($this->Campos[7].$f,$TotalDebitos)
-            ->setCellValue($this->Campos[8].$f,$TotalCreditos)
-            ->setCellValue($this->Campos[9].$f,"DIFERENCIA:")
-            ->setCellValue($this->Campos[10].$f,$TotalDebitos-$TotalCreditos)
+            ->setCellValue($this->Campos[7].$f,"TOTALES:")
+            ->setCellValue($this->Campos[8].$f,$TotalDebitos)
+            ->setCellValue($this->Campos[9].$f,$TotalCreditos)
+            ->setCellValue($this->Campos[10].$f,"DIFERENCIA:")
+            ->setCellValue($this->Campos[11].$f,$TotalDebitos-$TotalCreditos)
                      
             ;
         

@@ -295,7 +295,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         }
                         
                         
-                        $css->ColTabla($DatosItems["Concepto"], 1);
+                        $css->ColTabla($DatosItems["Concepto"]."<br> Doc. Referencia: ".$DatosItems["NumDocSoporte"], 1);
                         
                         print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");   
                             
