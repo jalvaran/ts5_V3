@@ -71,6 +71,13 @@ function AgregarItem(){
         
         return;
     }
+    if(Comando=="B" || Comando=="b"){
+        document.getElementById('Codigo').value=Codigo.substring(1); 
+        ModoBacula(0);
+        posiciona('Cantidad');
+        
+        return;
+    }
     var idPreventa=document.getElementById('idPreventa').value; 
     var CmbListado=document.getElementById('CmbListado').value;
     var Cantidad=parseFloat(document.getElementById('Cantidad').value);
@@ -485,7 +492,7 @@ $('#idCliente').select2({
  * Establece el modo bascula donde consulta el valor de la bascula en un intervalo de tiempo
  * @returns {undefined}
  */
-function ModoBacula(){
+function ModoBacula(Limpiar=1){
     
     var form_data = new FormData();        
         form_data.append('Accion', 6);
@@ -511,7 +518,9 @@ function ModoBacula(){
                     setTimeout(ModoBacula, 400);
                 }else{
                     document.getElementById("SpEstadoCaja").innerHTML="";
-                    document.getElementById("Cantidad").value=1;
+                    if(Limpiar==1){
+                        document.getElementById("Cantidad").value=1;
+                    }
                 }
                 
             }else{
