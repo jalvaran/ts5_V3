@@ -450,7 +450,7 @@ $this->PDF->writeHTML("<br>", true, false, false, false, '');
             <table border="0" cellpadding="2" cellspacing="2" align="left" style="border-radius: 10px;">
                 <tr align="center">
                     <td><strong>Tercero</strong></td>
-                    
+                    <td><strong>Referencia</strong></td>
                     <td><strong>Cuenta PUC</strong></td>
                     <td><strong>Nombre Cuenta</strong></td>
                    
@@ -486,7 +486,7 @@ $this->PDF->writeHTML("<br>", true, false, false, false, '');
 
                     <tr align="left">
                         <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosLibro["Tercero_Identificacion"].'<br>'.$DatosLibro["Tercero_Razon_Social"].'</td>
-                        
+                        <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosLibro["Num_Documento_Externo"].'</td>
                         <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosLibro["CuentaPUC"].'</td>
                         <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosLibro["NombreCuenta"].'</td>
                         
@@ -499,7 +499,7 @@ $this->PDF->writeHTML("<br>", true, false, false, false, '');
         }
         $Back='#F7F8E0';
         $html.='<tr > '
-                . '<td align="rigth" colspan="3" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">Totales:</td>'
+                . '<td align="rigth" colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">Totales:</td>'
                 . '<td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($Debitos).'</td>
                    <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($Creditos).'</td>'
                 . '</tr>';
@@ -789,7 +789,7 @@ $tbl.= "</table>";
         $Position=$this->PDF->SetY(65);
         
         
-        $sql="SELECT Tercero_Identificacion,NombreCuenta,Tercero_Razon_Social ,CuentaPUC,Debito,Credito FROM librodiario "
+        $sql="SELECT Tercero_Identificacion,NombreCuenta,Tercero_Razon_Social ,Num_Documento_Externo,CuentaPUC,Debito,Credito FROM librodiario "
                 . "WHERE Tipo_Documento_Intero='$NombreDocumento' AND Num_Documento_Interno='$Consecutivo'";
         $html=$this->HTML_Movimientos_Resumen($sql, $Vector);
         $this->PDF_Write("<BR><BR><BR><strong>MOVIMIENTOS CONTABLES:</strong><BR>".$html);

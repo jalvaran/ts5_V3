@@ -415,7 +415,7 @@ class Facturacion extends ProcesoVenta{
         $DatosTercero= $this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
         $Fecha=$DatosFactura["Fecha"];
         $TerceroTipoDocumento=$DatosTercero["Tipo_Documento"];
-        $NIT=$DatosTercero["Tipo_Documento"];
+        $NIT=$DatosTercero["Num_Identificacion"];
         $DV=$DatosTercero["DV"];
         $TerceroNombre1=$DatosTercero["Primer_Apellido"];
         $TerceroNombre2=$DatosTercero["Segundo_Apellido"];

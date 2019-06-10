@@ -13,6 +13,7 @@ $obVenta=new ProcesoVenta(1);
 $idRemision = $obVenta->normalizar($_REQUEST["ImgPrintRemi"]);
 
 $idFormatoCalidad=7;
+$DatosFormato=$obVenta->DevuelveValores("formatos_calidad", "ID", $idFormatoCalidad);
 
 $Documento="<strong>REMISION No. $idRemision</strong>";
 require_once('Encabezado.php');
@@ -168,7 +169,7 @@ $tbl = <<<EOD
  </table>
 EOD;
 $pdf->writeHTML($tbl, false, false, false, false, '');		
-		
+$PiePagina= utf8_encode($DatosFormato["NotasPiePagina"]);		
 $tbl = <<<EOD
 </br>
  
