@@ -345,3 +345,18 @@ CREATE TABLE `documentos_contables_registro_bases` (
 
 INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
 (191,	'Dar de baja o alta a un insumo',	25,	3,	0,	'',	0,	'',	'BajaAlta.php',	'_BLANK',	1,	'bajaalta.jpg',	3,	'2019-06-03 08:57:08',	'2019-01-12 09:12:44');
+
+
+
+CREATE TABLE `contabilidad_parametros_cuentasxcobrar` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `CuentaPUC` bigint(20) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `contabilidad_parametros_cuentasxcobrar` (`ID`, `CuentaPUC`, `Updated`, `Sync`) VALUES
+(1,130505,	'2019-06-10 14:24:08',	'0000-00-00 00:00:00');
+
+

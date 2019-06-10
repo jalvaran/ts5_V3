@@ -266,3 +266,14 @@ SELECT *
 FROM vista_cuentasxtercerosdocumentos_v2 t1 WHERE t1.Total<>0 AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Fecha;
 
 
+DROP VIEW IF EXISTS `vista_cuentasxcobrar`;
+CREATE VIEW vista_cuentasxcobrar AS
+SELECT *
+FROM vista_cuentasxterceros_v2 t1 WHERE t1.Total<>0 AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxcobrar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Total DESC;
+
+DROP VIEW IF EXISTS `vista_cuentasxcobrardetallado`;
+CREATE VIEW vista_cuentasxcobrardetallado AS
+SELECT *
+FROM vista_cuentasxtercerosdocumentos_v2 t1 WHERE t1.Total<>0 AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxcobrar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Fecha;
+
+
