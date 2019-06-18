@@ -46,6 +46,13 @@ class Compra extends ProcesoVenta{
     
     //Clase para agregar un item a una compra
     public function AgregueProductoCompra($idCompra,$idProducto,$Cantidad,$CostoUnitario,$TipoIVA,$IVAIncluido,$Vector) {
+       /*
+        $DatosCodigoBarras=$this->DevuelveValores("prod_codbarras", "CodigoBarras", $idProducto);
+        if($DatosCodigoBarras["ProductosVenta_idProductosVenta"]<>""){
+            $idProducto=$DatosCodigoBarras["ProductosVenta_idProductosVenta"];
+        }
+        * 
+        */
         //Proceso la informacion
         if($IVAIncluido=="SI"){
             if(is_numeric($TipoIVA)){

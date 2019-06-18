@@ -196,7 +196,7 @@ print("<body>");
         $css->CrearOptionSelect("", "Seleccione una cuenta contable", 0);
            while($DatosCuenta=$obVenta->FetchArray($Consulta)){
                $sel=0;
-               if($DatosCuenta["PUC"]=='4135'){
+               if($DatosCuenta["PUC"]=='413505'){
                    $sel=1;
                }               
                $css->CrearOptionSelect($DatosCuenta["PUC"],"$DatosCuenta[PUC] $DatosCuenta[Nombre]", $sel);

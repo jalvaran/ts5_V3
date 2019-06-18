@@ -24,7 +24,7 @@ if( !empty($_REQUEST["idAccion"]) ){
         
         while ($DatosTablas=$obCon->FetchArray($consulta)){
             $Tabla=$DatosTablas[0];
-            if($Tabla<>'precotizacion' and $Tabla<>'preventa'){
+            if($Tabla<>'precotizacion' and $Tabla<>'preventa' and $Tabla<>'registro_basculas'){
                 $sql="SELECT COUNT(*) as TotalRegistros FROM $Tabla WHERE Sync = '0000-00-00 00:00:00' OR Sync<>Updated";
                 $ConsultaConteo=$obCon->Query($sql);
                 $Registros=$obCon->FetchAssoc($ConsultaConteo);

@@ -24,8 +24,10 @@ if($key<>""){
     $DatosCompraGeneral=$obVenta->DevuelveValores("factura_compra", "ID", $idCompra);
     switch ($TipoBusqueda) {
         case 1:
-            $sql="SELECT * FROM `productosventa` pv 
-		WHERE pv.`idProductosVenta`='$key' OR pv.Nombre LIKE '%$key%' or pv.Referencia = '$key'  LIMIT 50";
+            //$DatosCodigoBarras=$obVenta->DevuelveValores("prod_codbarras", "CodigoBarras", $key);
+            
+            $sql="SELECT * FROM `productosventa` pv INNER JOIN prod_codbarras cb
+		WHERE pv.`idProductosVenta`='$key' OR pv.Nombre LIKE '%$key%' or pv.Referencia = '$key' OR cb.CodigoBarras='$key' LIMIT 50";
             $consulta=$obVenta->Query($sql);
             if($obVenta->NumRows($consulta)){
                 $css->FilaTabla(16);

@@ -359,4 +359,6 @@ CREATE TABLE `contabilidad_parametros_cuentasxcobrar` (
 INSERT INTO `contabilidad_parametros_cuentasxcobrar` (`ID`, `CuentaPUC`, `Updated`, `Sync`) VALUES
 (1,130505,	'2019-06-10 14:24:08',	'0000-00-00 00:00:00');
 
-
+INSERT INTO `documentos_contables` (`ID`, `Prefijo`, `Nombre`, `Descripcion`, `Updated`, `Sync`) VALUES
+(12,	'CC-12',	'COMPROBANTE DE EGRESO',	'Para realizar egresos de dinero',	'2019-04-11 09:01:47',	'2019-04-10 09:01:47'),
+(13,	'CC-13',	'COMPROBANTE DE INGRESO',	'Para realizar ingresos de dinero',	'2019-06-10 09:07:07',	'2019-04-10 09:01:47');

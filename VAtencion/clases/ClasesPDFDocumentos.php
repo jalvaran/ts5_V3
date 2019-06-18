@@ -473,7 +473,7 @@ class Documento extends Tabla{
         
         $html= $this->HTML_productos_devueltos_ND($idNota,"");
         $this->PDF_Write($html);
-        $sql="SELECT Tercero_Identificacion,NombreCuenta,Tercero_Razon_Social ,CuentaPUC,Debito,Credito FROM librodiario "
+        $sql="SELECT Tercero_Identificacion,NombreCuenta,Tercero_Razon_Social ,CuentaPUC,Debito,Credito,Num_Documento_Externo FROM librodiario "
                 . "WHERE Tipo_Documento_Intero='NOTA_DEVOLUCION' AND Num_Documento_Interno='$idNota'";
         $html=$this->HTML_Movimientos_Resumen($sql, $Vector);
         $this->PDF_Write("<BR><BR><BR><strong>MOVIMIENTOS CONTABLES:</strong><BR>".$html);
@@ -664,7 +664,9 @@ $tbl.= "</table>";
                 . "WHERE Tipo_Documento_Intero='$NombreDocumento' AND Num_Documento_Interno='$Consecutivo'";
         $html=$this->HTML_Movimientos_Resumen($sql, $Vector);
         $this->PDF_Write("<BR><BR><BR><strong>MOVIMIENTOS CONTABLES:</strong><BR>".$html);
-                
+        $html=$this->FirmaDocumentos();
+        $this->PDF_Write("<BR>".$html);
+        
         $this->PDF_Output("$Documento");
     }
     
