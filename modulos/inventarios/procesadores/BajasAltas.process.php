@@ -72,6 +72,30 @@ if( !empty($_REQUEST["Accion"]) ){
             print("Item Eliminado");
         break;//Fin caso 4
         
+        case 5://Se registran los movimientos del comprobante
+            $idComprobante=$obCon->normalizar($_REQUEST["idComprobante"]);
+            
+            $DatosComprobante=$obCon->DevuelveValores("inventario_comprobante_movimientos", "ID", $idComprobante);
+            if($DatosComprobante["Estado"]=='CERRADO'){
+                exit("E1;El comprobante $idComprobante ya está Cerrado");
+            }
+            $NumItems=$obCon->Count("inventario_comprobante_movimientos_items", "ID", "WHERE idComprobante='$idComprobante'");
+            if($NumItems==0 or $NumItems==""){
+                exit("E1;El comprobante $idComprobante No tiene Items, debe agregar items para poder guardarlo");
+            }
+            $obCon->RealizarMovimientosInventario($idComprobante, $idUser);
+            
+            print("OK;Comprobante Ingresado al Kardex");
+        break;//Fin caso 5
+        
+        case 6://Se Cierra el comprobante
+            $idComprobante=$obCon->normalizar($_REQUEST["idComprobante"]);
+            $obCon->ActualizaRegistro("inventario_comprobante_movimientos", "Estado", "CERRADO", "ID", $idComprobante);
+            $Ruta="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=25&idComprobante=$idComprobante";
+            $Link="<a href='$Ruta' target='_BLANK'> Imprimir </a>";
+            print("OK;Comprobante $idComprobante Cerrado, $Link");
+        break;    
+        
        
     }
     

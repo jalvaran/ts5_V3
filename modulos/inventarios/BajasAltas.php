@@ -145,7 +145,7 @@ $css->PageInit($myTitulo);
                 print("<a href='#'>Guardar</a>");
             $css->Clegend();   
             
-            $css->CrearBotonEvento("BtnGuardarComprobante", "Guardar", 1, "onclick", "GuardarComprobante()", "rojo", "");
+            $css->CrearBotonEvento("BtnGuardarComprobante", "Guardar", 1, "onclick", "ConfirmarBajaAlta()", "rojo", "");
             $css->Cfieldset();
     $css->CerrarDiv();
     

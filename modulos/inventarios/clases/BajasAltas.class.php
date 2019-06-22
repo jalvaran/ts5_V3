@@ -51,46 +51,46 @@ class BajasAltas extends ProcesoVenta{
     }
     
     //Ingrese los items al inventario o retire items del inventario
-    public function IngreseRetireProductosInventarioCompra($idCompra,$Movimiento,$idTabla='idFacturaCompra') {
+    public function RealizarMovimientosInventario($idComprobante,$idUser) {
         $obInsumos=new Recetas(1);
-        $Detalle="FacturaCompra";
-            if($idTabla=='idNotaDevolucion'){
-                $Detalle="NotaDevolucion";
+        $Detalle="ComprobanteBajaAlta";
+        $sql="SELECT * FROM inventario_comprobante_movimientos_items WHERE idComprobante='$idComprobante' AND Estado=''";
+        $Consulta=$this->Query($sql);
+        while($DatosProductos= $this->FetchArray($Consulta)){
+            if($DatosProductos["TipoMovimiento"]=="BAJA"){
+                $Movimiento="SALIDA";
+            }else{
+                $Movimiento="ENTRADA";
             }
-        if($Movimiento=="ENTRADA" AND $idTabla=='idNotaDevolucion'){
-            $consulta= $this->ConsultarTabla("factura_compra_items_devoluciones", "WHERE $idTabla='$idCompra'");
-        }    
-        if($Movimiento=="ENTRADA" AND $idTabla=='idFacturaCompra'){
-            $consulta= $this->ConsultarTabla("factura_compra_items", "WHERE $idTabla='$idCompra'");
-            $DatosKardex["CalcularCostoPromedio"]=1;
-        }
-        if($Movimiento=="SALIDA"){
-            $consulta= $this->ConsultarTabla("factura_compra_items_devoluciones", "WHERE $idTabla='$idCompra'");
-        } 
-        while($DatosProductos= $this->FetchArray($consulta)){
-            $DatosProductoGeneral= $this->DevuelveValores("productosventa", "idProductosVenta", $DatosProductos["idProducto"]);
-            $DatosKardex["Cantidad"]=$DatosProductos["Cantidad"];
-            $DatosKardex["idProductosVenta"]=$DatosProductos["idProducto"];
-            $DatosKardex["CostoUnitario"]=$DatosProductos['CostoUnitarioCompra'];
-            $DatosKardex["Existencias"]=$DatosProductoGeneral['Existencias'];
+            $idItem=$DatosProductos["ID"];
+            if($DatosProductos["TablaOrigen"]=='productosventa'){
+                
+                $DatosProductoGeneral= $this->DevuelveValores("productosventa", "idProductosVenta", $DatosProductos["idProducto"]);
+                $DatosKardex["Cantidad"]=$DatosProductos["Cantidad"];
+                $DatosKardex["idProductosVenta"]=$DatosProductos["idProducto"];
+                $DatosKardex["CostoUnitario"]=$DatosProductoGeneral['CostoUnitario'];
+                $DatosKardex["Existencias"]=$DatosProductoGeneral['Existencias'];
+
+                $DatosKardex["Detalle"]=$Detalle;   
+                $DatosKardex["idDocumento"]=$idComprobante;
+                $DatosKardex["TotalCosto"]=$DatosProductos["Cantidad"]*$DatosProductoGeneral['CostoUnitario'];
+                $DatosKardex["Movimiento"]=$Movimiento;
+                $DatosKardex["CostoUnitarioPromedio"]=$DatosProductoGeneral["CostoUnitarioPromedio"];
+                $DatosKardex["CostoTotalPromedio"]=$DatosProductoGeneral["CostoUnitarioPromedio"]*$DatosKardex["Cantidad"];
+                $this->InserteKardex($DatosKardex);
+            }
             
-            $DatosKardex["Detalle"]=$Detalle;   
-            $DatosKardex["idDocumento"]=$idCompra;
-            $DatosKardex["TotalCosto"]=$DatosProductos["Cantidad"]*$DatosProductos['CostoUnitarioCompra'];
-            $DatosKardex["Movimiento"]=$Movimiento;
-            $DatosKardex["CostoUnitarioPromedio"]=$DatosProductoGeneral["CostoUnitarioPromedio"];
-            $DatosKardex["CostoTotalPromedio"]=$DatosProductoGeneral["CostoUnitarioPromedio"]*$DatosKardex["Cantidad"];
-            $this->InserteKardex($DatosKardex);
-        }
-        
-        if($Movimiento=="ENTRADA" AND $idTabla=='idFacturaCompra'){
-            $consulta= $this->ConsultarTabla("factura_compra_insumos", "WHERE $idTabla='$idCompra'");
-            while($DatosProductos= $this->FetchArray($consulta)){
+            if($DatosProductos["TablaOrigen"]=='insumos'){
                 $DatosProductoGeneral= $this->DevuelveValores("insumos", "ID", $DatosProductos["idProducto"]);
             
-                $obInsumos->KardexInsumo($Movimiento, $Detalle, $idCompra, $DatosProductoGeneral["Referencia"], $DatosProductos["Cantidad"], $DatosProductos["CostoUnitarioCompra"], "");
+                $obInsumos->KardexInsumo($Movimiento, $Detalle, $idComprobante, $DatosProductoGeneral["Referencia"], $DatosProductos["Cantidad"], $DatosProductoGeneral["CostoUnitario"], "");
             }
-        }    
+            
+            $this->ActualizaRegistro("inventario_comprobante_movimientos_items", "Estado", "KARDEX", "ID", $idItem);
+            
+        }
+        
+          
         
     }
     

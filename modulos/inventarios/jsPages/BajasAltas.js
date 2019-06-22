@@ -362,45 +362,100 @@ function MuestraOcultaXIDCompras(id){
     }
     
 }
+function ConfirmarBajaAlta(){
+    
+    alertify.confirm('Está seguro que desea Guardar este Comprobante?',
+        function (e) {
+            if (e) {
+                
+                GuardarComprobante();
+            }else{
+                alertify.error("Se canceló el proceso");
+
+                return;
+            }
+        });
+}
+/**
+ * Agrega los cargos al subtotal de los insumos
+ * @param {type} event
+ * @returns {undefined}
+ */
+function GuardarComprobante(){
+    
+    document.getElementById("DivItemsComprobantes").innerHTML='<div id="GifProcess">Procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    document.getElementById('BtnGuardarComprobante').disabled=true;
+    var idComprobante = document.getElementById('idComprobante').value;
+    if(idComprobante==""){
+        alertify.alert("Debe Seleccionar un comprobante");
+        document.getElementById('idComprobante').style.backgroundColor="pink";
+        document.getElementById('BtnGuardarComprobante').disabled=false;
+        return;
+    }else{
+        document.getElementById('idComprobante').style.backgroundColor="white";
+    }
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '5'); 
+        form_data.append('idComprobante', idComprobante);
+        
+        $.ajax({
+        url: './procesadores/BajasAltas.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                var mensaje=respuestas[1];
+                CerrarComprobante();
+                alertify.success(mensaje);
+                
+            }else{
+                alertify.alert(data);
+                document.getElementById('BtnGuardarComprobante').disabled=false;
+            }
+            
+            //DibujeTotalesCompra(idCompra);
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
 
 /**
  * Agrega los cargos al subtotal de los insumos
  * @param {type} event
  * @returns {undefined}
  */
-function GuardarCompra(idCompra=''){
-    document.getElementById('BtnGuardarCompra').disabled=true;
-    if(idCompra==''){
-        var idCompra = document.getElementById('idCompra').value;
-    }
-        
-    var CmbTipoPago = document.getElementById("CmbTipoPago").value;
-    var CmbCuentaOrigen = document.getElementById("CmbCuentaOrigen").value;
-    var CmbCuentaPUCCXP = document.getElementById("CmbCuentaPUCCXP").value;
-    var TxtFechaProgramada = document.getElementById("TxtFechaProgramada").value;
-    var CmbTraslado = document.getElementById("CmbTraslado").value;
+function CerrarComprobante(){
     
     
-    if(TxtFechaProgramada==''){
-        alertify.alert("El campo fecha programada no puede estar vacío");
-        document.getElementById("TxtFechaProgramada").style.backgroundColor="pink";
+    document.getElementById('BtnGuardarComprobante').disabled=true;
+    var idComprobante = document.getElementById('idComprobante').value;
+    if(idComprobante==""){
+        alertify.alert("Debe Seleccionar un comprobante");
+        document.getElementById('idComprobante').style.backgroundColor="pink";
         return;
     }else{
-        document.getElementById("TxtFechaProgramada").style.backgroundColor="white";
+        document.getElementById('idComprobante').style.backgroundColor="white";
     }
     
-    
-    document.getElementById("TxtFechaProgramada").value='';
     var form_data = new FormData();
-        form_data.append('Accion', '9'); 
-        form_data.append('idCompra', idCompra);
-        form_data.append('CmbTipoPago', CmbTipoPago);
-        form_data.append('CmbCuentaOrigen', CmbCuentaOrigen);
-        form_data.append('CmbCuentaPUCCXP', CmbCuentaPUCCXP);
-        form_data.append('TxtFechaProgramada', TxtFechaProgramada);
-        form_data.append('CmbTraslado', CmbTraslado);
+        form_data.append('Accion', '6'); 
+        form_data.append('idComprobante', idComprobante);
+        
         $.ajax({
-        url: './procesadores/Compras.process.php',
+        url: './procesadores/BajasAltas.process.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -410,83 +465,20 @@ function GuardarCompra(idCompra=''){
         success: function(data){
             var respuestas = data.split(';'); 
             if(respuestas[0]=="OK"){
+                
                 var mensaje=respuestas[1];
-                LimpiarDivs();
-                var x = document.getElementById("idCompra");
+                
+                var x = document.getElementById("idComprobante");
                 x.remove(x.selectedIndex);
-                document.getElementById('BtnEditarCompra').disabled=true;
+                document.getElementById('BtnGuardarComprobante').disabled=false;
                 alertify.alert(mensaje);
+                LimpiarDivs();
                 
             }else{
-                alertify.error(data,10000);
-                document.getElementById('BtnGuardarCompra').disabled=false;
+                alertify.alert(data);
+                document.getElementById('BtnGuardarComprobante').disabled=false;
             }
             
-            //DibujeTotalesCompra(idCompra);
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      });
-    
-    
-}
-/**
- * Copia los items desde una orden de compra
- * @param {type} idOrdenCompra
- * @returns {undefined}
- */
-function CopiarItemsDesdeOrden(idOrdenCompra=''){
-    var idCompra = document.getElementById('idCompra').value;
-    if(idOrdenCompra==''){
-        var idOrdenCompra = document.getElementById('idCompraAcciones').value;
-    }
-        
-        
-    if(idCompra==''){
-        alertify.alert("Debes seleccionar una compra");
-        document.getElementById("idCompra").style.backgroundColor="pink";
-        return;
-    }else{
-        document.getElementById("idCompra").style.backgroundColor="white";
-    }
-    
-    if(idOrdenCompra==''){
-        alertify.alert("Debes digitar una valor");
-        document.getElementById("idCompraAcciones").style.backgroundColor="pink";
-        return;
-    }else{
-        document.getElementById("idCompraAcciones").style.backgroundColor="white";
-    }
-    
-    var form_data = new FormData();
-        form_data.append('Accion', '10'); 
-        form_data.append('idCompra', idCompra);
-        form_data.append('idOrdenCompra', idOrdenCompra);
-                
-        document.getElementById("idCompraAcciones").value='';
-        $.ajax({
-        url: './procesadores/Compras.process.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            var respuestas = data.split(';'); 
-            if(respuestas[0]=="OK"){
-                var mensaje=respuestas[1];
-                alertify.success(mensaje);
-                
-                
-            }else{
-                alertify.error(data,10000);
-                
-            }
-            DibujeCompra();
             //DibujeTotalesCompra(idCompra);
             
         },
@@ -499,346 +491,16 @@ function CopiarItemsDesdeOrden(idOrdenCompra=''){
     
 }
 
-function CopiarItemsDesdeOrdenVerificada(idOrdenCompra=''){
-    var idCompra = document.getElementById('idCompra').value;
-    if(idOrdenCompra==''){
-        var idOrdenCompra = document.getElementById('idCompraAcciones').value;
-    }
-        
-        
-    if(idCompra==''){
-        alertify.alert("Debes seleccionar una compra");
-        document.getElementById("idCompra").style.backgroundColor="pink";
-        return;
-    }else{
-        document.getElementById("idCompra").style.backgroundColor="white";
-    }
-    
-    if(idOrdenCompra==''){
-        alertify.alert("Debes digitar una valor");
-        document.getElementById("idCompraAcciones").style.backgroundColor="pink";
-        return;
-    }else{
-        document.getElementById("idCompraAcciones").style.backgroundColor="white";
-    }
-    
-    var form_data = new FormData();
-        form_data.append('Accion', '15'); 
-        form_data.append('idCompra', idCompra);
-        form_data.append('idOrdenCompra', idOrdenCompra);
-                
-        document.getElementById("idCompraAcciones").value='';
-        $.ajax({
-        url: './procesadores/Compras.process.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            var respuestas = data.split(';'); 
-            if(respuestas[0]=="OK"){
-                var mensaje=respuestas[1];
-                alertify.success(mensaje);
-                
-                
-            }else{
-                alertify.alert(data);
-                
-            }
-            DibujeCompra();
-            //DibujeTotalesCompra(idCompra);
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      });
-    
-    
-}
 /**
  * Limpia los divs de la compra despues de guardar
  * @returns {undefined}
  */
 function LimpiarDivs(){
-    document.getElementById('DivItemsCompra').innerHTML='';
-    document.getElementById('DivTotalesCompra').innerHTML='';
-}
-
-/**
- * Busca el precio de venta y costo de un producto
- * @returns {undefined}
- */
-function BusquePrecioVentaCosto(){
-   
-    var listado = document.getElementById('CmbListado').value;
-    var Codigo = document.getElementById('CodigoBarras').value;
-    
-    var form_data = new FormData();
-        form_data.append('Accion', 5);
-        form_data.append('listado', listado);
-        form_data.append('Codigo', Codigo);
-        $.ajax({
-        url: './Consultas/Compras.draw.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            console.log(data)
-            var respuestas = data.split(';');
-            if(respuestas[0]=='OK'){
-                document.getElementById('ValorUnitario').value=respuestas[1];
-                document.getElementById('PrecioVenta').value=respuestas[2];
-            }else{
-                alertify.alert("Error "+ data);
-            }
-            
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      });
-      
-}
-
-function AplicarDescuentoItem(idItem){
-    var idCaja="TxtDescuentoItem_"+idItem;
-    var idBoton="BtnEditarDescuento_"+idItem;
-    var Descuento=document.getElementById(idCaja).value;
-    var idCompra = document.getElementById('idCompra').value;
-    document.getElementById(idBoton).disabled=true;  
-        
-    if(Descuento==''){
-        alertify.alert("El campo Descuento no puede estar vacío");
-        document.getElementById(idCaja).style.backgroundColor="pink";
-        document.getElementById(idBoton).disabled=false;
-        return;
-    }else{
-        document.getElementById(idCaja).style.backgroundColor="white";
-    }
-            
-    var form_data = new FormData();
-        form_data.append('Accion', '11'); 
-        form_data.append('idCompra', idCompra);
-        form_data.append('idItem', idItem);
-        form_data.append('Descuento', Descuento);
-                
-        
-        $.ajax({
-        url: './procesadores/Compras.process.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            var respuestas = data.split(';'); 
-            if(respuestas[0]=="OK"){
-                var mensaje=respuestas[1];
-                alertify.success(mensaje);
-                
-                
-            }else if(respuestas[0]=="E1"){
-                var mensaje=respuestas[1];
-                alertify.error(mensaje);             
-                
-            }else{
-                alertify.alert(data);
-            }
-            document.getElementById(idBoton).disabled=false;
-            DibujeCompra();
-            //DibujeTotalesCompra(idCompra);
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      });
-    
-}
-/**
- * Copia una factura de compra
- * @param {type} idOrdenCompra
- * @returns {undefined}
- */
-function CopiarFacturaCompra(idFacturaCopiar=''){
-    var idCompra = document.getElementById('idCompra').value;
-    if(idFacturaCopiar==''){
-        var idFacturaCopiar = document.getElementById('idCompraAcciones').value;
-    }
-        
-        
-    if(idCompra==''){
-        alertify.alert("Debes seleccionar una compra");
-        document.getElementById("idCompra").style.backgroundColor="pink";
-        return;
-    }else{
-        document.getElementById("idCompra").style.backgroundColor="white";
-    }
-    
-    if(idFacturaCopiar==''){
-        alertify.alert("Debe digitar una valor");
-        document.getElementById("idCompraAcciones").style.backgroundColor="pink";
-        return;
-    }else{
-        document.getElementById("idCompraAcciones").style.backgroundColor="white";
-    }
-    
-    var form_data = new FormData();
-        form_data.append('Accion', '12'); 
-        form_data.append('idCompra', idCompra);
-        form_data.append('idFacturaCopiar', idFacturaCopiar);
-                
-        document.getElementById("idCompraAcciones").value='';
-        $.ajax({
-        url: './procesadores/Compras.process.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            var respuestas = data.split(';'); 
-            if(respuestas[0]=="OK"){
-                var mensaje=respuestas[1];
-                alertify.success(mensaje);
-                
-                
-            }else{
-                alertify.error(data,10000);
-                
-            }
-            DibujeCompra();
-            //DibujeTotalesCompra(idCompra);
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      });
-    
+    document.getElementById('DivItemsComprobantes').innerHTML='';
     
 }
 
-function EditarCostoUnitario(idCaja,idTabla,idItem){
-    
-    var Valor = document.getElementById(idCaja).value;
-    
-    if(Valor==''){
-        
-        alertify.error("El valor no puede estar vacío");
-        document.getElementById(idCaja).style.backgroundColor="pink"; 
-        
-        return;
-    }else{
-        document.getElementById(idCaja).style.backgroundColor="white";
-    }
-    
-    if(!$.isNumeric(Valor) ||  Valor<=0){
-        
-        alertify.error("El Valor debe se un número mayor a Cero");
-        document.getElementById(idCaja).style.backgroundColor="pink";   
-        
-        return;
-    }else{
-        document.getElementById(idCaja).style.backgroundColor="white";
-    }
-    
-    var form_data = new FormData();
-        form_data.append('Accion', 13);
-        form_data.append('idItem', idItem);
-        form_data.append('Valor', Valor);
-        form_data.append('idTabla', idTabla);
-        $.ajax({
-        url: './procesadores/Compras.process.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            if(data=='OK'){
-                alertify.success("Valor Editado");
-            }else{
-                alertify.alert(data);
-            }
-            
-            DibujeCompra();
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      });
-}
 
-function EditarCantidadItem(idCaja,idTabla,idItem){
-    
-    var Valor = document.getElementById(idCaja).value;
-    
-    if(Valor==''){
-        
-        alertify.error("El valor no puede estar vacío");
-        document.getElementById(idCaja).style.backgroundColor="pink"; 
-        
-        return;
-    }else{
-        document.getElementById(idCaja).style.backgroundColor="white";
-    }
-    
-    if(!$.isNumeric(Valor) ||  Valor<=0){
-        
-        alertify.error("El Valor debe se un número mayor a Cero");
-        document.getElementById(idCaja).style.backgroundColor="pink";   
-        
-        return;
-    }else{
-        document.getElementById(idCaja).style.backgroundColor="white";
-    }
-    
-    var form_data = new FormData();
-        form_data.append('Accion', 14);
-        form_data.append('idItem', idItem);
-        form_data.append('Valor', Valor);
-        form_data.append('idTabla', idTabla);
-        $.ajax({
-        url: './procesadores/Compras.process.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            if(data=='OK'){
-                alertify.success("Cantidad Editada");
-            }else{
-                alertify.alert(data);
-            }
-            
-            DibujeCompra();
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      });
-}
 
 function SeleccioneAccionFormularios(){
     var Accion = document.getElementById("idFormulario").value;

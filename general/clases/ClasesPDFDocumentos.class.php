@@ -359,14 +359,16 @@ $this->PDF->writeHTML("<br>", true, false, false, false, '');
         $Documento="$DatosFormatos[Nombre] No. $idComprobante";
         
         $this->PDF_Ini("ComprobanteBajasAltas", 8, "");
-        $DatosComprobante= $this->obCon->DevuelveValores("prod_bajas_altas", "ID", $idComprobante);
-        $DatosUsuarios= $this->obCon->DevuelveValores("usuarios", "idUsuarios", $DatosComprobante["Usuarios_idUsuarios"]);
+        $DatosComprobante= $this->obCon->DevuelveValores("inventario_comprobante_movimientos", "ID", $idComprobante);
+        $DatosUsuarios= $this->obCon->DevuelveValores("usuarios", "idUsuarios", $DatosComprobante["idUser"]);
                
         $this->PDF_Encabezado($fecha,1, $idFormato, "",$Documento);
         $html="<br><br><br><br><pre>";
         $html.="<strong>El día $DatosComprobante[Fecha], se realiza por parte del Colaborador(a) $DatosUsuarios[Nombre] $DatosUsuarios[Apellido], Identificado con Documento $DatosUsuarios[Identificacion],"
-             . "Por motivo: $DatosComprobante[Observaciones] ,Un movimiento de $DatosComprobante[Movimiento] en inventarios de $DatosComprobante[Cantidad] Unidades del producto $DatosComprobante[Nombre] con Referencia:  $DatosComprobante[Referencia],"
-             . "Para Constancia se firma por las partes:</strong> </pre>"; 
+             . "Por motivo: $DatosComprobante[Observaciones] ,los siguientes movimientos en el inventario:</pre>";
+             
+        $this->PDF_Write("<br>".$html);
+        $html= $this->HTML_Items_ComprobanteBajasAltas($idComprobante);
         $this->PDF_Write("<br>".$html);
         $html=$this->HTML_Firmas_Documentos();
         $this->PDF_Write("<br><br><br><br>".$html);
@@ -2284,6 +2286,71 @@ $tbl.= '<tr>'
         . '<td align="right" style="border-bottom: 1px solid #ddd;background-color: white;"><strong>'.number_format($GranTotal).'</strong></td>'
         . '<td align="center" style="border-bottom: 1px solid #ddd;background-color: white;"> </td>'
         . '</tr>';
+$tbl.= "</table>";
+        
+}
+        return($tbl);
+
+    }
+    
+    public function HTML_Items_ComprobanteBajasAltas($idComprobante) {
+        $tbl = "";        
+
+        $sql="SELECT *,
+                    (SELECT IF(TablaOrigen='productosventa', 
+                    (SELECT Referencia FROM productosventa WHERE productosventa.idProductosVenta=inventario_comprobante_movimientos_items.idProducto LIMIT 1), 
+                    (SELECT Referencia FROM insumos WHERE insumos.ID=inventario_comprobante_movimientos_items.idProducto LIMIT 1))) AS Referencia, 
+                    (SELECT IF(TablaOrigen='productosventa', 
+                    (SELECT Nombre FROM productosventa WHERE productosventa.idProductosVenta=inventario_comprobante_movimientos_items.idProducto LIMIT 1), 
+                    (SELECT Nombre FROM insumos WHERE insumos.ID=inventario_comprobante_movimientos_items.idProducto LIMIT 1))) AS Nombre
+                    FROM inventario_comprobante_movimientos_items WHERE idComprobante='$idComprobante'";
+        $Consulta= $this->obCon->Query($sql);
+        $h=1;  
+if($this->obCon->NumRows($Consulta)){
+    $tbl = <<<EOD
+                <h3 align="center">PRODUCTOS AGREGADOS</h3>
+        <table cellspacing="1" cellpadding="2" border="0">
+        <tr>
+            <td align="center" ><strong>Movimiento</strong></td>    
+            <td align="center" ><strong>Tipo de Producto</strong></td>       
+            <td align="center" ><strong>ID Del Producto</strong></td>
+            <td align="center" ><strong>Referencia</strong></td>
+            <td align="center" colspan="3"><strong>Nombre</strong></td>        
+            <td align="center" ><strong>Cantidad</strong></td>
+
+        </tr>
+    
+         
+EOD;
+
+while($DatosItemComprobante=$this->obCon->FetchArray($Consulta)){
+    
+    $Cantidad=$DatosItemComprobante["Cantidad"];
+    
+    if($h==0){
+        $Back="#f2f2f2";
+        $h=1;
+    }else{
+        $Back="white";
+        $h=0;
+    }
+    
+    $tbl .= '    
+    
+    <tr>
+        <td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosItemComprobante["TipoMovimiento"].'</td>    
+        <td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosItemComprobante["TablaOrigen"].'</td>
+        <td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosItemComprobante["idProducto"].'</td>
+        <td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.($DatosItemComprobante["Referencia"]).'</td>
+        <td align="left" colspan="3"  style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.($DatosItemComprobante["Nombre"]).'</td>
+        <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosItemComprobante["Cantidad"]).'</td>
+        
+    </tr>
+        
+ ';
+    
+}
+
 $tbl.= "</table>";
         
 }
