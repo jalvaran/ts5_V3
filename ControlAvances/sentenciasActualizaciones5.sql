@@ -362,3 +362,13 @@ INSERT INTO `contabilidad_parametros_cuentasxcobrar` (`ID`, `CuentaPUC`, `Update
 INSERT INTO `documentos_contables` (`ID`, `Prefijo`, `Nombre`, `Descripcion`, `Updated`, `Sync`) VALUES
 (12,	'CC-12',	'COMPROBANTE DE EGRESO',	'Para realizar egresos de dinero',	'2019-04-11 09:01:47',	'2019-04-10 09:01:47'),
 (13,	'CC-13',	'COMPROBANTE DE INGRESO',	'Para realizar ingresos de dinero',	'2019-06-10 09:07:07',	'2019-04-10 09:01:47');
+
+
+UPDATE `menu_submenus` SET `Estado` = '0' WHERE `menu_submenus`.`ID` = 191;
+INSERT INTO `menu_carpetas` (`ID`, `Ruta`, `Updated`, `Sync`) VALUES
+(12,	'../modulos/inventarios/',	'2019-06-22 10:09:52',	'2019-04-07 09:14:07');
+
+UPDATE `menu_submenus` SET `Nombre` = 'Dar de baja o alta a un producto o insumo' WHERE `menu_submenus`.`ID` = 72;
+UPDATE `menu_submenus` SET `idCarpeta` = '12' WHERE `menu_submenus`.`ID` = 72;
+UPDATE `menu_submenus` SET `Pagina` = 'BajasAltas.php' WHERE `menu_submenus`.`ID` = 72;
+

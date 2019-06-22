@@ -2308,7 +2308,7 @@ $tbl.= "</table>";
         $h=1;  
 if($this->obCon->NumRows($Consulta)){
     $tbl = <<<EOD
-                <h3 align="center">PRODUCTOS AGREGADOS</h3>
+                <h3 align="center">ITEMS EN ESTE COMPROBANTE</h3>
         <table cellspacing="1" cellpadding="2" border="0">
         <tr>
             <td align="center" ><strong>Movimiento</strong></td>    

@@ -1,6 +1,6 @@
 <?php
 
-$myTabla="prod_bajas_altas";
+$myTabla="inventario_comprobante_movimientos";
 $MyID="ID";
 $myPage="prod_bajas_altas.php";
 $myTitulo="Historial de Bajas y Altas";
@@ -26,7 +26,7 @@ $Vector["NuevoRegistro"]["Deshabilitado"]=1;
 $Vector["EditarRegistro"]["Deshabilitado"]=1; 
 
 //Link para la accion ver
-$Ruta="PDF_Documentos.php?idDocumento=25&idComprobante=";
+$Ruta="../general/Consultas/PDF_Documentos.draw.php?idDocumento=25&idComprobante=";
 $Vector["VerRegistro"]["Link"]=$Ruta;
 $Vector["VerRegistro"]["ColumnaLink"]="ID";
 /*
