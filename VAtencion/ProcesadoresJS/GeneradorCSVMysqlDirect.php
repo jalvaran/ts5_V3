@@ -38,38 +38,8 @@ if(isset($_REQUEST["Opcion"])){
             $sqlColumnas.=" UNION ALL ";
             $Indice=$Columnas["Field"][0];
             //print($Indice);
-            $sql=$sqlColumnas."SELECT $CamposShow FROM $statement;";
-            $Consulta=$obVenta->Query($sql);
-            
-            if($archivo = fopen($Link, "a")){
-                $mensaje="";
-                $r=0;
-                while($DatosExportacion= $obVenta->FetchArray($Consulta)){
-                    $r++;
-                    foreach ($Columnas["Field"] as $NombreColumna){
-                        $Dato="";
-                        if(isset($DatosExportacion[$NombreColumna])){
-                            $Dato=$DatosExportacion[$NombreColumna];
-                        }
-                        $mensaje.='"'.str_replace(";", "", $Dato).'";'; 
-                    }
-                    $mensaje=substr($mensaje, 0, -1);
-                    $mensaje.="\r\n";
-                    if($r==1000){
-                        $r=0;
-                        fwrite($archivo, $mensaje);
-                        $mensaje="";
-                    }
-                }
-                
-
-                fwrite($archivo, $mensaje);
-                fclose($archivo);
-                unset($mensaje);
-                unset($DatosExportacion);
-            }
-            
-            
+            $sql=$sqlColumnas."SELECT $CamposShow FROM $statement INTO OUTFILE '$OuputFile' FIELDS TERMINATED BY ';' $Enclosed LINES TERMINATED BY '\r\n';";
+            $obVenta->Query($sql);
             print("<a href='$Link' target='_top'><img src='../../images/download.gif'>Download</img></a>");
             break;
         case 2:   //Resumen de facturacion agrupado por referencia en un periodo de tiempo

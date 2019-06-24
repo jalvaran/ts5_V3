@@ -372,3 +372,29 @@ UPDATE `menu_submenus` SET `Nombre` = 'Dar de baja o alta a un producto o insumo
 UPDATE `menu_submenus` SET `idCarpeta` = '12' WHERE `menu_submenus`.`ID` = 72;
 UPDATE `menu_submenus` SET `Pagina` = 'BajasAltas.php' WHERE `menu_submenus`.`ID` = 72;
 
+CREATE TABLE `inventario_comprobante_movimientos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Estado` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `inventario_comprobante_movimientos_items` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idProducto` bigint(20) NOT NULL,
+  `TablaOrigen` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Cantidad` double NOT NULL,
+  `TipoMovimiento` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `Estado` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
+  `idComprobante` bigint(20) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+
