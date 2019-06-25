@@ -397,4 +397,12 @@ CREATE TABLE `inventario_comprobante_movimientos_items` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
+ALTER TABLE `restaurante_mesas` CHANGE `Estado` `Estado` INT(11) NOT NULL;
+ALTER TABLE `restaurante_mesas` ADD `idUser` INT NOT NULL AFTER `Estado`;
+
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(10,	'Determina cuantas copias saldrán al momento de imprimir un pedido de restaurante',	'2',	'2019-03-19 16:47:01',	'2019-03-18 16:47:01');
+
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(11,	'Determina cuantas copias saldrán al momento de imprimir una precuenta de restaurante',	'1',	'2019-03-19 16:47:01',	'2019-03-18 16:47:01');
 

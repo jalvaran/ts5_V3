@@ -1353,8 +1353,10 @@ class PageConstruct extends html_estruct_class{
          * Fila tabla
          * @param type $FontSize
          */
-	function FilaTabla($FontSize){
-            print('<tr class="odd gradeX" style="font-size:'.$FontSize.'px">');
+	function FilaTabla($FontSize,$styles=''){
+            
+            
+            print('<tr class="odd gradeX" style="font-size:'.$FontSize.'px;'.$styles.'">');
 		
 	}
 	/**
@@ -1908,12 +1910,12 @@ class PageConstruct extends html_estruct_class{
                     <ul class="nav nav-tabs">');
         }
         
-        public function TabLabel($id,$Title,$Ref,$Active=0) {
+        public function TabLabel($id,$Title,$Ref,$Active=0,$js) {
             $Class="";
             if($Active==1){
                 $Class='class="active"';
             }
-            print('<li '.$Class.'><a id='.$id.' href="#'.$Ref.'" data-toggle="tab">'.$Title.'</a></li>');
+            print('<li '.$Class.'><a id='.$id.' href="#'.$Ref.'" data-toggle="tab" '.$js.'>'.$Title.'</a></li>');
         }
         
         
@@ -1939,6 +1941,41 @@ class PageConstruct extends html_estruct_class{
         
         public function TabPaneEnd() {
             print('</div>');
+        }
+        
+        public function IconButton($Name,$id,$iconClass,$Titulo,$js,$spanActivo=0,$spanColor="red",$style='') {
+            print('<a name='.$Name.' id="'.$id.'" '.$js.' class="btn btn-app" '.$style.' style="background-color:#d9e8ff;color:red">');
+            
+            
+            if($spanActivo==1){
+                $idSpan="sp_$id";
+                print('<span id="'.$idSpan.'" class="badge bg-'.$spanColor.'">0</span>');
+            }
+            
+            print('<i class="'.$iconClass.' "></i> '.$Titulo.' </a>');
+        }
+        
+        public function CrearTitulo($Mensaje,$color='azul') {
+            
+            if($color=="azul"){
+                $tipo="info";
+            }
+            if($color=="rojo"){
+                $tipo="danger";
+            }
+            if($color=="naranja"){
+                $tipo="warning";
+            }
+            if($color=="verde"){
+                $tipo="success";
+            }
+            print('<div class="box box-'.$tipo.'">
+            <div class="box-header with-border">
+              <h3 class="box-title">'.$Mensaje.'</h3>             
+            </div>
+            
+          </div>');
+            //print('<div class="callout callout-info">'.$Mensaje.'</div>');
         }
         
         //////////////////////////////////FIN
