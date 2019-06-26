@@ -891,12 +891,20 @@ class Facturacion extends ProcesoVenta{
     
     //descarga una factura del inventario
      public function DescargueFacturaInventariosV2($idFactura,$Vector) {
+        include_once("../../compras/clases/Recetas.class.php");
         $consulta=$this->ConsultarTabla("facturas_items", "WHERE idFactura='$idFactura'");
         while($DatosItems=$this->FetchArray($consulta)){
             
             if($DatosItems["TipoItem"]=="PR" AND $DatosItems["TablaItems"]=="productosventa"){
                 $DatosProducto=$this->DevuelveValores($DatosItems["TablaItems"], "Referencia", $DatosItems["Referencia"]);
-                
+                if($DatosProducto['Existencias']<=0){
+                    $DatosReceta=$this->DevuelveValores("recetas_relaciones", "ReferenciaProducto", $DatosProducto['Referencia']);  
+                    if($DatosReceta["ID"]<>''){
+                        $obReceta=new Recetas($idUser);
+                        $obReceta->FabricarProducto($DatosCotizacion["idProducto"], $DatosCotizacion['Cantidad'], "");
+                        $DatosProducto['Existencias']=$DatosProducto['Existencias']+$DatosCotizacion['Cantidad'];
+                    }
+                }  
                 $DatosKardex["Cantidad"]=$DatosItems['Cantidad'];
                 $DatosKardex["idProductosVenta"]=$DatosProducto["idProductosVenta"];
                 $DatosKardex["CostoUnitario"]=$DatosProducto['CostoUnitario'];

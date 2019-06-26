@@ -406,3 +406,5 @@ INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `S
 INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
 (11,	'Determina cuantas copias saldrán al momento de imprimir una precuenta de restaurante',	'1',	'2019-03-19 16:47:01',	'2019-03-18 16:47:01');
 
+ALTER TABLE `restaurante_pedidos_items` ADD `TotalCostos` DOUBLE NOT NULL AFTER `Total`;
+

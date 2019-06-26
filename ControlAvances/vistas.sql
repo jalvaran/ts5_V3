@@ -276,4 +276,13 @@ CREATE VIEW vista_cuentasxcobrardetallado AS
 SELECT *
 FROM vista_cuentasxtercerosdocumentos_v2 t1 WHERE t1.Total<>0 AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxcobrar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Fecha;
 
+DROP VIEW IF EXISTS `vista_pedidos_restaurante`;
+CREATE VIEW vista_pedidos_restaurante AS
+SELECT ID,`Fecha`,`Hora`,`Estado`,idMesa , idCliente,NombreCliente, DireccionEnvio,TelefonoConfirmacion, Observaciones,idCierre,
+(SELECT SUM(Subtotal) as Subtotal FROM restaurante_pedidos_items WHERE restaurante_pedidos_items.idPedido=restaurante_pedidos.ID) as Subtotal,
+(SELECT SUM(IVA) as IVA FROM restaurante_pedidos_items WHERE restaurante_pedidos_items.idPedido=restaurante_pedidos.ID) as IVA,
+(SELECT SUM(Total) as Total FROM restaurante_pedidos_items WHERE restaurante_pedidos_items.idPedido=restaurante_pedidos.ID) as Total,
+(SELECT SUM(TotalCostos) FROM restaurante_pedidos_items WHERE restaurante_pedidos_items.idPedido=restaurante_pedidos.ID) as TotalCostos,
+idUsuario
+FROM `restaurante_pedidos`;
 

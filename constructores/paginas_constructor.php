@@ -1978,6 +1978,65 @@ class PageConstruct extends html_estruct_class{
             //print('<div class="callout callout-info">'.$Mensaje.'</div>');
         }
         
+        public function ImageOcultarMostrar($Nombre,$Leyenda,$idObjeto,$Ancho,$Alto,$Vector,$RutaImage='../../images/circle.png') {
+            print("<strong>$Leyenda</strong><image name='$Nombre' id='$Nombre' src='$RutaImage' style='cursor: pointer;height:$Ancho"."px".";width:$Alto"."px"."' onclick=MuestraOcultaXID('$idObjeto');>");
+        }
+
+        function CrearSelect($nombre,$evento,$ancho=200){
+		print('<select id="'.$nombre.'" class="form-control" required name="'.$nombre.'" style="width:'.$ancho.'px" onchange="'.$evento.'" >');
+		
+	}
+        
+        function CrearOptionSelect($value,$label,$selected){
+		
+		if($selected==1)
+			print('<option value='.$value.' selected>'.$label.'</option>');
+		else
+			print('<option value='.$value.'>'.$label.'</option>');
+		
+	}
+        
+        function CerrarSelect(){
+		print('</select>');
+		
+	}
+	
+        
+	function CrearInputNumber($nombre,$type,$label,$value,$placeh,$color,$TxtEvento,$TxtFuncion,$Ancho,$Alto,$ReadOnly,$Required,$Min,$Max,$Step,$css=""){
+		
+		if($ReadOnly==1)
+			$ReadOnly="readonly";
+		else
+			$ReadOnly="";
+		
+		if($Required==1)
+			$Required="required";
+		else
+			$Required="";
+		
+			print('<strong style="color:'.$color.'">'.$label.'<input name="'.$nombre.'" class="form-control" value="'.$value.'" type="'.$type.'" id="'.$nombre.'" placeholder="'.$placeh.'" '.$TxtEvento.' = "'.$TxtFuncion.'" 
+			'.$ReadOnly.' '.$Required.' min="'.$Min.'"   max="'.$Max.'" step="'.$Step.'" autocomplete="off" style="width: '.$Ancho.'px;height: '.$Alto.'px;'.$css.'"></strong>');
+		
+	}
+	
+        
+	function CrearTextArea($nombre,$label,$value,$placeh,$color,$TxtEvento,$TxtFuncion,$Ancho,$Alto,$ReadOnly,$Required,$BorderWidth=1){
+		
+		if($ReadOnly==1)
+			$ReadOnly="readonly";
+		else
+			$ReadOnly="";
+		$Required="";
+		if($Required==1)
+			$Required="required";
+                
+                print("<strong style= 'color:$color'>$label<textarea name='$nombre' class='form-control' id='$nombre' placeholder='$placeh' $TxtEvento = '$TxtFuncion'" 
+                ." $ReadOnly  autocomplete='off' style='width: ".$Ancho."px; height: ".$Alto."px;border-top-width:".$BorderWidth."px;border-left-width:".$BorderWidth."px;border-right-width:".$BorderWidth."px;border-bottom-width:".$BorderWidth."px;' $Required>".$value."</textarea></strong>");
+
+			
+		
+	}
+	
         //////////////////////////////////FIN
 }
 	

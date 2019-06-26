@@ -24,7 +24,7 @@ $css->PageInit($myTitulo);
             
             $css->TabLabel("TabCuentas2", "<strong>Pedidos</strong>", "Tab_2",0,"onclick=DibujePedidos()");
             $css->TabLabel("TabCuentas5", "<strong>Detalles</strong>", "Tab_5", 0,"");
-            $css->TabLabel("TabCuentas3", "<strong>Facturar</strong>", "Tab_3",0,"onclick=CargarHistorialPagos()");  
+            $css->TabLabel("TabCuentas3", "<strong>Facturar</strong>", "Tab_3",0,"");  
             $css->TabLabel("TabCuentas4", "<strong>Opciones</strong>", "Tab_4",0,"onclick=HistorialAnticipos()"); 
             
         $css->TabInitEnd();
@@ -59,7 +59,9 @@ $css->PageInit($myTitulo);
         $css->TabPaneInit("Tab_3");
             
              
-            $css->CrearDiv("DivTab3", "", "center", 1, 1);
+            $css->CrearDiv("DivFormularioFacturacion", "", "center", 1, 1);
+            $css->CerrarDiv();
+            $css->CrearDiv("DivProcesamiento", "", "center", 1, 1);
             $css->CerrarDiv();
             
         $css->TabPaneEnd();

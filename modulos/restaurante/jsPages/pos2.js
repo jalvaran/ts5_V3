@@ -563,6 +563,7 @@ function ImprimirPedido(){
 }
 
 
+
 function ImprimirPrecuenta(){
     var idPedido=document.getElementById("idPedido").value; 
      
@@ -638,6 +639,145 @@ function DisminuyeCantidad(){
     var Cantidad = parseFloat(document.getElementById("Cantidad").value);
     
     document.getElementById("Cantidad").value=Cantidad-1;
+}
+
+function AbrirOpcionesFacturacion(idPedido){
+    document.getElementById('TabCuentas3').click();
+    document.getElementById("DivFormularioFacturacion").innerHTML='<div id="GifProcess"><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '8');        
+        form_data.append('idPedido', idPedido);
+        
+                
+        $.ajax({
+        url: './Consultas/pos2.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivFormularioFacturacion').innerHTML=data;
+            $('#idCliente').select2({
+            
+            placeholder: 'Clientes Varios',
+            ajax: {
+              url: 'buscadores/clientes.search.php',
+              dataType: 'json',
+              delay: 250,
+              processResults: function (data) {
+
+        return {                     
+          results: data
+        };
+      },
+     cache: true
+    }
+  });
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+}
+
+//calcular la devuelta
+function CalculeDevueltaRestaurante(Total){
+    var Efectivo=$('#TxtEfectivo').val();
+    var Tarjetas=$('#TxtTarjetas').val();
+    var Cheques=$('#TxtCheques').val();
+    var Bonos=$('#TxtBonos').val();
+    var PropinaEfectivo=$('#TxtPropinaEfectivo').val();
+    var PropinaTarjetas=$('#TxtPropinaTarjetas').val();
+    var TotalPagos=parseInt(Efectivo)+parseInt(Tarjetas)+parseInt(Cheques)+parseInt(Bonos);
+    var TotalPropinas=parseInt(PropinaEfectivo)+parseInt(PropinaTarjetas);
+    document.getElementById("GranTotalPropinas").value = TotalPropinas;
+    document.getElementById("TxtDevuelta").value = TotalPagos-(parseInt(Total)+parseInt(TotalPropinas));
+}
+
+
+
+function FacturarPedido(idPedido,Options=0){
+        
+    var form_data = new FormData();
+        form_data.append('Accion', 5)
+    if(Options==0){
+    
+        form_data.append('idPedido', idPedido)
+        form_data.append('idCliente', $('#idCliente').val())
+        form_data.append('TxtTarjetas', $('#TxtTarjetas').val())
+        form_data.append('TxtCheques', $('#TxtCheques').val()) 
+        form_data.append('TxtBonos', $('#TxtBonos').val())
+        form_data.append('CmbTipoPago', $('#CmbTipoPago').val())
+        form_data.append('CmbColaboradores', $('#CmbColaboradores').val()) 
+        form_data.append('TxtObservaciones', $('#TxtObservacionesFactura').val())
+        form_data.append('TxtEfectivo', $('#TxtEfectivo').val()) 
+        form_data.append('TxtDevuelta', $('#TxtDevuelta').val())
+        form_data.append('TxtPropinaEfectivo', $('#TxtPropinaEfectivo').val()) 
+        form_data.append('TxtPropinaTarjetas', $('#TxtPropinaTarjetas').val())
+        
+    }
+    if(Options==1){
+    
+        form_data.append('idPedido', idPedido)
+        form_data.append('idCliente', 1)
+        form_data.append('TxtTarjetas', 0)
+        form_data.append('TxtCheques', 0) 
+        form_data.append('TxtBonos', 0)
+        form_data.append('CmbTipoPago', 'Contado')
+        form_data.append('CmbColaboradores', '') 
+        form_data.append('TxtObservaciones', '')
+        form_data.append('TxtEfectivo', 'NA') 
+        form_data.append('TxtDevuelta', '0')
+        form_data.append('TxtPropinaEfectivo', 0) 
+        form_data.append('TxtPropinaTarjetas', 0)
+        
+    }
+        document.getElementById('DivProcesamiento').innerHTML ='Procesando...<br><img src="../../images/process.gif" alt="Cargando" height="100" width="100">';
+                
+        $.ajax({
+        url: './procesadores/pos2.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            console.log(data)
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                document.getElementById('DivProcesamiento').innerHTML ="";
+                
+                var mensaje=respuestas[1];            
+                alertify.success(mensaje);
+                document.getElementById('DivFormularioFacturacion').innerHTML =mensaje;
+                
+            }else if(respuestas[0]=="E1"){
+                var mensaje=respuestas[1];
+                alertify.alert(mensaje);
+                document.getElementById('DivProcesamiento').innerHTML =mensaje;
+            
+            }else{
+                alertify.alert(data);
+                document.getElementById('DivProcesamiento').innerHTML =data;
+                              
+            }
+            
+            //DibujeTotalesCompra(idCompra);
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
 }
 
 document.getElementById('BtnMuestraMenuLateral').click();
