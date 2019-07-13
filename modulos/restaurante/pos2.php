@@ -20,12 +20,12 @@ $css->PageInit($myTitulo);
     $css->section("", "content", "", "");
     $css->CrearInputText("idPedido", "hidden", "", "", "", "", "", "", 100, 30, 0, 1);
     $css->TabInit();
-            $css->TabLabel("TabCuentas1", "<strong>Crear</strong>", "Tab_1", 1,"");
+            $css->TabLabel("TabCuentas1", "<strong>Crear</strong>", "Tab_1", 1,"onclick='AbrirFormularioNuevoPedido();idPestana=1;'");
             
-            $css->TabLabel("TabCuentas2", "<strong>Pedidos</strong>", "Tab_2",0,"onclick=DibujePedidos()");
-            $css->TabLabel("TabCuentas5", "<strong>Detalles</strong>", "Tab_5", 0,"");
-            $css->TabLabel("TabCuentas3", "<strong>Facturar</strong>", "Tab_3",0,"");  
-            $css->TabLabel("TabCuentas4", "<strong>Opciones</strong>", "Tab_4",0,"onclick=HistorialAnticipos()"); 
+            $css->TabLabel("TabCuentas2", "<strong>Pedidos</strong>", "Tab_2",0,"onclick='DibujePedidos();idPestana=2;'");
+            $css->TabLabel("TabCuentas5", "<strong>Detalles</strong>", "Tab_5", 0,"onclick='idPestana=5;'");
+            $css->TabLabel("TabCuentas3", "<strong>Facturar</strong>", "Tab_3",0,"onclick='AbrirOpcionesFacturacion();idPestana=3;'");  
+            $css->TabLabel("TabCuentas4", "<strong>Preparación</strong>", "Tab_4",0,"onclick='idPestana=4;'"); 
             
         $css->TabInitEnd();
         $css->TabContentInit();
@@ -34,7 +34,7 @@ $css->PageInit($myTitulo);
         $css->TabPaneInit("Tab_1", 1);
             $css->section("", "contentTab1", "", "");
             $css->CrearDiv("", "col-md-12", "center", 1, 1);
-                $css->CrearTitulo("Opciones de Creación", "azul");
+                $css->CrearTitulo("<strong>Opciones de Creación</strong>", "azul");
                 $css->div("", "col-sm-2", "", "", "", "", "");
                     
                     $css->IconButton("BtnNuevoPedido","bntNuevoPedido",'fa fa-plus',"Nuevo Pedido","onclick='AbrirFormularioNuevoPedido()'",$spanActivo=0,"orange",$style='style="background-color:#d9f2ff;color:black"');
@@ -75,32 +75,35 @@ $css->PageInit($myTitulo);
         
         $css->TabPaneInit("Tab_5");
             
-            $css->CrearDiv("DivTituloPedido", "col-sm-12", "left", 1, 1);
+            $css->CrearDiv("DivTituloPedido", "col-sm-4", "left", 1, 1);
             $css->CerrarDiv();
-            $css->div("DivAgregarItem", "col-sm-12", "", "", "", "", "style=display:none;");
-                $css->div("", "col-sm-12", "", "", "", "", "");
+            $css->div("DivAgregarItem", "col-sm-8", "", "", "", "", "");
+                $css->div("", "col-sm-6", "", "", "", "", "");
                     $css->CrearTitulo("<strong>Departamentos</strong>",'verde');
-                    $css->div("DivDepartamentos", "col-sm-12", "", "", "", "", "style=overflow:auto;height:100px;");
+                    $css->div("DivDepartamentos", "col-sm-12", "", "", "", "", "style=overflow:auto;height:140px;");
                     $css->CerrarDiv();
                 $css->CerrarDiv();
-                $css->div("DivOpcionesProductos", "col-sm-12", "", "", "", "", "style=text-align:center");
-                    $html='<div class="input-group" style="text-align:center">
+                $css->div("DivOpcionesProductos", "col-sm-6", "", "", "", "", "style=text-align:center");
+                $css->CrearTitulo("<strong>Agregar Item</strong>");    
+                $html='<div class="input-group" style="text-align:center">
+                       
                       <div class="input-group-addon" onclick="DisminuyeCantidad()" style="background-color:#ffc5c5;cursor:pointer;font-size:40px">
                         <i class="fa fa-minus-circle"></i>
                       </div>
-                      <input id="Cantidad" type="number" value="1"  placeholder="Cantidad" style="width:94%" ><br>
-                      <input id="Observaciones" type="text"  placeholder="Observaciones" style="width:94%" ><br>
-                      <input id="Busqueda" type="text" class="" placeholder="Buscar" onkeyup="BuscarProductos()" style="width:94%">
+                       <div id="DivSelectProductos">
+                      <select id="idProducto" name="idProducto" class="form-control" style="">
+                        <option value="">Seleccione un producto</option>
+                      </select>
+                      </div>
+                      <input id="Cantidad" type="number" value="1" class="form-control"  placeholder="Cantidad"  ><br>
+                      <input id="Observaciones" type="text" class="form-control" placeholder="Observaciones"  ><br>
+                      <input id="BtnAgregarItem" type="button" value="Agregar" class="btn btn-success" style="width:100%" onclick="AgregarProducto()" >
                       <div class="input-group-addon" onclick="IncrementaCantidad()" style="background-color:#c5ffcc;cursor:pointer;font-size:40px" >
                         <i class="fa fa-plus-circle"></i>
                       </div>
                     </div>';
-
-                    $css->CrearTitulo($html, "azul");
-
-                    $css->div("DivProductos", "col-sm-12", "", "", "", "", "style=overflow:auto;height:150px;");
-
-                    $css->CerrarDiv();
+                    print($html);
+                   
                 $css->CerrarDiv();
             $css->CerrarDiv();
             $css->div("", "col-sm-12", "", "", "", "", "");

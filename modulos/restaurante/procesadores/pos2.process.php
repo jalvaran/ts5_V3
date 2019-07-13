@@ -192,7 +192,8 @@ if( !empty($_REQUEST["Accion"]) ){
             if($PropinaEfectivo>0 or $PropinaTarjetas>0){
                 $obCon->PropinasRegistro($CuentaDestino,$idFactura,$idColaborador,$PropinaEfectivo,$PropinaTarjetas,"");
             }
-            $Total=$TotalesPedido["Total"];	
+            $Total=$TotalesPedido["Total"];
+            $obCon->RestauranteRegistreVentaUsuario($idFactura, $DatosPedido["idUsuario"],$Total);
             if($Print=="S"){
                 $DatosImpresora=$obCon->DevuelveValores("config_puertos", "ID", 1);
                 if($DatosImpresora["Habilitado"]=="SI"){
@@ -218,7 +219,25 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break; //Fin caso 5
         
-        
+        case 6: //Eliminar Item
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $obCon->BorraReg("restaurante_pedidos_items", "ID", $idItem);
+            print("OK;Item Eliminado");
+        break;
+    
+        case 7: //Cambiar Estado a item
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $idPedido=$obCon->normalizar($_REQUEST["idPedido"]);
+            $Estado=$obCon->normalizar($_REQUEST["Estado"]);
+            $obCon->ActualizaRegistro("restaurante_pedidos_items", "Estado", $Estado, "ID", $idItem);
+            $sql="SELECT Estado FROM restaurante_pedidos_items WHERE Estado='AB' AND idPedido='$idPedido' LIMIT 1";
+            $Consulta=$obCon->Query($sql);
+            $EstadosPedido=$obCon->FetchAssoc($Consulta);
+            if($EstadosPedido["Estado"]==""){
+                $obCon->ActualizaRegistro("restaurante_pedidos", "Estado", 4, "ID", $idPedido);
+            }
+            print("Item Preparado");
+        break;
        
     }
     

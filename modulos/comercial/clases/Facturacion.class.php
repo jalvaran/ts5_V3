@@ -228,7 +228,7 @@ class Facturacion extends ProcesoVenta{
         
         $CostoUnitario=0;
         $PrecioMayor=0;
-        
+        $fecha=date("Y-m-d");
         if(isset($DatosProductoGeneral["CostoUnitario"])){
             $CostoUnitario=$DatosProductoGeneral["CostoUnitario"];
         }
@@ -311,7 +311,7 @@ class Facturacion extends ProcesoVenta{
                 
             }
             
-            if($Porcentaje>0 and $FechaDescuento==$fecha){
+            if($Porcentaje>0 and $FechaDescuento==date("Y-m-d")){
 
                     $Porcentaje=(100-$Porcentaje)/100;
                     $ValorUnitario=round($ValorUnitario*$Porcentaje,2);
@@ -897,12 +897,13 @@ class Facturacion extends ProcesoVenta{
             
             if($DatosItems["TipoItem"]=="PR" AND $DatosItems["TablaItems"]=="productosventa"){
                 $DatosProducto=$this->DevuelveValores($DatosItems["TablaItems"], "Referencia", $DatosItems["Referencia"]);
-                if($DatosProducto['Existencias']<=0){
+                if($DatosProducto['Existencias']<$DatosItems['Cantidad']){
                     $DatosReceta=$this->DevuelveValores("recetas_relaciones", "ReferenciaProducto", $DatosProducto['Referencia']);  
                     if($DatosReceta["ID"]<>''){
-                        $obReceta=new Recetas($idUser);
-                        $obReceta->FabricarProducto($DatosCotizacion["idProducto"], $DatosCotizacion['Cantidad'], "");
-                        $DatosProducto['Existencias']=$DatosProducto['Existencias']+$DatosCotizacion['Cantidad'];
+                        $Diferencia=$DatosItems['Cantidad']-$DatosProducto['Existencias'];
+                        $obReceta=new Recetas(1);
+                        $obReceta->FabricarProducto($DatosProducto["idProductosVenta"], $Diferencia, "");
+                        $DatosProducto['Existencias']=$DatosProducto['Existencias']+$Diferencia;
                     }
                 }  
                 $DatosKardex["Cantidad"]=$DatosItems['Cantidad'];

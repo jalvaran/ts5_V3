@@ -57,8 +57,9 @@ if(isset($_REQUEST["idDocumento"])){
             break;
         case 25: //Comprobante de altas y bajas
             $idComprobante=$obCon->normalizar($_REQUEST["idComprobante"]);
-            $obDoc->PDF_CompBajasAltas($idComprobante);     
-            $obPrint->ImprimeComprobanteBajaAlta($idComprobante, "", 1, "");
+            $obDoc->PDF_CompBajasAltas($idComprobante);    
+            //print("Entra");
+            $obPrint->ImprimeComprobanteBajaAlta2($idComprobante, "", 1, "");
             break;
         case 30: //Cuenta de cobro para un tercero
             $idCuenta=$obCon->normalizar($_REQUEST["idCuenta"]);

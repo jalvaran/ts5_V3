@@ -10,6 +10,9 @@
  * Abre el modal para registrar la nueva compra
  * @returns {undefined}
  */
+
+var idPestana = 0;
+var contador =0;
 function AbrirModalNuevoComprobante(Proceso="Nuevo"){
     $("#ModalAcciones").modal();
     var idComprobante=document.getElementById('idComprobante').value;
@@ -47,8 +50,7 @@ function AbrirModalNuevoComprobante(Proceso="Nuevo"){
  * @returns {undefined}
  */
 function AbrirFormularioNuevoPedido(){
-    
-    
+     
     var form_data = new FormData();
         form_data.append('Accion', 1);        
           
@@ -118,7 +120,7 @@ function DibujeDepartamentos(){
 }
 
 function MostrarProductos(idDepartamento){
-    document.getElementById("DivProductos").innerHTML='<div id="GifProcess"><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    document.getElementById("DivSelectProductos").innerHTML='<div id="GifProcess"><img   src="../../images/loader.gif" alt="Cargando" height="20" width="20"></div>';
     
     var form_data = new FormData();
         form_data.append('Accion', 5);        
@@ -132,7 +134,7 @@ function MostrarProductos(idDepartamento){
         data: form_data,
         type: 'post',
         success: function(data){
-            document.getElementById('DivProductos').innerHTML=data;
+            document.getElementById('DivSelectProductos').innerHTML=data;
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.status);
@@ -165,7 +167,7 @@ function BuscarProductos(){
       })  
 }
 /**
- * Se dibujan los datos generales de una compra 
+ * Se dibujan los datos del pedido
  * @param {type} idCompra
  * @returns {undefined}
  */
@@ -213,7 +215,11 @@ function DibujePedidos(){
         type: 'post',
         success: function(data){
             document.getElementById('DivListaPedidos').innerHTML=data;
-            
+            if(idPestana==2){
+                //contador++;
+                //console.log(contador);
+                setTimeout(DibujePedidos, 3000);
+            }
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.status);
@@ -278,52 +284,20 @@ function DibujeTotalPedido(){
 }
 
 
-
-/**
- * Agrega un item a una FC
- * @returns {undefined}
- */
-function AgregarItem(){
-    
-    var idComprobante=document.getElementById('idComprobante').value;
-    var CmbListado=document.getElementById('CmbListado').value;
-    var CmbBusquedas=document.getElementById('CmbBusquedas').value;    
-    var TipoMovimiento = document.getElementById('TipoMovimiento').value;    
-    var Cantidad = (document.getElementById('Cantidad').value);
-    
-    
-    if(idComprobante==""){
-        alertify.alert("Debe Seleccionar un comprobante");
-        document.getElementById('idComprobante').style.backgroundColor="pink";
-        return;
+function DibujePreparacion(idPedido=''){
+    if(idPedido==''){
+        var idPedido = document.getElementById('idPedido').value;
     }else{
-        document.getElementById('idComprobante').style.backgroundColor="white";
+        document.getElementById('idPedido').value=idPedido;
     }
     
-    if(!$.isNumeric(Cantidad) || Cantidad == "" || Cantidad <= 0 ){
-    
-        alertify.alert("El campo Cantidad debe ser un número mayor a cero");
-        document.getElementById('Cantidad').style.backgroundColor="pink";
-        return;
-    }else{
-        document.getElementById('Cantidad').style.backgroundColor="white";
-    }
-    
+    document.getElementById('TabCuentas4').click();
     
     var form_data = new FormData();
-        form_data.append('Accion', 3);
-        form_data.append('CmbListado', CmbListado);
-        form_data.append('idComprobante', idComprobante);
-        form_data.append('CmbBusquedas', CmbBusquedas);
-        form_data.append('TipoMovimiento', TipoMovimiento);
-       
-        form_data.append('Cantidad', Cantidad);
-        
-        
-        document.getElementById('Cantidad').value=""; 
-          
+        form_data.append('Accion', 9);
+        form_data.append('idPedido', idPedido);
         $.ajax({
-        url: './procesadores/BajasAltas.process.php',
+        url: './Consultas/pos2.draw.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -331,23 +305,19 @@ function AgregarItem(){
         data: form_data,
         type: 'post',
         success: function(data){
-          
-          if (data == "OK") { 
-              
-                alertify.success("Item "+CmbListado+" Agregado");
-                DibujeComprobante(idComprobante);
-          
-          }else{
-              alertify.alert(data);
-          }
-          
+            document.getElementById('DivTab4').innerHTML=data;
+            
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.status);
             alert(thrownError);
           }
-      })  
+      });
+      
+      
 }
+
+
 /**
  * Elimina un item de una factura de compra
  * @param {type} Tabla
@@ -357,11 +327,11 @@ function AgregarItem(){
 function EliminarItem(Tabla,idItem){
         
     var form_data = new FormData();
-        form_data.append('Accion', 4);
+        form_data.append('Accion', 6);
         form_data.append('Tabla', Tabla);
         form_data.append('idItem', idItem);
         $.ajax({
-        url: './procesadores/BajasAltas.process.php',
+        url: './procesadores/pos2.process.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -370,7 +340,35 @@ function EliminarItem(Tabla,idItem){
         type: 'post',
         success: function(data){
             alertify.error(data);
-            DibujeComprobante();
+            DibujeItems();
+            DibujeTotalPedido();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function CambiarEstadoAPreparado(Estado,idItem){
+    var idPedido = document.getElementById('idPedido').value;
+    var form_data = new FormData();
+        form_data.append('Accion', 7);
+        form_data.append('idPedido', idPedido);
+        form_data.append('Estado', Estado);
+        form_data.append('idItem', idItem);
+        $.ajax({
+        url: './procesadores/pos2.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            alertify.success(data);
+            DibujePreparacion();
             
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -460,7 +458,8 @@ function CrearPedidoMesa(idMesa){
 }
 
 
-function AgregarProducto(idProducto){
+function AgregarProducto(){
+    var idProducto=document.getElementById("idProducto").value; 
     var idPedido=document.getElementById("idPedido").value; 
     var Cantidad = (document.getElementById('Cantidad').value);
     var Observaciones = document.getElementById('Observaciones').value; 
@@ -471,6 +470,15 @@ function AgregarProducto(idProducto){
         return;
     }else{
         document.getElementById('Cantidad').style.backgroundColor="white";
+    }
+    
+    if(!$.isNumeric(idProducto) || idProducto == "" ){
+    
+        alertify.alert("Debe Seleccionar un Producto");
+        document.getElementById('idProducto').style.backgroundColor="pink";
+        return;
+    }else{
+        document.getElementById('idProducto').style.backgroundColor="white";
     }
     var form_data = new FormData();
         form_data.append('Accion', '2'); 
@@ -614,8 +622,10 @@ function ImprimirPrecuenta(){
  * @returns {undefined}
  */
 function LimpiarDivs(){
-    document.getElementById('DivItemsComprobantes').innerHTML='';
     
+    document.getElementById('DivTituloPedido').innerHTML='';
+    document.getElementById('DivItems').innerHTML='';
+    document.getElementById('DivTotales').innerHTML='';
 }
 
 
@@ -641,7 +651,10 @@ function DisminuyeCantidad(){
     document.getElementById("Cantidad").value=Cantidad-1;
 }
 
-function AbrirOpcionesFacturacion(idPedido){
+function AbrirOpcionesFacturacion(idPedido=''){
+    if(idPedido==''){
+        var idPedido=document.getElementById('idPedido').value;
+    }
     document.getElementById('TabCuentas3').click();
     document.getElementById("DivFormularioFacturacion").innerHTML='<div id="GifProcess"><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
     
@@ -756,7 +769,8 @@ function FacturarPedido(idPedido,Options=0){
                 var mensaje=respuestas[1];            
                 alertify.success(mensaje);
                 document.getElementById('DivFormularioFacturacion').innerHTML =mensaje;
-                
+                document.getElementById('idPedido').value='';
+                LimpiarDivs();
             }else if(respuestas[0]=="E1"){
                 var mensaje=respuestas[1];
                 alertify.alert(mensaje);

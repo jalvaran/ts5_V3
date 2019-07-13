@@ -2317,7 +2317,7 @@ if($this->obCon->NumRows($Consulta)){
             <td align="center" ><strong>Referencia</strong></td>
             <td align="center" colspan="3"><strong>Nombre</strong></td>        
             <td align="center" ><strong>Cantidad</strong></td>
-
+            <td align="center" ><strong>Costo Total</strong></td>
         </tr>
     
          
@@ -2343,8 +2343,8 @@ while($DatosItemComprobante=$this->obCon->FetchArray($Consulta)){
         <td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosItemComprobante["idProducto"].'</td>
         <td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.($DatosItemComprobante["Referencia"]).'</td>
         <td align="left" colspan="3"  style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.($DatosItemComprobante["Nombre"]).'</td>
-        <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosItemComprobante["Cantidad"]).'</td>
-        
+        <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosItemComprobante["Cantidad"],2).'</td>
+        <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosItemComprobante["CostoTotal"],2).'</td>
     </tr>
         
  ';

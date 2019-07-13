@@ -408,3 +408,5 @@ INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `S
 
 ALTER TABLE `restaurante_pedidos_items` ADD `TotalCostos` DOUBLE NOT NULL AFTER `Total`;
 
+ALTER TABLE `inventario_comprobante_movimientos_items` ADD `CostoUnitario` DOUBLE NOT NULL AFTER `Estado`, ADD `CostoTotal` DOUBLE NOT NULL AFTER `CostoUnitario`;
+

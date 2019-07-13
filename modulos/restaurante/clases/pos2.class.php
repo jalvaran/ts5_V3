@@ -413,6 +413,16 @@ class VentasRestaurantePOS extends Facturacion{
         
     }
     
+    public function RestauranteRegistreVentaUsuario($idFactura,$idMesero,$Total) {
+        
+        $tab="restaurante_registro_ventas_mesero";
+        $Datos["idFactura"]=$idFactura;
+        $Datos["idUsuario"]=$idMesero;
+        $Datos["Total"]=$Total;
+        $sql=$this->getSQLInsert($tab, $Datos);
+        $this->Query($sql);
+    }
+    
     /**
      * Fin Clase
      */

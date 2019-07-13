@@ -2072,5 +2072,67 @@ fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
     fclose($handle); // cierra el fichero PRN
     $salida = shell_exec('lpr $COMPrinter');
     }
+    
+    public function ImprimeComprobanteBajaAlta2($idComprobante,$COMPrinter,$Copias,$Vector) {
+        $DatosImpresora=$this->DevuelveValores("config_puertos", "ID", 1);   
+        if($DatosImpresora["Habilitado"]<>"SI"){
+            return;
+        }
+        $COMPrinter= $this->COMPrinter;
+        if(($handle = @fopen("$COMPrinter", "w")) === FALSE){
+            die('ERROR:\nNo se puedo Imprimir, Verifique la conexion de la IMPRESORA');
+        }
+        $Titulo="Comprobante de Bajas O Altas No. $idComprobante";
+        $DatosComprobante=$this->DevuelveValores("inventario_comprobante_movimientos", "ID", $idComprobante);
+        $Fecha=$DatosComprobante["Fecha"];
+        
+        $idUsuario=$DatosComprobante["idUser"];
+        
+        
+        for($i=1; $i<=$Copias;$i++){
+        fwrite($handle,chr(27). chr(64));//REINICIO
+        
+        fwrite($handle, chr(27). chr(100). chr(0));// SALTO DE CARRO VACIO
+        fwrite($handle, chr(27). chr(33). chr(8));// NEGRITA
+        fwrite($handle, chr(27). chr(97). chr(1));// CENTRADO
+        fwrite($handle,"*************************************");
+        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        fwrite($handle,$Titulo); // Titulo
+        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        fwrite($handle,"*************************************");
+        
+        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        fwrite($handle, chr(27). chr(97). chr(0));// IZQUIERDA
+        fwrite($handle,"FECHA: $Fecha");
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"*************************************");
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"Observaciones / ".$DatosComprobante["Observaciones"]);
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea    
+        fwrite($handle,"Usuario / ".$idUsuario);
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea   
+        $sql="SELECT i.*, pv.Nombre FROM inventario_comprobante_movimientos_items i INNER JOIN productosventa pv ON "
+                . "pv.idProductosVenta=i.idProducto WHERE i.idComprobante='$idComprobante'";
+        $Consulta=$this->Query($sql);
+        while($DatosItems=$this->FetchAssoc($Consulta)){
+            fwrite($handle,$DatosItems["TipoMovimiento"]." / ");
+            //fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle,$DatosItems["Cantidad"]." / ".$DatosItems["Nombre"]);
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        }
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea    
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+    fwrite($handle, chr(29). chr(86). chr(49));//CORTA PAPEL
+    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            
+        
+        
+    }
+    fclose($handle); // cierra el fichero PRN
+    $salida = shell_exec('lpr $COMPrinter');
+    }
     //Fin Clases
 }

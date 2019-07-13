@@ -64,7 +64,8 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>idProducto</strong>", 1, "C");
                     $css->ColTabla("<strong>Referencia</strong>", 1, "C");
                     $css->ColTabla("<strong>Nombre</strong>", 1, "C");
-                    $css->ColTabla("<strong>Cantidad</strong>", 1, "C");                    
+                    $css->ColTabla("<strong>Cantidad</strong>", 1, "C");  
+                    $css->ColTabla("<strong>CostoTotal</strong>", 1, "C");
                     $css->ColTabla("<strong>Eliminar</strong>", 1, "C");
                     
                 $css->CierraFilaTabla();
@@ -88,7 +89,8 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                         $css->ColTabla($DatosItems["Referencia"], 1, "C");
                         $css->ColTabla($DatosItems["Nombre"], 1, "L");
-                       $css->ColTabla(number_format($DatosItems["Cantidad"]), 1, "C");
+                       $css->ColTabla(number_format($DatosItems["Cantidad"],3), 1, "C");
+                       $css->ColTabla(number_format($DatosItems["CostoTotal"],2), 1, "C");
                         print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");   
                             
                             $css->li("", "fa  fa-remove", "", "onclick=EliminarItem(`1`,`$idItem`) style=font-size:16px;cursor:pointer;text-align:center;color:red");

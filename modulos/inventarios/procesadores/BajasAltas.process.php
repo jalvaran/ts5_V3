@@ -41,7 +41,14 @@ if( !empty($_REQUEST["Accion"]) ){
             $idComprobante=$obCon->normalizar($_REQUEST["idComprobante"]); 
             $CmbListado=$obCon->normalizar($_REQUEST["CmbListado"]); 
             $idProducto=$obCon->normalizar($_REQUEST["CmbBusquedas"]);             
-            $Cantidad=$obCon->normalizar($_REQUEST["Cantidad"]); 
+            $Cantidad=($_REQUEST["Cantidad"]); 
+            
+            if($idProducto==''){
+                exit("E1;Debe seleccionar un producto o insumo");
+            }
+            if(!is_numeric($Cantidad)){
+                exit("E1;La cantidad debe ser un valor numerico");
+            }
             $TipoMovimiento=$obCon->normalizar($_REQUEST["TipoMovimiento"]); 
             $TablaOrigen="";
             if($CmbListado==1){

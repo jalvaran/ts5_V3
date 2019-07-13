@@ -39,13 +39,22 @@ class BajasAltas extends ProcesoVenta{
      * @param type $Vector
      */
     public function AgregarItem($idComprobante,$idProducto, $TablaOrigen, $Cantidad,$TipoMovimiento,$Vector ) {
+        $idTabla="ID";
+        if($TablaOrigen=="productosventa"){
+            $idTabla="idProductosVenta";
+        }
+        
+        $DatosProducto=$this->DevuelveValores($TablaOrigen, $idTabla, $idProducto);
         $tab="inventario_comprobante_movimientos_items";
         $Datos["idProducto"]=$idProducto;
         $Datos["TablaOrigen"]=$TablaOrigen;
         $Datos["Cantidad"]=$Cantidad;
+        $Datos["CostoUnitario"]=$DatosProducto["CostoUnitario"];
+        $Datos["CostoTotal"]=$DatosProducto["CostoUnitario"]*$Cantidad;
         $Datos["TipoMovimiento"]=$TipoMovimiento;
         $Datos["idComprobante"]=$idComprobante;
         $sql=$this->getSQLInsert($tab, $Datos);
+        
         $this->Query($sql);
         
     }
@@ -53,6 +62,8 @@ class BajasAltas extends ProcesoVenta{
     //Ingrese los items al inventario o retire items del inventario
     public function RealizarMovimientosInventario($idComprobante,$idUser) {
         $obInsumos=new Recetas(1);
+        $DatosComprobante=$this->DevuelveValores("inventario_comprobante_movimientos", "ID", $idComprobante);
+        $DatosEmpresaPro=$this->DevuelveValores("empresapro", "idEmpresaPro", 1);
         $Detalle="ComprobanteBajaAlta";
         $sql="SELECT * FROM inventario_comprobante_movimientos_items WHERE idComprobante='$idComprobante' AND Estado=''";
         $Consulta=$this->Query($sql);
@@ -64,7 +75,7 @@ class BajasAltas extends ProcesoVenta{
             }
             $idItem=$DatosProductos["ID"];
             if($DatosProductos["TablaOrigen"]=='productosventa'){
-                
+                $idProductoVenta=$DatosProductos["idProducto"];
                 $DatosProductoGeneral= $this->DevuelveValores("productosventa", "idProductosVenta", $DatosProductos["idProducto"]);
                 $DatosKardex["Cantidad"]=$DatosProductos["Cantidad"];
                 $DatosKardex["idProductosVenta"]=$DatosProductos["idProducto"];
@@ -78,6 +89,28 @@ class BajasAltas extends ProcesoVenta{
                 $DatosKardex["CostoUnitarioPromedio"]=$DatosProductoGeneral["CostoUnitarioPromedio"];
                 $DatosKardex["CostoTotalPromedio"]=$DatosProductoGeneral["CostoUnitarioPromedio"]*$DatosKardex["Cantidad"];
                 $this->InserteKardex($DatosKardex);
+                /*
+                $TotalCosto=$DatosProductos["Cantidad"]*$DatosProductoGeneral['CostoUnitario'];
+                $DatosParametros= $this->DevuelveValores("parametros_contables", "ID", 4);
+                $CuentaInventarios=$DatosParametros["CuentaPUC"];
+                $NombreCuentaInventarios=$DatosParametros["NombreCuenta"];
+                $DatosParametros= $this->DevuelveValores("parametros_contables", "ID", 3);
+                $CuentaBajas=$DatosParametros["CuentaPUC"];
+                $DatosParametros= $this->DevuelveValores("parametros_contables", "ID", 5);
+                $CuentaAltas=$DatosParametros["CuentaPUC"];
+                $NombreCuentaAltas=$DatosParametros["NombreCuenta"];
+                if($DatosProductos["TipoMovimiento"]=="ALTA"){
+                    //print("Entra Alta");
+                    $this->IngreseMovimientoLibroDiario($DatosComprobante["Fecha"], "ComprobanteMovimientosInventario", $idComprobante,$idComprobante , $DatosEmpresaPro["NIT"], $CuentaInventarios, $NombreCuentaInventarios, "Movimiento en Inventario $Movimiento", "DB", $TotalCosto, $DatosComprobante["Observaciones"], 1, 1, "");
+                    $this->IngreseMovimientoLibroDiario($DatosComprobante["Fecha"], "ComprobanteMovimientosInventario", $idComprobante,$idComprobante , $DatosEmpresaPro["NIT"], $CuentaAltas, $NombreCuentaAltas, "Movimiento en Inventario $Movimiento", "CR", $TotalCosto, $DatosComprobante["Observaciones"], 1, 1, "");
+                }
+                if($DatosProductos["TipoMovimiento"]=="BAJA"){
+                    //print("Entra Baja");
+                    $this->IngreseMovimientoLibroDiario($DatosComprobante["Fecha"], "ComprobanteMovimientosInventario", $idComprobante,$idComprobante , $DatosEmpresaPro["NIT"], $CuentaInventarios, $NombreCuentaInventarios, "Movimiento en Inventario $Movimiento", "CR", $TotalCosto, $DatosComprobante["Observaciones"], 1, 1, "");
+                    $this->IngreseMovimientoLibroDiario($DatosComprobante["Fecha"], "ComprobanteMovimientosInventario", $idComprobante,$idComprobante , $DatosEmpresaPro["NIT"], $CuentaAltas, $NombreCuentaAltas, "Movimiento en Inventario $Movimiento", "DB", $TotalCosto,$DatosComprobante["Observaciones"], 1, 1, "");
+                }
+                 * 
+                 */
             }
             
             if($DatosProductos["TablaOrigen"]=='insumos'){

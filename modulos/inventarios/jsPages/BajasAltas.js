@@ -254,7 +254,7 @@ function AgregarItem(){
     var CmbListado=document.getElementById('CmbListado').value;
     var CmbBusquedas=document.getElementById('CmbBusquedas').value;    
     var TipoMovimiento = document.getElementById('TipoMovimiento').value;    
-    var Cantidad = (document.getElementById('Cantidad').value);
+    var Cantidad = document.getElementById('Cantidad').value;
     
     
     if(idComprobante==""){
@@ -264,17 +264,7 @@ function AgregarItem(){
     }else{
         document.getElementById('idComprobante').style.backgroundColor="white";
     }
-    
-    if(!$.isNumeric(Cantidad) || Cantidad == "" || Cantidad <= 0 ){
-    
-        alertify.alert("El campo Cantidad debe ser un número mayor a cero");
-        document.getElementById('Cantidad').style.backgroundColor="pink";
-        return;
-    }else{
-        document.getElementById('Cantidad').style.backgroundColor="white";
-    }
-    
-    
+       
     var form_data = new FormData();
         form_data.append('Accion', 3);
         form_data.append('CmbListado', CmbListado);
