@@ -35,6 +35,10 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit("E1;No hay un pedido seleccionado");
             }
             $obCon->AgregueProductoAPedido($idPedido,$Cantidad, $idProducto, $Observaciones, $idUser, "");
+            $DatosPedido=$obCon->DevuelveValores("restaurante_pedidos", "ID", $idPedido);
+            if($DatosPedido["Estado"]<>'1' AND $DatosPedido["Estado"]<>'3'){
+                $obCon->ActualizaRegistro("restaurante_pedidos", "Estado", 3, "ID", $idPedido);
+            }
             print("OK;Producto Agregado");
             
         break; //fin caso 2
@@ -239,6 +243,13 @@ if( !empty($_REQUEST["Accion"]) ){
             print("Item Preparado");
         break;
        
+        case 8: //Cambiar un pedido a estado entregado
+            $idPedido=$obCon->normalizar($_REQUEST["idPedido"]);
+            $obCon->ActualizaRegistro("restaurante_pedidos_items", "Estado", "EN", "idPedido", $idPedido);
+            $obCon->ActualizaRegistro("restaurante_pedidos", "Estado", "6", "ID", $idPedido);
+            
+            print("OK;Pedido Entregado");
+        break;
     }
     
     

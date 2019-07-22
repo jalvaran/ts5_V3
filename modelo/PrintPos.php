@@ -1543,7 +1543,18 @@ class PrintPos extends ProcesoVenta{
         $consulta=$this->Query($sql);
 								
 	while($DatosPedido=$this->FetchArray($consulta)){
-		
+	    $Estado="";
+            if($DatosPedido["Estado"]=='AB'){
+                $Estado="Solicitado";
+            }
+            if($DatosPedido["Estado"]=='PR'){
+                $Estado="Preparado";
+            }
+            if($DatosPedido["Estado"]=='EN'){
+                $Estado="Entregado";
+            }
+            fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+            fwrite($handle,$Estado."  ");
             fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
             fwrite($handle,$DatosPedido["Cantidad"]."  ");
             fwrite($handle,substr($DatosPedido["NombreProducto"],0,50)."   ");

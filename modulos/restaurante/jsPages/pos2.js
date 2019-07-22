@@ -794,6 +794,49 @@ function FacturarPedido(idPedido,Options=0){
     
 }
 
+function EntregarPedido(idPedido){
+      
+    var form_data = new FormData();
+        form_data.append('Accion', '8');        
+        form_data.append('idPedido', idPedido);
+        
+                
+        $.ajax({
+        url: './procesadores/pos2.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                                
+                var mensaje=respuestas[1];            
+                alertify.success(mensaje);
+                
+            }else if(respuestas[0]=="E1"){
+                var mensaje=respuestas[1];
+                alertify.alert(mensaje);
+            
+            }else{
+                alertify.alert(data);
+                              
+            }
+            
+            //DibujeTotalesCompra(idCompra);
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
 document.getElementById('BtnMuestraMenuLateral').click();
 //ConvertirSelectBusquedas();
 

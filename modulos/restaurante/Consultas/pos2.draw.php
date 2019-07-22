@@ -62,6 +62,11 @@ if( !empty($_REQUEST["Accion"]) ){
                         $MensajePedido="Solicitado hace: ".$TiempoTranscurrido." min.";
                     }
                     
+                    if($TiempoTranscurrido<=15 and $Estado==1){
+                        $styles="";
+                        $MensajePedido="Solicitado hace: ".$TiempoTranscurrido." min.";
+                    }
+                    
                     if($Estado==3){
                         $styles="style=background-color:#f9ffd2;";
                         $MensajePedido="Re Abierto";
@@ -94,7 +99,9 @@ if( !empty($_REQUEST["Accion"]) ){
                         print("<td>");
                             $css->IconButton("btnAgregar", "btnAgregar", "fa fa-opencart", "Agregar Items", "onclick='DibujePedido($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#dbffae;color:red"');
                             $css->IconButton("btnPreparar", "btnPreparar", "fa fa-spoon", "Preparar", "onclick='DibujePreparacion($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#5792ff;color:white"');
-                            $css->IconButton("btnEstados", "btnEstados", "fa fa-bullseye", "Ver Preparacion", "onclick='VerEstadoPreparacion($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#e0eff3;color:black"');
+                            $css->IconButton("btnEntregar", "btnEntregar", "fa fa-hand-paper-o", "Entregar", "onclick='EntregarPedido($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#84ffff;color:black"');
+                            //$css->IconButton("btnEstados", "btnEstados", "fa fa-bullseye", "Ver Preparacion", "onclick='VerEstadoPreparacion($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#e0eff3;color:black"');
+                            $css->IconButton("btnFacturar", "btnFacturar", "fa fa-credit-card", "Facturar", "onclick='AbrirOpcionesFacturacion(`$idPedido`)'",$spanActivo=0,"orange",$style='style="background-color:#ffffcd;color:black"');
                             $css->IconButton("btnCancelar", "btnCancelar", "fa fa-remove", "Eliminar", "onclick='AgregarItems($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#ffeaae;color:red"');
                         print("</td>");
                         
