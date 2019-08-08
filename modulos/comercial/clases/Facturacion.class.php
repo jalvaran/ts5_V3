@@ -177,8 +177,8 @@ class Facturacion extends ProcesoVenta{
         $DatosFactura=$this->DevuelveValores("facturas", "idFacturas", $idFactura);
         $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
         $ParametrosAnticipos=$this->DevuelveValores("parametros_contables", "ID", 20);
-        $this->IngreseMovimientoLibroDiario($Fecha, "FACTURA", $idFactura, "", $DatosCliente["Num_Identificacion"], $CuentaDestino, $NombreCuentaDestino, "Cruce de Anticipos", "CR", $ValorAnticipo, "Cruce Anticipos Relaizados por Clientes", $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
-        $this->IngreseMovimientoLibroDiario($Fecha, "FACTURA", $idFactura, "", $DatosCliente["Num_Identificacion"], $ParametrosAnticipos["CuentaPUC"], $ParametrosAnticipos["NombreCuenta"], "Cruce de Anticipos", "DB", $ValorAnticipo, "Cruce Anticipos Relaizados por Clientes", $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
+        $this->IngreseMovimientoLibroDiario($Fecha, "FACTURA", $idFactura, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDestino, $NombreCuentaDestino, "Cruce de Anticipos", "CR", $ValorAnticipo, "Cruce Anticipos Relaizados por Clientes", $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
+        $this->IngreseMovimientoLibroDiario($Fecha, "FACTURA", $idFactura, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $ParametrosAnticipos["CuentaPUC"], $ParametrosAnticipos["NombreCuenta"], "Cruce de Anticipos", "DB", $ValorAnticipo, "Cruce Anticipos Relaizados por Clientes", $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
         
         $NuevoSaldo=$DatosFactura["SaldoFact"]-$ValorAnticipo;
         $AbonosTotales=$DatosFactura["Total"]-$NuevoSaldo;
@@ -412,6 +412,7 @@ class Facturacion extends ProcesoVenta{
         $sqlFactura="INSERT INTO `librodiario` ( `Fecha`, `Tipo_Documento_Intero`, `Num_Documento_Interno`, `Num_Documento_Externo`, `Tercero_Tipo_Documento`, `Tercero_Identificacion`, `Tercero_DV`, `Tercero_Primer_Apellido`, `Tercero_Segundo_Apellido`, `Tercero_Primer_Nombre`, `Tercero_Otros_Nombres`, `Tercero_Razon_Social`, `Tercero_Direccion`, `Tercero_Cod_Dpto`, `Tercero_Cod_Mcipio`, `Tercero_Pais_Domicilio`, `Concepto`, `CuentaPUC`, `NombreCuenta`, `Detalle`, `Debito`, `Credito`, `Neto`, `Mayor`, `Esp`, `idCentroCosto`, `idEmpresa`, `idSucursal`, `Estado`, `idUsuario`) VALUES ";
         
         $DatosFactura= $this->DevuelveValores("facturas", "idFacturas", $idFactura);
+        $NumeroFactura=$DatosFactura["NumeroFactura"];
         $DatosTercero= $this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
         $Fecha=$DatosFactura["Fecha"];
         $TerceroTipoDocumento=$DatosTercero["Tipo_Documento"];
@@ -459,7 +460,7 @@ class Facturacion extends ProcesoVenta{
                     $Credito=$DiferenciaFormasPago;
                     $Neto=$DiferenciaFormasPago*(-1);
                 }
-                $sqlFactura.="('$Fecha','FACTURA','$idFactura','','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
+                $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
             }
             //Si se paga con tarjetas
             if($DatosFactura["Tarjetas"]>0){ 
@@ -470,7 +471,7 @@ class Facturacion extends ProcesoVenta{
                 $Debito=$DatosFactura["Tarjetas"];
                 $Credito=0;
                 $Neto=$DatosFactura["Tarjetas"];
-                $sqlFactura.="('$Fecha','FACTURA','$idFactura','','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
+                $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
 
             }
             //Si hay pagos con cheques
@@ -482,7 +483,7 @@ class Facturacion extends ProcesoVenta{
                 $Debito=$DatosFactura["Cheques"];
                 $Credito=0;
                 $Neto=$DatosFactura["Cheques"];
-                $sqlFactura.="('$Fecha','FACTURA','$idFactura','','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
+                $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
 
             }
 
@@ -495,7 +496,7 @@ class Facturacion extends ProcesoVenta{
                 $Debito=$DatosFactura["Otros"];
                 $Credito=0;
                 $Neto=$DatosFactura["Otros"];
-                $sqlFactura.="('$Fecha','FACTURA','$idFactura','','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
+                $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
 
             }
 
@@ -510,7 +511,7 @@ class Facturacion extends ProcesoVenta{
             $Debito=$Total;
             $Credito=0;
             $Neto=$Total;
-            $sqlFactura.="('$Fecha','FACTURA','$idFactura','','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
+            $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
 
 
         }
@@ -524,7 +525,7 @@ class Facturacion extends ProcesoVenta{
             $Debito=$Total;
             $Credito=0;
             $Neto=$Total;
-            $sqlFactura.="('$Fecha','FACTURA','$idFactura','','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
+            $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
 
 
         }
@@ -553,7 +554,7 @@ class Facturacion extends ProcesoVenta{
             $Credito=$Subtotal;
             $Neto=$Subtotal*(-1);
             
-            $sqlFactura.="('$Fecha','FACTURA','$idFactura','','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
+            $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
          
             ///////////////////////Registramos IVA Generado si aplica
 
@@ -568,7 +569,7 @@ class Facturacion extends ProcesoVenta{
                 $Credito=$Impuestos;
                 $Neto=$Impuestos*(-1);
 
-                $sqlFactura.="('$Fecha','FACTURA','$idFactura','','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
+                $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
          
             }
 
@@ -598,7 +599,7 @@ class Facturacion extends ProcesoVenta{
                 $Credito=$TotalCostosM;
                 $Neto=$TotalCostosM*(-1);
 
-                $sqlFactura.="('$Fecha','FACTURA','$idFactura','','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
+                $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
          
 
             }

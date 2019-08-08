@@ -1910,7 +1910,7 @@ class PageConstruct extends html_estruct_class{
                     <ul class="nav nav-tabs">');
         }
         
-        public function TabLabel($id,$Title,$Ref,$Active=0,$js) {
+        public function TabLabel($id,$Title,$Ref,$Active=0,$js='') {
             $Class="";
             if($Active==1){
                 $Class='class="active"';

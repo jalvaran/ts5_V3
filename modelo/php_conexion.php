@@ -252,7 +252,7 @@ public function RegFactLibroDiario($NumFact,$CuentaDestino,$CuentaIngresos,$Tabl
             $DatosSucursal=  $this->DevuelveValores("empresa_pro_sucursales", "Actual", $idSucursal);
             	                
             $tab="librodiario";
-            $NumRegistros=27;
+            $NumRegistros=28;
             $Entra=0;
             
                 $Columnas[0]="Fecha";			$Valores[0]=$fecha;
@@ -282,6 +282,7 @@ public function RegFactLibroDiario($NumFact,$CuentaDestino,$CuentaIngresos,$Tabl
 		$Columnas[24]="idCentroCosto";		$Valores[24]=$CentroCostos;
 		$Columnas[25]="idEmpresa";		$Valores[25]=$EmpresaPro;
                 $Columnas[26]="idSucursal";		$Valores[26]=$DatosSucursal["ID"];
+                $Columnas[27]="Num_Documento_Externo";  $Valores[27]=$DatosFactura["NumeroFactura"];
                 
                 //Si se paga solo en efectivo
                 if($DatosFactura['FormaPago']=="Contado" and $DatosFactura["Tarjetas"]==0 and $DatosFactura["Cheques"]==0){
@@ -1006,7 +1007,7 @@ public function InicializarPreventas()
         $DatosSucursal=  $this->DevuelveValores("empresa_pro_sucursales", "Actual", 1);
         
         $tab="librodiario";
-        $NumRegistros=27;
+        $NumRegistros=28;
         $Parametros=$this->DevuelveValores("parametros_contables", "ID", 6);
         $CuentaPUC= $Parametros["CuentaPUC"];
         $NombreCuenta=$Parametros["NombreCuenta"];
@@ -1038,6 +1039,7 @@ public function InicializarPreventas()
         $Columnas[24]="idCentroCosto";		$Valores[24]=$CentroCostos;
         $Columnas[25]="idEmpresa";		$Valores[25]=$idEmpresaPro;
         $Columnas[26]="idSucursal";		$Valores[26]=$DatosSucursal["ID"];
+        $Columnas[27]="Num_Documento_Externo";	$Valores[27]=$DatosFactura["NumeroFactura"];
         
         $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
 

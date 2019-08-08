@@ -208,7 +208,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         if($Tercero==''){
                             print("<strong>Buscando Documento</strong>");
                         }else{
-                            print("<strong>Cuentas X Pagar del Tercero:</strong> <h4 style=color:blue>". number_format($Tercero)."</h4>");
+                            print("<strong>Cuentas X Cobrar del Tercero:</strong> <h4 style=color:blue>". number_format($Tercero)."</h4>");
                         }
                         
                     print("</td>");

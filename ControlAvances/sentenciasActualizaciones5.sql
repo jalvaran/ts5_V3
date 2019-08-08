@@ -410,3 +410,7 @@ ALTER TABLE `restaurante_pedidos_items` ADD `TotalCostos` DOUBLE NOT NULL AFTER 
 
 ALTER TABLE `inventario_comprobante_movimientos_items` ADD `CostoUnitario` DOUBLE NOT NULL AFTER `Estado`, ADD `CostoTotal` DOUBLE NOT NULL AFTER `CostoUnitario`;
 
+UPDATE librodiario t1 INNER JOIN facturas t2 ON t1.Num_Documento_Interno=t2.idFacturas SET t1.Num_Documento_Externo=t2.NumeroFactura 
+WHERE t1.Tipo_Documento_Intero='FACTURA';
+
+
