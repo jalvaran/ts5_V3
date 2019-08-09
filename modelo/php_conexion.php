@@ -2144,7 +2144,7 @@ public function CalculePesoRemision($idCotizacion)
      
     
     
-    ///Registre un abono a un separado
+    ///Cerrar turno
     //
     public function CierreTurno($idUser,$idCaja,$VectorCierre) {
         
@@ -2260,11 +2260,11 @@ public function CalculePesoRemision($idCotizacion)
         
         //UPDATES
         
-        $this->update("facturas", "CerradoDiario", $idCierre, "WHERE CerradoDiario='' AND Usuarios_idUsuarios='$idUser'");
+        $this->update("facturas", "CerradoDiario", $idCierre, "WHERE (CerradoDiario='0' or CerradoDiario='' ) AND Usuarios_idUsuarios='$idUser'");
         $this->update("egresos", "CerradoDiario", $idCierre, "WHERE CerradoDiario='' AND Usuario_idUsuario='$idUser'");
         $this->update("separados_abonos", "idCierre", $idCierre, "WHERE idCierre='' AND idUsuarios='$idUser'");
         $this->update("facturas_abonos", "idCierre", $idCierre, "WHERE idCierre='' AND Usuarios_idUsuarios='$idUser'");
-        $this->update("facturas_items", "idCierre", $idCierre, "WHERE idCierre='' AND idUsuarios='$idUser'");
+        $this->update("facturas_items", "idCierre", $idCierre, "WHERE (idCierre='0' or idCierre='') AND idUsuarios='$idUser'");
         $this->update("facturas_intereses_sistecredito", "idCierre", $idCierre, "WHERE idCierre='' AND idUsuario='$idUser'"); 
         $this->update("comprobantes_ingreso", "idCierre", $idCierre, "WHERE idCierre='' AND Usuarios_idUsuarios='$idUser'"); 
          

@@ -250,6 +250,16 @@ if( !empty($_REQUEST["Accion"]) ){
             
             print("OK;Pedido Entregado");
         break;
+    
+        case 9: //Cerrar turno
+            $TxtObservaciones=$obCon->normalizar($_REQUEST["TxtObservaciones"]);
+            if($TxtObservaciones==''){
+                exit("E1;El campo Observaciones no puede estar vacío;TxtObservaciones");
+            }
+            $idCierre=$obCon->CierreTurnoRestaurantePos($TxtObservaciones,$idUser);
+            $obCon->RegistreResumenCierre($idCierre, $idUser);
+            print("OK;Se ha Cerrado el turno $idCierre;Imprimir");
+        break; //Fin caso 9
     }
     
     

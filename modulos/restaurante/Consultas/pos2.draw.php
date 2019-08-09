@@ -382,6 +382,14 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CrearTitulo("No hay Items en este pedido","rojo");
             }
         break;     //Fin caso 9
+        
+        case 10: //dibujar el formulario para cerrar el turno
+            print("<h4><strong>Cerrar este turno:<strong></h4><br>");
+            $css->textarea("TxtObservaciones", "form-control", "TxtObservaciones", "Observaciones", "Observaciones", "", "");
+            $css->Ctextarea();
+            $css->CrearBotonEvento("BtnConfirmaCerrarTurno", "Cerrar Turno", 1, "onclick", "ConfirmaCerrarTurno()", "rojo", "");
+                        
+        break; //Fin Caso 10
     }
     
     

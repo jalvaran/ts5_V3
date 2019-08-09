@@ -39,9 +39,13 @@ $css->PageInit($myTitulo);
                     
                     $css->IconButton("BtnNuevoPedido","bntNuevoPedido",'fa fa-plus',"Nuevo Pedido","onclick='AbrirFormularioNuevoPedido()'",$spanActivo=0,"orange",$style='style="background-color:#d9f2ff;color:black"');
 
-                    $css->IconButton("BtnNuevoDomicilio","bntNuevoDomicilio",'fa fa-motorcycle',"Nuevo Domicilio","onclick='AbrirNuevoDomicilio()'",$spanActivo=0,"orange",$style='style="background-color:#fffed9;color:black"');
-                    $css->IconButton("BtnNuevoBarra","bntNuevoBarra",'fa fa-home',"Pedido en Barra","onclick='AbrirNuevoPedido()'",$spanActivo=0,"orange",$style='style="background-color:#d9dfff;color:black"');
+                    //$css->IconButton("BtnNuevoDomicilio","bntNuevoDomicilio",'fa fa-motorcycle',"Nuevo Domicilio","onclick='AbrirNuevoDomicilio()'",$spanActivo=0,"orange",$style='style="background-color:#fffed9;color:black"');
+                    //$css->IconButton("BtnNuevoBarra","bntNuevoBarra",'fa fa-home',"Pedido en Barra","onclick='AbrirNuevoPedido()'",$spanActivo=0,"orange",$style='style="background-color:#d9dfff;color:black"');
                     $css->IconButton("BtnNuevoTercero","bntNuevoTercero",'fa fa-user-plus',"Nuevo Tercero","onclick='AbrirNuevoPedido()'",$spanActivo=0,"orange",$style='style="background-color:#ffd9e3;color:black"');
+                    if($TipoUser=='administrador'){
+                        $css->IconButton("BtnCerrarTurno","BtnCerrarTurno",'fa fa-cogs',"Cerrar Turno","onclick='AbrirCierreTurno()'",$spanActivo=0,"orange",$style='style="background-color:#ff2b2b;color:white"');
+                    }
+                    
                 $css->CerrarDiv();
                 $css->div("DivTa1_1", "col-sm-10", "", "", "", "", "");
 

@@ -252,7 +252,7 @@ FROM librodiario GROUP BY Tercero_Identificacion,CuentaPUC;
 DROP VIEW IF EXISTS `vista_cuentasxpagar_v2`;
 CREATE VIEW vista_cuentasxpagar_v2 AS
 SELECT *
-FROM vista_cuentasxterceros_v2 t1 WHERE t1.Total<>0 AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Total;
+FROM vista_cuentasxterceros_v2 t1 WHERE (t1.Total<-1 or t1.Total>1) AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Total;
 
 DROP VIEW IF EXISTS `vista_cuentasxtercerosdocumentos_v2`;
 CREATE VIEW vista_cuentasxtercerosdocumentos_v2 AS
@@ -263,7 +263,7 @@ FROM librodiario GROUP BY Tercero_Identificacion,CuentaPUC,Num_Documento_Externo
 DROP VIEW IF EXISTS `vista_cuentasxpagardetallado_v2`;
 CREATE VIEW vista_cuentasxpagardetallado_v2 AS
 SELECT *
-FROM vista_cuentasxtercerosdocumentos_v2 t1 WHERE t1.Total<>0 AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Fecha;
+FROM vista_cuentasxtercerosdocumentos_v2 t1 WHERE (t1.Total<-1 or t1.Total>1) AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Fecha;
 
 
 DROP VIEW IF EXISTS `vista_cuentasxcobrar`;
@@ -304,3 +304,14 @@ fi.ImpuestoCompra AS Impuestos, fi.TotalCompra AS Total,fi.Tipo_Impuesto AS Tipo
 FROM factura_compra c INNER JOIN proveedores t ON `c`.`Tercero` = `t`.`Num_Identificacion` 
 INNER JOIN factura_compra_items fi ON fi.idFacturaCompra=c.ID INNER JOIN productosventa pv ON fi.idProducto=pv.idProductosVenta
 WHERE c.`Estado`='CERRADA';
+
+
+DROP VIEW IF EXISTS `vista_cierre_restaurante_pos2`;
+CREATE VIEW vista_cierre_restaurante_pos2 AS
+SELECT ID,`Fecha`,`Hora`,`Estado`,idMesa , idCliente,NombreCliente, DireccionEnvio,TelefonoConfirmacion, Observaciones,idCierre,
+(SELECT SUM(Subtotal) as Subtotal FROM restaurante_pedidos_items WHERE restaurante_pedidos_items.idPedido=restaurante_pedidos.ID) as Subtotal,
+(SELECT SUM(IVA) as IVA FROM restaurante_pedidos_items WHERE restaurante_pedidos_items.idPedido=restaurante_pedidos.ID) as IVA,
+(SELECT SUM(Total) as Total FROM restaurante_pedidos_items WHERE restaurante_pedidos_items.idPedido=restaurante_pedidos.ID) as Total,
+(SELECT SUM(TotalCostos) FROM restaurante_pedidos_items WHERE restaurante_pedidos_items.idPedido=restaurante_pedidos.ID) as TotalCostos,
+idUsuario
+FROM `restaurante_pedidos`;

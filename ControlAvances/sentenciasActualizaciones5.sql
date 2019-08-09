@@ -413,4 +413,32 @@ ALTER TABLE `inventario_comprobante_movimientos_items` ADD `CostoUnitario` DOUBL
 UPDATE librodiario t1 INNER JOIN facturas t2 ON t1.Num_Documento_Interno=t2.idFacturas SET t1.Num_Documento_Externo=t2.NumeroFactura 
 WHERE t1.Tipo_Documento_Intero='FACTURA';
 
+ALTER TABLE `restaurante_pedidos` ADD `Tipo` VARCHAR(20) NOT NULL AFTER `Estado`;
+
+CREATE TABLE `restaurante_registro_ventas_mesero` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idFactura` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `idUsuario` int(11) NOT NULL,
+  `Total` double NOT NULL,
+  `idCierre` bigint(20) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idFactura` (`idFactura`),
+  KEY `idUsuario` (`idUsuario`),
+  KEY `idCierre` (`idCierre`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+ALTER TABLE `inventario_comprobante_movimientos_items` ADD `idCierre` BIGINT NOT NULL AFTER `idComprobante`;
+
+ALTER TABLE `restaurante_cierres` ADD `Observaciones` TEXT NOT NULL AFTER `Hora`;
+
+ALTER TABLE `traslados_items` ADD `idCierre` BIGINT NOT NULL AFTER `CodigoBarras4`;
+ALTER TABLE `traslados_items` ADD INDEX(`idCierre`);
+ALTER TABLE `factura_compra_items` ADD `idCierre` DOUBLE NOT NULL AFTER `PrecioVenta`;
+ALTER TABLE `inventario_comprobante_movimientos_items` ADD INDEX(`TablaOrigen`);
+ALTER TABLE `inventario_comprobante_movimientos_items` ADD INDEX(`idProducto`);
+ALTER TABLE `inventario_comprobante_movimientos_items` ADD INDEX(`idComprobante`);
+ALTER TABLE `inventario_comprobante_movimientos_items` ADD INDEX(`idCierre`);
 

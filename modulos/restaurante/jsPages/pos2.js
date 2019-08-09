@@ -837,6 +837,101 @@ function EntregarPedido(idPedido){
     
 }
 
+function AbrirCierreTurno(){
+     
+    var form_data = new FormData();
+        form_data.append('Accion', 10);        
+          
+        $.ajax({
+        url: './Consultas/pos2.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivTa1_1').innerHTML=data;
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+function ConfirmaCerrarTurno(){
+    
+    alertify.confirm('Está seguro que desea Cerrar este turno?',
+        function (e) {
+            if (e) {
+                
+                CerrarTurno();
+            }else{
+                alertify.error("Se canceló el proceso");
+
+                return;
+            }
+        });
+}
+
+function CerrarTurno(){
+    document.getElementById("BtnConfirmaCerrarTurno").disabled=true;
+    document.getElementById("BtnConfirmaCerrarTurno").value='Cerrando Turno...';
+    var TxtObservaciones=document.getElementById("TxtObservaciones").value;
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '9');        
+        form_data.append('TxtObservaciones', TxtObservaciones);                  
+        $.ajax({
+        url: './procesadores/pos2.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                                
+                var mensaje=respuestas[1];            
+                alertify.success(mensaje);
+                document.getElementById('DivTa1_1').innerHTML=respuestas[2];
+                
+            }else if(respuestas[0]=="E1"){
+                var mensaje=respuestas[1];
+                MarqueErrorElemento(respuestas[2]);
+                document.getElementById("BtnConfirmaCerrarTurno").disabled=false;
+                document.getElementById("BtnConfirmaCerrarTurno").value='Cerrar Turno';
+                alertify.alert(mensaje);
+            
+            }else{
+                alertify.alert(data);
+                document.getElementById("BtnConfirmaCerrarTurno").disabled=false;
+                document.getElementById("BtnConfirmaCerrarTurno").value='Cerrar Turno';
+                              
+            }
+           
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
+function MarqueErrorElemento(idElemento){
+    console.log(idElemento);
+    if(idElemento==undefined){
+       return; 
+    }
+    document.getElementById(idElemento).style.backgroundColor="pink";
+    document.getElementById(idElemento).focus();
+}
 document.getElementById('BtnMuestraMenuLateral').click();
 //ConvertirSelectBusquedas();
 

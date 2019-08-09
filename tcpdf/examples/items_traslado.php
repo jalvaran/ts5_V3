@@ -36,7 +36,7 @@ while($DatosItemTraslado=$obVenta->FetchArray($Consulta)){
     
     $CostoUnitario=  number_format($DatosItemTraslado["CostoUnitario"]);
     $SubTotalItem=  number_format($DatosItemTraslado["CostoUnitario"]*$DatosItemTraslado["Cantidad"]);
-    
+    $NombreProducto= utf8_encode($DatosItemTraslado["Nombre"]);
     if($h==0){
         $Back="#f2f2f2";
         $h=1;
@@ -49,7 +49,7 @@ while($DatosItemTraslado=$obVenta->FetchArray($Consulta)){
     <tr>
         <td align="left" style="border-bottom: 1px solid #ddd;background-color: $Back;">$DatosItemTraslado[Referencia]</td>
         <td align="left"  style="border-bottom: 1px solid #ddd;background-color: $Back;">$DatosItemTraslado[CodigoBarras]</td>
-        <td align="right" colspan="2" style="border-bottom: 1px solid #ddd;background-color: $Back;">$DatosItemTraslado[Nombre]</td>
+        <td align="right" colspan="2" style="border-bottom: 1px solid #ddd;background-color: $Back;">$NombreProducto</td>
         <td align="center" style="border-bottom: 1px solid #ddd;background-color: $Back;">$CostoUnitario</td>
         <td align="right" style="border-bottom: 1px solid #ddd;background-color: $Back;">$DatosItemTraslado[Cantidad]</td>
         <td align="center" style="border-bottom: 1px solid #ddd;background-color: $Back;">$SubTotalItem</td>

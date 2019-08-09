@@ -4732,7 +4732,7 @@ EOD;
     public function FirmaDocumentos() {
         $html = '<table border="1" cellpadding="2" cellspacing="0" align="left">
             <tr align="left" >
-                <td style="height: 100px;" >Preparado:</td>
+                <td style="height: 100px;" >Recibe:</td>
                 <td style="height: 100px;" >Revisado:</td>
                 <td style="height: 100px;" >Aprobado:</td>
                 <td style="height: 100px;" >Contabilizado:</td>

@@ -423,6 +423,60 @@ class VentasRestaurantePOS extends Facturacion{
         $this->Query($sql);
     }
     
+    //cerrar el turno en restaurante
+    public function CierreTurnoRestaurantePos($Observaciones,$idUser) {
+        $fecha=date("Y-m-d");
+        $hora=date("H:i:s");
+        $tab="restaurante_cierres";
+        $NumRegistros=4; 
+        
+        $Columnas[0]="Fecha";               $Valores[0]=$fecha;
+        $Columnas[1]="Hora";                $Valores[1]=$hora;
+        $Columnas[2]="idUsuario";           $Valores[2]=$idUser;
+        $Columnas[3]="Observaciones";       $Valores[3]=$Observaciones;
+                
+        $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
+        $idCierre=$this->ObtenerMAX($tab,"ID", 1,"");
+        $this->update("restaurante_pedidos", "idCierre", $idCierre, " WHERE idCierre=0 AND Estado<>'1'");
+        $this->update("restaurante_pedidos_items", "idCierre", $idCierre, " WHERE idCierre=0 AND Estado<>'1' ");
+        $this->update("traslados_items", "idCierre", $idCierre, " WHERE idCierre=0");
+        $this->update("restaurante_registro_propinas", "idCierre", $idCierre, " WHERE idCierre=0;");
+        $this->update("restaurante_registro_ventas_mesero", "idCierre", $idCierre, " WHERE idCierre=0;");
+        $this->update("inventario_comprobante_movimientos_items", "idCierre", $idCierre, " WHERE idCierre=0;");
+        $this->update("facturas", "CerradoDiario", $idCierre, "WHERE (CerradoDiario='0' or CerradoDiario='' ) AND Usuarios_idUsuarios='$idUser'");
+        $this->update("facturas_items", "idCierre", $idCierre, "WHERE (idCierre='0' or idCierre='') AND idUsuarios='$idUser'");
+        $this->update("factura_compra_items", "idCierre", $idCierre, "WHERE (idCierre='0' or idCierre='') ");
+        return($idCierre);
+    }
+    
+    
+    //cerrar el turno en restaurante
+    public function RegistreResumenCierre($idCierre,$idUser) {
+        $Fecha=date("Y-m-d");
+        $FechaRegistro=date("Y-m-d H:i:s");
+        $DatosSucursal= $this->DevuelveValores("empresa_pro_sucursales", "Actual", 1);
+        $SedeActual= $DatosSucursal["ID"];     
+        $sql="INSERT INTO restaurante_resumen_cierre 
+                (`Fecha`,`idProducto`,`NombreProducto`,`Compra`,`Ventas`,`TrasladosRecibidos`,`TrasladosRealizados`,`Bajas`,`Recibe`,`Saldo`,`TotalVentas`,`TotalPropinas1`,`TotalPropinas2`,`TotalPropinas3`,`TotalCasa`,`idUser`,`idCierre`,`FechaCreacion`)
+              SELECT '$Fecha',t1.idProductosVenta,t1.Nombre,
+               (SELECT IFNULL((SELECT SUM(Cantidad) FROM factura_compra_items fci WHERE t1.idProductosVenta=fci.idProducto AND idCierre='$idCierre'),0)) AS ItemsCompras,
+               (SELECT IFNULL((SELECT SUM(Cantidad) FROM facturas_items fi WHERE t1.Referencia=fi.Referencia AND idCierre='$idCierre'),0)) as ItemsVentas,
+               (SELECT IFNULL((SELECT SUM(Cantidad) FROM traslados_items ti WHERE CONVERT(ti.Referencia USING utf8)=CONVERT(t1.Referencia USING utf8 ) AND Destino='$SedeActual' AND idCierre='$idCierre'),0)) as TrasladosRecibidos,
+               (SELECT IFNULL((SELECT SUM(Cantidad) FROM traslados_items ti WHERE CONVERT(ti.Referencia USING utf8)=CONVERT(t1.Referencia USING utf8 ) AND Destino<>'$SedeActual' AND idCierre='$idCierre' AND Estado='PREPARADO'),0)) as TrasladosEnviados,
+               (SELECT IFNULL((SELECT SUM(Cantidad) FROM inventario_comprobante_movimientos_items icm WHERE t1.idProductosVenta=icm.idProducto AND TablaOrigen='productosventa' AND TipoMovimiento='BAJA' AND idCierre='$idCierre'),0)) AS TotalBajas,
+               (t1.Existencias - (SELECT ItemsCompras) + (SELECT TrasladosEnviados) - (SELECT TrasladosRecibidos) + (SELECT TotalBajas) + (SELECT ItemsVentas)) AS CantidadRecibida, 
+               (t1.Existencias) as SaldoFinal,
+               (SELECT SUM(TotalItem) FROM facturas_items fi WHERE t1.Referencia=fi.Referencia AND idCierre='$idCierre') as TotalVentas,
+               (t1.ValorComision1 * (SELECT ItemsVentas)) as TotalComisiones1,
+               (t1.ValorComision2 * (SELECT ItemsVentas)) as TotalComisiones2,
+               (t1.ValorComision3 * (SELECT ItemsVentas)) as TotalComisiones3,
+               ((SELECT TotalVentas)-(SELECT TotalComisiones1)-(SELECT TotalComisiones2)-(SELECT TotalComisiones3)) as TotalCasa,
+               '$idUser','$idCierre','$FechaRegistro'
+              FROM productosventa t1   
+            ";
+        $this->Query($sql);
+    }
+    
     /**
      * Fin Clase
      */
