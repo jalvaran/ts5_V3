@@ -315,3 +315,22 @@ SELECT ID,`Fecha`,`Hora`,`Estado`,idMesa , idCliente,NombreCliente, DireccionEnv
 (SELECT SUM(TotalCostos) FROM restaurante_pedidos_items WHERE restaurante_pedidos_items.idPedido=restaurante_pedidos.ID) as TotalCostos,
 idUsuario
 FROM `restaurante_pedidos`;
+
+
+DROP VIEW IF EXISTS `vista_servicio_acompanamiento_turno_actual`;
+CREATE VIEW vista_servicio_acompanamiento_turno_actual AS
+SELECT t1.idModelo,t2.NombreArtistico,count(t1.ID) as NumeroServicios, SUM(t1.ValorPagado) as ValorPagado, 
+      SUM(t1.ValorModelo) as ValorModelo,SUM(t1.ValorCasa) as ValorCasa 
+FROM modelos_agenda t1 INNER JOIN modelos_db t2 ON t1.idModelo=t2.ID WHERE t1.idCierre=0 GROUP BY t1.idModelo ORDER BY t2.NombreArtistico;
+
+
+DROP VIEW IF EXISTS `vista_servicio_acompanamiento_cuentas_x_pagar`;
+CREATE VIEW vista_servicio_acompanamiento_cuentas_x_pagar AS
+SELECT t1.idModelo,
+    (SELECT NombreArtistico FROM modelos_db t2 WHERE t2.ID=t1.idModelo LIMIT 1) AS NombreArtistico,
+    (SELECT IFNULL((SELECT SUM(ValorModelo) FROM modelos_agenda t3 WHERE t3.idModelo=t1.idModelo),0)) AS ValorTotalServiciosPrestados,
+    (SELECT IFNULL((SELECT SUM(ValorPagado) FROM modelos_pagos_realizados t4 WHERE t4.idModelo=t1.idModelo),0)) AS ValorTotalServiciosPagados,
+    ((SELECT ValorTotalServiciosPrestados)-(SELECT ValorTotalServiciosPagados)) as Saldo
+FROM modelos_agenda t1 GROUP BY t1.idModelo;
+
+

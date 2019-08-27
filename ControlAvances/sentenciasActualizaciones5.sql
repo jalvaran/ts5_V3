@@ -442,3 +442,12 @@ ALTER TABLE `inventario_comprobante_movimientos_items` ADD INDEX(`idProducto`);
 ALTER TABLE `inventario_comprobante_movimientos_items` ADD INDEX(`idComprobante`);
 ALTER TABLE `inventario_comprobante_movimientos_items` ADD INDEX(`idCierre`);
 
+ALTER TABLE `modelos_agenda` CHANGE `Estado` `Estado` INT(2) NOT NULL;
+
+ALTER TABLE `modelos_agenda` ADD INDEX(`idModelo`);
+ALTER TABLE `modelos_agenda` ADD INDEX(`idCierre`);
+ALTER TABLE `modelos_agenda` ADD INDEX(`Estado`);
+ALTER TABLE `modelos_agenda` ADD `HoraFinalizacion` DATETIME NOT NULL AFTER `HoraATerminar`;
+ALTER TABLE `modelos_agenda` ADD `TipoServicio` INT NOT NULL AFTER `idModelo`;
+ALTER TABLE `modelos_agenda` ADD INDEX(`TipoServicio`);
+

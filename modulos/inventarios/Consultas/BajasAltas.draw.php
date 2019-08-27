@@ -89,7 +89,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                         $css->ColTabla($DatosItems["Referencia"], 1, "C");
                         $css->ColTabla($DatosItems["Nombre"], 1, "L");
-                       $css->ColTabla(number_format($DatosItems["Cantidad"],3), 1, "C");
+                       $css->ColTabla(number_format($DatosItems["Cantidad"],2), 1, "C");
                        $css->ColTabla(number_format($DatosItems["CostoTotal"],2), 1, "C");
                         print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");   
                             

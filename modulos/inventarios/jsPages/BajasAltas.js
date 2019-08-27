@@ -275,8 +275,9 @@ function AgregarItem(){
         form_data.append('Cantidad', Cantidad);
         
         
-        document.getElementById('Cantidad').value=""; 
-          
+        document.getElementById('Cantidad').value="1";   
+        document.getElementById('CmbBusquedas').value="";
+        document.getElementById('select2-CmbBusquedas-container').innerHTML="Buscar";
         $.ajax({
         url: './procesadores/BajasAltas.process.php',
         //dataType: 'json',
