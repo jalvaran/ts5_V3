@@ -478,3 +478,6 @@ CREATE TABLE `modelos_tipo_servicios` (
 
 
 ALTER TABLE `librodiario` ADD `idCierre` BIGINT NOT NULL AFTER `idUsuario`, ADD INDEX `idCierre` (`idCierre`);
+
+INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `CuerpoFormato`, `NotasPiePagina`, `Updated`, `Sync`) VALUES
+(36,	'INFORME DE CIERRE',	'001',	'F-GC-003',	'2019-08-28',	'',	'',	'2019-01-31 12:08:58',	'2019-06-12 10:41:11');

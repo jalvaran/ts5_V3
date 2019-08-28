@@ -102,7 +102,7 @@ if( !empty($_REQUEST["Accion"]) ){
                             $css->IconButton("btnEntregar", "btnEntregar", "fa fa-hand-paper-o", "Entregar", "onclick='EntregarPedido($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#84ffff;color:black"');
                             //$css->IconButton("btnEstados", "btnEstados", "fa fa-bullseye", "Ver Preparacion", "onclick='VerEstadoPreparacion($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#e0eff3;color:black"');
                             $css->IconButton("btnFacturar", "btnFacturar", "fa fa-credit-card", "Facturar", "onclick='AbrirOpcionesFacturacion(`$idPedido`)'",$spanActivo=0,"orange",$style='style="background-color:#ffffcd;color:black"');
-                            $css->IconButton("btnCancelar", "btnCancelar", "fa fa-remove", "Eliminar", "onclick='AgregarItems($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#ffeaae;color:red"');
+                            //$css->IconButton("btnCancelar", "btnCancelar", "fa fa-remove", "Eliminar", "onclick='AgregarItems($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#ffeaae;color:red"');
                         print("</td>");
                         
                         

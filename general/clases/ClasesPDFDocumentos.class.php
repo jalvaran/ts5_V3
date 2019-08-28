@@ -114,7 +114,7 @@ $tbl = <<<EOD
 EOD;
 $this->PDF->writeHTML($tbl, true, false, false, false, '');
 $this->PDF->SetFillColor(255, 255, 255);
-$txt="<h3>".$DatosEmpresaPro["RazonSocial"]."<br>NIT ".$DatosEmpresaPro["NIT"]."</h3>";
+$txt="<h3>".($DatosEmpresaPro["RazonSocial"])."<br>NIT ".$DatosEmpresaPro["NIT"]."</h3>";
 $this->PDF->MultiCell(62, 5, $txt, 0, 'L', 1, 0, '', '', true,0, true, true, 10, 'M');
 $txt=$DatosEmpresaPro["Direccion"]."<br>".$DatosEmpresaPro["Telefono"]."<br>".$DatosEmpresaPro["Ciudad"]."<br>".$DatosEmpresaPro["WEB"];
 $this->PDF->MultiCell(62, 5, $txt, 0, 'C', 1, 0, '', '', true,0, true, true, 10, 'M');
@@ -1464,7 +1464,7 @@ EOD;
         $this->PDF_Encabezado($FechaActual,$idEmpresa, 34, "",$NumeracionDocumento);
         $DatosTercero=$obCon->DevuelveValores("proveedores", "Num_Identificacion", $CmbTercero);
         $html="<strong>FECHA DE EXPEDICIÓN: </strong>$FechaActual<BR><BR>";
-        $html.="<strong>RETENIDO:</strong> $DatosTercero[RazonSocial] <BR>";
+        $html.="<strong>RETENIDO:</strong> ".utf8_encode($DatosTercero["RazonSocial"])." <BR>";
         $html.="<strong>NIT:</strong> $DatosTercero[Num_Identificacion] - $DatosTercero[DV] <BR>";
         $html.="<strong>DIRECCIÓN:</strong> $DatosTercero[Direccion] $DatosTercero[Ciudad]<BR><BR>";
         $html.="<strong>CIUDAD DONDE SE PRACTICÓ LA RETENCIÓN:</strong> $CmbCiudadRetencion<BR>";
@@ -2358,6 +2358,153 @@ $tbl.= "</table>";
 
     }
     
+    public function InformeCierreRestaurante($idCierre) {
+        $idFormato=36;
+        
+        $DatosFormatos= $this->obCon->DevuelveValores("formatos_calidad", "ID", $idFormato);
+        
+        $Documento="$DatosFormatos[Nombre] $idCierre";
+        
+        $this->PDF_Ini($DatosFormatos['Nombre'],7, "");
+           
+        $this->PDF_Encabezado($DatosFormatos["Fecha"],1, $idFormato, "",$Documento);
+        
+        $html= $this->TablaRelacionProductosRestaurante($idCierre);
+        //print($html);
+        $this->PDF->writeHTML("<br><br>".$html, true, false, false, false, ''); 
+        $this->PDF_Output("Reporte_Cierre_$idCierre");
+    }
+    
+    public function TablaRelacionProductosRestaurante($idCierre) {
+        $html='<table cellspacing="1" cellpadding="2" border="0">';
+            $html.="<tr>";
+                $html.="<td>";
+                    $html.="<strong>Producto</strong>";
+                $html.="</td>"; 
+                $html.="<td>";
+                    $html.="<strong>Recibe</strong>";
+                $html.="</td>"; 
+                $html.="<td>";     
+                    $html.="<strong>Compras</strong>";
+                $html.="</td>"; 
+                $html.="<td>";   
+                    $html.="<strong>Traslados Recibidos</strong>";
+                $html.="</td>"; 
+                $html.="<td>";    
+                    $html.="<strong>Ventas</strong>";
+                $html.="</td>"; 
+                $html.="<td>";    
+                    $html.="<strong>Traslados Recibidos</strong>";
+                $html.="</td>"; 
+                $html.="<td>";    
+                    $html.="<strong>Bajas</strong>";
+                $html.="</td>"; 
+                $html.="<td>";    
+                    $html.="<strong>Saldo</strong>";
+                $html.="</td>"; 
+                $html.="<td>";    
+                    $html.="<strong>Total Venta</strong>";
+                $html.="</td>"; 
+                $html.="<td>";    
+                    $html.="<strong>Propina 1</strong>";
+                $html.="</td>"; 
+                $html.="<td>";    
+                    $html.="<strong>Propina 2</strong>";
+                $html.="</td>"; 
+                $html.="<td>";    
+                    $html.="<strong>Propina 3</strong>";
+                $html.="</td>"; 
+                $html.="<td>";    
+                    $html.="<strong>Casa</strong>";
+                $html.="</td>";
+            $html.="</tr>";
+            $sql="SELECT * FROM restaurante_resumen_cierre WHERE idCierre='$idCierre'";
+            $Consulta= $this->obCon->Query($sql);
+            $h=0;
+            $TotalVentas=0;
+            $TotalPropinas1=0;
+            $TotalPropinas2=0;
+            $TotalPropinas3=0;
+            $TotalCasa=0;
+            while($DatosCierre= $this->obCon->FetchAssoc($Consulta)){
+                $TotalVentas=$TotalVentas+$DatosCierre["TotalVentas"];
+                $TotalPropinas1=$TotalPropinas1+$DatosCierre["TotalPropinas1"];
+                $TotalPropinas2=$TotalPropinas2+$DatosCierre["TotalPropinas2"];
+                $TotalPropinas3=$TotalPropinas1+$DatosCierre["TotalPropinas3"];
+                $TotalCasa=$TotalCasa+$DatosCierre["TotalCasa"];
+                if($h==0){
+                    $Back="#f2f2f2";
+                    $h=1;
+                }else{
+                    $Back="white";
+                    $h=0;
+                }
+                $html.="<tr>";
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+                        $html.= utf8_encode($DatosCierre["NombreProducto"]);
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+                        $html.=$DatosCierre["Recibe"];
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.=$DatosCierre["Compra"];
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.=$DatosCierre["TrasladosRecibidos"];
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.=$DatosCierre["Ventas"];
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
+                        $html.=$DatosCierre["TrasladosRealizados"];
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';     
+                        $html.=$DatosCierre["Bajas"];
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';  
+                        $html.=$DatosCierre["Saldo"];
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.= number_format($DatosCierre["TotalVentas"]);
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
+                        $html.=number_format($DatosCierre["TotalPropinas1"]);
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.=number_format($DatosCierre["TotalPropinas2"]);
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
+                        $html.=number_format($DatosCierre["TotalPropinas3"]);
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
+                        $html.=number_format($DatosCierre["TotalCasa"]);
+                    $html.="</td>";
+                $html.="</tr>";
+            }
+            $html.="<tr>";
+                $html.='<td align="rigth" colspan="8" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.="<strong>TOTALES:</strong>";
+                $html.="</td>"; 
+                $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.= number_format($TotalVentas);
+                $html.="</td>"; 
+                $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
+                    $html.=number_format($TotalPropinas1);
+                $html.="</td>"; 
+                $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.=number_format($TotalPropinas2);
+                $html.="</td>"; 
+                $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
+                    $html.=number_format($TotalPropinas3);
+                $html.="</td>"; 
+                $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
+                    $html.=number_format($TotalCasa);
+                $html.="</td>";
+            $html.="</tr>";
+            
+        $html.="</table>";
+        return($html);
+    }
    //Fin Clases
 }
     

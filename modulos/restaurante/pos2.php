@@ -42,8 +42,8 @@ $css->PageInit($myTitulo);
                     //$css->IconButton("BtnNuevoDomicilio","bntNuevoDomicilio",'fa fa-motorcycle',"Nuevo Domicilio","onclick='AbrirNuevoDomicilio()'",$spanActivo=0,"orange",$style='style="background-color:#fffed9;color:black"');
                     //$css->IconButton("BtnNuevoBarra","bntNuevoBarra",'fa fa-home',"Pedido en Barra","onclick='AbrirNuevoPedido()'",$spanActivo=0,"orange",$style='style="background-color:#d9dfff;color:black"');
                     $css->IconButton("BtnNuevoTercero","bntNuevoTercero",'fa fa-user-plus',"Nuevo Tercero","onclick='ModalCrearTercero(`ModalAcciones`,`DivFrmModalAcciones`);'",$spanActivo=0,"orange",$style='style="background-color:#ffd9e3;color:black"');
-                    $css->IconButton("BtnCrearEgreso","BtnCrearEgreso",'fa fa-money',"Crear Egreso","onclick='ModalCrearEgreso()'",$spanActivo=0,"orange",$style='style="background-color:#d7dbf8;color:black"');
                     if($TipoUser=='administrador'){
+                        $css->IconButton("BtnCrearEgreso","BtnCrearEgreso",'fa fa-money',"Crear Egreso","onclick='ModalCrearEgreso()'",$spanActivo=0,"orange",$style='style="background-color:#d7dbf8;color:black"');
                         $css->IconButton("BtnCerrarTurno","BtnCerrarTurno",'fa fa-cogs',"Cerrar Turno","onclick='AbrirCierreTurno()'",$spanActivo=0,"orange",$style='style="background-color:#ff2b2b;color:white"');
                     }
                     
