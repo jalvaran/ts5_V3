@@ -109,9 +109,95 @@ if( !empty($_REQUEST["Accion"]) ){
         break; //fin Caso 2
         
         case 3: //dibujar las cuentas x pagar de las modelos
+            if(isset($_REQUEST['Page'])){
+                $NumPage=$obCon->normalizar($_REQUEST['Page']);
+            }else{
+                $NumPage=1;
+            }
+           $TxtBusqueda=$obCon->normalizar($_REQUEST["TxtBusqueda"]);   
+           $Condicional=" WHERE ";
+            if($TxtBusqueda<>'' ){
+                $Condicional.=" (NombreArtistico LIKE '%$TxtBusqueda%' OR idModelo='$TxtBusqueda') AND ";
+            }
+           $Condicional.=" Saldo<>0 ";
+           $statement=" vista_servicio_acompanamiento_cuentas_x_pagar  $Condicional ";
+           
+           $limit = 10;
+            $startpoint = ($NumPage * $limit) - $limit;
+            $VectorST = explode("LIMIT", $statement);
+            $statement = $VectorST[0]; 
+            $query = "SELECT COUNT(*) as `num`,SUM(Saldo) AS Total FROM {$statement}";
+            $row = $obCon->FetchArray($obCon->Query($query));
+            $ResultadosTotales = $row['num'];
+            $Total=$row['Total'];
+            $st_reporte=$statement;
+            $Limit=" LIMIT $startpoint,$limit";
             
-           $TxtBusqueda=$obCon->normalizar($_REQUEST["TxtBusqueda"]);           
+            $query="SELECT * ";
+            $sql="$query FROM $statement ORDER BY NombreArtistico $Limit";
+           
+            $Consulta=$obCon->Query($sql);
+            
+            
+            
            $css->CrearTabla();
+           
+                $css->FilaTabla(16);
+                    print("<td style='text-align:center'>");
+                        print("<strong>Registros:</strong> <h4 style=color:green>". number_format($ResultadosTotales)."</h4>");
+                    print("</td>");
+                    print("<td colspan=3 style='text-align:center'>");
+                        print("<strong>Total:</strong> <h4 style=color:red>". number_format($Total)."</h4>");
+                    print("</td>");
+                    print("<td>");
+                        $css->CrearBotonEvento("BtnExportarExcel", "Exportar", 1, "onclick", "ExportarExcel('$db','vista_servicio_acompanamiento_cuentas_x_pagar','')", "verde", "");
+                    print("</td>");
+                    
+                //$css->CierraFilaTabla();
+                
+                $st= urlencode($st_reporte);
+                    if($ResultadosTotales>$limit){
+
+                        //$css->FilaTabla(14);
+                            
+                            $TotalPaginas= ceil($ResultadosTotales/$limit);
+                            print("<td  style=text-align:center>");
+                            //print("<strong>Página: </strong>");
+                            
+                            print('<div class="input-group" style=width:150px>');
+                            if($NumPage>1){
+                                $NumPage1=$NumPage-1;
+                            print('<span class="input-group-addon" onclick=CambiePaginaCuentasXPagar('.$NumPage1.') style=cursor:pointer><i class="fa fa-chevron-left"></i></span>');
+                            }
+                            $FuncionJS="onchange=CambiePaginaCuentasXPagar();";
+                            $css->select("CmbPageCuentasXPagar", "form-control", "CmbPageCuentasXPagar", "", "", $FuncionJS, "");
+                            
+                                for($p=1;$p<=$TotalPaginas;$p++){
+                                    if($p==$NumPage){
+                                        $sel=1;
+                                    }else{
+                                        $sel=0;
+                                    }
+                                    
+                                    $css->option("", "", "", $p, "", "",$sel);
+                                        print($p);
+                                    $css->Coption();
+                                    
+                                }
+
+                            $css->Cselect();
+                            if($ResultadosTotales>($startpoint+$limit)){
+                                $NumPage1=$NumPage+1;
+                            print('<span class="input-group-addon" onclick=CambiePaginaCuentasXPagar('.$NumPage1.') style=cursor:pointer><i class="fa fa-chevron-right" ></i></span>');
+                            }
+                            print("<div>");
+                            print("</td>");
+                            
+                            
+                           $css->CierraFilaTabla(); 
+                        }
+           
+           
                 $css->FilaTabla(16);
                     $css->ColTabla("<strong>idModelo</strong>", 1);
                     $css->ColTabla("<strong>Nombre Artistico</strong>", 1);
@@ -120,14 +206,11 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>Saldo a Pagar</strong>", 1);
                     $css->ColTabla("<strong>Terminar</strong>", 1);
                 $css->CierraFilaTabla();
-                $Condicional="";
-                if($TxtBusqueda<>'' ){
-                    $Condicional=" (NombreArtistico LIKE '%$TxtBusqueda%' OR idModelo='$TxtBusqueda') AND ";
-                }
+                /*
                 $sql="SELECT * FROM vista_servicio_acompanamiento_cuentas_x_pagar  "
                         . "  WHERE $Condicional Saldo<>0 ORDER BY NombreArtistico LIMIT 20";
                 $Consulta=$obCon->Query($sql);
-                
+                */
                 while($DatosAgenda=$obCon->FetchAssoc($Consulta)){
                     $idModelo=$DatosAgenda["idModelo"];
                     $css->FilaTabla(16);

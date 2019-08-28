@@ -29,6 +29,9 @@ $css->PageInit($myTitulo);
               </div>');
     $css->CerrarDiv();
     print("<br><br><br>");
+    $css->CrearDiv("DivMensajes", "container", "center", 1, 1);
+    
+    $css->CerrarDiv();
     $css->CrearDiv("divContenedr", "container", "left", 1, 1);
      $css->TabInit();
             $css->TabLabel("Tab1", "<strong>Registrar Servicios</strong>", "Tab_1", 1,"onclick='DibujeServicios();idPestana=1;'");

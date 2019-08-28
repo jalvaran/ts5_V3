@@ -175,7 +175,7 @@ function DibujeResumenTurno(){
       });
 }
 
-function DibujeCuentasXPagarServicios(){
+function DibujeCuentasXPagarServicios(Page=1){
     
     document.getElementById("DivCuentasXPagar").innerHTML='<div id="GifProcess"><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
     var TxtBusqueda =document.getElementById("TxtBusquedas").value;
@@ -183,7 +183,7 @@ function DibujeCuentasXPagarServicios(){
     var form_data = new FormData();
         form_data.append('Accion', 3);
         form_data.append('TxtBusqueda', TxtBusqueda);
-        
+        form_data.append('Page', Page);
         $.ajax({
         url: './Consultas/ServicioAcompanamiento.draw.php',
         //dataType: 'json',
@@ -323,6 +323,54 @@ function BuscarModelo(){
     
 }
 
+function CambiePaginaCuentasXPagar(Page=""){
+    
+    if(Page==""){
+        Page = document.getElementById('CmbPageCuentasXPagar').value;
+    }
+    DibujeCuentasXPagarServicios(Page);
+}
+
+function ExportarExcel(db,Tabla,st){
+    //document.getElementById("DivMensajes").innerHTML="Exportando...";
+    document.getElementById("DivMensajes").innerHTML='<div id="GifProcess">Exportando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    var idBoton="BtnExportarExcel";
+    document.getElementById(idBoton).disabled=true; 
+    
+    var form_data = new FormData();
+        form_data.append('Opcion', 2); 
+        
+        form_data.append('Tabla', Tabla);
+        form_data.append('db', db);
+        form_data.append('st', st);
+              
+    $.ajax({
+        
+        url: '../../general/procesadores/GeneradorCSV.process.php',
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idBoton).disabled=false; 
+               console.log(data)
+                
+            document.getElementById("DivMensajes").innerHTML=data;
+                
+           
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            document.getElementById(idBoton).disabled=false;
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
 
 document.getElementById('BtnMuestraMenuLateral').click();
 

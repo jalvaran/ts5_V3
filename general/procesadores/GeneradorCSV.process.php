@@ -75,7 +75,43 @@ if(isset($_REQUEST["Opcion"])){
             
             $obCon->Query($sql);
             print("<div id='DivImagenDescargarTablaDB'><a href='$Link' download='$Tabla.csv' target='_top' style='text-align:center;position: absolute;top:50%;left:50%;padding:5px;' onclick=document.getElementById('DivImagenDescargarTablaDB').style.display='none';><h1>Descargar: </h1><img src='../../images/descargar3.png'></img></a></div>");
-            break;
+            break;//Fin Caso 1
+            
+            case 2: //Exportar CSV directamente
+            
+            $Tabla=$obCon->normalizar($_REQUEST["Tabla"]);
+            $FileName=$Tabla."_".$idUser.".csv";
+            $Link.= $FileName;
+            $OuputFile.=$FileName;
+            
+            if(file_exists($Link)){
+                unlink($Link);
+            }
+                       
+            $Condicion="";
+            
+            $Separador=";";
+            $NumPage="";
+            $limit="";
+            $startpoint="";
+            
+            
+            $sqlColumnas="SELECT  ";
+            $Columnas=$obCon->ShowColums($Tabla);
+            //print_r($Columnas);
+            foreach ($Columnas["Field"] as $key => $value) {
+                $sqlColumnas.="'$value',";
+            }
+            $sqlColumnas=substr($sqlColumnas, 0, -1);
+            $sqlColumnas.=" UNION ALL ";
+            
+            $sql=$sqlColumnas." SELECT * FROM $Tabla $Condicion INTO OUTFILE '$OuputFile' FIELDS TERMINATED BY '$Separador' $Enclosed LINES TERMINATED BY '\r\n';";
+            $Fecha=date("Ymd_His");
+            $obCon->Query($sql);
+            
+            $NombreArchivo=$Tabla;
+            print("<div id='DivImagenDescargarTablaDB'><a href='$Link' download='$NombreArchivo.csv' target='_top' ><h1>Descargar</h1></a></div>");
+            break;//Fin caso 2
         
         }
 }else{
