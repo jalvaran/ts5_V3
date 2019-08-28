@@ -17,13 +17,24 @@ $css->PageInit($myTitulo);
         $css->Cdiv();
         
     $css->CModal("BntModalAcciones", "onclick=SeleccioneAccionFormularios()", "button", "Guardar");
-    
-    
+    $css->CrearDiv("", "col-md-8", "center", 1, 1);
+        print("<h3>MÓDULO DE ACOMPAÑANTES<h3>");
+    $css->CerrarDiv();
+    $css->CrearDiv("", "col-md-4", "center", 1, 1);
+        print('<br><div class="input-group">');
+        $css->input("text", "TxtBusquedas", "form-control", "TxtBusquedas", "", "", "Buscar Modelo", "", "", "onchange=BuscarModelo()");
+
+
+         print('<span class="input-group-addon"><i class="fa fa-fw fa-search"></i></span>
+              </div>');
+    $css->CerrarDiv();
+    print("<br><br><br>");
+    $css->CrearDiv("divContenedr", "container", "left", 1, 1);
      $css->TabInit();
-            $css->TabLabel("Tab1", "<strong>Registrar Servicios</strong>", "Tab_1", 1,"onclick='DibujeServicios();'");
+            $css->TabLabel("Tab1", "<strong>Registrar Servicios</strong>", "Tab_1", 1,"onclick='DibujeServicios();idPestana=1;'");
             
-            $css->TabLabel("Tab2", "<strong>Resumen Servicios</strong>", "Tab_2",0,"onclick='DibujeResumenTurno();'");
-            $css->TabLabel("Tab3", "<strong>Cuentas por Pagar</strong>", "Tab_3",0,"onclick='DibujeCuentasXPagarServicios();'");
+            $css->TabLabel("Tab2", "<strong>Resumen Servicios</strong>", "Tab_2",0,"onclick='DibujeResumenTurno();idPestana=2;'");
+            $css->TabLabel("Tab3", "<strong>Cuentas por Pagar</strong>", "Tab_3",0,"onclick='DibujeCuentasXPagarServicios();idPestana=3;'");
         $css->TabInitEnd();
         $css->TabContentInit();
         
@@ -108,7 +119,7 @@ $css->PageInit($myTitulo);
                 
             $css->Csection();
         $css->TabPaneEnd();
-    
+    $css->CerrarDiv();
 $css->PageFin();
 
 print('<script src="jsPages/ServicioAcompanamiento.js"></script>');  //script propio de la pagina

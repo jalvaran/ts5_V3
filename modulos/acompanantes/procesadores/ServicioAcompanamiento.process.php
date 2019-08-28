@@ -68,10 +68,14 @@ if( !empty($_REQUEST["Accion"]) ){
             if(!is_numeric($ValorPago) or $ValorPago<=0){
                 exit("E1;El campo de texto Valor Pagado debe ser un Número mayor a Cero");
             }
+            $DatosModelo=$obCon->DevuelveValores("vista_servicio_acompanamiento_cuentas_x_pagar", "idModelo", $idModelo);
+            if($ValorPago>$DatosModelo["Saldo"]){
+                exit("E1;El valor a pagar no puede superar el saldo");
+            }
             $obCon->PagoAModelo($FechaPago, $idModelo, $ValorPago,$idUser);
             print("OK;Pago Registrado a al modelo $idModelo");
             
-        break;  //Fin caso 3  
+        break;  //Fin caso 4
         
     }
     

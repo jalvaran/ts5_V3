@@ -16,7 +16,7 @@ if( !empty($_REQUEST["Accion"]) ){
     
     switch ($_REQUEST["Accion"]) {
         case 1: //dibujar la agenda de las modelos
-            
+            $TxtBusqueda=$obCon->normalizar($_REQUEST["TxtBusqueda"]);
            $css->CrearTabla();
                 $css->FilaTabla(16);
                     $css->ColTabla("<strong>Modelo</strong>", 1);
@@ -26,9 +26,12 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>Estado</strong>", 1);
                     $css->ColTabla("<strong>Terminar</strong>", 1);
                 $css->CierraFilaTabla();
-                
+                $Condicional="";
+                if($TxtBusqueda<>'' ){
+                    $Condicional=" (t2.NombreArtistico LIKE '%$TxtBusqueda%' OR t1.idModelo='$TxtBusqueda') and ";
+                }
                 $sql="SELECT t1.*,t2.NombreArtistico FROM modelos_agenda t1 INNER JOIN modelos_db t2 ON t1.idModelo=t2.ID  "
-                        . "  WHERE t1.Estado=0";
+                        . "  WHERE $Condicional  t1.Estado=0";
                 $Consulta=$obCon->Query($sql);
                 
                 while($DatosAgenda=$obCon->FetchAssoc($Consulta)){
@@ -56,7 +59,7 @@ if( !empty($_REQUEST["Accion"]) ){
         break; //fin Caso 1
         
         case 2: //dibujar resumen del turno actual
-            
+           $TxtBusqueda=$obCon->normalizar($_REQUEST["TxtBusqueda"]);
            $css->CrearTabla();
                 $css->FilaTabla(16);
                     $css->ColTabla("<strong>Modelo</strong>", 1);
@@ -66,8 +69,11 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>Valor Casa</strong>", 1);
                     
                 $css->CierraFilaTabla();
-                
-                $sql="SELECT * FROM vista_servicio_acompanamiento_turno_actual ";
+                $Condicional="";
+                if($TxtBusqueda<>'' ){
+                    $Condicional=" WHERE NombreArtistico LIKE '%$TxtBusqueda%' OR idModelo='$TxtBusqueda'";
+                }
+                $sql="SELECT * FROM vista_servicio_acompanamiento_turno_actual $Condicional ";
                         
                 $Consulta=$obCon->Query($sql);
                 $TotalServicios=0;
@@ -104,6 +110,7 @@ if( !empty($_REQUEST["Accion"]) ){
         
         case 3: //dibujar las cuentas x pagar de las modelos
             
+           $TxtBusqueda=$obCon->normalizar($_REQUEST["TxtBusqueda"]);           
            $css->CrearTabla();
                 $css->FilaTabla(16);
                     $css->ColTabla("<strong>idModelo</strong>", 1);
@@ -113,9 +120,12 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>Saldo a Pagar</strong>", 1);
                     $css->ColTabla("<strong>Terminar</strong>", 1);
                 $css->CierraFilaTabla();
-                
+                $Condicional="";
+                if($TxtBusqueda<>'' ){
+                    $Condicional=" (NombreArtistico LIKE '%$TxtBusqueda%' OR idModelo='$TxtBusqueda') AND ";
+                }
                 $sql="SELECT * FROM vista_servicio_acompanamiento_cuentas_x_pagar  "
-                        . "  WHERE Saldo<>0 ORDER BY NombreArtistico LIMIT 20";
+                        . "  WHERE $Condicional Saldo<>0 ORDER BY NombreArtistico LIMIT 20";
                 $Consulta=$obCon->Query($sql);
                 
                 while($DatosAgenda=$obCon->FetchAssoc($Consulta)){
@@ -139,12 +149,12 @@ if( !empty($_REQUEST["Accion"]) ){
         
         case 4://Formulario para grabar un pago a una modelo
             $idModelo=$obCon->normalizar($_REQUEST["idModelo"]);
-            $DatosModelo=$obCon->DevuelveValores("modelos_db", "ID", $idModelo);                 
+            $DatosModelo=$obCon->DevuelveValores("vista_servicio_acompanamiento_cuentas_x_pagar", "idModelo", $idModelo);               
             $css->CrearTitulo("Realizar pago a la modelo: ".$DatosModelo["NombreArtistico"].", ID: $idModelo", "rojo");
             $css->CrearTabla();
                 $css->FilaTabla(16);
                     print("<td>");
-                        $css->input("text", "TxtValorPago", "form-control", "TxtValorPago", "Valor Pago", "", "Valor del Pago", "off", "", "");
+                        $css->input("text", "TxtValorPago", "form-control", "TxtValorPago", "Valor Pago", $DatosModelo["Saldo"], "Valor del Pago", "off", "", "");
                     print("</td>");
                     print("<td>");
                         $css->CrearBotonEvento("btnPagar", "Pagar", 1, "onclick", "PagarAModelo($idModelo)", "rojo", "");

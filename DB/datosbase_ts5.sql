@@ -5,17 +5,14 @@ SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
-TRUNCATE `cajas`;
 INSERT INTO `cajas` (`ID`, `Nombre`, `Base`, `idUsuario`, `Estado`, `CuentaPUCEfectivo`, `CuentaPUCCheques`, `CuentaPUCOtros`, `CuentaPUCIVAEgresos`, `idTerceroIntereses`, `idEmpresa`, `idSucursal`, `CentroCostos`, `idResolucionDian`, `idBascula`, `Updated`, `Sync`) VALUES
 (1,	'CAJA 1',	'200000',	3,	'ABIERTA',	110510,	11100502,	11100503,	240801,	900833180,	1,	1,	1,	3,	1,	'2019-03-08 17:02:05',	'2019-03-08 12:02:05'),
 (2,	'CAJA 2',	'200000',	1,	'ABIERTA',	11051002,	11100502,	11100503,	240801,	900833180,	1,	1,	1,	2,	0,	'2019-04-27 15:42:37',	'2019-04-27 10:42:37'),
 (3,	'CAJA 3',	'150000',	0,	'ABIERTA',	11051002,	11100502,	11100503,	240801,	900833180,	1,	1,	1,	1,	0,	'2019-03-08 17:02:05',	'2019-03-08 12:02:05');
 
-TRUNCATE `centrocosto`;
 INSERT INTO `centrocosto` (`ID`, `Nombre`, `EmpresaPro`, `Updated`, `Sync`) VALUES
 (1,	'PRINCIPAL',	1,	'2019-01-13 14:04:37',	'2019-01-13 09:04:37');
 
-TRUNCATE `ciuu`;
 INSERT INTO `ciuu` (`Codigo`, `Descripcion`, `Updated`, `Sync`) VALUES
 (10,	' Asalariados',	'2019-01-13 14:04:39',	'2019-01-13 09:04:39'),
 (11,	'Cultivos agr?colas transitorios.',	'2019-01-13 14:04:39',	'2019-01-13 09:04:39'),
@@ -742,7 +739,6 @@ INSERT INTO `ciuu` (`Codigo`, `Descripcion`, `Updated`, `Sync`) VALUES
 (9820,	' Actividades no diferenciadas de los hogares individuales como productores de servicios para uso propio.',	'2019-01-13 14:04:39',	'2019-01-13 09:04:39'),
 (9900,	' Actividades de organizaciones y entidades extraterritoriales.',	'2019-01-13 14:04:39',	'2019-01-13 09:04:39');
 
-TRUNCATE `clasecuenta`;
 INSERT INTO `clasecuenta` (`PUC`, `Clase`, `Valor`, `Updated`, `Sync`) VALUES
 ('1',	'Activo',	'0',	'2019-01-13 14:04:39',	'2019-01-13 09:04:39'),
 ('2',	'Pasivo',	'0',	'2019-01-13 14:04:39',	'2019-01-13 09:04:39'),
@@ -754,7 +750,6 @@ INSERT INTO `clasecuenta` (`PUC`, `Clase`, `Valor`, `Updated`, `Sync`) VALUES
 ('8',	'Cuentas de Orden Deudoras',	'0',	'2019-01-13 14:04:39',	'2019-01-13 09:04:39'),
 ('9',	'Cuentas de orden Acreedoras',	'0',	'2019-01-13 14:04:39',	'2019-01-13 09:04:39');
 
-TRUNCATE `cod_departamentos`;
 INSERT INTO `cod_departamentos` (`Cod_dpto`, `Nombre`, `Updated`, `Sync`) VALUES
 (5,	'ANTIOQUIA',	'2019-01-13 14:04:41',	'2019-01-13 09:04:41'),
 (8,	'ATLANTICO',	'2019-01-13 14:04:41',	'2019-01-13 09:04:41'),
@@ -790,7 +785,6 @@ INSERT INTO `cod_departamentos` (`Cod_dpto`, `Nombre`, `Updated`, `Sync`) VALUES
 (97,	'VAUPES',	'2019-01-13 14:04:41',	'2019-01-13 09:04:41'),
 (99,	'VICHADA',	'2019-01-13 14:04:41',	'2019-01-13 09:04:41');
 
-TRUNCATE `cod_documentos`;
 INSERT INTO `cod_documentos` (`Codigo`, `Descripcion`, `Updated`, `Sync`) VALUES
 (11,	'Registro civil de nacimiento ',	'2019-01-13 14:04:41',	'2019-01-13 09:04:41'),
 (12,	'Tarjeta de identidad ',	'2019-01-13 14:04:41',	'2019-01-13 09:04:41'),
@@ -807,7 +801,6 @@ INSERT INTO `cod_documentos` (`Codigo`, `Descripcion`, `Updated`, `Sync`) VALUES
 (44,	'Documento de Identificaci?n extranjero Persona Jur?dica ',	'2019-01-13 14:04:41',	'2019-01-13 09:04:41'),
 (46,	'Carn? Diplom?tico: Documento expedido por el Ministerio de relaciones Exteriores a los miembros de la misiones diplom?ticas y consulares, con el que se deben identificar ente las autoridades nacionale',	'2019-01-13 14:04:41',	'2019-01-13 09:04:41');
 
-TRUNCATE `cod_municipios_dptos`;
 INSERT INTO `cod_municipios_dptos` (`ID`, `Cod_mcipio`, `Cod_Dpto`, `Departamento`, `Ciudad`, `Updated`, `Sync`) VALUES
 ('1',	'001',	5,	'ANTIOQUIA',	'MEDELLIN',	'2019-01-13 14:04:42',	'2019-01-13 09:04:42'),
 ('10',	'040',	5,	'ANTIOQUIA',	'ANORI',	'2019-01-13 14:04:42',	'2019-01-13 09:04:42'),
@@ -1931,7 +1924,6 @@ INSERT INTO `cod_municipios_dptos` (`ID`, `Cod_mcipio`, `Cod_Dpto`, `Departament
 ('999',	'770',	73,	'TOLIMA',	'SUAREZ',	'2019-01-13 14:04:42',	'2019-01-13 09:04:42'),
 ('ID',	'idMcipio',	0,	'depat',	'muni',	'2019-01-13 14:04:42',	'2019-01-13 09:04:42');
 
-TRUNCATE `cod_paises`;
 INSERT INTO `cod_paises` (`Codigo`, `Pais`, `Updated`, `Sync`) VALUES
 (1,	'NIVE ISLA',	'2019-01-13 14:04:43',	'2019-01-13 09:04:43'),
 (13,	'AFGANISTAN',	'2019-01-13 14:04:43',	'2019-01-13 09:04:43'),
@@ -2180,14 +2172,10 @@ INSERT INTO `cod_paises` (`Codigo`, `Pais`, `Updated`, `Sync`) VALUES
 (998,	'COMUNIDAD EUROPEA',	'2019-01-13 14:04:43',	'2019-01-13 09:04:43'),
 (999,	'NO DECLARADOS',	'2019-01-13 14:04:43',	'2019-01-13 09:04:43');
 
-TRUNCATE `comercial_plataformas_pago`;
 INSERT INTO `comercial_plataformas_pago` (`ID`, `Nombre`, `NIT`, `Activa`, `Updated`, `Sync`) VALUES
 (1,	'SisteCredito',	811007713,	1,	'2019-04-08 14:13:56',	'2019-04-08 09:13:56'),
 (2,	'KUPY',	0,	1,	'2019-04-08 14:13:56',	'2019-04-08 09:13:56');
 
-TRUNCATE `configuraciones_nombres_campos`;
-
-TRUNCATE `configuracion_campos_asociados`;
 INSERT INTO `configuracion_campos_asociados` (`ID`, `TablaOrigen`, `CampoTablaOrigen`, `TablaAsociada`, `CampoAsociado`, `IDCampoAsociado`, `Updated`, `Sync`) VALUES
 (1,	'empresapro',	'Ciudad',	'cod_municipios_dptos',	'Ciudad',	'Ciudad',	'2019-01-13 14:04:47',	'2019-01-13 09:04:47'),
 (2,	'empresapro',	'Regimen',	'empresapro_regimenes',	'Regimen',	'Regimen',	'2019-01-13 14:04:47',	'2019-01-13 09:04:47'),
@@ -2205,7 +2193,6 @@ INSERT INTO `configuracion_campos_asociados` (`ID`, `TablaOrigen`, `CampoTablaOr
 (14,	'clientes',	'Cod_Mcipio',	'cod_departamentos',	'Ciudad',	'Cod_mcipio',	'2019-03-07 16:45:07',	'2019-03-07 11:45:07'),
 (15,	'clientes',	'Pais_Domicilio',	'cod_paises',	'Pais',	'Codigo',	'2019-03-07 16:45:07',	'2019-03-07 11:45:07');
 
-TRUNCATE `configuracion_control_tablas`;
 INSERT INTO `configuracion_control_tablas` (`ID`, `TablaDB`, `Agregar`, `Editar`, `Ver`, `LinkVer`, `Exportar`, `AccionesAdicionales`, `Eliminar`, `Updated`, `Sync`) VALUES
 (1,	'empresapro',	1,	1,	0,	'',	1,	0,	0,	'2019-01-13 14:04:48',	'2019-01-13 09:04:48'),
 (2,	'formatos_calidad',	1,	1,	0,	'',	1,	0,	0,	'2019-01-13 14:04:48',	'2019-01-13 09:04:48'),
@@ -2220,7 +2207,6 @@ INSERT INTO `configuracion_control_tablas` (`ID`, `TablaDB`, `Agregar`, `Editar`
 (11,	'ordenesdecompra',	0,	0,	1,	'PDF_Documentos.draw.php?idDocumento=5&ID=',	1,	1,	0,	'2019-04-16 19:45:33',	'2019-04-16 14:45:33'),
 (12,	'vista_factura_compra_totales',	0,	0,	1,	'PDF_Documentos.draw.php?idDocumento=23&ID=',	1,	1,	0,	'2019-04-16 19:45:33',	'2019-04-16 14:45:33');
 
-TRUNCATE `configuracion_general`;
 INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
 (1,	'RUTA PARA EXPORTAR TABLAS EN CSV',	'../../htdocs/ts5/exports/tabla.csv',	'2019-01-13 14:04:49',	'2019-01-13 09:04:49'),
 (2,	'Valor por defecto si se imprime o no al momento de realizar una factura pos',	'1',	'2019-03-18 12:44:40',	'2019-03-18 07:44:40'),
@@ -2234,7 +2220,6 @@ INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `S
 (10,	'Determina cuantas copias saldrán al momento de imprimir un pedido de restaurante',	'2',	'2019-03-19 21:47:01',	'2019-03-18 16:47:01'),
 (11,	'Determina cuantas copias saldrán al momento de imprimir una precuenta de restaurante',	'1',	'2019-03-19 21:47:01',	'2019-03-18 16:47:01');
 
-TRUNCATE `configuracion_tablas_acciones_adicionales`;
 INSERT INTO `configuracion_tablas_acciones_adicionales` (`ID`, `TablaDB`, `JavaScript`, `ClaseIcono`, `Titulo`, `Ruta`, `Target`, `Updated`, `Sync`) VALUES
 (1,	'facturas',	'',	'fa fa-fw fa-copy',	'Copia',	'../../general/Consultas/PDF_Documentos.draw.php?TipoFactura=COPIA&idDocumento=2&ID=	',	'_BLANK',	'2019-01-13 14:04:49',	'2019-01-13 09:04:49'),
 (2,	'facturas',	'',	'fa fa-fw fa-book',	'Contabilidad',	'../../general/Consultas/PDF_Documentos.draw.php?TipoFactura=CONTABILIDAD&idDocumento=2&ID=	',	'_BLANK',	'2019-01-13 14:04:49',	'2019-01-13 09:04:49'),
@@ -2243,7 +2228,52 @@ INSERT INTO `configuracion_tablas_acciones_adicionales` (`ID`, `TablaDB`, `JavaS
 (5,	'prestamos_terceros',	'onclick=AbreModalAbonar',	'fa fa-fw fa-plus',	'Abonar',	'#',	'_SELF',	'2019-04-06 19:49:13',	'2019-04-06 14:49:13'),
 (6,	'prestamos_terceros',	'onclick=HistorialAbonos',	'fa fa-fw fa-history',	'Historial',	'#',	'_SELF',	'2019-04-07 13:23:24',	'2019-04-07 08:23:24');
 
-TRUNCATE `cuentas`;
+INSERT INTO `config_codigo_barras` (`ID`, `TituloEtiqueta`, `DistaciaEtiqueta1`, `DistaciaEtiqueta2`, `DistaciaEtiqueta3`, `AlturaLinea1`, `AlturaLinea2`, `AlturaLinea3`, `AlturaLinea4`, `AlturaLinea5`, `AlturaCodigoBarras`, `Updated`, `Sync`) VALUES
+(1,	'TRAKI',	10,	280,	560,	1,	20,	40,	60,	120,	30,	'2019-01-13 14:04:45',	'2019-01-13 09:04:45');
+
+INSERT INTO `config_puertos` (`ID`, `Puerto`, `Utilizacion`, `Habilitado`, `Updated`, `Sync`) VALUES
+(1,	'COM3',	'IMPRESORA POS EPSON',	'SI',	'2019-08-08 12:20:47',	'2019-01-13 09:04:46'),
+(2,	'COM5',	'IMPRESORA CODIGO DE BARRAS',	'SI',	'2019-01-14 21:33:23',	'2019-01-14 16:33:23');
+
+INSERT INTO `config_tiketes_promocion` (`ID`, `NombreTiket`, `Tope`, `Multiple`, `Activo`, `Updated`, `Sync`) VALUES
+(1,	'PROMOCION DEL MES',	'10000',	'NO',	'NO',	'2019-01-13 14:04:46',	'2019-01-13 09:04:46');
+
+INSERT INTO `contabilidad_parametros_cuentasxcobrar` (`ID`, `CuentaPUC`, `Updated`, `Sync`) VALUES
+(1,	130505,	'2019-06-10 14:24:08',	'0000-00-00 00:00:00');
+
+INSERT INTO `contabilidad_parametros_cuentasxpagar` (`ID`, `CuentaPUC`, `Updated`, `Sync`) VALUES
+(1,	2205,	'2019-05-23 03:59:36',	'2019-05-22 22:59:36'),
+(2,	220505,	'2019-05-23 03:59:36',	'2019-05-22 22:59:36');
+
+INSERT INTO `costos` (`idCostos`, `NombreCosto`, `ValorCosto`, `Updated`, `Sync`) VALUES
+(1,	'participacion ',	2000000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(2,	'Transporte',	240000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(3,	'Publicidad',	100000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(4,	'Arriendo',	1200000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(5,	'Energia',	1400000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(6,	'Telefono',	220000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(7,	'Mano de Obra ',	11531200,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(8,	'Agua',	40000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(9,	'Contador',	230000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(10,	'Aceite Hid.',	8000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(11,	'Aceite Caja ',	13500,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(12,	'Formularios Cont.',	0,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(13,	'Gas',	5500,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(14,	'Oxigeno',	80000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(15,	'Aseo',	10000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(16,	'Cumplea',	11000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(17,	'Dotacion',	125000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(18,	'Anchetas fda',	21000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(19,	'Herramientas',	1800000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(20,	'otros gastos de administracion ',	1200000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(21,	'Gastos Financieros ',	2271420,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(22,	'internet ',	108700,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(23,	'Asistente administrativo ',	1364260,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(24,	'auxiliar contable',	1125930,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(25,	'papeleria ',	200000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(26,	'dsadas',	43243234.5,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50'),
+(27,	'ARRIENDO',	50000,	'2019-01-13 14:04:50',	'2019-01-13 09:04:50');
+
 INSERT INTO `cuentas` (`idPUC`, `Nombre`, `Valor`, `GupoCuentas_PUC`, `Updated`, `Sync`) VALUES
 ('1105',	'Caja',	'0',	'11',	'2019-01-13 14:04:52',	'2019-01-13 09:04:52'),
 ('1110',	'Bancos',	'0',	'11',	'2019-01-13 14:04:52',	'2019-01-13 09:04:52'),
@@ -2582,7 +2612,6 @@ INSERT INTO `cuentas` (`idPUC`, `Nombre`, `Valor`, `GupoCuentas_PUC`, `Updated`,
 ('9395',	'Otras cuentas de orden acreedoras de control',	'0',	'93',	'2019-01-13 14:04:52',	'2019-01-13 09:04:52'),
 ('9399',	'Ajustes por inflaci?n patrimonio',	'0',	'93',	'2019-01-13 14:04:52',	'2019-01-13 09:04:52');
 
-TRUNCATE `cuentasfrecuentes`;
 INSERT INTO `cuentasfrecuentes` (`CuentaPUC`, `Nombre`, `ClaseCuenta`, `UsoFuturo`, `Updated`, `Sync`) VALUES
 ('110505',	'CAJA GENERAL',	'ACTIVOS',	'',	'2019-01-13 14:04:53',	'2019-01-13 09:04:53'),
 ('11051001',	'CAJA MENOR CAJA 1',	'ACTIVOS',	'',	'2019-01-13 14:04:53',	'2019-01-13 09:04:53'),
@@ -2590,9 +2619,6 @@ INSERT INTO `cuentasfrecuentes` (`CuentaPUC`, `Nombre`, `ClaseCuenta`, `UsoFutur
 ('11100501',	'CUENTA DE AHORROS DAVIVIENDA',	'ACTIVOS',	'_',	'2019-01-13 14:04:53',	'2019-01-13 09:04:53'),
 ('523505',	'Aseo y vigilacia',	'EGRESOS',	'',	'2019-01-13 14:04:53',	'2019-01-13 09:04:53');
 
-TRUNCATE `cuentas_frecuentes`;
-
-TRUNCATE `documentos_contables`;
 INSERT INTO `documentos_contables` (`ID`, `Prefijo`, `Nombre`, `Descripcion`, `Updated`, `Sync`) VALUES
 (1,	'CC-1',	'AJUSTE CONTABLE',	'Documento para generar ajustes a la contabilidad',	'2019-04-11 14:01:47',	'2019-04-11 09:01:47'),
 (2,	'CC-2',	'MOVIMIENTO DE CUENTAS',	'',	'2019-04-11 14:01:47',	'2019-04-11 09:01:47'),
@@ -2608,33 +2634,44 @@ INSERT INTO `documentos_contables` (`ID`, `Prefijo`, `Nombre`, `Descripcion`, `U
 (12,	'CC-12',	'COMPROBANTE DE EGRESO',	'Para realizar egresos de dinero',	'2019-04-11 14:01:47',	'2019-04-10 09:01:47'),
 (13,	'CC-13',	'COMPROBANTE DE INGRESO',	'Para realizar ingresos de dinero',	'2019-06-10 14:07:07',	'2019-04-10 09:01:47');
 
-TRUNCATE `documentos_generados`;
 
-TRUNCATE `empresapro`;
+INSERT INTO `egresos_tipo` (`id`, `Nombre`, `Cuentas_idCuentas`, `Visible`, `Updated`, `Sync`) VALUES
+(1,	'Gastos de Personal',	5105,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(2,	'Honorarios',	5110,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(3,	'Impuestos',	5115,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(4,	'Arrendamientos',	5120,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(5,	'Seguros',	5130,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(6,	'Servicios',	5135,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(7,	'Gastos Legales',	5140,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(8,	'Mantenimiento y Reparaciones',	5145,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(9,	'Adecuacion e instalacion',	5150,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(10,	'Gastos de Viaje',	5155,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(11,	'Diversos',	5195,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(12,	'Costos',	71,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(50,	'Mercancias no fabricadas por la empresa',	1435,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(51,	'Equipo Medico Cientifico',	1532,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(52,	'Equipos de Oficina',	1524,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
+(53,	'Equipos de Computacion y Comunicacion',	1528,	1,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54');
+
 INSERT INTO `empresapro` (`idEmpresaPro`, `RazonSocial`, `NIT`, `DigitoVerificacion`, `Direccion`, `Barrio`, `Telefono`, `Celular`, `Ciudad`, `ResolucionDian`, `Regimen`, `TipoPersona`, `TipoDocumento`, `MatriculoMercantil`, `ActividadesEconomicas`, `Email`, `WEB`, `ObservacionesLegales`, `PuntoEquilibrio`, `DatosBancarios`, `RutaImagen`, `FacturaSinInventario`, `CXPAutomaticas`, `Updated`, `Sync`) VALUES
 (1,	'Ftech Colombia SAS',	901143311,	1,	'AvPoblado Cra 43 A 19 17',	'MEDELLIN',	'3177740609',	'3177740609',	'MEDELLIN',	'IVA REGIMEN COMUN ACTIVIDAD ECONOMICA CIIU 8020',	'COMUN',	'3',	31,	1234567,	'O-42;O-42',	'info@technosoluciones.com',	'www.technosoluciones.com',	'Esta Factura de Venta se asimila en todos sus efectos a una letra de cambio (Art. 621 y siguientes del Codigo de Comercio). En caso de mora se causaran los intereses legales Vigentes.',	5000000,	'_',	'LogosEmpresas/logotipo1.png',	'SI',	'SI',	'2019-01-13 14:04:55',	'2019-01-13 09:04:55');
 
-TRUNCATE `empresapro_regimenes`;
 INSERT INTO `empresapro_regimenes` (`ID`, `Regimen`, `Updated`, `Sync`) VALUES
 (1,	'COMUN',	'2019-01-13 14:04:55',	'2019-01-13 09:04:55'),
 (2,	'SIMPLIFICADO',	'2019-01-13 14:04:55',	'2019-01-13 09:04:55');
 
-TRUNCATE `empresapro_resoluciones_facturacion`;
 INSERT INTO `empresapro_resoluciones_facturacion` (`ID`, `NombreInterno`, `NumResolucion`, `Fecha`, `NumSolicitud`, `Tipo`, `Factura`, `Prefijo`, `Desde`, `Hasta`, `FechaVencimiento`, `idEmpresaPro`, `Estado`, `Completada`, `Updated`, `Sync`) VALUES
 (1,	'Facturas por computador',	'150000055430',	'2015-03-26',	'242',	'02',	'Computador',	'A',	1,	300000000,	'2017-03-26',	1,	'',	'NO',	'2019-03-07 16:45:11',	'2019-03-07 11:45:11'),
 (2,	'Facturas por POS',	'1555431',	'2016-03-28',	'248',	'03',	'POS',	'B',	1001,	2000000000,	'2017-03-27',	1,	'',	'NO',	'2019-04-27 15:47:16',	'2019-04-27 10:47:16'),
-(3,	'Factura pruebas electronica',	'9000000123973223',	'2018-01-11',	'248',	'03',	'FE',	'PRUE',	980000000,	985000000,	'2028-01-11',	1,	'',	'NO',	'2019-07-17 16:03:36',	'2019-05-26 11:29:43');
+(3,	'Factura pruebas electronica',	'9000000123973223',	'2018-01-11',	'248',	'03',	'FE',	'PRUE',	980000000,	985000000,	'2028-01-11',	1,	'',	'NO',	'2019-08-08 12:18:38',	'2019-05-26 11:29:43');
 
-TRUNCATE `empresa_pro_sucursales`;
 INSERT INTO `empresa_pro_sucursales` (`ID`, `Nombre`, `Ciudad`, `Direccion`, `idEmpresaPro`, `Visible`, `Actual`, `idServidor`, `Updated`, `Sync`) VALUES
 (1,	'TECHNO YOTOCO',	'YOTOCO',	'',	1,	'SI',	'0',	0,	'2019-05-20 14:34:20',	'2019-05-20 09:34:20'),
 (2,	'TECHNO BUGA',	'BUGA',	'',	1,	'SI',	'0',	3,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54'),
 (3,	'TECHNO GINEBRA',	'GINEBRA',	'',	1,	'SI',	'1',	0,	'2019-05-20 14:34:20',	'2019-05-20 09:34:20'),
 (4,	'TECHNO SAN PEDRO',	'SAN PEDRO',	'',	1,	'SI',	'0',	0,	'2019-01-13 14:04:54',	'2019-01-13 09:04:54');
 
-TRUNCATE `facturas_formapago`;
 
-TRUNCATE `facturas_tipo_pago`;
 INSERT INTO `facturas_tipo_pago` (`ID`, `TipoPago`, `Leyenda`, `Updated`, `Sync`) VALUES
 (1,	'Contado',	'Contado',	'2019-01-13 14:10:59',	'2019-01-13 09:10:59'),
 (2,	'15',	'Credito a 15 dias',	'2019-01-13 14:10:59',	'2019-01-13 09:10:59'),
@@ -2643,7 +2680,9 @@ INSERT INTO `facturas_tipo_pago` (`ID`, `TipoPago`, `Leyenda`, `Updated`, `Sync`
 (5,	'90',	'Credito a 90 dias',	'2019-01-13 14:10:59',	'2019-01-13 09:10:59'),
 (6,	'SisteCredito',	'SisteCredito',	'2019-01-13 14:10:59',	'2019-01-13 09:10:59');
 
-TRUNCATE `formatos_calidad`;
+INSERT INTO `fe_webservice` (`ID`, `DireccionWebService`, `User`, `Pass`, `Updated`, `Sync`) VALUES
+(1,	'http://69.160.41.171/WSfacturatech.asmx?WSDL',	'programacion@facturatech.co',	'Demo.Col2018.1',	'2019-01-13 14:11:00',	'2019-01-13 09:11:00');
+
 INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `CuerpoFormato`, `NotasPiePagina`, `Updated`, `Sync`) VALUES
 (1,	'PROPUESTA ECONOMICA',	'002',	'F-GA-015',	'2016-05-11',	'',	'Esta Propuesta tiene 15 dias de Vigencia',	'2019-01-13 14:11:00',	'2019-01-13 09:11:00'),
 (2,	'FACTURA DE VENTA',	'001',	'F-GA-013',	'2016-05-11',	'',	'***GRACIAS POR SU COMPRA***; Los productos en promocion no tienen Cambio',	'2019-01-13 14:11:00',	'2019-01-13 09:11:00'),
@@ -2681,7 +2720,6 @@ INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `C
 (34,	'CERTIFICADO DE RETENCIONES',	'001',	'F-GC-006',	'2018-05-15',	'',	'Forma Continua Impresa por Computador no necesita Firma Autografa (Art. 10 D.R. 836/91, recopilado Art. 1.6.1.12.12 del DUT 1625 de 2016-10-11, que regula el contenido del certificado de renta.',	'2019-01-31 22:08:58',	'2019-01-31 17:08:58'),
 (35,	'CERTIFICADO DE PRESTAMO',	'001',	'F-GH-002',	'2018-05-15',	'',	'',	'2019-04-06 19:18:54',	'2019-04-06 14:18:54');
 
-TRUNCATE `gupocuentas`;
 INSERT INTO `gupocuentas` (`PUC`, `Nombre`, `Valor`, `ClaseCuenta_PUC`, `Updated`, `Sync`) VALUES
 ('11',	'Disponible',	'0',	'1',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01'),
 ('12',	'Inversiones',	'0',	'1',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01'),
@@ -2736,7 +2774,17 @@ INSERT INTO `gupocuentas` (`PUC`, `Nombre`, `Valor`, `ClaseCuenta_PUC`, `Updated
 ('95',	'Acreedoras fiscales por contra (DB)',	'0',	'9',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01'),
 ('96',	'Acreedoras de control por contra (DB)',	'0',	'9',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01');
 
-TRUNCATE `menu`;
+INSERT INTO `impret` (`idImpRet`, `Nombre`, `Tipo`, `Valor`, `CuentaRetFavor`, `CuentaRetRealizadas`, `Aplicable_A`, `Updated`, `Sync`) VALUES
+(1,	'IVA',	'Impuesto',	'16',	'',	'',	'Subtotal',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01'),
+(2,	'RETEFUENTE',	'Retencion',	'0.04',	'135515',	'',	'Subtotal',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01'),
+(3,	'CREE',	'Autorretencion',	'0.008',	'135595',	'',	'Subtotal',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01'),
+(4,	'RETEIVA',	'Retencion',	'0.15',	'135517',	'',	'IVA',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01'),
+(5,	'RETENCION ICA',	'Retencion',	'0.009',	'135518',	'',	'Subtotal',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01'),
+(6,	'Retencion en la Fuente Aplicado al Regimen Simplificado por Servicios',	'RetencionAplicada',	'0.06',	'',	'2365',	'Subtotal',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01'),
+(7,	'Retencion en la Fuente Aplicado al Regimen Comun por Servicios',	'RetencionAplicada',	'0.04',	'',	'2365',	'Subtotal',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01'),
+(8,	'Impuesto a las ventas retenido, aplicado al IVA',	'RetencionAplicada',	'0.15',	'',	'2367',	'IVA',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01'),
+(9,	'Impuesto de industria y comercio retenido, las tarifas dependen de la ciudad y actividad',	'RetencionAplicada',	'0.009',	'',	'2368',	'Subtotal',	'2019-01-13 14:11:01',	'2019-01-13 09:11:01');
+
 INSERT INTO `menu` (`ID`, `Nombre`, `idCarpeta`, `Pagina`, `Target`, `Estado`, `Image`, `CSS_Clase`, `Orden`, `Updated`, `Sync`) VALUES
 (1,	'Administrar',	1,	'Admin.php',	'_BLANK',	1,	'admin.png',	'fa fa-share',	1,	'2019-01-13 14:12:42',	'2019-01-13 09:12:42'),
 (2,	'Gestión Comercial',	1,	'MnuVentas.php',	'_BLANK',	1,	'comercial.png',	'fa fa-share',	2,	'2019-01-13 14:12:42',	'2019-01-13 09:12:42'),
@@ -2771,7 +2819,6 @@ INSERT INTO `menu` (`ID`, `Nombre`, `idCarpeta`, `Pagina`, `Target`, `Estado`, `
 (31,	'Documentos Contables',	1,	'MnuDocumentosContables.php',	'_BLANK',	1,	'documentos_contables.png',	'fa fa-share',	8,	'2019-01-13 14:12:42',	'2019-01-13 09:12:42'),
 (32,	'Gestión del Personal',	1,	'MnuNomina.php',	'_BLANK',	1,	'colaboradores.png',	'fa fa-share',	20,	'2019-01-13 14:12:42',	'2019-01-13 09:12:42');
 
-TRUNCATE `menu_carpetas`;
 INSERT INTO `menu_carpetas` (`ID`, `Ruta`, `Updated`, `Sync`) VALUES
 (1,	'',	'2019-01-13 14:12:43',	'2019-01-13 09:12:43'),
 (2,	'../',	'2019-01-13 14:12:43',	'2019-01-13 09:12:43'),
@@ -2786,7 +2833,6 @@ INSERT INTO `menu_carpetas` (`ID`, `Ruta`, `Updated`, `Sync`) VALUES
 (11,	'../modulos/reportes/',	'2019-04-08 14:14:07',	'2019-04-08 09:14:07'),
 (12,	'../modulos/inventarios/',	'2019-06-22 15:09:52',	'2019-04-07 09:14:07');
 
-TRUNCATE `menu_pestanas`;
 INSERT INTO `menu_pestanas` (`ID`, `Nombre`, `idMenu`, `Orden`, `Estado`, `Updated`, `Sync`) VALUES
 (1,	'Empresa',	1,	1,	CONV('1', 2, 10) + 0,	'2019-01-13 14:12:43',	'2019-01-13 09:12:43'),
 (2,	'Usuarios',	1,	2,	CONV('1', 2, 10) + 0,	'2019-01-13 14:12:43',	'2019-01-13 09:12:43'),
@@ -2838,7 +2884,6 @@ INSERT INTO `menu_pestanas` (`ID`, `Nombre`, `idMenu`, `Orden`, `Estado`, `Updat
 (48,	'Colaboradores',	20,	1,	CONV('1', 2, 10) + 0,	'2019-01-13 14:12:43',	'2019-01-13 09:12:43'),
 (49,	'Ingresos',	23,	1,	CONV('1', 2, 10) + 0,	'2019-01-13 14:12:43',	'2019-01-13 09:12:43');
 
-TRUNCATE `menu_submenus`;
 INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
 (1,	'Crear/Editar Empresa',	1,	3,	0,	'empresapro',	1,	'onclick=\"SeleccioneTablaDB(`empresapro`)\";',	'empresapro.php',	'_SELF',	1,	'empresa.png',	1,	'2019-01-13 14:12:44',	'2019-01-13 09:12:44'),
 (2,	'Crear/Editar Sucursal',	1,	3,	0,	'empresa_pro_sucursales',	1,	'onclick=\"SeleccioneTablaDB(`empresa_pro_sucursales`)\";',	'empresa_pro_sucursales.php',	'_SELF',	1,	'sucursal.png',	2,	'2019-01-13 14:12:44',	'2019-01-13 09:12:44'),
@@ -3031,7 +3076,6 @@ INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`,
 (190,	'Configuracion General',	1,	3,	0,	'configuracion_general',	1,	'onclick=\"SeleccioneTablaDB(`configuracion_general`)\";',	'configuracion_general.php',	'_SELF',	1,	'configuracion.png',	7,	'2019-05-01 16:17:41',	'2019-05-01 11:17:41'),
 (191,	'Dar de baja o alta a un insumo',	25,	3,	0,	'',	0,	'',	'BajaAlta.php',	'_BLANK',	0,	'bajaalta.jpg',	3,	'2019-06-22 15:08:45',	'2019-01-12 09:12:44');
 
-TRUNCATE `paginas`;
 INSERT INTO `paginas` (`ID`, `Nombre`, `TipoPagina`, `Visible`, `Updated`, `Sync`) VALUES
 (1,	'Admin.php',	'Menu',	1,	'2019-01-13 14:12:54',	'2019-01-13 09:12:54'),
 (2,	'MnuEgresos.php',	'Menu',	1,	'2019-01-13 14:12:54',	'2019-01-13 09:12:54'),
@@ -3132,7 +3176,6 @@ INSERT INTO `paginas` (`ID`, `Nombre`, `TipoPagina`, `Visible`, `Updated`, `Sync
 (97,	'Ejecutar_Actividades.php',	'Vista',	1,	'2019-01-13 14:12:54',	'2019-01-13 09:12:54'),
 (98,	'facturas_abonos.php',	'Vista',	1,	'2019-01-13 14:12:54',	'2019-01-13 09:12:54');
 
-TRUNCATE `paginas_bloques`;
 INSERT INTO `paginas_bloques` (`ID`, `TipoUsuario`, `Pagina`, `Habilitado`, `Updated`, `Sync`) VALUES
 (1,	'comercial',	'MnuVentas.php',	'SI',	'2019-01-13 14:12:55',	'2019-01-13 09:12:55'),
 (2,	'comercial',	'Menu.php',	'SI',	'2019-01-13 14:12:55',	'2019-01-13 09:12:55'),
@@ -3194,7 +3237,6 @@ INSERT INTO `paginas_bloques` (`ID`, `TipoUsuario`, `Pagina`, `Habilitado`, `Upd
 (59,	'comercial',	'VentasRestaurante.php',	'SI',	'2019-01-13 14:12:55',	'2019-01-13 09:12:55'),
 (60,	'comercial',	'MnuRestaurante.php',	'SI',	'2019-01-13 14:12:55',	'2019-01-13 09:12:55');
 
-TRUNCATE `parametros_contables`;
 INSERT INTO `parametros_contables` (`ID`, `Descripcion`, `CuentaPUC`, `NombreCuenta`, `Updated`, `Sync`) VALUES
 (1,	'Cuenta que se utiliza para el iva generado en las operaciones de venta ',	24080501,	'Impuesto sobre las ventas por pagar Generado',	'2019-01-13 14:12:55',	'2019-01-13 09:12:55'),
 (2,	'Cuenta Costo de venta de la mercancia',	613501,	'Venta de Mercancias No Fabricadas por la Empresa',	'2019-01-13 14:12:55',	'2019-01-13 09:12:55'),
@@ -3229,9 +3271,7 @@ INSERT INTO `parametros_contables` (`ID`, `Descripcion`, `CuentaPUC`, `NombreCue
 (31,	'Anticipos realizados por clientes para los separados',	28050501,	'ANTICIPOS REALIZADOS POR CLIENTES EN SEPARADOS',	'2019-02-26 20:55:46',	'2019-02-26 15:55:46'),
 (32,	'Retefuente por compra de Honorarios',	236515,	'Retencion en la fuente por honorarios',	'2019-03-30 16:53:40',	'2019-03-30 11:53:40');
 
-TRUNCATE `parametros_generales`;
 
-TRUNCATE `plataforma_tablas`;
 INSERT INTO `plataforma_tablas` (`ID`, `Nombre`, `Updated`, `Sync`) VALUES
 (1,	'abonos_libro',	'2019-01-13 14:12:56',	'2019-01-13 09:12:56'),
 (2,	'act_movimientos',	'2019-01-13 14:12:56',	'2019-01-13 09:12:56'),
@@ -3326,7 +3366,6 @@ INSERT INTO `plataforma_tablas` (`ID`, `Nombre`, `Updated`, `Sync`) VALUES
 (91,	'factura_compra_retenciones',	'2019-01-13 14:12:56',	'2019-01-13 09:12:56'),
 (92,	'factura_compra_servicios',	'2019-01-13 14:12:56',	'2019-01-13 09:12:56');
 
-TRUNCATE `porcentajes_iva`;
 INSERT INTO `porcentajes_iva` (`ID`, `Nombre`, `Valor`, `ClaseImpuesto`, `Factor`, `CuentaPUC`, `CuentaPUCIVAGenerado`, `NombreCuenta`, `Habilitado`, `Updated`, `Sync`) VALUES
 (1,	'Sin IVA',	'0',	'01',	'M',	2408,	2408,	'',	'SI',	'2019-01-13 14:12:57',	'2019-01-13 09:12:57'),
 (2,	'Excluidos',	'E',	'01',	'M',	2408,	2408,	'',	'SI',	'2019-01-13 14:12:57',	'2019-01-13 09:12:57'),
@@ -3337,7 +3376,31 @@ INSERT INTO `porcentajes_iva` (`ID`, `Nombre`, `Valor`, `ClaseImpuesto`, `Factor
 (7,	'ImpoConsumo Bolsas',	'20',	'02',	'S',	24080511,	24081011,	'IMPUESTO AL CONSUMO DE BOLSAS',	'SI',	'2019-01-13 14:12:57',	'2019-01-13 09:12:57'),
 (8,	'impuesto del 1.9%',	'0.019',	'01',	'M',	24080505,	24081005,	'Impuestos del 10% del 19%',	'SI',	'2019-01-13 14:12:57',	'2019-01-13 09:12:57');
 
-TRUNCATE `subcuentas`;
+INSERT INTO `repuestas_forma_pago` (`ID`, `DiasCartera`, `Etiqueta`, `Updated`, `Sync`) VALUES
+(1,	'Contado',	'Contado',	'2019-01-13 14:14:08',	'2019-01-13 09:14:08'),
+(2,	'1',	'Credito a 1 Dia',	'2019-02-27 19:22:38',	'2019-02-27 14:22:38'),
+(3,	'8',	'Credito a 8 Dias',	'2019-02-27 19:22:38',	'2019-02-27 14:22:38'),
+(4,	'15',	'Credito a 15 Dias',	'2019-02-27 19:23:41',	'2019-02-27 14:23:41'),
+(5,	'30',	'Credito a 30 Dias',	'2019-02-27 19:23:41',	'2019-02-27 14:23:41'),
+(6,	'60',	'Credito a 60 Dias',	'2019-02-27 19:23:41',	'2019-02-27 14:23:41'),
+(7,	'90',	'Credito a 90 Dias',	'2019-02-27 19:23:41',	'2019-02-27 14:23:41'),
+(8,	'SisteCredito',	'SisteCredito',	'2019-02-27 19:23:41',	'2019-02-27 14:23:41');
+
+INSERT INTO `respuestas_condicional` (`ID`, `Valor`, `Updated`, `Sync`) VALUES
+(1,	'NO',	'2019-01-13 14:14:09',	'2019-01-13 09:14:09'),
+(2,	'SI',	'2019-01-13 14:14:09',	'2019-01-13 09:14:09');
+
+INSERT INTO `respuestas_tipo_item` (`ID`, `Valor`, `Updated`, `Sync`) VALUES
+(1,	'PR',	'2019-01-13 14:14:09',	'2019-01-13 09:14:09'),
+(2,	'MO',	'2019-01-13 14:14:09',	'2019-01-13 09:14:09'),
+(3,	'AQ',	'2019-01-13 14:14:09',	'2019-01-13 09:14:09');
+
+INSERT INTO `restaurante_tipos_pedido` (`ID`, `Nombre`) VALUES
+(1,	'PEDIDO MESA'),
+(2,	'DOMICILIO'),
+(3,	'BARRA'),
+(4,	'PARA LLEVAR');
+
 INSERT INTO `subcuentas` (`PUC`, `Nombre`, `Valor`, `SolicitaBase`, `Updated`, `Sync`) VALUES
 (1435,	'Mercancias no fabricadas por la empresa',	'0',	0,	'2019-01-13 14:14:10',	'2019-01-13 09:14:10'),
 (6135,	'Mercancias no fabricadas por la empresa',	'0',	0,	'2019-01-13 14:14:10',	'2019-01-13 09:14:10'),
@@ -4924,7 +4987,6 @@ INSERT INTO `subcuentas` (`PUC`, `Nombre`, `Valor`, `SolicitaBase`, `Updated`, `
 (24081004,	'IMPUESTO AL CONSUMO DE BOLSAS PLASTICAS',	NULL,	0,	'2019-01-13 14:14:10',	'2019-01-13 09:14:10'),
 (51950101,	'Peajes',	'0',	0,	'2019-01-13 14:14:10',	'2019-01-13 09:14:10');
 
-TRUNCATE `tablas_campos_control`;
 INSERT INTO `tablas_campos_control` (`ID`, `NombreTabla`, `Campo`, `Visible`, `Editable`, `Habilitado`, `TipoUser`, `idUser`, `Updated`, `Sync`) VALUES
 (1,	'usuarios',	'Password',	0,	1,	0,	'administrador',	3,	'2019-01-13 14:14:12',	'2019-01-13 09:14:12'),
 (3,	'usuarios',	'Nombre',	1,	1,	1,	'administrador',	3,	'2019-01-13 14:14:12',	'2019-01-13 09:14:12'),
@@ -5025,32 +5087,27 @@ INSERT INTO `tablas_campos_control` (`ID`, `NombreTabla`, `Campo`, `Visible`, `E
 (99,	'facturas',	'NumeroFactura',	0,	1,	1,	'administrador',	3,	'2019-03-13 14:16:10',	'2019-03-13 09:16:10'),
 (100,	'facturas',	'Fecha',	0,	1,	1,	'administrador',	3,	'2019-03-13 14:16:10',	'2019-03-13 09:16:10');
 
-TRUNCATE `tablas_ventas`;
 INSERT INTO `tablas_ventas` (`ID`, `NombreTabla`, `idTabla`, `TipoVenta`, `IVAIncluido`, `CuentaPUCDefecto`, `Updated`, `Sync`) VALUES
 (1,	'productosventa',	'idProductosVenta',	'PRODUCTOS',	'SI',	'4135',	'2019-01-13 14:14:12',	'2019-01-13 09:14:12'),
 (2,	'servicios',	'idProductosVenta',	'SERVICIOS',	'SI',	'412060',	'2019-01-13 14:14:12',	'2019-01-13 09:14:12'),
 (3,	'productosalquiler',	'idProductosVenta',	'ALQUILER DE SERVICIOS',	'SI',	'4135',	'2019-01-13 14:14:12',	'2019-01-13 09:14:12');
 
-TRUNCATE `tarjetas_forma_pago`;
 INSERT INTO `tarjetas_forma_pago` (`ID`, `Tipo`, `Nombre`, `PorcentajeComision`, `CuentaPUC`, `NombreCuenta`, `Updated`, `Sync`) VALUES
 (1,	'CREDITO',	'AMERICAN EXPRESS',	0.03,	11100501,	'CUENTA DE AHORROS DAVIVIENDA',	'2019-01-13 14:14:13',	'2019-01-13 09:14:13'),
 (2,	'CREDITO',	'VISA',	0.04,	11100501,	'CUENTA DE AHORROS DAVIVIENDA',	'2019-01-13 14:14:13',	'2019-01-13 09:14:13'),
 (3,	'DEBITO',	'TARJETAS DEBITO',	0,	11100501,	'CUENTA DE AHORROS DAVIVIENDA',	'2019-01-13 14:14:13',	'2019-01-13 09:14:13');
 
-TRUNCATE `tiposretenciones`;
 INSERT INTO `tiposretenciones` (`ID`, `Nombre`, `CuentaPasivo`, `NombreCuentaPasivo`, `CuentaActivo`, `NombreCuentaActivo`, `Updated`, `Sync`) VALUES
 (1,	'RETENCION EN LA FUENTE',	'236540',	'Rete Fuente x compras',	'135515',	'Anticipo de Impuestos Retefuente',	'2019-01-13 14:14:13',	'2019-01-13 09:14:13'),
 (2,	'RETEIVA',	'236701',	'IVA retenido',	'135517',	'Anticipo de Impuestos ReteIVA',	'2019-01-13 14:14:13',	'2019-01-13 09:14:13'),
 (3,	'RETE-ICA',	'2368',	'Rete Fuente x ICA',	'135518',	'Anticipo de Impuestos ReteICA',	'2019-01-13 14:14:13',	'2019-01-13 09:14:13');
 
-TRUNCATE `usuarios`;
 INSERT INTO `usuarios` (`idUsuarios`, `Nombre`, `Apellido`, `Identificacion`, `Telefono`, `Login`, `Password`, `TipoUser`, `Email`, `Role`, `Habilitado`, `Updated`, `Sync`) VALUES
 (1,	'TECHNO ',	'SOLUCIONES',	'900833180',	'3177740609',	'admin',	'techno',	'administrador',	'info@technosoluciones.com',	'SUPERVISOR',	'SI',	'2019-04-27 15:38:18',	'2019-04-27 10:38:18'),
 (2,	'ADMINISTRADOR',	'SOFTCONTECH',	'1',	'1',	'administrador',	'91f5167c34c400758115c2a6826ec2e3',	'operador',	'no@no.com',	'SUPERVISOR',	'SI',	'2019-01-13 14:14:14',	'2019-01-13 09:14:14'),
 (3,	'JULIAN ANDRES',	'ALVARAN',	'94481747',	'3177740609',	'jalvaran',	'pirlo1985',	'administrador',	'jalvaran@gmail.com',	'SUPERVISOR',	'SI',	'2019-04-08 20:35:50',	'2019-04-08 15:35:50'),
 (4,	'WILSON',	'ALBERTO MOSQUERA',	'1',	'318 5658225',	'wamc',	'f5dc2d19e23c69e58e398ea72ae06fd4',	'comercial',	'no',	'ADMINISTRADOR',	'SI',	'2019-01-13 14:14:14',	'2019-01-13 09:14:14');
 
-TRUNCATE `usuarios_tipo`;
 INSERT INTO `usuarios_tipo` (`ID`, `Tipo`, `Updated`, `Sync`) VALUES
 (1,	'administrador',	'2019-01-13 14:14:14',	'2019-01-13 09:14:14'),
 (2,	'operador',	'2019-01-13 14:14:14',	'2019-01-13 09:14:14'),
@@ -5058,4 +5115,4 @@ INSERT INTO `usuarios_tipo` (`ID`, `Tipo`, `Updated`, `Sync`) VALUES
 (4,	'cajero',	'2019-01-13 14:14:14',	'2019-01-13 09:14:14'),
 (5,	'bodega',	'2019-01-13 14:14:14',	'2019-01-13 09:14:14');
 
--- 2019-07-22 16:11:03
+-- 2019-08-28 00:11:41

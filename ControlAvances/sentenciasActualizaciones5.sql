@@ -451,3 +451,28 @@ ALTER TABLE `modelos_agenda` ADD `HoraFinalizacion` DATETIME NOT NULL AFTER `Hor
 ALTER TABLE `modelos_agenda` ADD `TipoServicio` INT NOT NULL AFTER `idModelo`;
 ALTER TABLE `modelos_agenda` ADD INDEX(`TipoServicio`);
 
+
+CREATE TABLE `modelos_pagos_realizados` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` datetime NOT NULL,
+  `idModelo` int(11) NOT NULL,
+  `ValorPagado` double NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idModelo` (`idModelo`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `modelos_tipo_servicios` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Servicio` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
+  `Valor` double NOT NULL,
+  `ValorModelo` double NOT NULL,
+  `Tiempo` int(11) NOT NULL,
+  `Habilitado` int(1) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+

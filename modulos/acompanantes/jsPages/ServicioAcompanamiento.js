@@ -1,9 +1,10 @@
 /**
- * Controlador para realizar las compras
- * JULIAN ALVARAN 2018-12-05
+ * Controlador para realizar los procesos del los acompañantes
+ * JULIAN ALVARAN 2019-08-27
  * TECHNO SOLUCIONES SAS 
  * 317 774 0609
  */
+var idPestana=1;
 function startTime() {
     var today = new Date();
     
@@ -127,10 +128,10 @@ function AgregarServicio(){
 }
 
 function DibujeServicios(){
-       
+    var TxtBusqueda =document.getElementById("TxtBusquedas").value;       
     var form_data = new FormData();
         form_data.append('Accion', 1);
-        
+        form_data.append('TxtBusqueda', TxtBusqueda);
         $.ajax({
         url: './Consultas/ServicioAcompanamiento.draw.php',
         //dataType: 'json',
@@ -151,10 +152,10 @@ function DibujeServicios(){
 }
 
 function DibujeResumenTurno(){
-       
+    var TxtBusqueda =document.getElementById("TxtBusquedas").value;    
     var form_data = new FormData();
         form_data.append('Accion', 2);
-        
+        form_data.append('TxtBusqueda', TxtBusqueda);
         $.ajax({
         url: './Consultas/ServicioAcompanamiento.draw.php',
         //dataType: 'json',
@@ -177,9 +178,11 @@ function DibujeResumenTurno(){
 function DibujeCuentasXPagarServicios(){
     
     document.getElementById("DivCuentasXPagar").innerHTML='<div id="GifProcess"><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    var TxtBusqueda =document.getElementById("TxtBusquedas").value;
     
     var form_data = new FormData();
         form_data.append('Accion', 3);
+        form_data.append('TxtBusqueda', TxtBusqueda);
         
         $.ajax({
         url: './Consultas/ServicioAcompanamiento.draw.php',
@@ -306,6 +309,20 @@ function PagarAModelo(idModelo){
           }
       });
 }
+
+function BuscarModelo(){
+    if(idPestana==1){
+        DibujeServicios();
+    }
+    if(idPestana==2){
+        DibujeResumenTurno();
+    }
+    if(idPestana==3){
+        DibujeCuentasXPagarServicios();
+    }
+    
+}
+
 
 document.getElementById('BtnMuestraMenuLateral').click();
 

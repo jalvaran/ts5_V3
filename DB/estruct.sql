@@ -1844,6 +1844,7 @@ CREATE TABLE `factura_compra_items` (
   `ValorDescuento` double NOT NULL,
   `SubtotalDescuento` double NOT NULL,
   `PrecioVenta` double NOT NULL,
+  `idCierre` double NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`),
@@ -2128,9 +2129,14 @@ CREATE TABLE `inventario_comprobante_movimientos_items` (
   `CostoUnitario` double NOT NULL,
   `CostoTotal` double NOT NULL,
   `idComprobante` bigint(20) NOT NULL,
+  `idCierre` bigint(20) NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`ID`),
+  KEY `TablaOrigen` (`TablaOrigen`),
+  KEY `idProducto` (`idProducto`),
+  KEY `idComprobante` (`idComprobante`),
+  KEY `idCierre` (`idCierre`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
@@ -2345,20 +2351,26 @@ CREATE TABLE `menu_submenus` (
 CREATE TABLE `modelos_agenda` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idModelo` int(11) NOT NULL,
+  `TipoServicio` int(11) NOT NULL,
   `ValorPagado` double NOT NULL,
   `ValorModelo` double NOT NULL,
   `ValorCasa` double NOT NULL,
   `Minutos` int(11) NOT NULL,
   `HoraInicial` datetime NOT NULL,
   `HoraATerminar` datetime NOT NULL,
+  `HoraFinalizacion` datetime NOT NULL,
   `idCierreModelo` bigint(20) NOT NULL,
   `idCierre` bigint(20) NOT NULL,
-  `Estado` varchar(10) COLLATE utf8_spanish_ci NOT NULL DEFAULT 'Abierto',
+  `Estado` int(2) NOT NULL,
   `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
   `idUser` bigint(20) NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`ID`),
+  KEY `idModelo` (`idModelo`),
+  KEY `idCierre` (`idCierre`),
+  KEY `Estado` (`Estado`),
+  KEY `TipoServicio` (`TipoServicio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
@@ -2398,6 +2410,32 @@ CREATE TABLE `modelos_db` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `NombreArtistico` (`NombreArtistico`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `modelos_pagos_realizados` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` datetime NOT NULL,
+  `idModelo` int(11) NOT NULL,
+  `ValorPagado` double NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idModelo` (`idModelo`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `modelos_tipo_servicios` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Servicio` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
+  `Valor` double NOT NULL,
+  `ValorModelo` double NOT NULL,
+  `Tiempo` int(11) NOT NULL,
+  `Habilitado` int(1) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
 CREATE TABLE `nomina_configuracion_documentos_equivalentes` (
@@ -3809,6 +3847,7 @@ CREATE TABLE `restaurante_cierres` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
   `Hora` time NOT NULL,
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
   `idUsuario` bigint(20) NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -4507,9 +4546,11 @@ CREATE TABLE `traslados_items` (
   `CodigoBarras2` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `CodigoBarras3` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `CodigoBarras4` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `idCierre` bigint(20) NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`ID`),
+  KEY `idCierre` (`idCierre`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
@@ -5036,4 +5077,4 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 DROP TABLE IF EXISTS `vista_totales_facturacion`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_totales_facturacion` AS select `facturas_items`.`FechaFactura` AS `FechaFactura`,sum(`facturas_items`.`Cantidad`) AS `Items`,round(sum(`facturas_items`.`SubtotalItem`),0) AS `Subtotal`,round(sum(`facturas_items`.`IVAItem`),0) AS `IVA`,round(sum(`facturas_items`.`ValorOtrosImpuestos`),0) AS `OtrosImpuestos`,round(sum(`facturas_items`.`TotalItem`),0) AS `Total` from `facturas_items` group by `facturas_items`.`FechaFactura`;
 
--- 2019-07-22 16:07:18
+-- 2019-08-28 00:06:51
