@@ -2571,7 +2571,7 @@ public function CalculePesoRemision($idCotizacion)
                 
 		$tab="librodiario";
 		
-		$NumRegistros=28;
+		$NumRegistros=29;
 		$CuentaPUC=$CuentaDestino;  			 
 		if($TipoEgreso==3) //Si es pago de impuestos
 			$DatosCuenta=$this->DevuelveValores("cuentas","idPUC",$CuentaPUC);	
@@ -2608,6 +2608,7 @@ public function CalculePesoRemision($idCotizacion)
 		$Columnas[25]="idEmpresa";              $Valores[25]=$idEmpresa;
 		$Columnas[26]="idSucursal";             $Valores[26]=$DatosSucursal["ID"];
                 $Columnas[27]="Num_Documento_Externo";  $Valores[27]=$NumFact;
+                $Columnas[28]="idUsuario";              $Valores[28]=$this->idUser;
 		$this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
 		
 		/////////////////////////////////////////////////////////////////

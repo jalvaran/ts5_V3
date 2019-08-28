@@ -631,10 +631,21 @@ function LimpiarDivs(){
 
 
 function SeleccioneAccionFormularios(){
+    document.getElementById("BntModalAcciones").disabled=true;
+    document.getElementById("BntModalAcciones").value="Guardando...";
     var Accion = document.getElementById("idFormulario").value;
         
     if(Accion==1 || Accion==2){
         CrearComprobante();
+    }
+    
+    if(Accion==3){
+        CrearEgreso();
+    }
+    
+    if(Accion==100){
+        
+        CrearTercero('ModalAcciones','BntModalAcciones');
     }
 }
 
@@ -932,6 +943,175 @@ function MarqueErrorElemento(idElemento){
     document.getElementById(idElemento).style.backgroundColor="pink";
     document.getElementById(idElemento).focus();
 }
+
+function ModalCrearEgreso(){
+    
+    $("#ModalAcciones").modal();
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 11);
+        
+        $.ajax({
+        url: './Consultas/pos2.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivFrmModalAcciones').innerHTML=data;
+            $('#TipoEgreso').select2();
+            $('#CmbTerceroEgreso').select2({
+		  
+                placeholder: 'Selecciona un Tercero',
+                ajax: {
+                  url: 'buscadores/proveedores.search.php',
+                  dataType: 'json',
+                  delay: 250,
+                  processResults: function (data) {
+                      
+                    return {                     
+                      results: data
+                    };
+                  },
+                 cache: true
+                }
+              });
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+
+function CrearEgreso(){
+    var CuentaPUC=document.getElementById('TipoEgreso').value;
+    var Tercero=document.getElementById('CmbTerceroEgreso').value;
+    var SubtotalEgreso=parseFloat(document.getElementById('SubtotalEgreso').value);
+    var IVAEgreso=parseFloat(document.getElementById('IVAEgreso').value);
+    var TotalEgreso=parseFloat(document.getElementById('TotalEgreso').value);
+    var TxtNumeroSoporteEgreso=(document.getElementById('TxtNumeroSoporteEgreso').value);
+    var TxtConcepto=document.getElementById('TxtConcepto').value;
+    
+    if(Tercero==''){        
+        alertify.error("Debe seleccionar un tercero");
+        document.getElementById("select2-CmbTerceroEgreso-container").style.backgroundColor="pink";   
+        document.getElementById("BntModalAcciones").disabled=false;        
+        return;
+    }else{
+        document.getElementById("select2-CmbTerceroEgreso-container").style.backgroundColor="white";
+    }
+    
+    if(TxtConcepto==''){        
+        alertify.error("El campo Concepto no puede estar vacío");
+        document.getElementById("TxtConcepto").style.backgroundColor="pink";   
+        document.getElementById("BntModalAcciones").disabled=false;        
+        return;
+    }else{
+        document.getElementById("TxtConcepto").style.backgroundColor="white";
+    }
+    
+    if(TxtNumeroSoporteEgreso==''){        
+        alertify.error("El campo Número de Soporte no puede estar vacío");
+        document.getElementById("TxtNumeroSoporteEgreso").style.backgroundColor="pink";   
+        document.getElementById("BntModalAcciones").disabled=false;        
+        return;
+    }else{
+        document.getElementById("TxtNumeroSoporteEgreso").style.backgroundColor="white";
+    }
+    
+      
+    if(!$.isNumeric(SubtotalEgreso) ||  SubtotalEgreso<0){
+        
+        alertify.error("El Subtotal debe ser un número mayor o igual a cero");
+        document.getElementById("SubtotalEgreso").style.backgroundColor="pink";
+        document.getElementById("BntModalAcciones").disabled=false;
+        posiciona('SubtotalEgreso'); 
+        return;
+    }else{
+        document.getElementById("SubtotalEgreso").style.backgroundColor="white";
+    }
+    
+    if(!$.isNumeric(TotalEgreso) ||  TotalEgreso<0){
+        
+        alertify.error("El Total debe ser un número mayor o igual a cero");
+        document.getElementById("TotalEgreso").style.backgroundColor="pink";
+        document.getElementById("BntModalAcciones").disabled=false;
+        posiciona('SubtotalEgreso'); 
+        return;
+    }else{
+        document.getElementById("TotalEgreso").style.backgroundColor="white";
+    }
+    
+    if(!$.isNumeric(IVAEgreso) ||  IVAEgreso<0){
+        
+        alertify.error("El IVA debe ser un número mayor o igual a cero");
+        document.getElementById("IVAEgreso").style.backgroundColor="pink";
+        document.getElementById("BntModalAcciones").disabled=false;
+        posiciona('IVAEgreso'); 
+        return;
+    }else{
+        document.getElementById("IVAEgreso").style.backgroundColor="white";
+    }
+    
+    document.getElementById('SubtotalEgreso').value='';
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 10);
+        form_data.append('CuentaPUC', CuentaPUC); 
+        form_data.append('Tercero', Tercero); 
+        form_data.append('SubtotalEgreso', SubtotalEgreso); 
+        form_data.append('IVAEgreso', IVAEgreso); 
+        form_data.append('TotalEgreso', TotalEgreso); 
+        form_data.append('TxtNumeroSoporteEgreso', TxtNumeroSoporteEgreso); 
+        form_data.append('TxtConcepto', TxtConcepto); 
+        
+        $.ajax({
+        url: './procesadores/pos2.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+                
+            }else if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+                CierraModal('ModalAcciones');                
+            }else{
+                alertify.alert(data);
+            }
+            document.getElementById("BntModalAcciones").disabled=false;
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+/**
+ * Calcula el total de un egreso
+ * @returns {undefined}
+ */
+function CalculeTotalEgreso(){
+    var subtotal=parseFloat(document.getElementById('SubtotalEgreso').value);
+    var iva=parseFloat(document.getElementById('IVAEgreso').value);
+    
+    document.getElementById('TotalEgreso').value=subtotal+iva;
+    
+}
+
 document.getElementById('BtnMuestraMenuLateral').click();
 //ConvertirSelectBusquedas();
 

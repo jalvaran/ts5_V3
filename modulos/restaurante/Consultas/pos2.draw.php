@@ -390,6 +390,68 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CrearBotonEvento("BtnConfirmaCerrarTurno", "Cerrar Turno", 1, "onclick", "ConfirmaCerrarTurno()", "rojo", "");
                         
         break; //Fin Caso 10
+    
+        case 11://Formulario para Crear un egreso
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 3, "", "", "", ""); //3 sirve para indicarle al sistema que debe guardar el formulario de crear un egreso
+            
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Tipo de Egreso</strong>", 1);
+                    $css->ColTabla("<strong>Tercero</strong>", 1);
+                    
+                    $css->ColTabla("<strong>Número de Soporte</strong>", 1);
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                    print("<td>");
+                        $css->select("TipoEgreso", "form-control", "TipoEgreso", "", "", "", "style=width:300px");
+                        $Consulta=$obCon->ConsultarTabla("subcuentas", " WHERE (PUC LIKE '5135%' or PUC LIKE '5105%' or PUC LIKE '5195%') AND LENGTH(PUC)>4 ");
+                        while($DatosCuenta=$obCon->FetchAssoc($Consulta)){
+                                                       
+                            $css->option("", "", "", $DatosCuenta["PUC"], "", "", 0);
+                                print($DatosCuenta["PUC"]." ".$DatosCuenta["Nombre"]);
+                            $css->Coption();
+                        }    
+                        $css->Cselect();
+                    print("</td>");
+                    print("<td>");
+                        $css->select("CmbTerceroEgreso", "form-control", "CmbTerceroEgreso", "", "", "", "style=width:300px");
+                            $css->option("", "", "", "", "", "");
+                                print("Seleccione un tercero");
+                            $css->Coption();
+                        $css->Cselect();
+                    print("</td>");
+                    
+                    
+                    print("<td>");
+                        $css->input("text", "TxtNumeroSoporteEgreso", "form-control", "TxtNumeroSoporteEgreso", "", "", "Número de Soporte", "off", "", "");
+                    print("</td>");
+                    
+                    
+                $css->CierraFilaTabla();
+                                
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Concepto</strong>", 2);
+                    $css->ColTabla("<strong>Valor</strong>", 1);
+                    
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                    print("<td colspan=2>");
+                        $css->textarea("TxtConcepto", "form-control", "TxtConcepto", "Concepto", "Concepto", "", "");
+                        $css->Ctextarea();
+                    print("</td>");
+                    
+                    print("<td>");
+                        $css->input("number", "SubtotalEgreso", "form-control", "SubtotalEgreso", "SubtotalEgreso", "", "Subtotal", "off", "", "", "onkeyup=CalculeTotalEgreso()");                    
+                        $css->input("number", "IVAEgreso", "form-control", "IVAEgreso", "IVAEgreso", 0, "IVA", "off", "", "", "onkeyup=CalculeTotalEgreso()");
+                        $css->input("number", "TotalEgreso", "form-control", "TotalEgreso", "TotalEgreso", "", "Total", "off", "", "", "","disabled");
+                        
+                    print("</td>");
+                $css->CierraFilaTabla();
+                
+            $css->CerrarTabla();
+        break;//Fin caso 11    
     }
     
     

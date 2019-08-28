@@ -476,3 +476,5 @@ CREATE TABLE `modelos_tipo_servicios` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
+
+ALTER TABLE `librodiario` ADD `idCierre` BIGINT NOT NULL AFTER `idUsuario`, ADD INDEX `idCierre` (`idCierre`);

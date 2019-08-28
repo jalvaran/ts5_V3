@@ -66,6 +66,9 @@ function ObtengaValorServicio(){
             var respuestas = data.split(';'); 
             if(respuestas[0]=='OK'){
                 document.getElementById('ValorServicio').value=respuestas[1];
+                document.getElementById('TxtEfectivo').value=respuestas[1];
+                document.getElementById('TxtTarjetas').value=0;
+                CalculeFormasPago(1);
             }else{
                 alertify.alert(data);
             }
@@ -83,12 +86,16 @@ function AgregarServicio(){
     document.getElementById('BtnAgregarServicio').value="Agregando...";
     var CmbTipoServicio=document.getElementById('CmbTipoServicio').value;     
     var CmbModelo=document.getElementById('CmbModelo').value;     
-    var ValorServicio=document.getElementById('ValorServicio').value;     
+    var ValorServicio=document.getElementById('ValorServicio').value;   
+    var TxtEfectivo=document.getElementById('TxtEfectivo').value; 
+    var TxtTarjetas=document.getElementById('TxtTarjetas').value; 
     var form_data = new FormData();
         form_data.append('Accion', 2);
         form_data.append('CmbTipoServicio', CmbTipoServicio);
         form_data.append('CmbModelo', CmbModelo);
         form_data.append('ValorServicio', ValorServicio);
+        form_data.append('TxtEfectivo', TxtEfectivo);
+        form_data.append('TxtTarjetas', TxtTarjetas);
         
         $.ajax({
         url: './procesadores/ServicioAcompanamiento.process.php',
@@ -370,6 +377,55 @@ function ExportarExcel(db,Tabla,st){
             alert(thrownError);
           }
       })
+}
+
+function CalculeFormasPago(CajaCambiante){
+       
+    var TxtEfectivo=document.getElementById('TxtEfectivo').value; 
+    var TxtTarjetas=document.getElementById('TxtTarjetas').value; 
+    var ValorServicio=document.getElementById('ValorServicio').value; 
+    var form_data = new FormData();
+        form_data.append('Accion', 5);
+        form_data.append('TxtEfectivo', TxtEfectivo);
+        form_data.append('TxtTarjetas', TxtTarjetas);
+        form_data.append('ValorServicio', ValorServicio);
+        form_data.append('CajaCambiante', CajaCambiante);        
+        $.ajax({
+        url: './procesadores/ServicioAcompanamiento.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=='OK'){
+                
+                document.getElementById('TxtEfectivo').value=respuestas[1]; 
+                document.getElementById('TxtTarjetas').value=respuestas[2]; 
+                
+            }else if(respuestas[0]=='E1'){
+                alertify.alert(respuestas[1]);
+                
+            }else{
+                alertify.alert(data);
+                
+            }
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function IgualeValorEfectivo(){
+    var ValorServicio=document.getElementById('ValorServicio').value;
+    document.getElementById('TxtEfectivo').value=ValorServicio;
+    document.getElementById('TxtTarjetas').value=0;
 }
 
 document.getElementById('BtnMuestraMenuLateral').click();

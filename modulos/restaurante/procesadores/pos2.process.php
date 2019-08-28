@@ -260,6 +260,46 @@ if( !empty($_REQUEST["Accion"]) ){
             $obCon->RegistreResumenCierre($idCierre, $idUser);
             print("OK;Se ha Cerrado el turno $idCierre;Imprimir");
         break; //Fin caso 9
+        
+        case 10://Crear un egreso
+            $fecha=date("Y-m-d");
+            $Hora=date("H:i:s");
+            $obPrint = new PrintPos($idUser);
+            $idProveedor=$obCon->normalizar($_REQUEST['Tercero']);
+            $CuentaDestino=$obCon->normalizar($_REQUEST['CuentaPUC']);
+            $Subtotal=$obCon->normalizar($_REQUEST['SubtotalEgreso']);
+            $IVA=$obCon->normalizar($_REQUEST['IVAEgreso']);
+            $Total=$obCon->normalizar($_REQUEST['TotalEgreso']);
+            $NumFact=$obCon->normalizar($_REQUEST['TxtNumeroSoporteEgreso']);
+            $Concepto=$obCon->normalizar($_REQUEST['TxtConcepto']);
+            
+            $DatosCaja=$obCon->DevuelveValores("cajas", "idUsuario", $idUser);
+            
+            $CuentaOrigen=$DatosCaja["CuentaPUCEfectivo"];
+            $CentroCostos=$DatosCaja["CentroCostos"];
+            $CuentaPUCIVA=$DatosCaja["CuentaPUCIVAEgresos"];
+            $TipoEgreso="Restaurante";
+            $TipoPago="Contado";
+            $Sanciones=0;
+            $Intereses=0;
+            $Impuestos=0;
+            $ReteFuente=0;
+            $ReteIVA=0;
+            $ReteICA=0;
+            $VectorEgreso["Fut"]=0;  //Uso futuro
+            ///                
+            
+            $idEgreso=$obCon->CrearEgreso($fecha,"",$idUser,$CentroCostos,$TipoPago,$CuentaOrigen,$CuentaDestino,$CuentaPUCIVA,$idProveedor, $Concepto,$NumFact,"",$TipoEgreso,$Subtotal,$IVA,$Total,$Sanciones,$Intereses,$Impuestos,$ReteFuente,$ReteIVA,$ReteICA,$VectorEgreso);
+            
+            $DatosImpresora=$obCon->DevuelveValores("config_puertos", "ID", 1);
+            $VectorEgresos["Fut"]=1;
+            if($DatosImpresora["Habilitado"]=="SI"){
+                $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 9); //Copias del egreso
+                $obPrint->ImprimeEgresoPOS($idEgreso,$VectorEgresos,$DatosImpresora["Puerto"],$Configuracion["Valor"]);
+                    
+            }
+            print("OK;Egreso $idEgreso Realizado");
+        break;//fin caso 10
     }
     
     

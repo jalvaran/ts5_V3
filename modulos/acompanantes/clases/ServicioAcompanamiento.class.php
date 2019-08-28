@@ -4,7 +4,7 @@ if(file_exists("../../../modelo/php_conexion.php")){
 }
 class Servicios extends ProcesoVenta{
     
-    public function NuevoServicio($idModelo,$Valor,$TipoServicio,$idUser) {
+    public function NuevoServicio($idModelo,$Efectivo,$Tarjetas,$Valor,$TipoServicio,$idUser) {
         $DatosModelos= $this->DevuelveValores("modelos_db", "ID", $idModelo);
         $DatosServicios=$this->DevuelveValores("modelos_tipo_servicios", "ID", $TipoServicio);
         $Tiempo=$DatosServicios["Tiempo"];
@@ -42,7 +42,7 @@ class Servicios extends ProcesoVenta{
         }
         //////Ingreso a agenda          
         $tab="modelos_agenda";
-        $NumRegistros=10;
+        $NumRegistros=12;
 
         $Columnas[0]="idModelo";	$Valores[0]=$idModelo;
         $Columnas[1]="ValorPagado";     $Valores[1]=$Valor;
@@ -54,6 +54,8 @@ class Servicios extends ProcesoVenta{
         $Columnas[7]="idUser";          $Valores[7]=$idUser;
         $Columnas[8]="Estado";          $Valores[8]=$Estado;
         $Columnas[9]="TipoServicio";    $Valores[9]=$TipoServicio;
+        $Columnas[10]="Efectivo";       $Valores[10]=$Efectivo;
+        $Columnas[11]="Tarjetas";       $Valores[11]=$Tarjetas;
         $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
         
     }

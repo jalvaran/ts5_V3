@@ -50,6 +50,8 @@ $css->PageInit($myTitulo);
                         $css->FilaTabla(16);
                             $css->ColTabla("<strong>Modelo</strong>", 1);
                             $css->ColTabla("<strong>Servicio</strong>", 1);
+                            $css->ColTabla("<strong>Efectivo</strong>", 1);
+                            $css->ColTabla("<strong>Tarjetas</strong>", 1);
                             $css->ColTabla("<strong>Valor</strong>", 1);
                             $css->ColTabla("<strong>Agregar</strong>", 1);
                         $css->CierraFilaTabla();
@@ -77,9 +79,15 @@ $css->PageInit($myTitulo);
                                 
                                 $css->Cselect();
                             print("</td>");
-                            
                             print("<td>");
-                                $css->input("text", "ValorServicio", "form-control", "ValorServicio", "", "", "Valor del Servicio", "off", "", "");
+                                $css->input("text", "TxtEfectivo", "form-control", "TxtEfectivo", "", "0", "Efectivo", "off", "", "onkeyUp=CalculeFormasPago(1)");
+                                
+                            print("</td>");print("<td>");
+                                $css->input("text", "TxtTarjetas", "form-control", "TxtTarjetas", "", "0", "Tarjetas", "off", "", "onkeyUp=CalculeFormasPago(2)");
+                                
+                            print("</td>");
+                            print("<td>");
+                                $css->input("text", "ValorServicio", "form-control", "ValorServicio", "", "", "Valor del Servicio", "off", "", "onkeyUp=IgualeValorEfectivo()");
                                 
                             print("</td>");
                             print("<td>");

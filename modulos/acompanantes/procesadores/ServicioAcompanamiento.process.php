@@ -26,6 +26,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $CmbTipoServicio=$obCon->normalizar($_REQUEST["CmbTipoServicio"]);
             $CmbModelo=$obCon->normalizar($_REQUEST["CmbModelo"]);
             $ValorServicio=$obCon->normalizar($_REQUEST["ValorServicio"]);
+            $TxtEfectivo=$obCon->normalizar($_REQUEST["TxtEfectivo"]);            
+            $TxtTarjetas=$obCon->normalizar($_REQUEST["TxtTarjetas"]);
             if($CmbModelo==''){
                 exit("E1;Debes elegir una modelo");
             }  
@@ -35,15 +37,25 @@ if( !empty($_REQUEST["Accion"]) ){
             }  
             
             if(!is_numeric($ValorServicio) or $ValorServicio<=0){
-                exit("E1;El valor del servicio debe ser u número entero mayor a Cero");
-            }  
+                exit("E1;El valor del servicio debe ser un número entero mayor a Cero");
+            } 
+            if(!is_numeric($TxtEfectivo) or $TxtEfectivo<0){
+                exit("E1;El valor del Efectivo debe ser un número entero mayor a Cero");
+            } 
+            if(!is_numeric($TxtTarjetas) or $TxtTarjetas<0){
+                exit("E1;El valor de las Tarjetas debe ser un número entero mayor a Cero");
+            } 
+            
+            if(($TxtEfectivo+$TxtTarjetas)<>$ValorServicio){
+                exit("E1;El Efectivo + Tarjetas debe ser igual al Valot Total");
+            }
             $sql="SELECT ID FROM modelos_agenda WHERE idModelo='$CmbModelo' AND Estado='0'";
             $DatosAgenda=$obCon->FetchAssoc($obCon->Query($sql));
             if($DatosAgenda["ID"]<>''){
                 exit("E1;La modelo seleccionada ya se encuentra en servicio");
             }
             
-            $obCon->NuevoServicio($CmbModelo, $ValorServicio, $CmbTipoServicio, $idUser);            
+            $obCon->NuevoServicio($CmbModelo,$TxtEfectivo, $TxtTarjetas,$ValorServicio, $CmbTipoServicio, $idUser);            
             print("OK;Servicio agregado");            
             
         break; //Fin caso 2
@@ -76,6 +88,36 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Pago Registrado a al modelo $idModelo");
             
         break;  //Fin caso 4
+        
+        case 5://Calcule los valores del efectivo o tarjetas segun el total a pagar
+            $TxtEfectivo=$obCon->normalizar($_REQUEST["TxtEfectivo"]);            
+            $TxtTarjetas=$obCon->normalizar($_REQUEST["TxtTarjetas"]);
+            $ValorServicio=$obCon->normalizar($_REQUEST["ValorServicio"]);
+            $CajaCambiante=$obCon->normalizar($_REQUEST["CajaCambiante"]);
+            
+            if($CajaCambiante==''){
+                exit("E1;No se recibió la caja que cambia");
+            }
+            if(!is_numeric($TxtEfectivo) or $TxtEfectivo<0){
+                exit("E1;El campo de texto Efectivo debe ser un Número mayor a Cero");
+            }
+            if(!is_numeric($TxtTarjetas) or $TxtTarjetas<0){
+                exit("E1;El campo de texto Tarjetas debe ser un Número mayor a Cero");
+            }
+            if(!is_numeric($ValorServicio) or $ValorServicio<0){
+                exit("E1;El campo de texto Valor del Servicio debe ser un Número mayor a Cero");
+            }
+            
+            if($CajaCambiante==1){ //Quiere decir que se está digitando la caja de texto Efectivo
+                $TxtTarjetas=$ValorServicio-$TxtEfectivo;
+            }
+            
+            if($CajaCambiante==2){ //Quiere decir que se está digitando la caja de texto Tarjetas
+                 $TxtEfectivo=$ValorServicio-$TxtTarjetas;
+            }
+            print("OK;$TxtEfectivo;$TxtTarjetas");
+            
+        break;  //Fin caso 5
         
     }
     
