@@ -446,7 +446,7 @@ class VentasRestaurantePOS extends Facturacion{
         
         $this->update("modelos_pagos_realizados", "idCierre", $idCierre, " WHERE idCierre=0;");
         $this->update("modelos_agenda", "idCierre", $idCierre, " WHERE idCierre=0;");
-        $this->update("librodiario", "idCierre", $idCierre, " WHERE idCierre=0 AND idUsuario='$idUser';");
+        $this->update("librodiario", "idCierre", $idCierre, " WHERE idCierre=0;"); //Ojo para este caso se cierra sin tener en cuenta el id del usuario
         $this->update("facturas", "CerradoDiario", $idCierre, "WHERE (CerradoDiario='0' or CerradoDiario='' ) AND Usuarios_idUsuarios='$idUser'");
         $this->update("facturas_items", "idCierre", $idCierre, "WHERE (idCierre='0' or idCierre='') AND idUsuarios='$idUser'");
         $this->update("factura_compra_items", "idCierre", $idCierre, "WHERE (idCierre='0' or idCierre='') ");
@@ -461,14 +461,15 @@ class VentasRestaurantePOS extends Facturacion{
         $DatosSucursal= $this->DevuelveValores("empresa_pro_sucursales", "Actual", 1);
         $SedeActual= $DatosSucursal["ID"];     
         $sql="INSERT INTO restaurante_resumen_cierre 
-                (`Fecha`,`idProducto`,`NombreProducto`,`Compra`,`Ventas`,`TrasladosRecibidos`,`TrasladosRealizados`,`Bajas`,`Recibe`,`Saldo`,`TotalVentas`,`TotalPropinas1`,`TotalPropinas2`,`TotalPropinas3`,`TotalCasa`,`idUser`,`idCierre`,`FechaCreacion`)
+                (`Fecha`,`idProducto`,`NombreProducto`,`Compra`,`Ventas`,`TrasladosRecibidos`,`TrasladosRealizados`,`Bajas`,`Altas`,`Recibe`,`Saldo`,`TotalVentas`,`TotalPropinas1`,`TotalPropinas2`,`TotalPropinas3`,`TotalCasa`,`idUser`,`idCierre`,`FechaCreacion`)
               SELECT '$Fecha',t1.idProductosVenta,t1.Nombre,
                (SELECT IFNULL((SELECT SUM(Cantidad) FROM factura_compra_items fci WHERE t1.idProductosVenta=fci.idProducto AND idCierre='$idCierre'),0)) AS ItemsCompras,
                (SELECT IFNULL((SELECT SUM(Cantidad) FROM facturas_items fi WHERE t1.Referencia=fi.Referencia AND idCierre='$idCierre'),0)) as ItemsVentas,
                (SELECT IFNULL((SELECT SUM(Cantidad) FROM traslados_items ti WHERE CONVERT(ti.Referencia USING utf8)=CONVERT(t1.Referencia USING utf8 ) AND Destino='$SedeActual' AND idCierre='$idCierre'),0)) as TrasladosRecibidos,
                (SELECT IFNULL((SELECT SUM(Cantidad) FROM traslados_items ti WHERE CONVERT(ti.Referencia USING utf8)=CONVERT(t1.Referencia USING utf8 ) AND Destino<>'$SedeActual' AND idCierre='$idCierre' AND Estado='PREPARADO'),0)) as TrasladosEnviados,
                (SELECT IFNULL((SELECT SUM(Cantidad) FROM inventario_comprobante_movimientos_items icm WHERE t1.idProductosVenta=icm.idProducto AND TablaOrigen='productosventa' AND TipoMovimiento='BAJA' AND idCierre='$idCierre'),0)) AS TotalBajas,
-               (t1.Existencias - (SELECT ItemsCompras) + (SELECT TrasladosEnviados) - (SELECT TrasladosRecibidos) + (SELECT TotalBajas) + (SELECT ItemsVentas)) AS CantidadRecibida, 
+               (SELECT IFNULL((SELECT SUM(Cantidad) FROM inventario_comprobante_movimientos_items icm WHERE t1.idProductosVenta=icm.idProducto AND TablaOrigen='productosventa' AND TipoMovimiento='ALTA' AND idCierre='$idCierre'),0)) AS TotalAltas,
+               (t1.Existencias - (SELECT ItemsCompras) + (SELECT TrasladosEnviados) - (SELECT TrasladosRecibidos) + (SELECT TotalBajas) - (SELECT TotalAltas) + (SELECT ItemsVentas)) AS CantidadRecibida, 
                (t1.Existencias) as SaldoFinal,
                (SELECT SUM(TotalItem) FROM facturas_items fi WHERE t1.Referencia=fi.Referencia AND idCierre='$idCierre') as TotalVentas,
                (t1.ValorComision1 * (SELECT ItemsVentas)) as TotalComisiones1,

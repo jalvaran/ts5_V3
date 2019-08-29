@@ -2362,16 +2362,44 @@ $tbl.= "</table>";
         $idFormato=36;
         
         $DatosFormatos= $this->obCon->DevuelveValores("formatos_calidad", "ID", $idFormato);
-        
+        $DatosCierre= $this->obCon->DevuelveValores("restaurante_cierres", "ID", $idCierre);
+        $DatosUsuario= $this->obCon->DevuelveValores("usuarios", "idUsuarios", $DatosCierre["idUsuario"]);
         $Documento="$DatosFormatos[Nombre] $idCierre";
         
         $this->PDF_Ini($DatosFormatos['Nombre'],7, "");
            
         $this->PDF_Encabezado($DatosFormatos["Fecha"],1, $idFormato, "",$Documento);
         
+        $html="<strong>FECHA Y HORA DEL CIERRE:</strong> ".$DatosCierre["Fecha"]." ".$DatosCierre["Hora"];
+        
+        $html.="<br><strong>RESPONSABLE:</strong> ".$DatosUsuario["Nombre"]." ".$DatosUsuario["Apellido"];
+        $html.="<br><strong>IDENTIFICACIÓN:</strong> ".$DatosUsuario["Identificacion"];
+        $this->PDF->writeHTML("<br><br>".$html, true, false, false, false, ''); 
+        
         $html= $this->TablaRelacionProductosRestaurante($idCierre);
         //print($html);
+        $this->PDF->writeHTML("<br><br><br><br>".$html, true, false, false, false, ''); 
+        //$this->PDF->AddPage();
+        
+        $html= $this->TablaServiciosPrestados($idCierre);
+        
         $this->PDF->writeHTML("<br><br>".$html, true, false, false, false, ''); 
+        
+        $html= $this->TablaServiciosPagados($idCierre);
+        
+        $this->PDF->writeHTML("<br><br>".$html, true, false, false, false, ''); 
+        
+        //$this->PDF->AddPage();
+        
+        $html= $this->TablaComprasGastos($idCierre);
+        
+        $this->PDF->writeHTML("<br><br>".$html, true, false, false, false, ''); 
+          
+        $html= $this->TablaCuadreCaja($idCierre);
+        
+        $this->PDF->writeHTML("<br><br>".$html, true, false, false, false, '');         
+        $html= $this->HTML_Firmas_Documentos(); 
+        $this->PDF->writeHTML("<br><br><br><br>".$html, true, false, false, false, '');  
         $this->PDF_Output("Reporte_Cierre_$idCierre");
     }
     
@@ -2388,14 +2416,12 @@ $tbl.= "</table>";
                     $html.="<strong>Compras</strong>";
                 $html.="</td>"; 
                 $html.="<td>";   
-                    $html.="<strong>Traslados Recibidos</strong>";
+                    $html.="<strong>Altas</strong>";
                 $html.="</td>"; 
                 $html.="<td>";    
                     $html.="<strong>Ventas</strong>";
                 $html.="</td>"; 
-                $html.="<td>";    
-                    $html.="<strong>Traslados Recibidos</strong>";
-                $html.="</td>"; 
+                
                 $html.="<td>";    
                     $html.="<strong>Bajas</strong>";
                 $html.="</td>"; 
@@ -2430,7 +2456,7 @@ $tbl.= "</table>";
                 $TotalVentas=$TotalVentas+$DatosCierre["TotalVentas"];
                 $TotalPropinas1=$TotalPropinas1+$DatosCierre["TotalPropinas1"];
                 $TotalPropinas2=$TotalPropinas2+$DatosCierre["TotalPropinas2"];
-                $TotalPropinas3=$TotalPropinas1+$DatosCierre["TotalPropinas3"];
+                $TotalPropinas3=$TotalPropinas3+$DatosCierre["TotalPropinas3"];
                 $TotalCasa=$TotalCasa+$DatosCierre["TotalCasa"];
                 if($h==0){
                     $Back="#f2f2f2";
@@ -2450,14 +2476,12 @@ $tbl.= "</table>";
                         $html.=$DatosCierre["Compra"];
                     $html.="</td>"; 
                     $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
-                        $html.=$DatosCierre["TrasladosRecibidos"];
+                        $html.=$DatosCierre["Altas"];
                     $html.="</td>"; 
                     $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
                         $html.=$DatosCierre["Ventas"];
                     $html.="</td>"; 
-                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
-                        $html.=$DatosCierre["TrasladosRealizados"];
-                    $html.="</td>"; 
+                    
                     $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';     
                         $html.=$DatosCierre["Bajas"];
                     $html.="</td>"; 
@@ -2482,7 +2506,7 @@ $tbl.= "</table>";
                 $html.="</tr>";
             }
             $html.="<tr>";
-                $html.='<td align="rigth" colspan="8" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                $html.='<td align="rigth" colspan="7" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
                     $html.="<strong>TOTALES:</strong>";
                 $html.="</td>"; 
                 $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
@@ -2502,9 +2526,389 @@ $tbl.= "</table>";
                 $html.="</td>";
             $html.="</tr>";
             
+            $html.="<tr>";
+                $html.='<td align="center" colspan="12" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.='<strong>OBSERVACIONES</strong>';
+                $html.="</td>";
+                $sql="SELECT Observaciones FROM restaurante_cierres WHERE ID='$idCierre'";
+                $Consulta= $this->obCon->Query($sql);
+                $DatosGenerales=$this->obCon->FetchArray($Consulta);
+            $html.="</tr>";    
+            $html.="<tr>";
+            
+                $html.='<td align="left" colspan="12" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.= utf8_encode($DatosGenerales["Observaciones"]);
+                $html.="</td>";
+            $html.="</tr>";    
+            
         $html.="</table>";
         return($html);
     }
+    
+    public function TablaServiciosPrestados($idCierre) {
+        $html='<table cellspacing="1" cellpadding="2" border="0">';
+            $html.="<tr>";
+                $html.='<td colspan="7" style="text-align:center;"  >';
+                    $html.="<strong>RELACIÓN DE SERVICIOS PRESTADOS</strong>";
+                $html.="</td>";
+            $html.="</tr>";    
+            $html.="<tr>";
+                $html.="<td>";
+                    $html.="<strong>Modelo</strong>";
+                $html.="</td>";
+                $html.="<td>";
+                    $html.="<strong>Servicio</strong>";
+                $html.="</td>"; 
+                $html.="<td>";
+                    $html.="<strong>Inicio</strong>";
+                $html.="</td>"; 
+                $html.="<td>";     
+                    $html.="<strong>Fin</strong>";
+                $html.="</td>";                 
+                $html.="<td>";    
+                    $html.="<strong>Tarifa</strong>";
+                $html.="</td>"; 
+                $html.="<td>";    
+                    $html.="<strong>Total Modelo</strong>";
+                $html.="</td>"; 
+                $html.="<td>";    
+                    $html.="<strong>Total Casa</strong>";
+                $html.="</td>"; 
+                
+            $html.="</tr>";
+            $sql="SELECT t1.*,"
+                    . "(SELECT NombreArtistico FROM modelos_db t2 WHERE t2.ID=t1.idModelo) as NombreModelo,"
+                    . "(SELECT Servicio FROM modelos_tipo_servicios t3 WHERE t3.ID=t1.TipoServicio) as Servicio "
+                    . " FROM modelos_agenda t1 WHERE idCierre='$idCierre'";
+            $Consulta= $this->obCon->Query($sql);
+            $h=0;
+            $TotalPagado=0;
+            $TotalModelo=0;
+            
+            $TotalCasa=0;
+            $Back="#f2f2f2";
+            while($DatosCierre= $this->obCon->FetchAssoc($Consulta)){
+                $TotalPagado=$TotalPagado+$DatosCierre["ValorPagado"];
+                $TotalModelo=$TotalModelo+$DatosCierre["ValorModelo"];
+                
+                $TotalCasa=$TotalCasa+$DatosCierre["ValorCasa"];
+                if($h==0){
+                    $Back="#f2f2f2";
+                    $h=1;
+                }else{
+                    $Back="white";
+                    $h=0;
+                }
+                $html.="<tr>";
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+                        $html.= utf8_encode($DatosCierre["NombreModelo"]);
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+                        $html.=$DatosCierre["Servicio"];
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.=$DatosCierre["HoraInicial"];
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.=$DatosCierre["HoraFinalizacion"];
+                    $html.="</td>"; 
+                    
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.= number_format($DatosCierre["ValorPagado"]);
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
+                        $html.=number_format($DatosCierre["ValorModelo"]);
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.=number_format($DatosCierre["ValorCasa"]);
+                    $html.="</td>"; 
+                $html.="</tr>";
+            }
+            $html.="<tr>";
+                $html.='<td align="rigth" colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.="<strong>TOTALES:</strong>";
+                $html.="</td>"; 
+                $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.= number_format($TotalPagado);
+                $html.="</td>"; 
+                $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
+                    $html.=number_format($TotalModelo);
+                $html.="</td>"; 
+                $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.=number_format($TotalCasa);
+                $html.="</td>"; 
+                
+            $html.="</tr>";
+            
+        $html.="</table>";
+        return($html);
+    }
+    
+    public function TablaServiciosPagados($idCierre) {
+        $html='<table cellspacing="1" cellpadding="2" border="0">';
+            $html.="<tr>";
+                $html.='<td colspan="5" style="text-align:center;"  >';
+                    $html.="<strong>RELACIÓN DE SERVICIOS PAGADOS</strong>";
+                $html.="</td>";
+            $html.="</tr>";    
+            $html.="<tr>";
+                $html.="<td>";
+                    $html.="<strong>Fecha</strong>";
+                $html.="</td>";
+                $html.="<td>";
+                    $html.="<strong>idModelo</strong>";
+                $html.="</td>"; 
+                $html.="<td>";
+                    $html.="<strong>Modelo</strong>";
+                $html.="</td>"; 
+                $html.="<td>";     
+                    $html.="<strong>Valor Pagado</strong>";
+                $html.="</td>";                 
+                $html.="<td>";    
+                    $html.="<strong>Usuario que Paga</strong>";
+                $html.="</td>"; 
+                                
+            $html.="</tr>";
+            $sql="SELECT t1.*,"
+                    . "(SELECT NombreArtistico FROM modelos_db t2 WHERE t2.ID=t1.idModelo) as NombreModelo"
+                    
+                    . " FROM modelos_pagos_realizados t1 WHERE idCierre='$idCierre'";
+            $Consulta= $this->obCon->Query($sql);
+            $h=0;
+            $TotalPagado=0;
+            
+            $Back="#f2f2f2";
+            while($DatosCierre= $this->obCon->FetchAssoc($Consulta)){
+                $TotalPagado=$TotalPagado+$DatosCierre["ValorPagado"];
+                
+                if($h==0){
+                    $Back="#f2f2f2";
+                    $h=1;
+                }else{
+                    $Back="white";
+                    $h=0;
+                }
+                $html.="<tr>";
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+                        $html.= ($DatosCierre["Fecha"]);
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+                        $html.=$DatosCierre["idModelo"];
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.= utf8_encode($DatosCierre["NombreModelo"]);
+                    $html.="</td>"; 
+                                        
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.= number_format($DatosCierre["ValorPagado"]);
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
+                        $html.=($DatosCierre["idUser"]);
+                    $html.="</td>"; 
+                    
+                $html.="</tr>";
+            }
+            $html.="<tr>";
+                $html.='<td align="rigth" colspan="3" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.="<strong>TOTAL:</strong>";
+                $html.="</td>"; 
+                $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.= number_format($TotalPagado);
+                $html.="</td>"; 
+                $html.='<td align="rigth"  style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.=" ";
+                $html.="</td>";                 
+            $html.="</tr>";
+            
+        $html.="</table>";
+        return($html);
+    }
+    
+    
+    public function TablaComprasGastos($idCierre) {
+        $html='<table cellspacing="1" cellpadding="2" border="0">';
+            $html.="<tr>";
+                $html.='<td colspan="7" style="text-align:center;"  >';
+                    $html.="<strong>RELACIÓN DE COMPRAS Y GASTOS</strong>";
+                $html.="</td>";
+            $html.="</tr>";    
+            $html.="<tr>";
+                $html.="<td>";
+                    $html.="<strong>Fecha</strong>";
+                $html.="</td>";
+                $html.="<td>";
+                    $html.="<strong>Documento Interno</strong>";
+                $html.="</td>";
+                $html.="<td>";
+                    $html.="<strong>Referencia</strong>";
+                $html.="</td>"; 
+                $html.="<td>";
+                    $html.="<strong>Beneficiario</strong>";
+                $html.="</td>"; 
+                $html.="<td>";     
+                    $html.="<strong>Concepto</strong>";
+                $html.="</td>";  
+                $html.="<td>";     
+                    $html.="<strong>Cuenta</strong>";
+                $html.="</td>";  
+                $html.="<td>";    
+                    $html.="<strong>Valor Pagado</strong>";
+                $html.="</td>"; 
+                                
+            $html.="</tr>";
+            $sql="SELECT t1.* "
+                    . " FROM librodiario t1 WHERE idCierre='$idCierre' AND CuentaPUC LIKE '11%' AND Credito>0 ";
+            $Consulta= $this->obCon->Query($sql);
+            $h=0;
+            $TotalPagado=0;
+            
+            $Back="#f2f2f2";
+            while($DatosCierre= $this->obCon->FetchAssoc($Consulta)){
+                $TotalPagado=$TotalPagado+$DatosCierre["Credito"];
+                
+                if($h==0){
+                    $Back="#f2f2f2";
+                    $h=1;
+                }else{
+                    $Back="white";
+                    $h=0;
+                }
+                $html.="<tr>";
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+                        $html.= ($DatosCierre["Fecha"]);
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+                        $html.=$DatosCierre["Tipo_Documento_Intero"]." ".$DatosCierre["Num_Documento_Interno"];
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.= ($DatosCierre["Num_Documento_Externo"]);
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.= utf8_encode($DatosCierre["Tercero_Razon_Social"])." ".$DatosCierre["Tercero_Identificacion"];
+                    $html.="</td>"; 
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
+                        $html.=($DatosCierre["Concepto"]);
+                    $html.="</td>";  
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
+                        $html.=($DatosCierre["CuentaPUC"]);
+                    $html.="</td>";  
+                    $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                        $html.= number_format($DatosCierre["Credito"]);
+                    $html.="</td>"; 
+                    
+                    
+                $html.="</tr>";
+            }
+            $html.="<tr>";
+                $html.='<td align="rigth" colspan="6" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.="<strong>TOTAL:</strong>";
+                $html.="</td>"; 
+                $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';    
+                    $html.= number_format($TotalPagado);
+                $html.="</td>"; 
+                               
+            $html.="</tr>";
+            
+        $html.="</table>";
+        return($html);
+    }
+    
+    public function TablaCuadreCaja($idCierre) {
+        $sql="SELECT SUM(ValorPagado) as TotalIngresos, SUM(Tarjetas) as Tarjetas FROM modelos_agenda WHERE idCierre='$idCierre' ";
+        $TotalesServicios=$this->obCon->FetchAssoc($this->obCon->Query($sql));
+        $sql="SELECT SUM(ValorPagado) as TotalPagos FROM modelos_pagos_realizados WHERE idCierre='$idCierre' ";
+        $TotalesServiciosPagos=$this->obCon->FetchAssoc($this->obCon->Query($sql));        
+        $TotalIngresosServiciosTarjetas=$TotalesServicios["Tarjetas"];
+        $TotalIngresosServicios=$TotalesServicios["TotalIngresos"];
+        $TotalServiciosPagados=$TotalesServiciosPagos["TotalPagos"];
+        
+        $sql="SELECT SUM(TotalVentas) as TotalVentas FROM restaurante_resumen_cierre WHERE idCierre='$idCierre' ";
+        $TotalesRestaurante=$this->obCon->FetchAssoc($this->obCon->Query($sql));
+        $VentasBar=$TotalesRestaurante["TotalVentas"];
+        $sql="SELECT SUM(Credito) as TotalGastos FROM librodiario t1 WHERE idCierre='$idCierre' AND CuentaPUC LIKE '11%' AND Credito>0 ";
+        $TotalesGastos=$this->obCon->FetchAssoc($this->obCon->Query($sql));  
+        
+        $sql="SELECT SUM(Debito) as TotalIngresosBancos FROM librodiario t1 WHERE idCierre='$idCierre' AND CuentaPUC LIKE '1110%' AND Debito>0 ";
+        $TotalesIngresosBancos=$this->obCon->FetchAssoc($this->obCon->Query($sql));  
+        
+        $TotalIngresos=$TotalIngresosServicios+$VentasBar;
+        $TotalComprasGastos=$TotalesGastos["TotalGastos"];
+        $TotalEgresos=$TotalComprasGastos+$TotalServiciosPagados;
+        $TotalCaja=$TotalIngresos-$TotalEgresos;
+        $IngresosBancos=$TotalesIngresosBancos["TotalIngresosBancos"]+$TotalIngresosServiciosTarjetas;
+        $TotalCajaGeneral=$TotalCaja-$IngresosBancos;
+        $html='<table cellspacing="1" cellpadding="2" border="0">';
+            $html.="<tr>";
+                $html.='<td colspan="3" style="text-align:center;"  >';
+                    $html.="<strong>CUADRE DE CAJA GENERAL</strong>";
+                $html.="</td>";
+            $html.="</tr>";    
+            $html.="<tr>";
+                $html.='<td colspan="2" style="text-align:rigth;"  >';
+                    $html.="<strong>INGRESOS POR SERVICIOS</strong>";
+                $html.="</td>";
+                $html.='<td style="text-align:rigth;"  >';
+                    $html.= number_format($TotalIngresosServicios);
+                $html.="</td>";
+            $html.="</tr>";    
+            $html.="<tr>";
+                $html.='<td colspan="2" style="text-align:rigth;"  >';
+                    $html.="<strong>VENTAS BAR</strong>";
+                $html.="</td>";
+                $html.='<td style="text-align:rigth;"  >';
+                    $html.= number_format($VentasBar);
+                $html.="</td>";
+            $html.="</tr>";  
+            
+            $html.="<tr>";
+                $html.='<td colspan="2" style="text-align:rigth;"  >';
+                    $html.="<strong>TOTAL INGRESOS</strong>";
+                $html.="</td>";
+                $html.='<td style="text-align:rigth;"  >';
+                    $html.= number_format($TotalIngresos);
+                $html.="</td>";
+            $html.="</tr>";  
+            
+            $html.="<tr>";
+                $html.='<td colspan="2" style="text-align:rigth;"  >';
+                    $html.="<strong>EGRESOS</strong>";
+                $html.="</td>";
+                $html.='<td style="text-align:rigth;"  >';
+                    $html.= number_format($TotalEgresos);
+                $html.="</td>";
+            $html.="</tr>";  
+            
+            $html.="<tr>";
+                $html.='<td colspan="2" style="text-align:rigth;"  >';
+                    $html.="<strong>TOTAL CAJA</strong>";
+                $html.="</td>";
+                $html.='<td style="text-align:rigth;"  >';
+                    $html.= number_format($TotalCaja);
+                $html.="</td>";
+            $html.="</tr>";  
+            
+            $html.="<tr>";
+                $html.='<td colspan="2" style="text-align:rigth;"  >';
+                    $html.="<strong>INGRESOS POR BANCOS</strong>";
+                $html.="</td>";
+                $html.='<td style="text-align:rigth;"  >';
+                    $html.= number_format($IngresosBancos);
+                $html.="</td>";
+            $html.="</tr>";  
+            
+            $html.="<tr>";
+                $html.='<td colspan="2" style="text-align:rigth;"  >';
+                    $html.="<strong>TOTAL CAJA GENERAL</strong>";
+                $html.="</td>";
+                $html.='<td style="text-align:rigth;">';
+                    $html.="<h3>". number_format($TotalCajaGeneral)."</h3>";
+                $html.="</td>";
+            $html.="</tr>";  
+            
+        $html.="</table>";
+        return($html);
+    }
+    
    //Fin Clases
 }
     
