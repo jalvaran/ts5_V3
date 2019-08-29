@@ -481,3 +481,16 @@ ALTER TABLE `librodiario` ADD `idCierre` BIGINT NOT NULL AFTER `idUsuario`, ADD 
 
 INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `CuerpoFormato`, `NotasPiePagina`, `Updated`, `Sync`) VALUES
 (36,	'INFORME DE CIERRE',	'001',	'F-GC-003',	'2019-08-28',	'',	'',	'2019-01-31 12:08:58',	'2019-06-12 10:41:11');
+
+
+INSERT INTO `menu_carpetas` (`ID`, `Ruta`, `Updated`, `Sync`) VALUES
+(13,	'../modulos/restaurante/',	'2019-06-22 10:09:52',	'2019-04-07 09:14:07');
+
+UPDATE `menu_submenus` SET `idCarpeta` = '13',`Pagina` = 'pos2.php' WHERE `menu_submenus`.`ID` = 83;
+
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+(192,	'Historial de Cierres',	30,	13,	0,	'',	0,	'',	'historial_cierres_restaurante.php',	'_BLANK',	CONV('1', 2, 10) + 0,	'historial.png',	1,	'2019-08-29 15:31:53',	'2019-01-23 11:16:14');
+
+
+INSERT INTO `configuracion_control_tablas` (`ID`, `TablaDB`, `Agregar`, `Editar`, `Ver`, `LinkVer`, `Exportar`, `AccionesAdicionales`, `Eliminar`, `Updated`, `Sync`) VALUES
+(14,	'restaurante_cierres',	0,	0,	1,	'PDF_Documentos.draw.php?idDocumento=36&ID=',	1,	1,	0,	'2019-01-23 06:07:37',	'2019-01-23 11:12:27');

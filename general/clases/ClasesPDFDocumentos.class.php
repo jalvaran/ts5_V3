@@ -2787,7 +2787,7 @@ $tbl.= "</table>";
                         $html.= utf8_encode($DatosCierre["Tercero_Razon_Social"])." ".$DatosCierre["Tercero_Identificacion"];
                     $html.="</td>"; 
                     $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
-                        $html.=($DatosCierre["Concepto"]);
+                        $html.=utf8_encode($DatosCierre["Concepto"]);
                     $html.="</td>";  
                     $html.='<td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';      
                         $html.=($DatosCierre["CuentaPUC"]);

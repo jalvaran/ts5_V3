@@ -35,7 +35,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 . " FROM restaurante_pedidos rp "
                 . "INNER JOIN usuarios us ON us.idUsuarios=rp.idUsuario "
                 . "INNER JOIN restaurante_mesas rm ON rm.ID=rp.idMesa"
-                . " WHERE rp.idUsuario='$idUser' AND (rp.Estado<>'2' AND rp.Estado<>'7') AND rp.Tipo='1'";
+                . " WHERE (rp.Estado<>'2' AND rp.Estado<>'7') AND rp.Tipo='1'";
             $Consulta=$obCon->Query($sql);
             if($obCon->NumRows($Consulta)){
                 $css->CrearTitulo("<strong>Lista de Pedidos</strong>");
@@ -97,11 +97,11 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                         
                         print("<td>");
-                            $css->IconButton("btnAgregar", "btnAgregar", "fa fa-opencart", "Agregar Items", "onclick='DibujePedido($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#dbffae;color:red"');
-                            $css->IconButton("btnPreparar", "btnPreparar", "fa fa-spoon", "Preparar", "onclick='DibujePreparacion($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#5792ff;color:white"');
-                            $css->IconButton("btnEntregar", "btnEntregar", "fa fa-hand-paper-o", "Entregar", "onclick='EntregarPedido($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#84ffff;color:black"');
+                            $css->IconButton("btnAgregar", "btnAgregar", "fa fa-opencart", "Agregar Items", "onclick='DibujePedido($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#dbffae;color:red;width:100px;height:100px"');
+                            $css->IconButton("btnPreparar", "btnPreparar", "fa fa-spoon", "Preparar", "onclick='DibujePreparacion($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#5792ff;color:white;width:100px;height:100px"');
+                            $css->IconButton("btnEntregar", "btnEntregar", "fa fa-hand-paper-o", "Entregar", "onclick='EntregarPedido($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#84ffff;color:black;width:100px;height:100px"');
                             //$css->IconButton("btnEstados", "btnEstados", "fa fa-bullseye", "Ver Preparacion", "onclick='VerEstadoPreparacion($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#e0eff3;color:black"');
-                            $css->IconButton("btnFacturar", "btnFacturar", "fa fa-credit-card", "Facturar", "onclick='AbrirOpcionesFacturacion(`$idPedido`)'",$spanActivo=0,"orange",$style='style="background-color:#ffffcd;color:black"');
+                            $css->IconButton("btnFacturar", "btnFacturar", "fa fa-credit-card", "Facturar", "onclick='AbrirOpcionesFacturacion(`$idPedido`)'",$spanActivo=0,"orange",$style='style="background-color:#ffffcd;color:black;width:100px;height:100px"');
                             //$css->IconButton("btnCancelar", "btnCancelar", "fa fa-remove", "Eliminar", "onclick='AgregarItems($idPedido)'",$spanActivo=0,"orange",$style='style="background-color:#ffeaae;color:red"');
                         print("</td>");
                         

@@ -447,8 +447,8 @@ class VentasRestaurantePOS extends Facturacion{
         $this->update("modelos_pagos_realizados", "idCierre", $idCierre, " WHERE idCierre=0;");
         $this->update("modelos_agenda", "idCierre", $idCierre, " WHERE idCierre=0;");
         $this->update("librodiario", "idCierre", $idCierre, " WHERE idCierre=0;"); //Ojo para este caso se cierra sin tener en cuenta el id del usuario
-        $this->update("facturas", "CerradoDiario", $idCierre, "WHERE (CerradoDiario='0' or CerradoDiario='' ) AND Usuarios_idUsuarios='$idUser'");
-        $this->update("facturas_items", "idCierre", $idCierre, "WHERE (idCierre='0' or idCierre='') AND idUsuarios='$idUser'");
+        $this->update("facturas", "CerradoDiario", $idCierre, "WHERE (CerradoDiario='0' or CerradoDiario='' ) ");
+        $this->update("facturas_items", "idCierre", $idCierre, "WHERE (idCierre='0' or idCierre='')");
         $this->update("factura_compra_items", "idCierre", $idCierre, "WHERE (idCierre='0' or idCierre='') ");
         return($idCierre);
     }
