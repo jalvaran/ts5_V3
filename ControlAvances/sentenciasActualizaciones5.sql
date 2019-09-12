@@ -494,3 +494,12 @@ INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`,
 
 INSERT INTO `configuracion_control_tablas` (`ID`, `TablaDB`, `Agregar`, `Editar`, `Ver`, `LinkVer`, `Exportar`, `AccionesAdicionales`, `Eliminar`, `Updated`, `Sync`) VALUES
 (14,	'restaurante_cierres',	0,	0,	1,	'PDF_Documentos.draw.php?idDocumento=36&ID=',	1,	1,	0,	'2019-01-23 06:07:37',	'2019-01-23 11:12:27');
+
+INSERT INTO `menu_carpetas` (`ID`, `Ruta`, `Updated`, `Sync`) VALUES
+(14,	'../modulos/acompanantes/',	'2019-06-22 10:09:52',	'2019-04-07 09:14:07');
+
+ALTER TABLE `productosventa` ADD `ValorComision4` INT NOT NULL AFTER `ValorComision3`;
+ALTER TABLE `inventarios_temporal` ADD `ValorComision4` INT NOT NULL AFTER `ValorComision3`;
+
+ALTER TABLE `restaurante_resumen_cierre` ADD `TotalPropinas4` DOUBLE NOT NULL AFTER `TotalPropinas3`;
+

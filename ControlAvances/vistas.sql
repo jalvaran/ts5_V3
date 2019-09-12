@@ -333,4 +333,25 @@ SELECT t1.idModelo,
     ((SELECT ValorTotalServiciosPrestados)-(SELECT ValorTotalServiciosPagados)) as Saldo
 FROM modelos_agenda t1 GROUP BY t1.idModelo;
 
+DROP VIEW IF EXISTS `vista_resumen_restaurante_turno_actual`;
+CREATE VIEW vista_resumen_restaurante_turno_actual AS
+
+    SELECT t1.idProductosVenta,t1.Nombre,
+        (SELECT IFNULL((SELECT SUM(Cantidad) FROM factura_compra_items fci WHERE t1.idProductosVenta=fci.idProducto AND idCierre='0'),0)) AS ItemsCompras,
+        (SELECT IFNULL((SELECT SUM(Cantidad) FROM facturas_items fi WHERE t1.Referencia=fi.Referencia AND idCierre='0'),0)) as ItemsVentas,
+        (SELECT IFNULL((SELECT SUM(Cantidad) FROM traslados_items ti WHERE CONVERT(ti.Referencia USING utf8)=CONVERT(t1.Referencia USING utf8 ) AND Destino='$SedeActual' AND idCierre='0'),0)) as TrasladosRecibidos,
+        (SELECT IFNULL((SELECT SUM(Cantidad) FROM traslados_items ti WHERE CONVERT(ti.Referencia USING utf8)=CONVERT(t1.Referencia USING utf8 ) AND Destino<>'$SedeActual' AND idCierre='0' AND Estado='PREPARADO'),0)) as TrasladosEnviados,
+        (SELECT IFNULL((SELECT SUM(Cantidad) FROM inventario_comprobante_movimientos_items icm WHERE t1.idProductosVenta=icm.idProducto AND TablaOrigen='productosventa' AND TipoMovimiento='BAJA' AND idCierre='0'),0)) AS TotalBajas,
+        (SELECT IFNULL((SELECT SUM(Cantidad) FROM inventario_comprobante_movimientos_items icm WHERE t1.idProductosVenta=icm.idProducto AND TablaOrigen='productosventa' AND TipoMovimiento='ALTA' AND idCierre='0'),0)) AS TotalAltas,
+        (t1.Existencias - (SELECT ItemsCompras) + (SELECT TrasladosEnviados) - (SELECT TrasladosRecibidos) + (SELECT TotalBajas) - (SELECT TotalAltas) + (SELECT ItemsVentas)) AS CantidadRecibida, 
+        (t1.Existencias) as SaldoFinal,
+        (SELECT IFNULL((SELECT SUM(TotalItem) FROM facturas_items fi WHERE t1.Referencia=fi.Referencia AND idCierre='0'),0)) as TotalVentas,
+        (t1.ValorComision1 * (SELECT ItemsVentas)) as TotalComisiones1,
+        (t1.ValorComision2 * (SELECT ItemsVentas)) as TotalComisiones2,
+        (t1.ValorComision3 * (SELECT ItemsVentas)) as TotalComisiones3,
+        (t1.ValorComision4 * (SELECT ItemsVentas)) as TotalComisiones4,
+        ((SELECT TotalVentas)-(SELECT TotalComisiones1)-(SELECT TotalComisiones2)-(SELECT TotalComisiones3)-(SELECT TotalComisiones4)) as TotalCasa
+
+    FROM productosventa t1;
+
 

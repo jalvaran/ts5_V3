@@ -133,6 +133,10 @@ function DibujeOpcionesReporte(){
         var Accion=5;
     }
     
+    if(Reporte==4){//Movimiento de cuentas
+        var Accion=7;
+    }
+    
     var form_data = new FormData();
         form_data.append('Accion', Accion);
         form_data.append('Reporte', Reporte);
@@ -479,6 +483,48 @@ function GenereHTMLEstadoResultadosAnio(){
 }
 
 
+function GenereHTMLMovimientoCuentas(){    
+    document.getElementById("DivReportesContables").innerHTML='<div id="GifProcess">Procesando...<br><img   src="../../images/process.gif" alt="Cargando" height="100" width="100"></div>';
+    var TxtFechaInicial = document.getElementById('TxtFechaInicial').value;
+    var TxtFechaFinal = document.getElementById('TxtFechaFinal').value;
+    var CmbCentroCosto = document.getElementById('CmbCentroCosto').value;
+    var CmbEmpresa = document.getElementById('CmbEmpresa').value;
+    
+    var CmbTercero = document.getElementById('CmbTercero').value; 
+    var TxtCuentaContable = document.getElementById('TxtCuentaContable').value; 
+    
+    var form_data = new FormData();
+        form_data.append('idDocumento', 3);
+        
+        form_data.append('TxtFechaInicial', TxtFechaInicial);
+        form_data.append('TxtFechaFinal', TxtFechaFinal);
+        form_data.append('CmbCentroCosto', CmbCentroCosto);
+        form_data.append('CmbEmpresa', CmbEmpresa);
+        
+        form_data.append('CmbTercero', CmbTercero);
+        form_data.append('TxtCuentaContable', TxtCuentaContable);
+          
+        $.ajax({
+        url: './Consultas/PDF_ReportesContables.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            console.log(data);
+            document.getElementById("DivOpcionesReportes").innerHTML="";
+            document.getElementById("DivReportesContables").innerHTML=data;
+            document.getElementById("DivPDFReportes").style.display="none";
+          
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })        
+}
 
 function ExportarTablaToExcel(idTabla){
     excel = new ExcelGen({

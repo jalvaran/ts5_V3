@@ -48,6 +48,63 @@ if(isset($_REQUEST["idDocumento"])){
     
             
         break;
+    
+        case 3://Genera el html con los datos del movimiento de cuentas
+            
+            $FechaInicial=$obCon->normalizar($_REQUEST["TxtFechaInicial"]);
+            $FechaFinal=$obCon->normalizar($_REQUEST["TxtFechaFinal"]);
+            $idEmpresa=$obCon->normalizar($_REQUEST["CmbEmpresa"]);
+            $CentroCosto=$obCon->normalizar($_REQUEST["CmbCentroCosto"]);             
+            $CmbTercero=$obCon->normalizar($_REQUEST["CmbTercero"]);
+            $TxtCuentaContable=$obCon->normalizar($_REQUEST["TxtCuentaContable"]);
+            $Condicional="";
+            if($CmbTercero<>""){
+                $Condicional="AND Tercero_Identificacion='$CmbTercero'";
+            }
+            
+            if($FechaInicial==""){
+                exit("E1;Debe Seleccionar una Fecha Inicial");
+            }
+            if($FechaFinal==""){
+                exit("E1;Debe Seleccionar una Fecha Final");
+            }
+            if($idEmpresa==""){
+                exit("E1;Debe Seleccionar una Empresa");
+            }
+            if($CentroCosto==""){
+                exit("E1;Debe Seleccionar un Centro de Costos");
+            }
+            
+            if($TxtCuentaContable==""){
+                exit("E1;Debe Seleccionar un Cuenta Contable");
+            }
+            
+            $sql="SELECT Fecha,Tipo_Documento_Intero,Num_Documento_Interno,Num_Documento_Externo,
+                Tercero_Identificacion,Tercero_Razon_Social,CuentaPUC, NombreCuenta,
+                @SaldoInicial as SaldoInicialCuenta,
+                Debito AS Debitos,Credito AS Creditos, ( ((SELECT Debitos) - (SELECT Creditos)) ) as Saldo,
+                 @SaldoFinal := @SaldoFinal + (SELECT Saldo) AS SaldoFinalCuenta,
+                @SaldoInicial := @SaldoInicial+(SELECT Saldo)
+
+                FROM librodiario JOIN (SELECT @SaldoFinal:=0) tb2 
+                JOIN (SELECT @SaldoInicial:=(SELECT SUM(Debito-Credito) FROM librodiario WHERE Fecha < '$FechaInicial' AND CuentaPUC like '$TxtCuentaContable%')) tb3 
+                WHERE Fecha>='$FechaInicial' AND Fecha<='$FechaFinal' AND CuentaPUC like '$TxtCuentaContable%' $Condicional ORDER BY Fecha ;";
+            
+            $html=$obDoc->HTMLReporteMovimientoDeCuentas($sql);
+            /*
+            $page="Consultas/PDF_ReportesContables.draw.php?idDocumento=1&TxtFechaInicial=$FechaInicial&TxtFechaFinal=$FechaFinal"; 
+            $page.="&CmbEmpresa=$idEmpresa&CmbCentroCosto=$CentroCosto&CmbAnio=$Anio";
+            print("<a href='$page' target='_blank'><button class='btn btn-warning' >Exportar a PDF</button></a>");
+            
+             * 
+             */
+            print("<input type='button' class='btn btn-success' value='Exportar a Excel' onclick=ExportarTablaToExcel('ReporteMovimientoCuentas')> ");
+            //$css->CrearBotonEvento("BtnExportar", "Exportar", 1, "onclick", "ExportarTablaToExcel('TblReporte')", "verde", "");
+            print($html);
+            //$obDoc->EstadosResultadosAnio_PDF($FechaInicial,$FechaFinal,$idEmpresa,$CentroCosto,"" );
+    
+            
+        break;
         
     }
 }else{

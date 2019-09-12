@@ -199,8 +199,9 @@ if( !empty($_REQUEST["Accion"]) ){
                             $css->ColTabla(number_format($DatosItems["Total"]), 1,'R');
                             print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");
                                 if($Estado=='AB'){
-                                    $css->li("", "fa  fa-remove", "", "onclick=EliminarItem(`1`,`$idItem`) style=font-size:16px;cursor:pointer;text-align:center;color:red");
-                                    $css->Cli();
+                                    $css->CrearBotonEvento("BtnEliminarItem_$idItem", "Eliminar", 1, "onclick", "onclick=EliminarItem(`1`,`$idItem`)", "rojo", "");
+                                    //$css->li("", "fa  fa-remove", "", "onclick=EliminarItem(`1`,`$idItem`) style=font-size:16px;cursor:pointer;text-align:center;color:red");
+                                    //$css->Cli();
                                 }
                             print("</td>");
                         $css->CierraFilaTabla();
@@ -392,6 +393,10 @@ if( !empty($_REQUEST["Accion"]) ){
         break; //Fin Caso 10
     
         case 11://Formulario para Crear un egreso
+            $DatosCaja=$obCon->DevuelveValores("cajas", "idUsuario", $idUser);
+            if($DatosCaja["ID"]==''){
+                exit("E1;No tienes una caja Asignada, por favor asignese una caja");
+            }
             $css->input("hidden", "idFormulario", "", "idFormulario", "", 3, "", "", "", ""); //3 sirve para indicarle al sistema que debe guardar el formulario de crear un egreso
             
             $css->CrearTabla();
@@ -452,6 +457,87 @@ if( !empty($_REQUEST["Accion"]) ){
                 
             $css->CerrarTabla();
         break;//Fin caso 11    
+        case 12://Dibuja el resumen actual del turno
+            
+            $css->CrearBotonEvento("BtnExportarExcel", "Exportar Resumen del turno", 1, "onclick", "ExportarTablaToExcel('tblResumenTurno')", "verde", "");
+           
+            
+           
+            $css->CrearTabla('tblResumenTurno');
+                 
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>ID</strong>", 1);
+                    $css->ColTabla("<strong>Producto</strong>", 1);
+                    $css->ColTabla("<strong>Recibe</strong>", 1);
+                    $css->ColTabla("<strong>Compras</strong>", 1);
+                    $css->ColTabla("<strong>Altas</strong>", 1);
+                    $css->ColTabla("<strong>Ventas</strong>", 1);
+                    $css->ColTabla("<strong>Bajas</strong>", 1);
+                    $css->ColTabla("<strong>Saldo Final</strong>", 1);
+                    $css->ColTabla("<strong>Total Ventas</strong>", 1);
+                    $css->ColTabla("<strong>Comision 1</strong>", 1);
+                    $css->ColTabla("<strong>Comision 2</strong>", 1);
+                    $css->ColTabla("<strong>Comision 3</strong>", 1);
+                    $css->ColTabla("<strong>Comision 4</strong>", 1);
+                    $css->ColTabla("<strong>Total Casa</strong>", 1);
+                    
+                $css->CierraFilaTabla();
+                
+                $sql="SELECT * FROM vista_resumen_restaurante_turno_actual  ";
+                        
+                $Consulta=$obCon->Query($sql);
+                $TotalVentas=0;
+                $TotalComision1=0;
+                $TotalComision2=0;
+                $TotalComision3=0;
+                $TotalComision4=0;
+                $TotalCasa=0;
+                while($DatosAgenda=$obCon->FetchAssoc($Consulta)){
+                    $TotalVentas=$TotalVentas+$DatosAgenda["TotalVentas"];    
+                    $TotalComision1=$TotalComision1+$DatosAgenda["TotalComisiones1"];  
+                    $TotalComision2=$TotalComision2+$DatosAgenda["TotalComisiones2"];  
+                    $TotalComision3=$TotalComision3+$DatosAgenda["TotalComisiones3"];  
+                    $TotalComision4=$TotalComision4+$DatosAgenda["TotalComisiones4"];  
+                    $TotalCasa=$TotalCasa+$DatosAgenda["TotalCasa"];  
+                    $css->FilaTabla(16);
+                        $css->ColTabla($DatosAgenda["idProductosVenta"], 1);
+                        $css->ColTabla($DatosAgenda["Nombre"], 1);
+                        $css->ColTabla($DatosAgenda["CantidadRecibida"], 1);
+                        $css->ColTabla($DatosAgenda["ItemsCompras"], 1);
+                        $css->ColTabla($DatosAgenda["TotalAltas"], 1);
+                        $css->ColTabla($DatosAgenda["ItemsVentas"], 1);
+                        $css->ColTabla($DatosAgenda["TotalBajas"], 1);
+                        $css->ColTabla($DatosAgenda["SaldoFinal"], 1);
+                        $css->ColTabla(number_format($DatosAgenda["TotalVentas"]), 1);
+                        $css->ColTabla(number_format($DatosAgenda["TotalComisiones1"]), 1);
+                        $css->ColTabla(number_format($DatosAgenda["TotalComisiones2"]), 1);
+                        $css->ColTabla(number_format($DatosAgenda["TotalComisiones3"]), 1);
+                        $css->ColTabla(number_format($DatosAgenda["TotalComisiones4"]), 1);
+                        $css->ColTabla(number_format($DatosAgenda["TotalCasa"]), 1);
+                        
+                    $css->CierraFilaTabla();
+                }
+                
+                $css->FilaTabla(16);
+                        $css->ColTabla(" ", 1,"R");
+                        $css->ColTabla(" ", 1,"R");
+                        $css->ColTabla(" ", 1,"R");
+                        $css->ColTabla(" ", 1,"R");
+                        $css->ColTabla(" ", 1,"R");
+                        $css->ColTabla(" ", 1,"R");
+                        $css->ColTabla(" ", 1,"R");
+                        //$css->ColTabla(" ", 1,"R");                        
+                        $css->ColTabla("<strong>TOTALES:</strong>", 1,"R");
+                        $css->ColTabla("<strong>".number_format($TotalVentas)."</strong>", 1);
+                        $css->ColTabla("<strong>".number_format($TotalComision1)."</strong>", 1);
+                        $css->ColTabla("<strong>".number_format($TotalComision2)."</strong>", 1);
+                        $css->ColTabla("<strong>".number_format($TotalComision3)."</strong>", 1);
+                        $css->ColTabla("<strong>".number_format($TotalComision4)."</strong>", 1);
+                        $css->ColTabla("<strong>".number_format($TotalCasa)."</strong>", 1);
+                        
+                    $css->CierraFilaTabla();
+           $css->CerrarTabla(); 
+        break; //Fin caso 12    
     }
     
     

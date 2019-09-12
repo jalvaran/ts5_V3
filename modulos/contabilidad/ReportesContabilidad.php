@@ -40,9 +40,15 @@ $css->PageInit($myTitulo);
                     print("Estado de Resultados");
                 $css->Coption();
                 
+                $css->option("", "", "Movimiento de Cuentas", 4, "", "");
+                    print("Movimientos de cuenta");
+                $css->Coption();
+                
                 $css->option("", "", "Certificados de retencion", 2, "", "");
                     print("Certificados de retención");
                 $css->Coption();
+                
+                
                 
             $css->Cselect();
         $css->Cfieldset();

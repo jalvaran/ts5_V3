@@ -230,6 +230,32 @@ function DibujePedidos(){
       
 }
 
+function VerResumenTurno(){
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 12);
+       
+        $.ajax({
+        url: './Consultas/pos2.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivTab6').innerHTML=data;
+           
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+      
+      
+}
+
 
 function DibujeTituloPedido(idPedido){
     
@@ -1110,6 +1136,15 @@ function CalculeTotalEgreso(){
     
     document.getElementById('TotalEgreso').value=subtotal+iva;
     
+}
+
+function ExportarTablaToExcel(idTabla){
+    excel = new ExcelGen({
+        "src_id": idTabla,
+        "show_header": true,
+        "type": "table"
+    });
+    excel.generate();
 }
 
 document.getElementById('BtnMuestraMenuLateral').click();

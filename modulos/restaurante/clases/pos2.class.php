@@ -461,7 +461,7 @@ class VentasRestaurantePOS extends Facturacion{
         $DatosSucursal= $this->DevuelveValores("empresa_pro_sucursales", "Actual", 1);
         $SedeActual= $DatosSucursal["ID"];     
         $sql="INSERT INTO restaurante_resumen_cierre 
-                (`Fecha`,`idProducto`,`NombreProducto`,`Compra`,`Ventas`,`TrasladosRecibidos`,`TrasladosRealizados`,`Bajas`,`Altas`,`Recibe`,`Saldo`,`TotalVentas`,`TotalPropinas1`,`TotalPropinas2`,`TotalPropinas3`,`TotalCasa`,`idUser`,`idCierre`,`FechaCreacion`)
+                (`Fecha`,`idProducto`,`NombreProducto`,`Compra`,`Ventas`,`TrasladosRecibidos`,`TrasladosRealizados`,`Bajas`,`Altas`,`Recibe`,`Saldo`,`TotalVentas`,`TotalPropinas1`,`TotalPropinas2`,`TotalPropinas3`,`TotalPropinas4`,`TotalCasa`,`idUser`,`idCierre`,`FechaCreacion`)
               SELECT '$Fecha',t1.idProductosVenta,t1.Nombre,
                (SELECT IFNULL((SELECT SUM(Cantidad) FROM factura_compra_items fci WHERE t1.idProductosVenta=fci.idProducto AND idCierre='$idCierre'),0)) AS ItemsCompras,
                (SELECT IFNULL((SELECT SUM(Cantidad) FROM facturas_items fi WHERE t1.Referencia=fi.Referencia AND idCierre='$idCierre'),0)) as ItemsVentas,
@@ -475,7 +475,8 @@ class VentasRestaurantePOS extends Facturacion{
                (t1.ValorComision1 * (SELECT ItemsVentas)) as TotalComisiones1,
                (t1.ValorComision2 * (SELECT ItemsVentas)) as TotalComisiones2,
                (t1.ValorComision3 * (SELECT ItemsVentas)) as TotalComisiones3,
-               ((SELECT TotalVentas)-(SELECT TotalComisiones1)-(SELECT TotalComisiones2)-(SELECT TotalComisiones3)) as TotalCasa,
+               (t1.ValorComision4 * (SELECT ItemsVentas)) as TotalComisiones4,
+               ((SELECT TotalVentas)-(SELECT TotalComisiones1)-(SELECT TotalComisiones2)-(SELECT TotalComisiones3)-(SELECT TotalComisiones4)) as TotalCasa,
                '$idUser','$idCierre','$FechaRegistro'
               FROM productosventa t1   
             ";

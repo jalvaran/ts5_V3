@@ -26,7 +26,9 @@ $css->PageInit($myTitulo);
             $css->TabLabel("TabCuentas5", "<strong>Detalles</strong>", "Tab_5", 0,"onclick='idPestana=5;'");
             $css->TabLabel("TabCuentas3", "<strong>Facturar</strong>", "Tab_3",0,"onclick='AbrirOpcionesFacturacion();idPestana=3;'");  
             $css->TabLabel("TabCuentas4", "<strong>Preparación</strong>", "Tab_4",0,"onclick='idPestana=4;'"); 
-            
+            if($TipoUser=='administrador'){
+                $css->TabLabel("TabCuentas6", "<strong>Resumen Turno Actual</strong>", "Tab_6",0,"onclick='VerResumenTurno();idPestana=6;'"); 
+            }
         $css->TabInitEnd();
         $css->TabContentInit();
         
@@ -121,22 +123,23 @@ $css->PageInit($myTitulo);
 
         $css->TabPaneEnd();
            
+        if($TipoUser=='administrador'){
             
-            
-            /*            
-            $css->CrearDiv("DivTotales", "col-sm-4", "center", 1, 1);
+        $css->TabPaneInit("Tab_6");
+                         
+            $css->CrearDiv("DivTab6", "", "center", 1, 1);
             $css->CerrarDiv();
             
-             * 
-             */
         $css->TabPaneEnd();
-        
+            
+        }
     $css->Csection();
 
 $css->PageFin();
 
 print('<script src="jsPages/pos2.js"></script>');  //script propio de la pagina
 
+$css->AddJSExcel();
 $css->Cbody();
 $css->Chtml();
 

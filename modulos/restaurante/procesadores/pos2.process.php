@@ -258,7 +258,9 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             $idCierre=$obCon->CierreTurnoRestaurantePos($TxtObservaciones,$idUser);
             $obCon->RegistreResumenCierre($idCierre, $idUser);
-            print("OK;Se ha Cerrado el turno $idCierre;Imprimir");
+            $Ruta="../../general/consultas/PDF_Documentos.draw.php?idDocumento=36&ID=$idCierre";
+            $Link="<a href='$Ruta' target='_BLANK'><h1>Imprimir Cierre $idCierre</h1></a>";
+            print("OK;Se ha Cerrado el turno $idCierre;$Link");
         break; //Fin caso 9
         
         case 10://Crear un egreso
@@ -274,6 +276,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $Concepto=$obCon->normalizar($_REQUEST['TxtConcepto']);
             
             $DatosCaja=$obCon->DevuelveValores("cajas", "idUsuario", $idUser);
+            if($DatosCaja["ID"]==''){
+                exit("E1;No tienes una caja Asignada, por favor asignese una caja");
+            }
             
             $CuentaOrigen=$DatosCaja["CuentaPUCEfectivo"];
             $CentroCostos=$DatosCaja["CentroCostos"];
