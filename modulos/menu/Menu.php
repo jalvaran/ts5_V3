@@ -71,7 +71,7 @@ $css->PageInit($myTitulo);
 
 $css->PageFin();
 
-print('<script src="../../general/js/notificaciones.js"></script>');
+//print('<script src="../../general/js/notificaciones.js"></script>');
 $ip=$_SERVER['REMOTE_ADDR'];
 $ipServer=$_SERVER['SERVER_ADDR'];
 /**
@@ -79,7 +79,7 @@ $ipServer=$_SERVER['SERVER_ADDR'];
  */
 //if($ip==$ipServer){
    // print('<script src="../../general/js/backups.js"></script>');
-    print('<script src="../../general/js/ProcesosConFacturas.js"></script>');
+    //print('<script src="../../general/js/ProcesosConFacturas.js"></script>');
 //}
 
 $css->Cbody();

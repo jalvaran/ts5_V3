@@ -405,9 +405,9 @@ class html_estruct_class {
      * @param type $class ->atr global. id del elemento span
      * @param type $vectorhtml ->vector por si se desea meter mas atributos al elemento(se debe definir antes de ulitlizarlo y en la clase definir el uso para tal atributo)
      */
-    function span($id,$class,$vectorhtml,$Script){
+    function span($id,$class,$vectorhtml,$Script,$style=""){
         
-        print('<span id="'.$id.'" class="'.$class.'" '.$Script.' >');
+        print('<span id="'.$id.'" class="'.$class.'" '.$Script.' '.$style.'>');
     }
     
     /**
