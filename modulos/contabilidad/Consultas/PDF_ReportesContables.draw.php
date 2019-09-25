@@ -83,8 +83,9 @@ if(isset($_REQUEST["idDocumento"])){
                 Tercero_Identificacion,Tercero_Razon_Social,CuentaPUC, NombreCuenta,
                 @SaldoInicial as SaldoInicialCuenta,
                 Debito AS Debitos,Credito AS Creditos, ( ((SELECT Debitos) - (SELECT Creditos)) ) as Saldo,
-                 @SaldoFinal := @SaldoFinal + (SELECT Saldo) AS SaldoFinalCuenta,
-                @SaldoInicial := @SaldoInicial+(SELECT Saldo)
+                 @SaldoFinal := @SaldoFinal + (SELECT Saldo) AS SaldoMovimiento,
+                 
+                @SaldoInicial := @SaldoInicial+(SELECT Saldo) as SaldoFinalCuenta
 
                 FROM librodiario JOIN (SELECT @SaldoFinal:=0) tb2 
                 JOIN (SELECT @SaldoInicial:=(SELECT SUM(Debito-Credito) FROM librodiario WHERE Fecha < '$FechaInicial' AND CuentaPUC like '$TxtCuentaContable%')) tb3 

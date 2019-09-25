@@ -238,7 +238,7 @@ class PDF_ReportesContables extends Documento{
         $Back="white";
         $Consulta=$this->obCon->Query($sql);
         $html.='<tr align="left" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
-        $html.='<td><strong>FECHA</strong></td><td><strong>TERCERO</strong></td><td><strong>DOCUMENTO</strong></td><td><strong>REFERENCIA</strong></td><td><strong>CUENTA</strong></td><td><strong>NOMBRE</strong></td><td><strong>SALDO ANTERIOR</strong></td><td><strong>DEBITO</strong></td><td><strong>CREDITO</strong></td><td><strong>SALDO FINAL</strong></td>'; 
+        $html.='<td><strong>FECHA</strong></td><td><strong>TERCERO</strong></td><td><strong>DOCUMENTO</strong></td><td><strong>REFERENCIA</strong></td><td><strong>CUENTA</strong></td><td><strong>NOMBRE</strong></td><td><strong>SALDO ANTERIOR</strong></td><td><strong>DEBITO</strong></td><td><strong>CREDITO</strong></td><td><strong>SALDO MOVIMIENTO</strong></td><td><strong>SALDO FINAL</strong></td>'; 
         
         $html.='</tr>';   
         
@@ -262,6 +262,7 @@ class PDF_ReportesContables extends Documento{
            $html.="<td>".number_format($DatosMayor["SaldoInicialCuenta"])."</td>";
            $html.="<td>".number_format($DatosMayor["Debitos"])."</td>";
            $html.="<td>".number_format($DatosMayor["Creditos"])."</td>";
+           $html.="<td>".number_format($DatosMayor["SaldoMovimiento"])."</td>";
            $html.="<td>".number_format($DatosMayor["SaldoFinalCuenta"])."</td>";
            
            $html.='</tr>'; 

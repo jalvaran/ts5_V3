@@ -4091,7 +4091,7 @@ public function VerificaPermisos($VectorPermisos) {
             $DatosSucursal=  $this->DevuelveValores("empresa_pro_sucursales", "Actual", 1); 
             
             $tab="librodiario";
-            $NumRegistros=27;
+            $NumRegistros=28;
             $CuentaPUC=$CuentaDestino;
             $NombreCuenta=$DatosCuentasFrecuentes["Nombre"];
             $CuentaPUCContraPartida=$CuentaClientes["CuentaPUC"];
@@ -4124,6 +4124,7 @@ public function VerificaPermisos($VectorPermisos) {
             $Columnas[24]="idCentroCosto";		$Valores[24]=$CentroCosto;
             $Columnas[25]="idEmpresa";			$Valores[25]=$DatosCentro["EmpresaPro"];
             $Columnas[26]="idSucursal";                 $Valores[26]=$DatosSucursal["ID"];
+            $Columnas[27]="Num_Documento_Externo";      $Valores[27]=$DatosFactura["NumeroFactura"];
             $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
 
 
