@@ -18,6 +18,17 @@ if( !empty($_REQUEST["Accion"]) ){
                 
         case 1://Dibuja los items de una preventa
             $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);
+            $DatosConfiguracion=$obCon->DevuelveValores("configuracion_general", "ID", 12); //Consultamos si está permitido crear desde el pos
+            if($idPreventa>=1 and $DatosConfiguracion["Valor"]==1){
+                $Titulo="Crear";
+                $Nombre="ImgShowMenu";
+                $RutaImage="../../images/pop_servicios.png";
+                $javascript="onclick=FormularioCreacionProductos('ModalAccionesPOS','DivFrmPOS','BntModalPOS')";
+                $VectorBim["f"]=0;
+                $target="#DialTabla";
+                $css->CrearBotonImagen($Titulo,$Nombre,$target,$RutaImage,$javascript,50,50,"fixed","right:10px;top:50px;z-index:100;",$VectorBim);
+            }
+            
             $css->CrearTabla();
                 $css->FilaTabla(16);
                     

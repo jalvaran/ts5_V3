@@ -856,8 +856,11 @@ class Facturacion extends ProcesoVenta{
                 }
             }
             $TotalSubtotal=$TotalSubtotal+$SubtotalItem; //se realiza la sumatoria del subtotal
-            
-            $IVAItem=($SubtotalItem*$DatosProducto["IVA"]);
+            $MultiplicadorIVA=$DatosProducto["IVA"];
+            if($DatosProducto["IVA"]=='E'){
+                $MultiplicadorIVA=0;
+            }
+            $IVAItem=($SubtotalItem*$MultiplicadorIVA);
            
             $TotalIVA=$TotalIVA+$IVAItem; //se realiza la sumatoria del iva
             

@@ -4,7 +4,7 @@ header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Ac
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 header('content-type: application/json; charset=utf-8');
 header('Accept: application/json; charset=utf-8');
-/*
+
 session_start();
 if (!isset($_SESSION['username'])){
   exit("<a href='../../index.php' ><img src='../images/401.png'>Iniciar Sesion </a>");
@@ -12,8 +12,7 @@ if (!isset($_SESSION['username'])){
 }
 $idUser=$_SESSION['idUser'];
 $fecha=date("Y-m-d");
- * 
- */
+ 
 function callAPI($method, $url, $data){
    $curl = curl_init();
 
@@ -49,10 +48,10 @@ function callAPI($method, $url, $data){
    curl_close($curl);
    return $result;
 }
-//include_once("../clases/Facturacion.class.php");
+include_once("../clases/facturacion_electronica.class.php");
 //include_once("restclient.php");
 if( !empty($_REQUEST["Accion"]) ){
-   // $obCon = new Facturacion($idUser);
+    $obCon = new Factura_Electronica($idUser);
     
     switch ($_REQUEST["Accion"]) {
         
@@ -392,7 +391,11 @@ if( !empty($_REQUEST["Accion"]) ){
               print_r($response);
         break;//fin caso 6
         
-        
+        case 7://Prueba json
+            $idFactura="201909271516270_45865500_1569615387";
+            $body=$obCon->JSONFactura($idFactura);
+            print($body);
+        break;//Fin caso 7    
     }
     
     

@@ -270,3 +270,284 @@ function CompletaRazonSocial() {
 
 
 }
+
+function FormularioCreacionProductos(idModal,idDivFormulario,idBotonModal){
+    $("#"+idModal).modal();
+    document.getElementById(idBotonModal).disabled=true;
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 2);
+        
+        $.ajax({
+        url: '../../general/Consultas/formularios.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDivFormulario).innerHTML=data;
+            ConvierteSelectoresSubgrupos('D');
+            $('#CmbCuentaPUC').select2({		  
+                placeholder: 'Seleccione una Cuenta Contable',
+                ajax: {
+                  url: '../../general/buscadores/CuentaPUCIngresos.search.php',
+                  dataType: 'json',
+                  delay: 250,
+                  processResults: function (data) {
+
+                    return {                     
+                      results: data
+                    };
+                  },
+                 cache: true
+                }
+              });
+            document.getElementById(idBotonModal).disabled=false;
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBotonModal).disabled=false;
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+function ConvierteSelectoresSubgrupos(idAccion){
+        
+    if(idAccion=='D'){
+        $('#CmbDepartamento').select2({
+		  
+            placeholder: 'Selecciona un Departamento',
+            ajax: {
+              url: '../../general/buscadores/departamentos.search.php',
+              dataType: 'json',
+              delay: 250,
+              processResults: function (data) {
+                  
+                return {                     
+                  results: data
+                };
+              },
+             cache: true
+            }
+          });
+          
+        document.getElementById("CmbSub1").value='';
+        
+        if(document.getElementById("select2-CmbSub1-container")){
+            
+            document.getElementById("select2-CmbSub1-container").innerHTML='Seleccione el Subgrupo 1';
+        }
+        
+        document.getElementById("CmbSub2").value='';
+        if(document.getElementById("select2-CmbSub2-container")){
+            
+            document.getElementById("select2-CmbSub2-container").innerHTML='Seleccione el Subgrupo 2';
+        }
+        
+        document.getElementById("CmbSub4").value='';
+        if(document.getElementById("select2-CmbSub4-container")){
+            
+            document.getElementById("select2-CmbSub4-container").innerHTML='Seleccione el Subgrupo 4';
+        }
+        document.getElementById("CmbSub3").value='';
+        if(document.getElementById("select2-CmbSub3-container")){
+            
+            document.getElementById("select2-CmbSub3-container").innerHTML='Seleccione el Subgrupo 3';
+        }
+        document.getElementById("CmbSub6").value='';
+        if(document.getElementById("select2-CmbSub6-container")){
+            document.getElementById("select2-CmbSub6-container").innerHTML='Seleccione el Subgrupo 6';
+        }
+        
+        var Departamento=document.getElementById("CmbDepartamento").value;
+        
+        $('#CmbSub1').select2({
+		  
+            placeholder: 'Selecciona el sub grupo 1',
+            ajax: {
+              url: '../../general/buscadores/sub1.search.php?idDepartamento='+Departamento,
+              dataType: 'json',
+              delay: 250,
+              processResults: function (data) {
+                  
+                return {                     
+                  results: data
+                };
+              },
+             cache: true
+            }
+          });
+    }
+    if(idAccion=='1'){
+        
+        document.getElementById("CmbSub2").value='';
+        if(document.getElementById("select2-CmbSub2-container")){
+            document.getElementById("select2-CmbSub2-container").innerHTML='Seleccione el Subgrupo 2';
+        }
+        document.getElementById("CmbSub4").value='';
+        if(document.getElementById("select2-CmbSub4-container")){
+            document.getElementById("select2-CmbSub4-container").innerHTML='Seleccione el Subgrupo 4';
+        }
+        document.getElementById("CmbSub3").value='';
+        if(document.getElementById("select2-CmbSub3-container")){
+            document.getElementById("select2-CmbSub3-container").innerHTML='Seleccione el Subgrupo 3';
+        }
+        document.getElementById("CmbSub6").value='';
+        if(document.getElementById("select2-CmbSub6-container")){
+            document.getElementById("select2-CmbSub6-container").innerHTML='Seleccione el Subgrupo 6';
+        }
+        var CmbSub1=document.getElementById("CmbSub1").value;
+        $('#CmbSub2').select2({
+		  
+            placeholder: 'Selecciona el sub grupo 2',
+            ajax: {
+              url: '../../general/buscadores/sub2.search.php?idSub1='+CmbSub1,
+              dataType: 'json',
+              delay: 250,
+              processResults: function (data) {
+                  
+                return {                     
+                  results: data
+                };
+              },
+             cache: true
+            }
+          });
+    }
+    if(idAccion=='2'){
+        
+        
+        document.getElementById("CmbSub4").value='';
+        if(document.getElementById("select2-CmbSub4-container")){
+            document.getElementById("select2-CmbSub4-container").innerHTML='Seleccione el Subgrupo 4';
+        }
+        document.getElementById("CmbSub3").value='';
+        if(document.getElementById("select2-CmbSub3-container")){
+            document.getElementById("select2-CmbSub3-container").innerHTML='Seleccione el Subgrupo 3';
+        }
+        document.getElementById("CmbSub6").value='';
+        if(document.getElementById("select2-CmbSub6-container")){
+            document.getElementById("select2-CmbSub6-container").innerHTML='Seleccione el Subgrupo 6';
+        }
+        var CmbSub2=document.getElementById("CmbSub2").value;
+        $('#CmbSub3').select2({
+		  
+            placeholder: 'Selecciona el sub grupo 3',
+            ajax: {
+              url: '../../general/buscadores/sub3.search.php?idSub2='+CmbSub2,
+              dataType: 'json',
+              delay: 250,
+              processResults: function (data) {
+                  
+                return {                     
+                  results: data
+                };
+              },
+             cache: true
+            }
+          });
+        
+    }
+    if(idAccion=='3'){        
+        
+        document.getElementById("CmbSub4").value='';   
+        if(document.getElementById("select2-CmbSub4-container")){
+            document.getElementById("select2-CmbSub4-container").innerHTML='Seleccione el Subgrupo 4';
+        }
+        document.getElementById("CmbSub6").value='';
+        if(document.getElementById("select2-CmbSub6-container")){
+            document.getElementById("select2-CmbSub6-container").innerHTML='Seleccione el Subgrupo 6';
+        }
+        var CmbSub3=document.getElementById("CmbSub3").value;
+        $('#CmbSub4').select2({
+		  
+            placeholder: 'Selecciona el sub grupo 4',
+            ajax: {
+              url: '../../general/buscadores/sub4.search.php?idSub3='+CmbSub3,
+              dataType: 'json',
+              delay: 250,
+              processResults: function (data) {
+                  
+                return {                     
+                  results: data
+                };
+              },
+             cache: true
+            }
+          });
+    }
+    if(idAccion=='4'){
+        
+        
+        document.getElementById("CmbSub6").value='';
+        if(document.getElementById("select2-CmbSub6-container")){
+            document.getElementById("select2-CmbSub6-container").innerHTML='Seleccione el Subgrupo 6';
+        }
+        var CmbSub4=document.getElementById("CmbSub4").value;
+        $('#CmbSub6').select2({
+		  
+            placeholder: 'Selecciona el sub grupo 6',
+            ajax: {
+              url: '../../general/buscadores/sub6.search.php?idSub4='+CmbSub4,
+              dataType: 'json',
+              delay: 250,
+              processResults: function (data) {
+                  
+                return {                     
+                  results: data
+                };
+              },
+             cache: true
+            }
+          });
+    }
+    
+      
+    
+}
+
+function ValidaReferencia(Tabla=1){
+    
+    var TxtReferencia=document.getElementById('TxtReferencia').value;
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 4);
+        form_data.append('Tabla', Tabla);
+        form_data.append('TxtReferencia', TxtReferencia);
+        
+        $.ajax({
+        url: '../../general/procesadores/formularios.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="E1"){
+                alertify.error(respuestas[1]);
+                
+                posiciona('TxtReferencia');
+                
+            }else if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+               
+            }else{
+                alertify.alert(data);
+                
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+
+}
