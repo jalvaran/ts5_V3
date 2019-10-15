@@ -515,12 +515,12 @@ function ValidaReferencia(Tabla=1){
     
     var form_data = new FormData();
         
-        form_data.append('Accion', 4);
+        form_data.append('Accion', 1);
         form_data.append('Tabla', Tabla);
         form_data.append('TxtReferencia', TxtReferencia);
         
         $.ajax({
-        url: '../../general/procesadores/formularios.process.php',
+        url: '../inventarios/procesadores/inventarios.process.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -550,4 +550,91 @@ function ValidaReferencia(Tabla=1){
           }
       })  
 
+}
+
+function CrearProductoVenta(ModuloQueInvoca=''){
+    var idModal ="ModalAccionesPOS";
+    var CmbDepartamento=document.getElementById('CmbDepartamento').value;
+    var CmbSub1=document.getElementById('CmbSub1').value;
+    var CmbSub2=document.getElementById('CmbSub2').value;
+    var CmbSub3=document.getElementById('CmbSub3').value;
+    var CmbSub4=document.getElementById('CmbSub4').value;
+    var CmbSub6=document.getElementById('CmbSub6').value;
+    
+    var TxtNombre=document.getElementById('TxtNombre').value;
+    var TxtReferencia=document.getElementById('TxtReferencia').value;
+    var TxtExistencias=document.getElementById('TxtExistencias').value;
+    var TxtPrecioVenta=document.getElementById('TxtPrecioVenta').value;
+    var TxtPrecioMayorista=document.getElementById('TxtPrecioMayorista').value;
+    var TxtCostoUnitario=document.getElementById('TxtCostoUnitario').value;
+    var CmbIVA=document.getElementById('CmbIVA').value;
+    var CmbCuentaPUC=document.getElementById('CmbCuentaPUC').value;
+    var TxtCodigoBarras=document.getElementById('TxtCodigoBarras').value;
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 2);
+        form_data.append('CmbDepartamento', CmbDepartamento);
+        form_data.append('CmbSub1', CmbSub1);
+        form_data.append('CmbSub2', CmbSub2);
+        form_data.append('CmbSub3', CmbSub3);
+        form_data.append('CmbSub4', CmbSub4);
+        form_data.append('CmbSub6', CmbSub6);
+        form_data.append('TxtReferencia', TxtReferencia);
+        form_data.append('TxtNombre', TxtNombre);
+        form_data.append('TxtExistencias', TxtExistencias);
+        form_data.append('TxtPrecioVenta', TxtPrecioVenta);
+        form_data.append('TxtPrecioMayorista', TxtPrecioMayorista);
+        form_data.append('TxtCostoUnitario', TxtCostoUnitario);
+        form_data.append('CmbIVA', CmbIVA);
+        form_data.append('CmbCuentaPUC', CmbCuentaPUC);
+        form_data.append('TxtCodigoBarras', TxtCodigoBarras);
+        
+        
+        $.ajax({
+        url: '../inventarios/procesadores/inventarios.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById("BntModalPOS").disabled=false;
+            document.getElementById("BntModalPOS").value="Guardar";
+            var respuestas = data.split(';');
+            if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);                
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+               if(ModuloQueInvoca==1){//Invoca el pos
+                   CierraModal(idModal);
+                   document.getElementById('Codigo').value=respuestas[1];
+                   //AgregarItem();
+               }
+            }else{
+                alertify.alert(data);
+                
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById("BntModalPOS").disabled=false;
+            document.getElementById("BntModalPOS").value="Guardar";
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+function MarqueErrorElemento(idElemento){
+    console.log(idElemento);
+    if(idElemento==undefined){
+       return; 
+    }
+    document.getElementById(idElemento).style.backgroundColor="pink";
+    document.getElementById(idElemento).focus();
 }

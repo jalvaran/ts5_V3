@@ -4448,13 +4448,13 @@ EOD;
         $this->PDF_Write($html);
         
         $Position=$this->PDF->GetY();
-        if($Position>246){
+        if($Position>243){
           $this->PDF_Add();
         }
         
         $html= $this->HTML_Totales_Factura($idFactura, $DatosFactura["ObservacionesFact"], $DatosEmpresaPro["ObservacionesLegales"]);
         if($VistaFactura==1)
-        $this->PDF->SetY(246);
+        $this->PDF->SetY(243);
         $this->PDF_Write($html);
         if($VistaFactura==3){
             $this->PDF_Write("<br>");

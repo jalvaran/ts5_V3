@@ -676,6 +676,10 @@ function AccionesPOS(){
         GuardarIngresoPlataformasPago();
     }
     
+    if(idFormulario==101){
+        CrearProductoVenta(1);
+    }
+    
 }
 /**
  * Crear un tercero

@@ -5761,33 +5761,6 @@ public function VerificaPermisos($VectorPermisos) {
         $DatosCodigo=$this->Query($SqlCB);
         $DatosCodigo=$this->FetchArray($DatosCodigo);
         $Datos=$this->ConsultarTabla("bodega", "");
-        /*
-        while($DatosBodegas=$this->FetchArray($Datos)){
-            $tabBodegas="productosventa_bodega_$DatosBodegas[0]";
-            
-            //$Vector["Tabla"]=$tabBodegas;
-            if($idProductoVenta==''){
-                $ID=$this->ObtenerMAX($tabBodegas,"idProductosVenta", 1,"");
-                $ID++;   
-            }else{
-                $ID=$idProductoVenta;
-            }
-            if($Referencia==''){
-                $Valores[2]="REF".$ID;
-            }
-            
-            $this->InsertarRegistro($tabBodegas,$NumRegistros,$Columnas,$Valores);
-            
-            $this->ActualizaRegistro($tabBodegas, "CodigoBarras", $ID, "idProductosVenta", $ID);
-            $tabBodegas="prod_codbarras_bodega_$DatosBodegas[0]";
-            $Columnas2[0]="ProductosVenta_idProductosVenta";    $Valores2[0]=$ID;
-            $Columnas2[1]="CodigoBarras";                       $Valores2[1]=$DatosCodigo["CodigoBarras"];
-            $this->InsertarRegistro($tabBodegas, 2, $Columnas2, $Valores2);
-            
-            
-        }
-         * *
-         */
         
         if($CodigoBarras<>''){
             $this->AgregueCodBarras($idProductoVenta, $CodigoBarras, "");

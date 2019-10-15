@@ -276,18 +276,24 @@ if( !empty($_REQUEST["Accion"]) ){
         case 13: //Agrega un movimiento a un documento desde una cuenta x pagar o x cobrar
             $idDocumento=$obCon->normalizar($_REQUEST["idDocumento"]); 
             $idItem=$obCon->normalizar($_REQUEST["idItem"]); 
-            $DatosMovimiento=$obCon->DevuelveValores("vista_cuentasxtercerosdocumentos_v2", "ID", $idItem);
-            $CuentaPUC=$DatosMovimiento["CuentaPUC"];            
-            $Tercero=$DatosMovimiento["Tercero_Identificacion"];
+            $Total=$obCon->normalizar($_REQUEST["Total"]); 
+            $CuentaPUC=$obCon->normalizar($_REQUEST["CuentaPUC"]); 
+            $NombreCuenta=$obCon->normalizar($_REQUEST["NombreCuenta"]); 
+            $Tercero=$obCon->normalizar($_REQUEST["Tercero"]); 
+            $TxtDocReferencia=$obCon->normalizar($_REQUEST["DocReferencia"]); 
+            
+            //$DatosMovimiento=$obCon->DevuelveValores("vista_cuentasxtercerosdocumentos_v2", "ID", $idItem);
+            //$CuentaPUC=$DatosMovimiento["CuentaPUC"];            
+            //$Tercero=$DatosMovimiento["Tercero_Identificacion"];
             $TxtConcepto="Cuenta x Pagar";
-            $Valor=abs($DatosMovimiento["Total"]); 
-            if($DatosMovimiento["Total"]>=0){
+            $Valor=abs($Total); 
+            if($Total>=0){
                 $TipoMovimiento="CR";
             }else{
                 $TipoMovimiento="DB";
             }
             
-            $TxtDocReferencia=$DatosMovimiento["NumeroDocumentoExterno"];
+            //$TxtDocReferencia=$DatosMovimiento["NumeroDocumentoExterno"];
             
             $Base=0;
             $Porcentaje=0;

@@ -75,19 +75,7 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Código disponible");
         break;//Fin caso 3
         
-        case 4://Verifica si ya existe la referencia de un producto o servicio
-            $Referencia=$obCon->normalizar($_REQUEST['TxtReferencia']);
-            $Tabla=$obCon->normalizar($_REQUEST['Tabla']);
-            if($Tabla==1){
-                $Tabla="productosventa";
-            }
-            $Datos=$obCon->ValorActual("$Tabla", "Referencia", " Referencia='$Referencia'");
-            if($Datos["Referencia"]<>''){
-                print("E1;La Referencia Digitada ya existe");
-                exit();
-            }
-            print("OK;Referencia disponible");
-        break;//Fin caso 4
+        
         
     }
     

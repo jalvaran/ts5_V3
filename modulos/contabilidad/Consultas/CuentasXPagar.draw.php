@@ -174,19 +174,21 @@ if( !empty($_REQUEST["Accion"]) ){
             
             
             
-            
-            $statement=" `vista_cuentasxpagardetallado_v2` $Condicional ";
+            $statement=" librodiario 
+                   WHERE Tercero_Identificacion='$Tercero' AND EXISTS "
+                    . "(SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE librodiario.CuentaPUC LIKE t2.CuentaPUC)  GROUP BY CuentaPUC,Num_Documento_Externo ORDER BY Fecha DESC ";
+            //$statement=" `vista_cuentasxpagardetallado_v2` $Condicional ";
             if(isset($_REQUEST['st'])){
 
                 $statement= urldecode($_REQUEST['st']);
                 //print($statement);
             }
             
-            $limit = 10;
+            $limit = 100;
             $startpoint = ($NumPage * $limit) - $limit;
             $VectorST = explode("LIMIT", $statement);
             $statement = $VectorST[0]; 
-            $query = "SELECT COUNT(*) as `num`,SUM(Total) AS Total FROM {$statement}";
+            $query = "SELECT COUNT(*) as `num`,SUM(Debito-Credito) AS Total FROM {$statement}";
             $row = $obCon->FetchArray($obCon->Query($query));
             $ResultadosTotales = $row['num'];
             $Total=$row['Total'];
@@ -194,6 +196,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $Limit=" LIMIT $startpoint,$limit";
             
             $query="SELECT * ";
+            $query="SELECT idLibroDiario as ID,CuentaPUC,Fecha,Num_Documento_Externo as NumeroDocumentoExterno,NombreCuenta,Tercero_Identificacion,Tercero_Razon_Social,SUM(Debito) as Debitos,SUM(Credito) as Creditos,SUM(Debito-Credito) AS Total ";
+            //print("$query FROM $statement $Limit");
             $Consulta=$obCon->Query("$query FROM $statement $Limit");
             
             $css->CrearTabla();
@@ -296,7 +300,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla($DatosCuentasXPagar["NombreCuenta"], 1);                        
                         $css->ColTabla(number_format($DatosCuentasXPagar["Total"]), 1);
                         print("<td style='text-align:center'>");
-                            print('<a href="#" onclick="AgregueMovimientoDesdeCuentaXPagar(`'.$idItem.'`,`'.$DatosCuentasXPagar["NumeroDocumentoExterno"].'`);"><i class="fa fa-plus"></i></a>');
+                            print('<a href="#" onclick="AgregueMovimientoDesdeCuentaXPagar(`'.$idItem.'`,`'.$DatosCuentasXPagar["NumeroDocumentoExterno"].'`,`'.$DatosCuentasXPagar["Total"].'`,`'.$DatosCuentasXPagar["CuentaPUC"].'`,`'.$DatosCuentasXPagar["NombreCuenta"].'`,`'.$Tercero.'`);"><i class="fa fa-plus"></i></a>');
                         print("</td>");
                     $css->CierraFilaTabla();
                 }
