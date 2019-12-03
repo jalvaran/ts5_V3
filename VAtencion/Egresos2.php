@@ -142,7 +142,7 @@ $css->CrearDiv("TipoEgresos", "container", "center", 1, 1);
                     $Consulta = $obVenta->ConsultarTabla("cuentas","WHERE GupoCuentas_PUC = 24");
                     $idTabla="idPUC";
             }else{
-                    $Consulta = $obVenta->ConsultarTabla("subcuentas","WHERE Cuentas_idPUC LIKE '$Egreso[Cuentas_idCuentas]%'");
+                    $Consulta = $obVenta->ConsultarTabla("subcuentas","WHERE PUC LIKE '$Egreso[Cuentas_idCuentas]%'");
                     $idTabla="PUC";
             }
             while($CuentaDestino=$obVenta->FetchArray($Consulta)){

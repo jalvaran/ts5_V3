@@ -238,6 +238,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $Tarjetas=$obCon->normalizar($_REQUEST["Tarjetas"]);
             $CmbPrint=$obCon->normalizar($_REQUEST["CmbPrint"]);
             $idCajero=$obCon->normalizar($_REQUEST["idCajero"]);
+            $TxtCuotaInicialCredito=$obCon->normalizar($_REQUEST["TxtCuotaInicialCredito"]);
+            
             if($idCajero<>$idUser){
                 print("Se ha iniciado sesion por un usario diferente al cajero actual, por favor inicie sesion nuevamente");
                 exit();
@@ -259,6 +261,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $Total=round($DatosTotalesCotizacion["Total"],2);
             $TotalCostos=$DatosTotalesCotizacion["TotalCostos"];
             $SaldoFactura=$Total;
+            if($TxtCuotaInicialCredito>$Total){
+                exit("E4; El valor de la cuota inicial no puede ser superior al valor de la factura");
+            }
             $Descuentos=0;
             $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
             if($AnticiposCruzados>0){
@@ -282,6 +287,18 @@ if( !empty($_REQUEST["Accion"]) ){
             if($FormaPagoFactura<>'Contado' and $idCliente<=1){
                 print("E5;No se puede crear una factura tipo $FormaPagoFactura asignada al cliente $idCliente");
                     exit();
+            }
+            
+            if($FormaPagoFactura<>'Contado'){
+                $NitCliente=$DatosCliente["Num_Identificacion"];
+                $sql="SELECT SUM(t1.Neto) as TotalCredito FROM librodiario t1 
+                        WHERE Tercero_Identificacion='$NitCliente' 
+                        AND EXISTS(SELECT 1 FROM contabilidad_parametros_cuentasxcobrar t2 WHERE t2.CuentaPUC like t1.CuentaPUC)";
+                $DatosTotalCreditoCliente=$obCon->FetchAssoc($obCon->Query($sql));
+                $SaldoNuevoCliente=$DatosTotalCreditoCliente["TotalCredito"]+$Total;
+                if($DatosCliente["Cupo"]<$SaldoNuevoCliente){
+                    exit("E4;El cupo del cliente no es suficiente para realizar la factura");
+                }
             }
             
             $idFactura=$obFactura->idFactura();
@@ -322,6 +339,48 @@ if( !empty($_REQUEST["Accion"]) ){
             $obFactura->DescargueFacturaInventariosV2($idFactura, "");
             if($CmbFormaPago<>'Contado'){
                 $obFactura->IngreseCartera($idFactura, $Fecha, $idCliente, $CmbFormaPago, $SaldoFactura, "");
+                //Se verifica si se recibió una cuota unicial
+                if((is_numeric($TxtCuotaInicialCredito) or $TxtCuotaInicialCredito>=1)){
+                    $DatosFactura=$obCon->DevuelveValores("facturas", "idFacturas", $idFactura);
+                    $DatosCaja=$obCon->DevuelveValores("cajas", "idUsuario", $idUser);
+                    $CuentaDestino=$DatosCaja["CuentaPUCEfectivo"];
+                    $CentroCosto=$DatosCaja["CentroCostos"];
+                    $idTerceroInteres=$DatosCaja["idTerceroIntereses"];
+                    $CentroCosto=$DatosCaja["CentroCostos"];
+                    if($CmbFormaPago<>'SisteCredito' AND $CmbFormaPago<>'KUPY'){
+                        $Concepto="ABONO A FACTURA No $DatosFactura[Prefijo] - $DatosFactura[NumeroFactura]";
+                        $VectorIngreso["fut"]="";
+                        $TipoPago="";
+                        $idComprobanteAbono=$obCon->RegistreAbonoCarteraCliente($Fecha,$Hora,$CuentaDestino,$idFactura,$TxtCuotaInicialCredito,$TipoPago,$CentroCosto,$Concepto,$idUser,"");
+
+                        $DatosImpresora=$obCon->DevuelveValores("config_puertos", "ID", 1);
+
+                        if($DatosImpresora["Habilitado"]=="SI"){
+                            $obPrint->ImprimeComprobanteAbonoFactura($idComprobanteAbono, $DatosImpresora["Puerto"], 1);
+
+                        }
+
+                    }else{
+                        if($CmbFormaPago=='SisteCredito'){
+                            $CmbPlataforma=1;
+                        }else{
+                            $CmbPlataforma=2;
+                        }
+                        $DatosPlataforma=$obCon->DevuelveValores("comercial_plataformas_pago", "ID", $CmbPlataforma);
+
+                        $CuentaDestino=$DatosCaja["CuentaPUCEfectivo"];
+                        $CentroCosto=$DatosCaja["CentroCostos"];
+                        $idTerceroInteres=$DatosPlataforma["NIT"];
+
+                        $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 19);
+                        $Abono=$TxtCuotaInicialCredito;
+                        $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $idTerceroInteres, $Abono, "PlataformasPago", "Ingreso por Plataforma de Pago $CmbPlataforma", "CERRADO");
+                        $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $idTerceroInteres, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
+
+                        $obCon->IngresoPlataformasPago($CmbPlataforma,$Fecha, $Hora, $Tercero, $Abono, $idComprobante, $idUser);
+
+                    }
+                }    
             }
             if($CmbFormaPago=='SisteCredito' or $CmbFormaPago=='KUPY'){
                 if($CmbFormaPago=='SisteCredito'){

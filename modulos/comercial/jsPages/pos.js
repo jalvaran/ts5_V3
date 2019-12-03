@@ -941,6 +941,7 @@ function GuardarFactura(){
     var TxtTotalFactura = parseFloat(document.getElementById('TxtTotalFactura').value);
     var TxtTotalAnticipos = parseFloat(document.getElementById('TxtTotalAnticiposFactura').value);
     var idCliente = (document.getElementById('idCliente').value);
+    var TxtCuotaInicialCredito = (document.getElementById('TxtCuotaInicialCredito').value);
     var idCajero = (document.getElementById('idCajero').value);
     
     if(!$.isNumeric(Devuelta) ||  Devuelta<0){
@@ -1039,6 +1040,7 @@ function GuardarFactura(){
         form_data.append('AnticiposCruzados', AnticiposCruzados);
         form_data.append('CmbPrint', CmbPrint);
         form_data.append('idCajero', idCajero);
+        form_data.append('TxtCuotaInicialCredito', TxtCuotaInicialCredito);
         AnticiposCruzados=0;
         $.ajax({
         url: './procesadores/pos.process.php',
@@ -1049,6 +1051,7 @@ function GuardarFactura(){
         data: form_data,
         type: 'post',
         success: function(data){
+            console.log(data);
             var respuestas = data.split(';'); 
             if(respuestas[0]=="OK"){
                 var mensaje=respuestas[1];                
@@ -1074,6 +1077,10 @@ function GuardarFactura(){
                 alertify.error("Error: El Cliente ya no cuenta con el saldo en anticipos escrito",0);
                 document.getElementById("BntModalPOS").disabled=false;  
                 document.getElementById("BntModalPOS").value="Guardar";    
+            }else if(respuestas[0]=="E4"){
+                alertify.error("Error: "+respuestas[1],0);
+                document.getElementById("BntModalPOS").disabled=false;  
+                document.getElementById("BntModalPOS").value="Guardar";      
             }else{
                 alertify.alert("Error: <br>"+data);
                 document.getElementById("BntModalPOS").disabled=false;
@@ -2179,6 +2186,18 @@ function MuestraOculta(id){
     }
     
 }
+
+function MuestraObjetoXID(id){
+    
+    document.getElementById(id).style.display="block";
+    
+}
+
+function OcultaObjetoXID(id){
+    
+    document.getElementById(id).style.display="none";
+    
+}
 /**
  * Abona a un credito
  * @param {type} idCredito
@@ -2431,6 +2450,16 @@ function GuardarIngresoPlataformasPago(){
             alert(thrownError);
           }
       })  
+}
+
+function HabiliteCuotaInicial(){
+    var TipoFactura=document.getElementById('CmbFormaPago').value;
+    if(TipoFactura==='Contado'){
+        document.getElementById('TxtCuotaInicialCredito').value="";
+        OcultaObjetoXID('DivCuotaInicialCredito');
+    }else{
+        MuestraObjetoXID('DivCuotaInicialCredito');
+    }
 }
 
 atajosPOS();

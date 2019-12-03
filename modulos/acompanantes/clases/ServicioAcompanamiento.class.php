@@ -13,6 +13,12 @@ class Servicios extends ProcesoVenta{
         if($TipoServicio<=3){
             $keyValorModelo="ValorServicio".$TipoServicio;
             $ValorModelo=$DatosModelos[$keyValorModelo];
+           
+            if($Valor>$DatosServicios["Valor"]){
+                $ValorRestante=$Valor-$DatosServicios["Valor"];
+                $ValorModelo=$ValorModelo+$ValorRestante;
+            }
+             
             $ValorCasa=$Valor-$ValorModelo;
             
         }

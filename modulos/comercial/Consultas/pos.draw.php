@@ -252,7 +252,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 $css->FilaTabla(14);
                 print("<td>");
-                        $css->select("CmbFormaPago", "form-control", "CmbFormaPago", "", "", "", "");
+                        $css->select("CmbFormaPago", "form-control", "CmbFormaPago", "", "", "onchange=HabiliteCuotaInicial()", "");
 
                             $sql="SELECT * FROM repuestas_forma_pago";
                             $Consulta=$obCon->Query($sql);
@@ -271,6 +271,11 @@ if( !empty($_REQUEST["Accion"]) ){
 
 
                         $css->Cselect();
+                        
+                        $css->CrearDiv("DivCuotaInicialCredito", "", "left", 0, 1);
+                            print("<br>");
+                            $css->input("text", "TxtCuotaInicialCredito", "form-control", "TxtCuotaInicialCredito", "", "", "Cuota Inicial", "off", "", "");
+                        $css->CerrarDiv();
                     print("</td>");
                     
                 print("<td>");
