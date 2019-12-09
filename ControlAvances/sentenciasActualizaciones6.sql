@@ -43,3 +43,15 @@ INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `S
 INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
 (13,	'Determina si se puede mostrar el icono para la creacion de un nuevo producto o servicio en el area de cotizaciones',	'0',	'2019-09-14 19:18:01',	'2019-09-13 19:18:01');
 
+ALTER TABLE `servidores` ADD `Puerto` INT NOT NULL AFTER `DataBase`, ADD `TipoServidor` VARCHAR(15) NOT NULL AFTER `Puerto`, ADD `Observaciones` TEXT NOT NULL AFTER `TipoServidor`;
+
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(21,	'Ruta para almacenar los xml de las Notas Debito de Factura electronica',	'SoportesTS5/ND_XML_Facturas_Electronicas/',	'2019-12-09 09:10:51',	'2019-09-13 19:18:01'),
+(20,	'Ruta para almacenar los pdf de las Notas Debito de Factura electronica',	'SoportesTS5/ND_PDF_Facturas_Electronicas/',	'2019-12-09 09:10:48',	'2019-09-13 19:18:01'),
+(19,	'Ruta para almacenar los xml de las Notas Credito de Factura electronica',	'SoportesTS5/NC_XML_Facturas_Electronicas/',	'2019-12-09 09:08:02',	'2019-09-13 19:18:01'),
+(18,	'Ruta para almacenar los pdf de las Notas Credito de Factura electronica',	'SoportesTS5/NC_PDF_Facturas_Electronicas/',	'2019-12-09 09:08:02',	'2019-09-13 19:18:01'),
+(17,	'Ruta para almacenar las facturas electronicas en XML',	'SoportesTS5/XML_Facturas_Electronicas/',	'2019-12-09 09:08:02',	'2019-09-13 19:18:01'),
+(16,	'Ruta para almacenar las facturas electronicas en PDF',	'SoportesTS5/PDF_Facturas_Electronicas/',	'2019-12-09 09:08:02',	'2019-09-13 19:18:01'),
+(15,	'RUTA SERVIDOR FTP PARA ALOJAR ARCHIVOS GENERADOS PARA GESTION DE GLOSAS',	'd\\:\\xampp\\htdocs\\ts_eps\\soportes\\glosas\\xml\\',	'2019-01-13 09:04:49',	'2019-01-13 09:04:49'),
+(14,	'RUTA LOCAL PARA ALOJAR ARCHIVOS GENERADOS PARA GESTION DE GLOSAS',	'../../htdocs/tss/SoportesSalud/GestionGlosas/XML/',	'2019-01-13 09:04:49',	'2019-01-13 09:04:49');
+

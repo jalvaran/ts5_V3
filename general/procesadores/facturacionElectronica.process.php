@@ -392,10 +392,63 @@ if( !empty($_REQUEST["Accion"]) ){
         break;//fin caso 6
         
         case 7://Prueba json
-            $idFactura="201909271516270_45865500_1569615387";
+            $url='http://35.238.236.240/api/ubl2.1/invoice/6ce20f05-a1e4-4188-ab56-8d8e366746e6';
+            $idFactura="201912090718320_88617600_1575893912";
             $body=$obCon->JSONFactura($idFactura);
-            print($body);
-        break;//Fin caso 7    
+            $make_call = callAPI('POST', $url, $body);
+              $response = ($make_call);
+              
+              print_r($response);
+        break;//Fin caso 7  
+    
+        case 8://Recibir una factura y reportarla
+            //$idFactura=$obCon->normalizar($_REQUEST["idFactura"]);
+            $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 104);
+            $url='http://35.238.236.240/api/ubl2.1/invoice/6ce20f05-a1e4-4188-ab56-8d8e366746e6';
+            $url=$DatosServidor["IP"];
+            
+            $idFactura="201912090948130_52620200_1575902893";
+            $body=$obCon->JSONFactura($idFactura);
+            $make_call = callAPI('POST', $url, $body);
+            $response = ($make_call);
+            $obCon->FacturaElectronica_Registre_Respuesta_Server($idFactura,$response);
+            
+            print_r($response);
+        break;//Fin caso 8
+        case 9://Generar PDF de la Factura Electronica
+            //$idFactura=$obCon->normalizar($_REQUEST["idFactura"]);
+                        
+            $idFactura="201912090948130_52620200_1575902893";
+            $DatosFactura=$obCon->DevuelveValores("facturas", "idFacturas", $idFactura);
+            $DatosLogFactura=$obCon->DevuelveValores("facturas_electronicas_log", "ID", 3); 
+            $JSONFactura= json_decode($DatosLogFactura["RespuestaCompletaServidor"]);
+            $RespuestaReporte=$JSONFactura->responseDian->Envelope->Body->SendTestSetAsyncResponse->SendTestSetAsyncResult->ErrorMessageList->_attributes->nil;
+            if($RespuestaReporte='true'){
+                $obCon->CrearPDFDesdeBase64($JSONFactura->pdfBase64Bytes,$DatosFactura);
+                
+                exit("OK;PDF de la Factura Electronica Creado Satisfactoriamente");
+            }else{
+                exit("E1;Hubo un error en la recepcion del archivo por parte de la DIAN");
+            }
+            
+        break;//Fin caso 9
+        
+        case 10://Generar ZIP de la Factura Electronica
+            //$idFactura=$obCon->normalizar($_REQUEST["idFactura"]);
+                        
+            $idFactura="201912090948130_52620200_1575902893";
+            $DatosFactura=$obCon->DevuelveValores("facturas", "idFacturas", $idFactura);
+            $DatosLogFactura=$obCon->DevuelveValores("facturas_electronicas_log", "ID", 3); 
+            $JSONFactura= json_decode($DatosLogFactura["RespuestaCompletaServidor"]);
+            $RespuestaReporte=$JSONFactura->responseDian->Envelope->Body->SendTestSetAsyncResponse->SendTestSetAsyncResult->ErrorMessageList->_attributes->nil;
+            if($RespuestaReporte='true'){
+                $obCon->CrearZIPDesdeBase64($JSONFactura->zipBase64Bytes,$DatosFactura);
+                exit("OK;ZIP de la Factura Electronica Creado Satisfactoriamente");
+            }else{
+                exit("E1;Hubo un error en la recepcion del archivo por parte de la DIAN");
+            }
+            
+        break;//Fin caso 10
     }
     
     

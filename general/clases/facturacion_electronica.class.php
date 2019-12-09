@@ -186,4 +186,42 @@ class Factura_Electronica extends ProcesoVenta{
             
         return($json_factura);
     }
+    
+    public function FacturaElectronica_Registre_Respuesta_Server($idFactura,$RespuestaServidor) {
+        $Datos["idFactura"]=$idFactura;
+        $Datos["RespuestaCompletaServidor"]=$RespuestaServidor;
+        $sql=$this->getSQLInsert("facturas_electronicas_log", $Datos);
+        $this->Query($sql);
+    }
+    
+    public function CrearPDFDesdeBase64($pdf_base64,$DatosFactura) {
+        
+        $DatosRuta=$this->DevuelveValores("configuracion_general", "ID", 16);
+        $Ruta=$DatosRuta["Valor"];
+        $NombreArchivo=$DatosRuta["Valor"].$DatosFactura["NumeroFactura"]."_FE.pdf";
+        $pdf_decoded = base64_decode($pdf_base64);
+        
+        $pdf = fopen ($NombreArchivo,'w');
+        fwrite ($pdf,$pdf_decoded);
+        fclose ($pdf);
+        //header('Content-Type: application/pdf');
+        //echo $data;
+    }
+    
+    public function CrearZIPDesdeBase64($zip_base64,$DatosFactura) {
+        
+        $DatosRuta=$this->DevuelveValores("configuracion_general", "ID", 16);
+        $Ruta=$DatosRuta["Valor"];
+        $NombreArchivo=$DatosRuta["Valor"].$DatosFactura["NumeroFactura"]."_FE.zip";
+        $pdf_decoded = base64_decode($zip_base64);
+        
+        $pdf = fopen ($NombreArchivo,'w');
+        fwrite ($pdf,$pdf_decoded);
+        fclose ($pdf);
+        //header('Content-Type: application/pdf');
+        //echo $data;
+    }
+    
+    
+    //Fin Clases
 }
