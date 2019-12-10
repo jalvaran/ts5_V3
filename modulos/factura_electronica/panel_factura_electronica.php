@@ -25,17 +25,19 @@ $DatosUsuario=$obCon->FetchAssoc($DatosUsuario);
 $TipoUser=$DatosUsuario["TipoUser"];
 
 $css->PageInit($myTitulo);
+    $css->Modal("ModalAcciones", "TS5", "", 1);
+        $css->div("DivFrmModalAcciones", "", "", "", "", "", "");
+        $css->Cdiv();        
+    $css->CModal("BntModalAcciones", "onclick=SeleccioneAccionFormularios()", "button", "Guardar");
     //$css->div("", "col-md-12", "", "", "", "", "");
     $css->section("", "content-header", "", "");
-        print("<h1>Módulo de Facturación Electrónica TS5");
-            
-        print("</h1>");
+        print("<h1>Módulo de Facturación Electrónica TS5</h1>"); 
     $css->Csection();
     //print("<br>");
     $css->section("", "content", "", "");
     $css->CrearDiv("", "row", "left", 1, 1);
     $css->CrearDiv("", "col-md-2", "left", 1, 1);
-    $css->CrearBotonEvento("BtnTablero", "Tablero", 1, "onclick", "VerTablero()", "azul");
+    $css->CrearBotonEvento("BtnTablero", "Tablero", 1, "onclick", "VerTablero();VerListado();", "azul");
     $css->CrearDiv("", "box box-solid", "left", 1, 1);
     $css->CrearDiv("", "box-header with-border", "left", 1, 1);
     print('<h3 class="box-title">Documentos</h3>');
@@ -46,9 +48,9 @@ $css->PageInit($myTitulo);
             </div>
             <div class="box-body no-padding" style="">
               <ul class="nav nav-pills nav-stacked">
-                <li><a href="#" onclick="VerHistorialDeFacturasElectronicas()"><i class="fa fa-send-o"></i> Enviados
+                <li><a href="#" onclick="VerListado()"><i class="fa fa-send-o"></i> Enviados
                   </a></li>
-                <li><a href="#" onclick="VerHistorialDeFacturasElectronicas()"><i class="fa fa-inbox"></i> Recibidos
+                <li><a href="#" onclick="VerListado()"><i class="fa fa-inbox"></i> Recibidos
                   </a></li>  
                 
                
@@ -66,7 +68,7 @@ $css->PageInit($myTitulo);
         $css->CrearDiv("", "col-md-10", "left", 1, 1);
         $css->CrearDiv("", "box-tools pull-right", "left", 1, 1);                
                 print('<div class="input-group">');               
-                    $css->input("text", "TxtBusquedas", "form-control", "TxtBusquedas", "", "", "Buscar", "", "", "onchange=VerHistorialDeFacturasElectronicas()");
+                    $css->input("text", "TxtBusquedas", "form-control", "TxtBusquedas", "", "", "Buscar", "", "", "onchange=VerListado();");
 
                 print('<span class="input-group-addon"><i class="fa fa-fw fa-search"></i></span>
                           </div>');

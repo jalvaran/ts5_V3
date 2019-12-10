@@ -290,6 +290,117 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CierraFilaTabla();
             $css->CerrarTabla();
         break;//Fin caso 2
+        
+        case 3://Dibuja formulario para editar un tercero de manera general
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 103, "", "", "", ""); //103 sirve para indicarle al sistema que debe guardar el formulario para editar un tercero
+            $idTercero=$obCon->normalizar($_REQUEST["idTercero"]);
+            $TablaTercero=$obCon->normalizar($_REQUEST["Tabla"]);
+            $css->input("hidden", "idTercero", "", "idTercero", "", $idTercero, "", "", "", "");
+            $idTabla="idClientes";
+            if($TablaTercero=='proveedores'){
+                $idTabla="idProveedores";
+            }
+            $DatosTercero=$obCon->DevuelveValores($TablaTercero, $idTabla, $idTercero);
+            //print_r($DatosTercero);
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Tipo de Documento</strong>", 1);
+                    $css->ColTabla("<strong>Identificación</strong>", 1);
+                    $css->ColTabla("<strong>Ciudad</strong>", 1);
+                    $css->ColTabla("<strong>Teléfono</strong>", 1);
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                    print("<td>");
+                        $css->select("TipoDocumento", "form-control", "TipoDocumento", "", "", "", "style=width:300px");
+                        $Consulta=$obCon->ConsultarTabla("cod_documentos", "");
+                        while($DatosTipoDocumento=$obCon->FetchAssoc($Consulta)){
+                            $sel=0;
+                            if($DatosTipoDocumento["Codigo"]==$DatosTercero["Tipo_Documento"]){
+                                $sel=1;
+                            }
+                            $css->option("", "", "", $DatosTipoDocumento["Codigo"], "", "", $sel);
+                                print($DatosTipoDocumento["Codigo"]." ".$DatosTipoDocumento["Descripcion"]);
+                            $css->Coption();
+                        }    
+                        $css->Cselect();
+                    print("</td>");
+                    print("<td>");
+                        $css->input("number", "Num_Identificacion", "form-control", "Num_Identificacion", $DatosTercero["Num_Identificacion"], $DatosTercero["Num_Identificacion"], "Identificación", "off", "", "");
+                    print("</td>");
+                    print("<td>");
+                        $css->select("CodigoMunicipio", "form-control", "CodigoMunicipio", "", "", "", "");
+                            $Consulta=$obCon->ConsultarTabla("cod_municipios_dptos", "");
+                            while($DatosMunicipios=$obCon->FetchAssoc($Consulta)){
+                                $sel=0;
+                                if($DatosMunicipios["Cod_mcipio"]==$DatosTercero["Cod_Mcipio"] and $DatosMunicipios["Cod_Dpto"]==$DatosTercero["Cod_Dpto"]){
+                                    $sel=1;
+                                }
+                                $css->option("", "", "", $DatosMunicipios["ID"], "", "", $sel);
+                                    print($DatosMunicipios["Ciudad"]." ".$DatosMunicipios["Cod_mcipio"]);
+                                $css->Coption();
+                            }    
+                        $css->Cselect();
+                    print("</td>");
+                    
+                    print("<td>");
+                        $css->input("text", "Telefono", "form-control", "Telefono", "", $DatosTercero["Telefono"], "Teléfono", "off", "", "");
+                    print("</td>");
+                    
+                    
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Nombres</strong>", 4,"C");
+                    
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                    print("<td>");
+                        $css->input("text", "PrimerNombre", "form-control", "PrimerNombre", "Primer Nombre", $DatosTercero["Primer_Nombre"], "Primer Nombre", "off", "", "onkeyup=CompletaRazonSocial()", "");
+                    print("</td>");
+                    print("<td>");
+                        $css->input("text", "OtrosNombres", "form-control", "OtrosNombres", "Otros Nombres", $DatosTercero["Otros_Nombres"], "Otros Nombres", "off", "", "onkeyup=CompletaRazonSocial()", "");
+                    print("</td>");
+                    print("<td>");
+                        $css->input("text", "PrimerApellido", "form-control", "PrimerApellido", "Primer Apellido", $DatosTercero["Primer_Apellido"], "Primer Apellido", "off", "", "onkeyup=CompletaRazonSocial()", "");
+                    print("</td>");
+                    print("<td>");
+                        $css->input("text", "SegundoApellido", "form-control", "SegundoApellido", "Segundo Apellido", $DatosTercero["Segundo_Apellido"], "Segundo Apellido", "off", "", "onkeyup=CompletaRazonSocial()", "");
+                    print("</td>");
+                    $css->FilaTabla(16);
+                        print("<td colspan=4>");
+                            $css->input("text", "RazonSocial", "form-control", "RazonSocial", "Razon Social", $DatosTercero["RazonSocial"], "RazonSocial", "off", "", "", "");
+                        print("</td>");
+                    $css->CierraFilaTabla(); 
+                    
+                $css->CierraFilaTabla();
+                
+                
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Dirección</strong>", 1);
+                    $css->ColTabla("<strong>Email</strong>", 1);
+                    $css->ColTabla("<strong>Cupo</strong>", 1);
+                    $css->ColTabla("<strong>Código Tarjeta</strong>", 1);
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                    print("<td>");
+                        $css->input("text", "Direccion", "form-control", "Direccion", "Direccion", $DatosTercero["Direccion"], "Dirección", "off", "", "", "");
+                    print("</td>");
+                    print("<td>");
+                        $css->input("text", "Email", "form-control", "Email", "Email", $DatosTercero["Email"], "Email", "off", "", "", "");
+                    print("</td>");
+                    print("<td>");
+                        $css->input("number", "Cupo", "form-control", "Cupo", "Cupo", $DatosTercero["Cupo"], "Cupo Crédito", "off", "", "", "");
+                    print("</td>");
+                    print("<td>");
+                        $css->input("number", "CodigoTarjeta", "form-control", "CodigoTarjeta", "Codigo Tarjeta", $DatosTercero["CodigoTarjeta"], "Código Tarjeta", "off", "", "", "");
+                    print("</td>");
+                $css->CierraFilaTabla();
+                
+            $css->CerrarTabla();
+        break;//Fin caso 3
     }
     
     

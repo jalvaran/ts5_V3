@@ -214,7 +214,7 @@ class Factura_Electronica extends ProcesoVenta{
                         "percent": "'.round($Porcentaje,2).'" 
                     }],                    
                     "description": "'. str_replace("\n","",$DatosItemsFactura["Nombre"]).'",
-                        "code": "'.$DatosItemsFactura["Referencia"].'",
+                        "code": "'.trim(preg_replace("/[\r\n|\n|\r]+/", "", $DatosItemsFactura["Referencia"])).'",
                         "type_item_identification_id": 3,
                         "price_amount": "'.round($DatosItemsFactura["ValorUnitarioItem"],2).'",
                         "base_quantity": "1.000000"
@@ -260,8 +260,7 @@ class Factura_Electronica extends ProcesoVenta{
         $pdf = fopen ($NombreArchivo,'w');
         fwrite ($pdf,$pdf_decoded);
         fclose ($pdf);
-        //header('Content-Type: application/pdf');
-        //echo $data;
+        return($NombreArchivo);
     }
     
     

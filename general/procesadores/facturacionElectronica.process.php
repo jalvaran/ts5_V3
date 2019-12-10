@@ -15,13 +15,21 @@ if( !empty($_REQUEST["Accion"]) ){
     switch ($_REQUEST["Accion"]) {
         
         case 1: //Crear facturas electronicas
+            if(!isset($_REQUEST["idFactura"])){
+                $sql="SELECT t1.idFacturas,t1.NumeroFactura FROM facturas t1 
+                    WHERE TipoFactura='FE' AND NOT EXISTS (SELECT 1 FROM facturas_electronicas_log t2 WHERE t1.idFacturas=t2.idFactura AND t2.Estado<20) LIMIT 1";
+
+                $DatosConsulta=$obCon->FetchAssoc($obCon->Query($sql));
+                $idFactura=$DatosConsulta["idFacturas"];
+                $NumeroFactura=$DatosConsulta["NumeroFactura"];
+            }else{
+                $idFactura=$obCon->normalizar($_REQUEST["idFactura"]);
+                $sql="SELECT NumeroFactura FROM facturas WHERE idFacturas='$idFactura'";
+                $DatosConsulta=$obCon->FetchAssoc($obCon->Query($sql));
+                $NumeroFactura=$DatosConsulta["NumeroFactura"];
+            }
             
-            $sql="SELECT t1.idFacturas,t1.NumeroFactura FROM facturas t1 
-                WHERE TipoFactura='FE' AND NOT EXISTS (SELECT 1 FROM facturas_electronicas_log t2 WHERE t1.idFacturas=t2.idFactura AND t2.Estado<20) LIMIT 1";
             
-            $DatosConsulta=$obCon->FetchAssoc($obCon->Query($sql));
-            $idFactura=$DatosConsulta["idFacturas"];
-            $NumeroFactura=$DatosConsulta["NumeroFactura"];
             $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 104);            
             $url=$DatosServidor["IP"];
             if($idFactura<>''){

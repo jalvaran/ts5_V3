@@ -75,6 +75,48 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Código disponible");
         break;//Fin caso 3
         
+        case 4://Editar un tercero
+            $idTercero=$obCon->normalizar($_REQUEST['idTercero']);
+            $Tabla=$obCon->normalizar($_REQUEST['Tabla']);
+            $nit=$obCon->normalizar($_REQUEST['Num_Identificacion']);
+            $idCiudad=$obCon->normalizar($_REQUEST['CodigoMunicipio']);
+            $DatosCiudad=$obCon->DevuelveValores("cod_municipios_dptos", "ID", $idCiudad);
+            $DV=$obCon->CalcularDV($nit);
+            
+            $Datos["Tipo_Documento"]=$obCon->normalizar($_REQUEST['TipoDocumento']);  
+            $Datos["Num_Identificacion"]=$nit;    
+            $Datos["DV"]=$DV;  
+            $Datos["Primer_Apellido"]=$obCon->normalizar($_REQUEST['PrimerApellido']);    
+            $Datos["Segundo_Apellido"]=$obCon->normalizar($_REQUEST['SegundoApellido']);    
+            $Datos["Primer_Nombre"]=$obCon->normalizar($_REQUEST['PrimerNombre']);    
+            $Datos["Otros_Nombres"]=$obCon->normalizar($_REQUEST['OtrosNombres']);    
+            $Datos["RazonSocial"]=$obCon->normalizar($_REQUEST['RazonSocial']);    
+            $Datos["Direccion"]=$obCon->normalizar($_REQUEST['Direccion']);    
+            $Datos["Cod_Dpto"]=$DatosCiudad["Cod_Dpto"];    
+            $Datos["Cod_Mcipio"]=$DatosCiudad["Cod_mcipio"];    
+            $Datos["Pais_Domicilio"]=169;   
+            $Datos["Telefono"]=$obCon->normalizar($_REQUEST['Telefono']);             
+            $Datos["Ciudad"]=$DatosCiudad["Ciudad"];    
+            $Datos["Email"]=$obCon->normalizar($_REQUEST['Email']); 
+            $Datos["Cupo"]=$obCon->normalizar($_REQUEST['Cupo']);    
+            $Datos["CodigoTarjeta"]=$obCon->normalizar($_REQUEST['CodigoTarjeta']); 
+            if(!filter_var($Datos["Email"], FILTER_VALIDATE_EMAIL)){
+                exit("E1;El campo Email debe ser del tipo Correo Electronico;Email");
+            }
+            $sqlUpdate=$obCon->getSQLUpdate($Tabla, $Datos);
+            $idTabla="idClientes";
+            if($Tabla=="proveedores"){
+                $idTabla="idProveedores";
+            }
+            $Condicion=" WHERE $idTabla='$idTercero'";
+            $obCon->Query($sqlUpdate.$Condicion);
+            
+            $DatosCliente=$obCon->ValorActual("clientes", "idClientes", " Num_Identificacion='$nit'");
+            
+            print("OK;Se ha editado el tercero ".$Datos["RazonSocial"].", con Identificación: ".$nit.";".$DatosCliente["idClientes"].";".$Datos["RazonSocial"]);
+            
+        break;//FIn caso 4
+        
         
         
     }
