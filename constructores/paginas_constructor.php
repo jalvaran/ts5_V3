@@ -1032,7 +1032,7 @@ class PageConstruct extends html_estruct_class{
      * @param type $Color
      * @param type $VectorBoton
      */
-    function CrearBotonEvento($nombre,$value,$enabled,$evento,$funcion,$Color,$VectorBoton){
+    function CrearBotonEvento($nombre,$value,$enabled,$evento,$funcion,$Color,$VectorBoton=''){
             
             switch ($Color){
                 case "verde":
@@ -2044,6 +2044,11 @@ class PageConstruct extends html_estruct_class{
           print('<a href="'.$target.'" role="button"  data-toggle="modal" title="'.$Titulo.'" >
 			<image src='.$RutaImage.' name='.$Nombre.' id='.$Nombre.' src='.$RutaImage.' '.$javascript.' style="display:scroll; position:'.$posicion.'; '.$margenes.'; height:'.$Alto.'px; width: '.$Ancho.'px;"></a>');
 	} 
+        
+        public function AddJSTextAreaEnriquecida(){
+            print(' <link rel="stylesheet" href="../../plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
+                    <script src="../../plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>');
+        }
         
         //////////////////////////////////FIN
 }

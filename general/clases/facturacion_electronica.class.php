@@ -9,6 +9,47 @@ if(file_exists("../../modelo/php_conexion.php")){
  */
 
 class Factura_Electronica extends ProcesoVenta{
+    
+    public function callAPI($method, $url, $data) {
+        
+        $DatosParametrosFE=$this->DevuelveValores("facturas_electronicas_parametros", "ID", 4);
+        $TokenTS5=$DatosParametrosFE["Valor"];
+        
+        $curl = curl_init();
+
+        switch ($method){
+           case "POST":
+              curl_setopt($curl, CURLOPT_POST, 1);
+              if ($data)
+                 curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+              break;
+           case "PUT":
+              curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
+              if ($data)
+                 curl_setopt($curl, CURLOPT_POSTFIELDS, $data);			 					
+              break;
+           default:
+              if ($data)
+                 $url = sprintf("%s?%s", $url, http_build_query($data));
+        }
+
+        // OPTIONS:
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+           'Authorization: Bearer '.$TokenTS5,
+           'Content-Type: application/json',
+           'Accept: application/json',
+        ));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+
+        // EXECUTE:
+        $result = curl_exec($curl);
+        if(!$result){die("Connection Failure");}
+        curl_close($curl);
+        return $result;
+    }
+    
     public function JSONFactura($idFactura) {
         $DatosFactura=$this->DevuelveValores("facturas", "idFacturas", $idFactura);
         $idEmpresaPro=$DatosFactura["EmpresaPro_idEmpresaPro"];
@@ -187,32 +228,33 @@ class Factura_Electronica extends ProcesoVenta{
         return($json_factura);
     }
     
-    public function FacturaElectronica_Registre_Respuesta_Server($idFactura,$RespuestaServidor) {
+    public function FacturaElectronica_Registre_Respuesta_Server($idFactura,$RespuestaServidor,$Estado) {
         $Datos["idFactura"]=$idFactura;
+        $Datos["Estado"]=$Estado;
         $Datos["RespuestaCompletaServidor"]=$RespuestaServidor;
+        $Datos["Created"]=date("Y-m-d H:i:s");
         $sql=$this->getSQLInsert("facturas_electronicas_log", $Datos);
         $this->Query($sql);
     }
     
-    public function CrearPDFDesdeBase64($pdf_base64,$DatosFactura) {
+    public function CrearPDFDesdeBase64($pdf_base64,$NumeroFactura) {
         
         $DatosRuta=$this->DevuelveValores("configuracion_general", "ID", 16);
         $Ruta=$DatosRuta["Valor"];
-        $NombreArchivo=$DatosRuta["Valor"].$DatosFactura["NumeroFactura"]."_FE.pdf";
+        $NombreArchivo=$DatosRuta["Valor"].$NumeroFactura."_FE.pdf";
         $pdf_decoded = base64_decode($pdf_base64);
         
         $pdf = fopen ($NombreArchivo,'w');
         fwrite ($pdf,$pdf_decoded);
         fclose ($pdf);
-        //header('Content-Type: application/pdf');
-        //echo $data;
+        return($NombreArchivo);
     }
     
-    public function CrearZIPDesdeBase64($zip_base64,$DatosFactura) {
+    public function CrearZIPDesdeBase64($zip_base64,$NumeroFactura) {
         
         $DatosRuta=$this->DevuelveValores("configuracion_general", "ID", 16);
         $Ruta=$DatosRuta["Valor"];
-        $NombreArchivo=$DatosRuta["Valor"].$DatosFactura["NumeroFactura"]."_FE.zip";
+        $NombreArchivo=$DatosRuta["Valor"].$NumeroFactura."_FE.zip";
         $pdf_decoded = base64_decode($zip_base64);
         
         $pdf = fopen ($NombreArchivo,'w');

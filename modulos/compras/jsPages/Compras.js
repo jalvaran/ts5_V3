@@ -153,7 +153,7 @@ function CrearCompra(event){
           
           }else{
               alertify.error("Error al crear la compra");
-              document.getElementById('DivDatosGeneralesCompra').innerHTML=data;
+              document.getElementById('DivItemsCompra').innerHTML=data;
           }
           
         },
