@@ -74,8 +74,10 @@ class Factura_Electronica extends ProcesoVenta{
             $AdqTipoPersona=1; //1 Juridica 2 Persona Natural
         }
         $adqNumTipoRegimen=0;
-        $AdqRazonSocial=$DatosCliente["RazonSocial"];
-        $AdqDireccion=$DatosCliente["Direccion"];
+        $AdqRazonSocial= str_replace("'", "", $DatosCliente["RazonSocial"]);
+        $AdqRazonSocial= str_replace('"', "", $AdqRazonSocial);
+        $AdqDireccion=str_replace("'", "",$DatosCliente["Direccion"]);
+        $AdqDireccion=str_replace('"', "",$AdqDireccion);
         if($AdqDireccion==''){
             $AdqDireccion="CALLE 1 1 106";
         }
@@ -201,7 +203,10 @@ class Factura_Electronica extends ProcesoVenta{
                 $Totales[$idImpuestoAPI]["Subtotal"]=$Totales[$idImpuestoAPI]["Subtotal"]+$Subtotal;
                 $Totales[$idImpuestoAPI]["Impuestos"]=$Totales[$idImpuestoAPI]["Impuestos"]+$Impuestos;
                 $Totales[$idImpuestoAPI]["Total"]=$Totales[$idImpuestoAPI]["Total"]+$Total;
-                
+                $NombreItem= str_replace('"', "", $DatosItemsFactura["Nombre"]);
+                $NombreItem= str_replace("'", "", $NombreItem);
+                $ReferenciaItem= str_replace('"', "", $DatosItemsFactura["Referencia"]);
+                $ReferenciaItem= str_replace("'", "", $ReferenciaItem);
                 $json_factura.='{ 
                     "unit_measure_id": 642, 
                     "invoiced_quantity": "'.round($DatosItemsFactura["Cantidad"]*$DatosItemsFactura["Dias"],6).'", 
@@ -213,8 +218,8 @@ class Factura_Electronica extends ProcesoVenta{
                         "taxable_amount": "'.round($DatosItemsFactura["SubtotalItem"],2).'",
                         "percent": "'.round($Porcentaje,2).'" 
                     }],                    
-                    "description": "'. str_replace("\n","",$DatosItemsFactura["Nombre"]).'",
-                        "code": "'.trim(preg_replace("/[\r\n|\n|\r]+/", "", $DatosItemsFactura["Referencia"])).'",
+                    "description": "'. str_replace("\n","",$NombreItem).'",
+                        "code": "'.trim(preg_replace("/[\r\n|\n|\r]+/", "", $ReferenciaItem)).'",
                         "type_item_identification_id": 3,
                         "price_amount": "'.round($DatosItemsFactura["ValorUnitarioItem"],2).'",
                         "base_quantity": "1.000000"

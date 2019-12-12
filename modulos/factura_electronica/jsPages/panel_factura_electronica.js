@@ -298,6 +298,50 @@ function GenereXMLFacturasElectronicas(){
             }else if(respuestas[0]==="RE"){
                 
                 document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                EnvieFacturasElectronicasXMail();
+                                           
+            }else{
+                document.getElementById(idDivDraw).innerHTML=data;
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
+
+function EnvieFacturasElectronicasXMail(){
+    var idDivDraw="NotificacionProcesos";
+    //document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
+    var form_data = new FormData();
+        form_data.append('Accion', 7);
+                        
+    $.ajax({
+        //async:false,
+        url: '../../general/procesadores/facturacionElectronica.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                EnvieFacturasElectronicasXMail();
+            }else if(respuestas[0]==="E1"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                           
+            }else if(respuestas[0]==="RE"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
                 VerTablero();
                 VerListado();
                 setTimeout(GenereFacturasElectronicas, 60000);
@@ -425,6 +469,51 @@ function SeleccioneAccionFormularios(){
         var idTercero=document.getElementById("idTercero").value;
         EditarTercero('ModalAcciones','BntModalAcciones',idTercero,'clientes');
     }
+}
+
+function ActualizarErroresFacturasElectronicas(){
+    var idDivDraw="DivProcessFE";
+   
+    document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Actualizacion de Documentos Corregidos</h3></a>';
+    var form_data = new FormData();
+        form_data.append('Accion', 5);
+               
+    $.ajax({
+        //async:false,
+        url: '../../general/procesadores/facturacionElectronica.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                alertify.success(respuestas[1]);
+                document.getElementById(idDivDraw).innerHTML='';
+                
+            }else if(respuestas[0]==="E1"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                alertify.error(respuestas[1]);           
+            }else if(respuestas[0]==="RE"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                alertify.error(respuestas[1]);                           
+            }else{
+                document.getElementById(idDivDraw).innerHTML=data;
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
 }
 
 document.getElementById('BtnMuestraMenuLateral').click();

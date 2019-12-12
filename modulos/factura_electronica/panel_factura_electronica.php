@@ -81,6 +81,8 @@ $css->PageInit($myTitulo);
                 $css->CerrarDiv();
             $css->CerrarDiv(); 
             $css->CrearDiv("", "box box-primary", "left", 1, 1);
+                $css->CrearDiv("DivProcessFE", "", "left", 1, 1);  
+                $css->CerrarDiv();
                 $css->CrearDiv("DivDrawListFE", "box-header with-border", "left", 1, 1);  
                 $css->CerrarDiv();
             $css->CerrarDiv(); 

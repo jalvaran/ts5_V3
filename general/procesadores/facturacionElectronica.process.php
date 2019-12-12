@@ -24,6 +24,11 @@ if( !empty($_REQUEST["Accion"]) ){
                 $NumeroFactura=$DatosConsulta["NumeroFactura"];
             }else{
                 $idFactura=$obCon->normalizar($_REQUEST["idFactura"]);
+                $sql="SELECT ID FROM facturas_electronicas_log WHERE idFactura='$idFactura' AND Estado=1";                
+                $DatosLog=$obCon->FetchAssoc($obCon->Query($sql));
+                if($DatosLog["ID"]>0){
+                    exit("E1;La Factura $idFactura ya fue reportada");
+                }
                 $sql="SELECT NumeroFactura FROM facturas WHERE idFacturas='$idFactura'";
                 $DatosConsulta=$obCon->FetchAssoc($obCon->Query($sql));
                 $NumeroFactura=$DatosConsulta["NumeroFactura"];
@@ -119,7 +124,96 @@ if( !empty($_REQUEST["Accion"]) ){
             }else{
                 exit("RE;No hay Facturas para crear XML");
             }
-        break;//Fin caso 3 
+        break;//Fin caso 4
+        
+        case 5://Editar Facturas que hayan sido reparadas
+            $sql="SELECT * FROM facturas_electronicas_log WHERE Estado>=10 OR Estado<20";
+            $Consulta=$obCon->Query($sql);
+            while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
+                $idFactura=$DatosConsulta["idFactura"];
+                
+                $sql="SELECT ID FROM facturas_electronicas_log WHERE idFactura='$idFactura' AND Estado='1'";
+                $DatosValidacion=$obCon->FetchAssoc($obCon->Query($sql));
+                if($DatosValidacion["ID"]>0){
+                    $sql="UPDATE facturas_electronicas_log SET Estado=30 WHERE idFactura='$idFactura' AND Estado>=10 AND Estado<20";
+                    $obCon->Query($sql);
+                }
+            }
+            exit("OK;Actualizacion de Documentos corregidos Realizada");
+        break;//Fin caso 5
+        
+        case 6://Enviar una factura electronica por correo
+            include_once("../clases/mail.class.php");            
+            $obMail=new TS_Mail($idUser);
+            
+            $idFactura=$obCon->normalizar($_REQUEST["idFactura"]);
+            $DatosFactura=$obCon->DevuelveValores("facturas", "idFacturas", $idFactura);
+            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
+            $DatosEmpresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $DatosFactura["EmpresaPro_idEmpresaPro"]);
+            if(!filter_var($DatosCliente["Email"], FILTER_VALIDATE_EMAIL)){
+                exit("E1;El tercero no cuenta con un Mail Válido: ".$DatosCliente["Email"]);
+            }
+            $para=$DatosCliente["Email"];
+            $de="technosolucionesfe@gmail.com";
+            $nombreRemitente=$DatosEmpresa["RazonSocial"];
+            $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 22); //Almecena el asunto del correo
+            $asunto=$Configuracion["Valor"];            
+            $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 23); //Almecena el cuerpo del mensaje del correo
+            $mensajeHTML=$Configuracion["Valor"];
+            $mensajeHTML= str_replace("@RazonSocial", $DatosCliente["RazonSocial"], $mensajeHTML);
+            $mensajeHTML= str_replace("@NumeroFactura", $DatosFactura["NumeroFactura"], $mensajeHTML);
+            $sql="SELECT RutaPDF,RutaXML FROM facturas_electronicas_log WHERE idFactura='$idFactura' AND Estado='1'";
+            $RutasFE=$obCon->FetchArray($obCon->Query($sql));            
+            $Adjunto=$RutasFE;
+            $status=$obMail->EnviarMailXPHPNativo($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
+            if($status=='OK'){
+                exit("OK;Envío Realizado");
+            }else{
+                exit("E1;No se pudo realizar el envío");
+            }
+            
+        break;//Fin caso 6
+        
+        case 7://Enviar las facturas electronicas por correo
+            include_once("../clases/mail.class.php");            
+            $obMail=new TS_Mail($idUser);
+            
+            $sql="SELECT * FROM facturas_electronicas_log WHERE Estado=1 AND EnviadoPorMail=0 LIMIT 1";
+            
+            $DatosLogFactura=$obCon->FetchAssoc($obCon->Query($sql));
+            $idFactura=$DatosLogFactura["idFactura"];
+            $idLog=$DatosLogFactura["ID"];
+            if($idFactura<>''){
+                $DatosFactura=$obCon->DevuelveValores("facturas", "idFacturas", $idFactura);
+                $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
+                $DatosEmpresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $DatosFactura["EmpresaPro_idEmpresaPro"]);
+                if(!filter_var($DatosCliente["Email"], FILTER_VALIDATE_EMAIL)){
+                    exit("E1;El tercero no cuenta con un Mail Válido: ".$DatosCliente["Email"]);
+                }
+                $para=$DatosCliente["Email"];
+                $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 24); //Almecena el asunto del correo
+                $de=$Configuracion["Valor"];
+                $nombreRemitente=$DatosEmpresa["RazonSocial"];
+                $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 22); //Almecena el asunto del correo
+                $asunto=$Configuracion["Valor"];            
+                $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 23); //Almecena el cuerpo del mensaje del correo
+                $mensajeHTML=$Configuracion["Valor"];
+                $mensajeHTML= str_replace("@RazonSocial", $DatosCliente["RazonSocial"], $mensajeHTML);
+                $mensajeHTML= str_replace("@NumeroFactura", $DatosFactura["NumeroFactura"], $mensajeHTML);
+                $sql="SELECT RutaPDF,RutaXML FROM facturas_electronicas_log WHERE idFactura='$idFactura' AND Estado='1'";
+                $RutasFE=$obCon->FetchArray($obCon->Query($sql));            
+                $Adjunto=$RutasFE;
+                $status=$obMail->EnviarMailXPHPNativo($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
+                if($status=='OK'){
+                    $obCon->ActualizaRegistro("facturas_electronicas_log", "EnviadoPorMail", 1, "ID", $idLog);
+                    exit("OK;Envío de la factura $idFactura Realizado");
+                }else{
+                    exit("E1;No se pudo realizar el envío de la factura $idFactura");
+                }
+            }else{
+                exit("RE;No hay Facturas para enviar por Mail");
+            }    
+        break;//Fin caso 7
     
         
     }

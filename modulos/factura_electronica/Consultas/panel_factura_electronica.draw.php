@@ -204,7 +204,11 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $css->CrearDiv("", "box-body no-padding", "", 1, 1);
                 $css->CrearDiv("", "mailbox-controls", "", 1, 1);
-                    print('<button type="button" class="btn btn-default btn-sm" onclick="VerListado()"><i class="fa fa-refresh"></i></button>');
+                    print('<button type="button" class="btn btn-default btn-sm" onclick="VerListado()"><i class="fa fa-refresh" title="Refrescar"></i></button>');
+                    if($TipoListado==4){
+                        print(' <button type="button" class="btn btn-default btn-sm" onclick="ActualizarErroresFacturasElectronicas();" style="color:red" title="Actualizar Errores"><i class="fa fa-cogs"></i></button>');
+                    }
+                    
                     $css->CrearDiv("", "pull-right", "", 1, 1);
                        
                         print('<div class="input-group">');   
@@ -241,15 +245,15 @@ if( !empty($_REQUEST["Accion"]) ){
                             $RutaXML=$DatosFacturas["RutaXML"];
                             print("<tr>");
                                 print("<td class='mailbox-date' style='text-align:center'>");
-                                    print("<i class='fa fa-fw fa-circle' style='color:$ColorStatus;cursor:pointer' onclick='VerMensajeFacturaElectronica($idItem)'></i>");
+                                    print("<i class='fa fa-fw fa-circle' style='color:$ColorStatus;cursor:pointer' onclick='VerMensajeFacturaElectronica($idItem)' title='Mensajes API'></i>");
                                 print("</td>"); 
                                 if($TipoListado==4){
                                     print("<td class='mailbox-date' style='text-align:center'>");
-                                        print("<i class='fa fa-fw fa-code' style='color:blue;cursor:pointer' onclick='VerJSONFacturaElectronica(`$idFactura`)'></i>");
+                                        print("<i class='fa fa-fw fa-code' style='color:blue;cursor:pointer' onclick='VerJSONFacturaElectronica(`$idFactura`)' title='Ver JSON'></i>");
                                     print("</td>"); 
                                     
                                     print("<td class='mailbox-date' style='text-align:center'>");
-                                        print("<i class='fa fa-share' style='color:red;cursor:pointer' onclick='ReportarFacturaElectronica(`$idFactura`)'></i>");
+                                        print("<i class='fa fa-share' style='color:red;cursor:pointer' onclick='ReportarFacturaElectronica(`$idFactura`)' title='Generar Factura Electronica Nuevamente'></i>");
                                     print("</td>"); 
                                 }
                                 print("<td class='mailbox-date' style='text-align:right'>");
