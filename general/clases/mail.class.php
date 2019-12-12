@@ -1,4 +1,8 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 if(file_exists("../../modelo/php_conexion.php")){
     include_once("../../modelo/php_conexion.php");
 }
@@ -67,6 +71,56 @@ class TS_Mail extends ProcesoVenta{
 
         //email sending status
         return $mail?"OK":"E1";
+        
+    }
+    
+    public function EnviarMailXPHPMailer($para,$de,$nombreRemitente, $asunto, $mensajeHTML, $Adjuntos='') {
+        
+        require '../../librerias/phpmailer/src/Exception.php';
+        require '../../librerias/phpmailer/src/PHPMailer.php';
+        require '../../librerias/phpmailer/src/SMTP.php';
+
+        /*
+        Primero, obtenemos el listado de e-mails
+        desde nuestra base de datos y la incorporamos a un Array.
+        */
+        $email=$para;
+        $name="";
+        $email_from=$de;
+        $name_from=$nombreRemitente;
+        $mail = new PHPMailer(true);
+        
+        $DatosSMTP=$this->DevuelveValores("configuracion_correos_smtp", "ID", 1);
+        $mail->IsSMTP();//telling the class to use SMTP
+        $mail->SMTPAuth = true;//enable SMTP authentication
+        $mail->SMTPSecure = $DatosSMTP["SMTPSecure"];//sets the prefix to the servier
+        $mail->Host = $DatosSMTP["Host"];//sets GMAIL as the SMTP server
+        $mail->Port = $DatosSMTP["Port"];//set the SMTP port for the GMAIL server
+        $mail->Username = $DatosSMTP["Username"];//GMAIL username
+        $mail->Password = $DatosSMTP["Password"];//GMAIL password
+        
+
+        // Typical mail data
+        $mail->AddAddress($email, $name);
+        $mail->SetFrom($email_from, $name_from);
+        $mail->IsHTML(true);
+        $mail->Subject = $asunto;
+        $mail->Body = $mensajeHTML;
+        
+        foreach ($Adjuntos as $value) {
+            $Vector=explode('/',$value);
+            $Total=count($Vector);
+            $NombreArchivo=$Vector[$Total-1];
+            $mail->AddAttachment($value,$NombreArchivo);
+        }
+        
+        
+        try{
+            $mail->Send();
+            return("OK");
+        } catch(Exception $e){           
+            return("E1");
+        }
         
     }
     

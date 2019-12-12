@@ -165,7 +165,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $sql="SELECT RutaPDF,RutaXML FROM facturas_electronicas_log WHERE idFactura='$idFactura' AND Estado='1'";
             $RutasFE=$obCon->FetchArray($obCon->Query($sql));            
             $Adjunto=$RutasFE;
-            $status=$obMail->EnviarMailXPHPNativo($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
+            //$status=$obMail->EnviarMailXPHPNativo($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
+            $status=$obMail->EnviarMailXPHPMailer($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
             if($status=='OK'){
                 exit("OK;Envío Realizado");
             }else{
@@ -191,7 +192,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     exit("E1;El tercero no cuenta con un Mail Válido: ".$DatosCliente["Email"]);
                 }
                 $para=$DatosCliente["Email"];
-                $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 24); //Almecena el asunto del correo
+                $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 24); //Almecena el correo que envia
                 $de=$Configuracion["Valor"];
                 $nombreRemitente=$DatosEmpresa["RazonSocial"];
                 $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 22); //Almecena el asunto del correo
@@ -203,7 +204,13 @@ if( !empty($_REQUEST["Accion"]) ){
                 $sql="SELECT RutaPDF,RutaXML FROM facturas_electronicas_log WHERE idFactura='$idFactura' AND Estado='1'";
                 $RutasFE=$obCon->FetchArray($obCon->Query($sql));            
                 $Adjunto=$RutasFE;
-                $status=$obMail->EnviarMailXPHPNativo($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
+                $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 25); //Determina el metodo a usar para enviar el correo al cliente
+                if($Configuracion["Valor"]==1){
+                    $status=$obMail->EnviarMailXPHPNativo($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
+                }
+                if($Configuracion["Valor"]==2){
+                    $status=$obMail->EnviarMailXPHPMailer($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
+                }
                 if($status=='OK'){
                     $obCon->ActualizaRegistro("facturas_electronicas_log", "EnviadoPorMail", 1, "ID", $idLog);
                     exit("OK;Envío de la factura $idFactura Realizado");

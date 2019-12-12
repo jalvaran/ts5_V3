@@ -135,3 +135,8 @@ INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `S
 (23,	'Configura el cuerpo del mensaje a enviar en una factura electronica',	'Cordial Saludo <strong> @RazonSocial </strong>,\r\n<br><br>\r\nPor medio del presente nos permitimos enviarle su factura electrónica @NumeroFactura .\r\n<br><br>\r\nQue tenga un excelente día.\r\n ',	'2019-12-11 21:02:13',	'0000-00-00 00:00:00'),
 (22,	'Configura el asunto a mostrar cuando se envia una factura electronica.',	'<strong>FACTURA ELECTRÓNICA @NumeroFactura </strong>',	'2019-12-11 20:58:45',	'0000-00-00 00:00:00');
 
+
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(25,	'Determina el metodo de envío de correo electrónico, 1 para php nativo (Windows), 2 para phpmailer (LINUX).',	'1',	'2019-12-12 13:13:50',	'0000-00-00 00:00:00'),
+(24,	'Se configura el Correo que envía la factura electronica',	'technosolucionesfe@gmail.com',	'2019-12-12 03:09:23',	'0000-00-00 00:00:00');
+
