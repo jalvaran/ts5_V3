@@ -247,10 +247,11 @@ if( !empty($_REQUEST["Accion"]) ){
                                 print("<td class='mailbox-date' style='text-align:center'>");
                                     print("<i class='fa fa-fw fa-circle' style='color:$ColorStatus;cursor:pointer' onclick='VerMensajeFacturaElectronica($idItem)' title='Mensajes API'></i>");
                                 print("</td>"); 
+                                print("<td class='mailbox-date' style='text-align:center'>");
+                                    print("<i class='fa fa-fw fa-code' style='color:blue;cursor:pointer' onclick='VerJSONFacturaElectronica(`$idFactura`)' title='Ver JSON'></i>");
+                                print("</td>"); 
                                 if($TipoListado==4){
-                                    print("<td class='mailbox-date' style='text-align:center'>");
-                                        print("<i class='fa fa-fw fa-code' style='color:blue;cursor:pointer' onclick='VerJSONFacturaElectronica(`$idFactura`)' title='Ver JSON'></i>");
-                                    print("</td>"); 
+                                    
                                     
                                     print("<td class='mailbox-date' style='text-align:center'>");
                                         print("<i class='fa fa-share' style='color:red;cursor:pointer' onclick='ReportarFacturaElectronica(`$idFactura`)' title='Generar Factura Electronica Nuevamente'></i>");
