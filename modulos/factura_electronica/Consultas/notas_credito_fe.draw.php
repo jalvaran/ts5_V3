@@ -59,13 +59,18 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>Fecha:</strong>", 1);
                     $css->ColTabla("<strong>Numero de Factura:</strong>", 1);
                     $css->ColTabla("<strong>Cliente:</strong>", 1);   
-                    $css->ColTabla("<strong>Valor:</strong>", 1);   
+                    $css->ColTabla("<strong>Valor Total de la Factura:</strong>", 1);  
+                    $css->ColTabla("<strong>Guardar Nota Credito:</strong>", 1);  
                 $css->CierraFilaTabla();
                 $css->FilaTabla(16);
                     $css->ColTabla($DatosFactura["Fecha"], 1);
                     $css->ColTabla($DatosFactura["Prefijo"].$DatosFactura["NumeroFactura"], 1);
                     $css->ColTabla($DatosCliente["RazonSocial"]." ".$DatosCliente["Num_Identificacion"], 1);   
                     $css->ColTabla(number_format($DatosFactura["Total"]), 1); 
+                    print("<td style='font-size:30px;text-align:center;color:red' title='Borrar'>"); 
+                        $css->li("BtnGuardarNota", "fa  fa-save", "", "onclick=ConfirmaGuardarNota(`$idNota`) style=font-size:60px;cursor:pointer;text-align:center;color:green");
+                        $css->Cli();
+                    print("</td>");
                 $css->CierraFilaTabla();
             $css->CerrarTabla();
             $css->CrearDiv("DivItemsFactura", "col-md-6", "left", 1, 1);
@@ -123,8 +128,14 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>Accion</strong>", 1);
                 $css->CierraFilaTabla();
             $Consulta=$obCon->ConsultarTabla("notas_credito_items", "WHERE idNotaCredito='$idNota'");
+            $Subtotal=0;
+            $Impuestos=0;
+            $Total=0;
             while($DatosItems=$obCon->FetchAssoc($Consulta)){
                 $idItem=$DatosItems["ID"];
+                $Subtotal=$Subtotal+$DatosItems["SubtotalItem"];
+                $Impuestos=$Subtotal+$DatosItems["IVAItem"];
+                $Total=$Subtotal+$DatosItems["TotalItem"];
                 $css->FilaTabla(14);
                     $css->ColTabla($DatosItems["Referencia"], 1);
                     $css->ColTabla($DatosItems["Nombre"], 1);
@@ -132,11 +143,24 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla(number_format($DatosItems["SubtotalItem"]), 1);
                     $css->ColTabla(number_format($DatosItems["IVAItem"]), 1);
                     $css->ColTabla(number_format($DatosItems["TotalItem"]), 1);
-                    print("<td>");
-                        $css->CrearBotonEvento("BtnAnular", "Eliminar", 1, "onclick", "AnularItemANota($idItem)", "naranja");
+                    print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>"); 
+                        $css->li("", "fa  fa-remove", "", "onclick=EliminarItem(`1`,`$idItem`) style=font-size:16px;cursor:pointer;text-align:center;color:red");
+                        $css->Cli();
                     print("</td>");
                 $css->CierraFilaTabla();
             }
+            $css->FilaTabla(16);
+                $css->ColTabla("<strong>Subtotal:</strong>", 5, "R");
+                $css->ColTabla("<strong>".number_format($Subtotal)."</strong>", 1, "l");
+            $css->CierraFilaTabla();
+            $css->FilaTabla(16);
+                $css->ColTabla("<strong>Impuestos:</strong>", 5, "R");
+                $css->ColTabla("<strong>".number_format($Impuestos)."</strong>", 1, "l");
+            $css->CierraFilaTabla();
+            $css->FilaTabla(16);
+                $css->ColTabla("<strong>Total:</strong>", 5, "R");
+                $css->ColTabla("<strong>".number_format($Total)."</strong>", 1, "l");
+            $css->CierraFilaTabla();
             $css->CerrarTabla();
         break;//fin caso 3    
     

@@ -70,7 +70,34 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit("E1;".$Respuesta);
             }
             
-        break;//Fin caso 2    
+        break;//Fin caso 2   
+        
+        case 3://eliminar un item a una nota credito
+            $Tabla=$obCon->normalizar($_REQUEST["Tabla"]);
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            
+            if($idItem==''){
+                exit("E1;No se recibió el item a eliminar");
+            }
+            
+            if($Tabla==''){
+                exit("E1;No se recibió la tabla para eliminar el item");
+            }
+            if($Tabla==1){
+                $Tabla="notas_credito_items";
+            }else{
+                exit("E1;Tabla invalida");
+            }
+            $obCon->BorraReg($Tabla, "ID", $idItem);
+            exit("OK;Item Eliminado");
+        break;//Fin caso 3
+        
+        case 4://Guardar una nota credito
+            $idNota=$obCon->normalizar($_REQUEST["idNota"]);
+            $obCon->ContabilizarNotaCredito($idNota);
+            $obCon->ActualizaRegistro("notas_credito", "Estado", 1, "ID", $idNota);
+            exit("OK;Nota Credito No. $idNota, Cerrada");
+        break;//Fin caso 4    
         
     }
     

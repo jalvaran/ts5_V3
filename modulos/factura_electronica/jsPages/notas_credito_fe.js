@@ -362,6 +362,114 @@ function AgregarItemANota(idItemFactura,idNota){
       })
 }
 
+function EliminarItem(Tabla,idItem){
+    
+    var idDivDraw="DivItemsNota";
+    
+   
+    var form_data = new FormData();
+        form_data.append('Accion', 3);
+        form_data.append('Tabla', Tabla);
+        form_data.append('idItem', idItem);
+                
+    $.ajax({
+        //async:false,
+        url: './procesadores/notas_credito.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                alertify.success(respuestas[1]);
+                DibujeItemsNota(respuestas[2]);
+                                
+            }else if(respuestas[0]==="E1"){
+                
+                alertify.error(respuestas[1]); 
+                                 
+            }else{
+                
+                document.getElementById(idDivDraw).innerHTML=data;
+                
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
+
+function ConfirmaGuardarNota(idNota){
+    
+    alertify.confirm('Está seguro que desea Guardar la Nota Credito No '+idNota+'?',
+        function (e) {
+            if (e) {
+
+                alertify.success("Guardando...");                    
+                GuardarNotaCredito(idNota);
+            }else{
+                alertify.error("Se canceló el proceso");
+
+                return;
+            }
+        });
+}
+
+function GuardarNotaCredito(idNota){
+    
+    var idDivDraw="DivItemsNota";
+    var idBoton="BtnGuardarNota";
+    
+    document.getElementById(idBoton).disabled=true;
+   
+    var form_data = new FormData();
+        form_data.append('Accion', 4);        
+        form_data.append('idNota', idNota);
+            
+    $.ajax({
+        //async:false,
+        url: './procesadores/notas_credito.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                alertify.success(respuestas[1]);
+                DibujeListado();
+                                
+            }else if(respuestas[0]==="E1"){
+                
+                alertify.error(respuestas[1]); 
+                                 
+            }else{
+                
+                document.getElementById(idDivDraw).innerHTML=data;
+                
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
 
 document.getElementById('BtnMuestraMenuLateral').click();
 VerListado();
