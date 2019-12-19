@@ -516,6 +516,242 @@ function ActualizarErroresFacturasElectronicas(){
       })
 }
 
+
+function FormularioNuevaNotaCredito(idFacturaElectronica){
+    var idDivDraw="DivFrmModalAcciones";
+    AbreModal('ModalAcciones');  
+    var form_data = new FormData();
+        form_data.append('Accion', 5);
+        form_data.append('idFacturaElectronica', idFacturaElectronica);
+        $.ajax({
+        url: './Consultas/panel_factura_electronica.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+           document.getElementById(idDivDraw).innerHTML=data;
+           DibujeItemsNota(idFacturaElectronica);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            LimpiarDivs();
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function AgregarItemANota(idItemFactura,idFacturaElectronica){
+    var idBoton="BtnAgregarItem_"+idItemFactura;
+    var idCantidad="TxtCantidad_"+idItemFactura;
+    document.getElementById(idBoton).disabled=true;
+    //document.getElementById(idBoton).value="Agregando...";
+    var idDivDraw="DivItemsNota";
+    var TxtCantidad = document.getElementById(idCantidad).value;
+   
+    var form_data = new FormData();
+        form_data.append('Accion', 2);
+        form_data.append('idItemFactura', idItemFactura);
+        form_data.append('idFacturaElectronica', idFacturaElectronica);
+        form_data.append('TxtCantidad', TxtCantidad); 
+        
+    $.ajax({
+        //async:false,
+        url: './procesadores/panel_factura_electronica.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                alertify.success(respuestas[1]);
+                DibujeItemsNota(idFacturaElectronica);
+                document.getElementById(idBoton).disabled=false;
+                //document.getElementById(idBoton).value="Agregar";
+                
+            }else if(respuestas[0]==="E1"){
+                
+                
+                alertify.error(respuestas[1]); 
+                MarqueErrorElemento(respuestas[2]);
+                document.getElementById(idBoton).disabled=false;
+                //document.getElementById(idBoton).value="Agregar";                       
+            }else{
+                
+                document.getElementById(idDivDraw).innerHTML=data;
+                document.getElementById(idBoton).disabled=false;
+                //document.getElementById(idBoton).value="Agregar";
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+                        
+            document.getElementById(idBoton).disabled=false;
+            document.getElementById(idBoton).value="Agregar";
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
+
+
+
+function DibujeItemsNota(idFacturaElectronica){
+    var idDivDraw="DivItemsNota";
+    document.getElementById(idDivDraw).innerHTML='<div id="GifProcess"><img   src="../../images/loading.gif" alt="Cargando" height="50" width="50"></div>';  
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 6);
+        form_data.append('idFacturaElectronica', idFacturaElectronica);
+        
+        $.ajax({
+        url: './Consultas/panel_factura_electronica.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+           document.getElementById(idDivDraw).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            LimpiarDivs();
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+
+function EliminarItem(Tabla,idItem,idFacturaElectronica){
+    
+    var idDivDraw="DivItemsNota";
+    
+   
+    var form_data = new FormData();
+        form_data.append('Accion', 3);
+        form_data.append('Tabla', Tabla);
+        form_data.append('idItem', idItem);
+        form_data.append('idFacturaElectronica', idFacturaElectronica);  
+    $.ajax({
+        //async:false,
+        url: './procesadores/panel_factura_electronica.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                alertify.success(respuestas[1]);
+                DibujeItemsNota(respuestas[2]);
+                                
+            }else if(respuestas[0]==="E1"){
+                
+                alertify.error(respuestas[1]); 
+                                 
+            }else{
+                
+                document.getElementById(idDivDraw).innerHTML=data;
+                
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
+
+function ConfirmaGuardarNota(idFacturaElectronica){
+    
+    alertify.confirm('Está seguro que desea Guardar la Nota Credito ?',
+        function (e) {
+            if (e) {
+
+                alertify.success("Guardando...");                    
+                GuardarNotaCredito(idFacturaElectronica);
+            }else{
+                alertify.error("Se canceló el proceso");
+
+                return;
+            }
+        });
+}
+
+function GuardarNotaCredito(idFacturaElectronica){
+    
+    var idDivDraw="DivFrmModalAcciones";
+    var idBoton="BtnGuardarNota";
+    
+    document.getElementById(idBoton).disabled=true;
+    var TxtFecha = document.getElementById("TxtFecha").value;    
+    var TxtObservaciones = document.getElementById("TxtObservaciones").value;
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 4);        
+        form_data.append('idFacturaElectronica', idFacturaElectronica);
+        form_data.append('TxtFecha', TxtFecha);
+        form_data.append('TxtObservaciones', TxtObservaciones);
+            
+    $.ajax({
+        //async:false,
+        url: './procesadores/panel_factura_electronica.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                alertify.success(respuestas[1]);
+                document.getElementById(idDivDraw).innerHTML="<h1>"+respuestas[1]+"</h1>";
+                TipoListado=2;
+                VerListado();
+                VerTablero();
+                                
+            }else if(respuestas[0]==="E1"){
+                MarqueErrorElemento(respuestas[2]);
+                alertify.error(respuestas[1]); 
+                                 
+            }else{
+                
+                document.getElementById(idDivDraw).innerHTML=data;
+                
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
+
 document.getElementById('BtnMuestraMenuLateral').click();
 VerListado();
 VerTablero();

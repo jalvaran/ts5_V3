@@ -289,7 +289,11 @@ if( !empty($_REQUEST["Accion"]) ){
                                 print("<td class='mailbox-date' style='text-align:left'>");
                                     print($DatosFacturas["NombreEstado"]);
                                 print("</td>");
-                                
+                                if($TipoListado==1){
+                                    print("<td class='mailbox-date' style='text-align:center'>");
+                                        print("<i class='fa fa-remove ' style='color:red;cursor:pointer' onclick='FormularioNuevaNotaCredito($idItem)' title='Nota Credito'></i>");
+                                    print("</td>"); 
+                                }
                             print("</tr>");
                         }
                         print('</tbody>');
@@ -329,7 +333,148 @@ if( !empty($_REQUEST["Accion"]) ){
             print("<pre>");
                 print_r($JSONFactura);
             print("</pre>");
-        break;//Fin caso 3
+        break;//Fin caso 4
+    
+        case 5://formulario para una Nota credito
+            $idFacturaElectronica=$obCon->normalizar($_REQUEST["idFacturaElectronica"]);
+            $DatosFacturaElectronica=$obCon->DevuelveValores("vista_listado_facturas_electronicas", "ID", $idFacturaElectronica);
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 1, "", "", "", "");
+            $css->input("hidden", "idFacturaElectronica", "", "idFacturaElectronica", "", 1, "", "", "", "");
+            $idFactura=$DatosFacturaElectronica["idFactura"];
+            $DatosFactura=$obCon->DevuelveValores("facturas", "idFacturas", $idFactura);
+            
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>DATOS DE LA NOTA CREDITO</strong>", 5,"C");                    
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Fecha de la Nota:</strong>", 1);                    
+                    $css->ColTabla("<strong>Observaciones:</strong>", 4);  
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    print("<td>");
+                        $css->input("date", "TxtFecha", "form-control", "TxtFecha", "Fecha", date("Y-m-d"), "Fecha", "off", "", "","style='line-height: 15px;'");
+                    print("</td>");                  
+                    print("<td colspan=4>");
+                        $css->textarea("TxtObservaciones", "form-control", "TxtObservaciones", "", "Observaciones", "", "");
+                        
+                        $css->Ctextarea(); 
+                    print("</td>");    
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>DATOS DE LA FACTURA A LA QUE AFECTA LA NOTA</strong>", 5,"C");                    
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Fecha de la Factura:</strong>", 1);
+                    $css->ColTabla("<strong>Numero de Factura:</strong>", 1);
+                    $css->ColTabla("<strong>Cliente:</strong>", 1);   
+                    $css->ColTabla("<strong>Valor Total de la Factura:</strong>", 1);  
+                    $css->ColTabla("<strong>Guardar Nota Credito:</strong>", 1);  
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla($DatosFactura["Fecha"], 1);
+                    $css->ColTabla($DatosFactura["Prefijo"].$DatosFactura["NumeroFactura"], 1);
+                    $css->ColTabla($DatosFacturaElectronica["RazonSocialCliente"]." ".$DatosFacturaElectronica["NIT_Cliente"], 1);   
+                    $css->ColTabla(number_format($DatosFactura["Total"]), 1); 
+                    print("<td style='font-size:30px;text-align:center;color:red' title='Borrar'>"); 
+                        $css->li("BtnGuardarNota", "fa  fa-save", "", "onclick=ConfirmaGuardarNota(`$idFacturaElectronica`) style=font-size:60px;cursor:pointer;text-align:center;color:green");
+                        $css->Cli();
+                    print("</td>");
+                $css->CierraFilaTabla();
+            $css->CerrarTabla();
+            $css->CrearDiv("DivItemsFactura", "col-md-6", "left", 1, 1);
+                $css->CrearTitulo("<strong>ITEMS DE LA FACTURA:</strong>", "rojo");
+                $css->CrearTabla();
+                    $css->FilaTabla(12);
+                        $css->ColTabla("<strong>REF</strong>", 1);
+                        $css->ColTabla("<strong>Producto o Servicio</strong>", 1);
+                        //$css->ColTabla("<strong>Precio Unitario</strong>", 1);
+                        $css->ColTabla("<strong>Cantidad</strong>", 1);
+                        $css->ColTabla("<strong>Subtotal</strong>", 1);
+                        $css->ColTabla("<strong>IVA</strong>", 1);
+                        $css->ColTabla("<strong>Total</strong>", 1);
+                        $css->ColTabla("<strong>Agregar</strong>", 1);
+                    $css->CierraFilaTabla();
+                    $Consulta=$obCon->ConsultarTabla("facturas_items", " WHERE idFactura='$idFactura'");
+                    while($DatosItemsFactura=$obCon->FetchAssoc($Consulta)){
+                        $idItem=$DatosItemsFactura["ID"];
+                        $css->FilaTabla(12);
+                        $css->ColTabla($DatosItemsFactura["Referencia"], 1);
+                        $css->ColTabla($DatosItemsFactura["Nombre"], 1);
+                        //$css->ColTabla(number_format($DatosItemsFactura["ValorUnitarioItem"]), 1);
+                        print("<td>");
+                            $css->input("number", "TxtCantidad_".$idItem, "form-control", "TxtCantidad_".$idItem, "cantidad", $DatosItemsFactura["Cantidad"], "Cantidad", "off", "", "");
+                        print("</td>");
+                        
+                        $css->ColTabla(number_format($DatosItemsFactura["SubtotalItem"]), 1);
+                        $css->ColTabla(number_format($DatosItemsFactura["IVAItem"]), 1);
+                        $css->ColTabla(number_format($DatosItemsFactura["TotalItem"]), 1);
+                        print("<td style='font-size:30px;text-align:center;color:blue' title='Agregar'>"); 
+                            $css->li("BtnAgregarItem_$idItem", "fa  fa-plus-circle", "", "onclick=AgregarItemANota(`$idItem`,`$idFacturaElectronica`) style=font-size:30px;cursor:pointer;text-align:center;color:blue");
+                            $css->Cli();
+                        print("</td>");
+                       
+                    $css->CierraFilaTabla();
+                    }
+                $css->CerrarTabla();
+            $css->CerrarDiv();
+            $css->CrearDiv("DivItemsNota", "col-md-6", "left", 1, 1);
+            
+            $css->CerrarDiv();
+            print("<br><br><br><br><br><br><br><br><br><br><br><br>");
+            print("<br><br><br><br><br><br><br><br><br><br><br><br>");
+        break;//Fin caso 5
+        
+        case 6:// dibuja los items de la nota
+            $idFacturaElectronica=$obCon->normalizar($_REQUEST["idFacturaElectronica"]);
+            $css->CrearTitulo("<strong>ITEMS DE LA NOTA CREDITO:</strong>", "azul");
+            $css->CrearTabla();
+                $css->FilaTabla(14);
+                    $css->ColTabla("<strong>REF</strong>", 1);
+                    $css->ColTabla("<strong>Producto o Servicio</strong>", 1);
+                    //$css->ColTabla("<strong>Precio Unitario</strong>", 1);
+                    $css->ColTabla("<strong>Cantidad</strong>", 1);
+                    $css->ColTabla("<strong>Subtotal</strong>", 1);
+                    $css->ColTabla("<strong>IVA</strong>", 1);
+                    $css->ColTabla("<strong>Total</strong>", 1);
+                    $css->ColTabla("<strong>Accion</strong>", 1);
+                $css->CierraFilaTabla();
+            $Consulta=$obCon->ConsultarTabla("notas_credito_items", "WHERE idFacturaElectronica='$idFacturaElectronica' AND idNotaCredito=''");
+            $Subtotal=0;
+            $Impuestos=0;
+            $Total=0;
+            while($DatosItems=$obCon->FetchAssoc($Consulta)){
+                $idItem=$DatosItems["ID"];
+                $Subtotal=$Subtotal+$DatosItems["SubtotalItem"];
+                $Impuestos=$Subtotal+$DatosItems["IVAItem"];
+                $Total=$Subtotal+$DatosItems["TotalItem"];
+                $css->FilaTabla(14);
+                    $css->ColTabla($DatosItems["Referencia"], 1);
+                    $css->ColTabla($DatosItems["Nombre"], 1);
+                    $css->ColTabla(number_format($DatosItems["Cantidad"]), 1);
+                    $css->ColTabla(number_format($DatosItems["SubtotalItem"]), 1);
+                    $css->ColTabla(number_format($DatosItems["IVAItem"]), 1);
+                    $css->ColTabla(number_format($DatosItems["TotalItem"]), 1);
+                    print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>"); 
+                        $css->li("", "fa  fa-remove", "", "onclick=EliminarItem(`1`,`$idItem`) style=font-size:16px;cursor:pointer;text-align:center;color:red");
+                        $css->Cli();
+                    print("</td>");
+                $css->CierraFilaTabla();
+            }
+            $css->FilaTabla(16);
+                $css->ColTabla("<strong>Subtotal:</strong>", 5, "R");
+                $css->ColTabla("<strong>".number_format($Subtotal)."</strong>", 1, "l");
+            $css->CierraFilaTabla();
+            $css->FilaTabla(16);
+                $css->ColTabla("<strong>Impuestos:</strong>", 5, "R");
+                $css->ColTabla("<strong>".number_format($Impuestos)."</strong>", 1, "l");
+            $css->CierraFilaTabla();
+            $css->FilaTabla(16);
+                $css->ColTabla("<strong>Total:</strong>", 5, "R");
+                $css->ColTabla("<strong>".number_format($Total)."</strong>", 1, "l");
+            $css->CierraFilaTabla();
+            $css->CerrarTabla();
+        break;//fin caso 6
         
     }
     

@@ -11,8 +11,9 @@ if(file_exists("../../../modelo/php_conexion.php")){
         
 class NotasCredito extends ProcesoVenta{
     
-    public function CrearNotaCredito($idFactura,$TxtFecha,$TxtObservaciones,$idUser) {
+    public function CrearNotaCredito($idFactura,$idFacturaElectronica,$TxtFecha,$TxtObservaciones,$idUser) {
         $Datos["idFactura"]=$idFactura;
+        $Datos["idFacturaElectronica"]=$idFacturaElectronica;
         $Datos["Fecha"]=$TxtFecha;
         $Datos["Observaciones"]=$TxtObservaciones;
         $Datos["idUser"]=$idUser;        
@@ -25,7 +26,7 @@ class NotasCredito extends ProcesoVenta{
         return($ID);
     }
     
-    public function AgregarItemANotaCredito($idNota,$idItemFactura,$Cantidad,$idUser) {
+    public function AgregarItemANotaCredito($idFacturaElectronica,$idItemFactura,$Cantidad,$idUser) {
         
         $sql="SELECT TablaItems,Referencia,Nombre,ValorUnitarioItem,Cantidad,Dias,
                 SubtotalItem,IVAItem,ValorOtrosImpuestos,TotalItem,PorcentajeIVA,
@@ -42,7 +43,7 @@ class NotasCredito extends ProcesoVenta{
             $Datos["SubtotalCosto"]=$Datos["SubtotalCosto"]*$Cantidad;
         }
         $Datos["idItemFactura"]=$idItemFactura;  
-        $Datos["idNotaCredito"]=$idNota;        
+        $Datos["idFacturaElectronica"]=$idFacturaElectronica;        
         $Datos["idUser"]=$idUser;
         $Datos["Created"]=date("Y-m-d H:i:s");
                 
@@ -53,10 +54,10 @@ class NotasCredito extends ProcesoVenta{
     
     public function ContabilizarNotaCredito($idNota) {
         
-        $DatosNota= $this->DevuelveValores("notas_credito", "ID", $idNotas);
-        $DatosFactura= $this->DevuelveValores("facturas", "idFacturas", $DatosNota["idFacturas"]);
-        $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosNota["Clientes_idClientes"]);
-        $Parametros=$this->DevuelveValores("parametros_contables", "ID", 9);
+        $DatosNota= $this->DevuelveValores("notas_credito", "ID", $idNota);
+        $DatosFactura= $this->DevuelveValores("facturas", "idFacturas", $DatosNota["idFactura"]);
+        $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
+        $Parametros=$this->DevuelveValores("parametros_contables", "ID", 9); //Devolucion en ventas
         $CuentaDevolucion=$Parametros["CuentaPUC"];
         $NombreCuentaDevolucion=$Parametros["NombreCuenta"];
         $sql="SELECT SUM(SubtotalItem) AS SubtotalItem,SUM(IVAItem) AS IVAItem,SUM(TotalItem) AS TotalItem,
@@ -65,21 +66,24 @@ class NotasCredito extends ProcesoVenta{
         $Totales= $this->FetchAssoc($this->Query($sql));
         
         
-        $this->IngreseMovimientoLibroDiario($DatosNota["Fecha"], "NOTA_CREDITO", $idNota, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDevolucion, $NombreCuentaDevolucion, "Nota credito Factura ".$DatosFactura["NumeroFactura"], "DB", $Totales["SubtotalItem"], $DatosNota["Observacion"], $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
+        $this->IngreseMovimientoLibroDiario($DatosNota["Fecha"], "NOTA_CREDITO", $idNota, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDevolucion, $NombreCuentaDevolucion, "Nota credito Factura ".$DatosFactura["NumeroFactura"], "DB", $Totales["SubtotalItem"], $DatosNota["Observaciones"], $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
         if($Totales["IVAItem"]<>0){
-            $this->IngreseMovimientoLibroDiario($DatosNota["Fecha"], "NOTA_CREDITO", $idNota, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDevolucion, $NombreCuentaDevolucion, "Nota credito Factura ".$DatosFactura["NumeroFactura"], "DB", $Totales["IVAItem"], $DatosNota["Observacion"], $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
+            $Parametros=$this->DevuelveValores("parametros_contables", "ID", 33); //Devolucion de IVA
+            $CuentaDevolucionIVA=$Parametros["CuentaPUC"];
+            $NombreCuentaDevolucionIVA=$Parametros["NombreCuenta"];
+            $this->IngreseMovimientoLibroDiario($DatosNota["Fecha"], "NOTA_CREDITO", $idNota, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDevolucionIVA, $NombreCuentaDevolucionIVA, "Nota credito Factura ".$DatosFactura["NumeroFactura"], "DB", $Totales["IVAItem"], $DatosNota["Observaciones"], $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
         }
         
         if($DatosFactura["FormaPago"]=='Contado'){
             $Parametros=$this->DevuelveValores("parametros_contables", "ID", 21); //Caja General
             $CuentaDevolucion=$Parametros["CuentaPUC"];
             $NombreCuentaDevolucion=$Parametros["NombreCuenta"];
-            $this->IngreseMovimientoLibroDiario($DatosNota["Fecha"], "NOTA_CREDITO", $idNota, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDevolucion, $NombreCuentaDevolucion, "Nota credito Factura ".$DatosFactura["NumeroFactura"], "CR", $Totales["TotalItem"], $DatosNota["Observacion"], $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
+            $this->IngreseMovimientoLibroDiario($DatosNota["Fecha"], "NOTA_CREDITO", $idNota, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDevolucion, $NombreCuentaDevolucion, "Nota credito Factura ".$DatosFactura["NumeroFactura"], "CR", $Totales["TotalItem"], $DatosNota["Observaciones"], $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
         }else{
             $Parametros=$this->DevuelveValores("parametros_contables", "ID", 6); //Clientes
             $CuentaDevolucion=$Parametros["CuentaPUC"];
             $NombreCuentaDevolucion=$Parametros["NombreCuenta"];
-            $this->IngreseMovimientoLibroDiario($DatosNota["Fecha"], "NOTA_CREDITO", $idNota, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDevolucion, $NombreCuentaDevolucion, "Nota credito Factura ".$DatosFactura["NumeroFactura"], "CR", $Totales["TotalItem"], $DatosNota["Observacion"], $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
+            $this->IngreseMovimientoLibroDiario($DatosNota["Fecha"], "NOTA_CREDITO", $idNota, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDevolucion, $NombreCuentaDevolucion, "Nota credito Factura ".$DatosFactura["NumeroFactura"], "CR", $Totales["TotalItem"], $DatosNota["Observaciones"], $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
         }
         
     }

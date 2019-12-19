@@ -140,3 +140,77 @@ INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `S
 (25,	'Determina el metodo de envío de correo electrónico, 1 para php nativo (Windows), 2 para phpmailer (LINUX).',	'1',	'2019-12-12 13:13:50',	'0000-00-00 00:00:00'),
 (24,	'Se configura el Correo que envía la factura electronica',	'technosolucionesfe@gmail.com',	'2019-12-12 03:09:23',	'0000-00-00 00:00:00');
 
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(25,	'Determina el metodo de envío de correo electrónico, 1 para php nativo (Windows), 2 para phpmailer (LINUX).',	'2',	'2019-12-12 13:13:50',	'0000-00-00 00:00:00');
+
+CREATE TABLE `configuracion_correos_smtp` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `SMTPSecure` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `Host` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
+  `Port` bigint(20) NOT NULL,
+  `Username` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `Password` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `configuracion_correos_smtp` (`ID`, `SMTPSecure`, `Host`, `Port`, `Username`, `Password`, `Updated`, `Sync`) VALUES
+(1,	'ssl',	'smtp.gmail.com',	465,	'technosolucionesfe@gmail.com',	'pirlo1985',	'2019-12-17 11:35:35',	'0000-00-00 00:00:00');
+
+INSERT INTO `menu_pestanas` (`ID`, `Nombre`, `idMenu`, `Orden`, `Estado`, `Updated`, `Sync`) VALUES
+(50,	'Facturacion Electronica',	3,	2,	CONV('1', 2, 10) + 0,	'2019-01-13 09:12:43',	'2019-01-13 09:12:43');
+
+INSERT INTO `menu_carpetas` (`ID`, `Ruta`, `Updated`, `Sync`) VALUES
+(14,	'../modulos/factura_electronica/',	'2019-06-22 10:09:52',	'2019-04-07 09:14:07');
+
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+(193,	'Notas Credito',	50,	14,	0,	'',	0,	'',	'notas_credito_fe.php',	'_BLANK',	1,	'notas_credito.png',	2,	'2019-12-13 10:14:11',	'2019-01-12 09:12:44'),
+(192,	'Panel de Facturacion Electronica',	50,	14,	0,	'',	0,	'',	'panel_factura_electronica.php',	'_BLANK',	1,	'factura_electronica.png',	1,	'2019-12-13 10:14:59',	'2019-01-12 09:12:44');
+
+
+
+CREATE TABLE `notas_credito` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `idFactura` varchar(45) CHARACTER SET utf8 COLLATE utf8_spanish2_ci NOT NULL,
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Estado` int(11) NOT NULL,
+  `Created` datetime NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idFactura` (`idFactura`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `notas_credito_items` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idItemFactura` bigint(20) NOT NULL,
+  `idNotaCredito` bigint(20) NOT NULL,
+  `TablaItems` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Referencia` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `Nombre` text COLLATE utf8_spanish_ci NOT NULL,
+  `ValorUnitarioItem` double NOT NULL,
+  `Cantidad` double NOT NULL,
+  `Dias` double NOT NULL,
+  `SubtotalItem` double NOT NULL,
+  `IVAItem` double NOT NULL,
+  `ValorOtrosImpuestos` double NOT NULL,
+  `TotalItem` double NOT NULL,
+  `PorcentajeIVA` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `idOtrosImpuestos` int(11) NOT NULL,
+  `idPorcentajeIVA` int(11) NOT NULL,
+  `PrecioCostoUnitario` double NOT NULL,
+  `SubtotalCosto` double NOT NULL,
+  `TipoItem` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `CuentaPUC` bigint(20) NOT NULL,
+  `idCierre` bigint(20) NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Created` datetime NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+

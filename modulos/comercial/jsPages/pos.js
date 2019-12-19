@@ -647,7 +647,7 @@ function atajosPOS(){
     });
     
     shortcut("Ctrl+A",function(){
-    document.getElementById("BntModalPOS").click();
+    //document.getElementById("BntModalPOS").click();
     });
 
 }

@@ -64,7 +64,7 @@ function FormularioNuevaNotaCredito(){
     var idDivDraw="DivFrmModalAcciones";
     AbreModal('ModalAcciones');  
     var form_data = new FormData();
-        form_data.append('Accion', 1);
+        form_data.append('Accion', 5);
         
         $.ajax({
         url: './Consultas/notas_credito_fe.draw.php',
@@ -107,10 +107,10 @@ function VerTablero(){
     var idDivDraw="DivDrawFE";
      
     var form_data = new FormData();
-        form_data.append('Accion', 1);
+        form_data.append('Accion', 4);
         form_data.append('TipoListado', TipoListado);
         $.ajax({
-        url: './Consultas/panel_factura_electronica.draw.php',
+        url: './Consultas/notas_credito_fe.draw.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -137,12 +137,12 @@ function VerListado(Page=1){
     var Busqueda=document.getElementById('TxtBusquedas').value;
         
     var form_data = new FormData();
-        form_data.append('Accion', 2);
+        form_data.append('Accion', 5);
         form_data.append('Page', Page);
         form_data.append('Busqueda', Busqueda);
         form_data.append('TipoListado', TipoListado);
         $.ajax({
-        url: './Consultas/panel_factura_electronica.draw.php',
+        url: './Consultas/notas_credito_fe.draw.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -449,7 +449,7 @@ function GuardarNotaCredito(idNota){
             var respuestas = data.split(';'); 
            if(respuestas[0]==="OK"){   
                 alertify.success(respuestas[1]);
-                DibujeListado();
+                VerListado();
                                 
             }else if(respuestas[0]==="E1"){
                 

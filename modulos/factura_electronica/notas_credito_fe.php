@@ -31,7 +31,7 @@ $css->PageInit($myTitulo);
     $css->CModal("BntModalAcciones", "onclick=SeleccioneAccionFormularios()", "button", "Guardar");
     //$css->div("", "col-md-12", "", "", "", "", "");
     $css->section("", "content-header", "", "");
-        print("<h1>Módulo Creacion de Notas Credito</h1>"); 
+        print("<h1>Módulo de Notas Credito</h1>"); 
     $css->Csection();
     //print("<br>");
     $css->section("", "content", "", "");
