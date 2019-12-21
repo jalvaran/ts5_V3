@@ -28,6 +28,14 @@ if( !empty($_REQUEST["Accion"]) ){
             $DatosTotales=$obCon->FetchArray($obCon->Query($sql));            
             $TotalPendientes=$DatosTotales["Total"];
             
+            $sql="SELECT COUNT(ID) as Total FROM notas_credito WHERE Estado=1";
+            $DatosTotales=$obCon->FetchArray($obCon->Query($sql));            
+            $TotalNotas=$DatosTotales["Total"];
+            
+            $sql="SELECT COUNT(ID) as Total FROM notas_credito WHERE Estado=0";
+            $DatosTotales=$obCon->FetchArray($obCon->Query($sql));            
+            $TotalNotasPendientes=$DatosTotales["Total"];
+            
             $TotalRecibidos=0;
             $Opacidad1="opacity:0.3;";  
             $Opacidad2="opacity:0.5;";
@@ -55,7 +63,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     <span class="info-box-icon"><i class="fa fa-send"></i></span>
 
                     <div class="info-box-content">
-                      <span class="info-box-text">Enviados</span>
+                      <span class="info-box-text">Facturas</span>
                       <span class="info-box-number">'.number_format($TotalEmitidos).'</span>
 
                       <div class="progress">
@@ -74,14 +82,14 @@ if( !empty($_REQUEST["Accion"]) ){
                     <span class="info-box-icon"><i class="fa fa-inbox"></i></span>
 
                     <div class="info-box-content">
-                      <span class="info-box-text">Recibidos</span>
-                      <span class="info-box-number">'.number_format($TotalRecibidos).'</span>
+                      <span class="info-box-text">Notas Credito</span>
+                      <span class="info-box-number">'.number_format($TotalNotas).'</span>
 
                       <div class="progress">
                         <div class="progress-bar" style="width: 100%"></div>
                       </div>
                       <span class="progress-description">
-                            Doc. Recibidos
+                            Notas Credito
                           </span>
                     </div>
                     <!-- /.info-box-content -->
@@ -93,8 +101,8 @@ if( !empty($_REQUEST["Accion"]) ){
                     <span class="info-box-icon"><i class="ion ion-ios-pricetag-outline"></i></span>
 
                     <div class="info-box-content">
-                      <span class="info-box-text">Pendientes</span>
-                      <span class="info-box-number">'.number_format($TotalPendientes).'</span>
+                      <span class="info-box-text">Notas Pendientes</span>
+                      <span class="info-box-number">'.number_format($TotalNotasPendientes).'</span>
 
                       <div class="progress">
                         <div class="progress-bar" style="width: 100%"></div>
@@ -129,22 +137,25 @@ if( !empty($_REQUEST["Accion"]) ){
         case 2: // se dibuja el listado de facturas electronicas
             $TipoListado=$obCon->normalizar($_REQUEST["TipoListado"]);
             $Busqueda=$obCon->normalizar($_REQUEST["Busqueda"]);
-            $Condicional="WHERE Estado>0 ";
+            $Condicional="WHERE ID>0 ";
             $OrderBy=" ORDER BY ID DESC";
+            $TablaConsulta="vista_listado_facturas_electronicas";
             if($TipoListado==1){ //Documentos enviados
                 $Condicional.=" AND Estado=1 ";
                 $Titulo="Listado de Documentos Enviados";
                 $ColorStatus="blue";
             }
-            if($TipoListado==2){ //Documentos recibidos
-                $Condicional.=" AND Estado>=100 AND Estado<150  ";
-                $Titulo="Listado de Documentos Recibido";
+            if($TipoListado==2){ //Notas credito enviadas
+                $TablaConsulta="vista_notas_credito_fe";
+                $Condicional.=" AND Estado=1 ";
+                $Titulo="Listado de Notas Credito Enviadas";
                 $ColorStatus="green";
             }
             
-            if($TipoListado==3 ){ //Documentos pendientes
-                $Condicional.=" AND Estado>=20 AND Estado<30 ";
-                $Titulo="Listado de Documentos Pendientes";
+            if($TipoListado==3 ){ //Notas credito pendientes
+                $TablaConsulta="vista_notas_credito_fe";
+                $Condicional.=" AND Estado=0 OR Estado=11";
+                $Titulo="Listado de Notas Credito Pendientes";
                 $ColorStatus="orange";
             }
             
@@ -171,7 +182,7 @@ if( !empty($_REQUEST["Accion"]) ){
             }
                       
                         
-            $statement=" `vista_listado_facturas_electronicas` $Condicional ";
+            $statement=" `$TablaConsulta` $Condicional ";
             if(isset($_REQUEST['st'])){
 
                 $statement= urldecode($_REQUEST['st']);
@@ -245,28 +256,54 @@ if( !empty($_REQUEST["Accion"]) ){
                             $RutaXML=$DatosFacturas["RutaXML"];
                             print("<tr>");
                                 print("<td class='mailbox-date' style='text-align:center'>");
-                                    print("<i class='fa fa-fw fa-circle' style='color:$ColorStatus;cursor:pointer' onclick='VerMensajeFacturaElectronica($idItem)' title='Mensajes API'></i>");
+                                    print("<i class='fa fa-fw fa-circle' style='color:$ColorStatus;cursor:pointer' onclick='VerMensajeFacturaElectronica(`$idItem`)' title='Mensajes API'></i>");
                                 print("</td>"); 
                                 print("<td class='mailbox-date' style='text-align:center'>");
-                                    print("<i class='fa fa-fw fa-code' style='color:blue;cursor:pointer' onclick='VerJSONFacturaElectronica(`$idFactura`)' title='Ver JSON'></i>");
+                                    if($TipoListado==3){
+                                        print("<i class='fa fa-fw fa-code' style='color:blue;cursor:pointer' onclick='VerJSONNotaCreditoFE(`$idItem`)' title='Ver JSON'></i>");
+                                    }else{
+                                        print("<i class='fa fa-fw fa-code' style='color:blue;cursor:pointer' onclick='VerJSONFacturaElectronica(`$idFactura`)' title='Ver JSON'></i>");
+                                    }
+                                    
                                 print("</td>"); 
                                 if($TipoListado==4){
-                                    
-                                    
                                     print("<td class='mailbox-date' style='text-align:center'>");
                                         print("<i class='fa fa-share' style='color:red;cursor:pointer' onclick='ReportarFacturaElectronica(`$idFactura`)' title='Generar Factura Electronica Nuevamente'></i>");
                                     print("</td>"); 
                                 }
-                                print("<td class='mailbox-date' style='text-align:right'>");
-                                    print('<b>'.$DatosFacturas["PrefijoFactura"].'</b>');
-                                print("</td>");
-                                print("<td class='mailbox-date' style='text-align:right'>");
-                                    print('<a href="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2&ID='.$idFactura.'" target="_blank"><b>'.$DatosFacturas["NumeroFactura"].'</b></a>');
-                                    //print('<b>'.$DatosFacturas["NumeroFactura"].'</b>');
-                                print("</td>");
-                                print("<td class='mailbox-date' style='text-align:right'>");
-                                    print($DatosFacturas["FechaFactura"]);
-                                print("</td>");
+                                
+                                if($TipoListado==3){
+                                    print("<td class='mailbox-date' style='text-align:center'>");
+                                        print("<i class='fa fa-share' style='color:red;cursor:pointer' onclick='ReportarNotaCreditoElectronica(`$idItem`)' title='Enviar Nota Credito Electronica Nuevamente'></i>");
+                                    print("</td>"); 
+                                }
+                                if($TipoListado==1 or $TipoListado==4){
+                                    print("<td class='mailbox-date' style='text-align:right'>");
+                                        print('<b>'.$DatosFacturas["PrefijoFactura"].'</b>');
+                                    print("</td>");
+                                }
+                                if($TipoListado==1 or $TipoListado==4){
+                                    print("<td class='mailbox-date' style='text-align:right'>");
+                                        print('<a href="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2&ID='.$idFactura.'" target="_blank"><b>'.$DatosFacturas["NumeroFactura"].'</b></a>');
+                                        //print('<b>'.$DatosFacturas["NumeroFactura"].'</b>');
+                                    print("</td>");
+                                }
+                                if($TipoListado==2 or $TipoListado==3){
+                                    print("<td class='mailbox-date' style='text-align:right'>");
+                                        print('<a href="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2&ID='.$idFactura.'" target="_blank"><b>'.$DatosFacturas["ID"].'</b></a>');
+                                        //print('<b>'.$DatosFacturas["NumeroFactura"].'</b>');
+                                    print("</td>");
+                                }
+                                if($TipoListado==1 or $TipoListado==4){
+                                    print("<td class='mailbox-date' style='text-align:right'>");
+                                        print($DatosFacturas["FechaFactura"]);
+                                    print("</td>");
+                                }
+                                if($TipoListado==2 or $TipoListado==3){
+                                    print("<td class='mailbox-date' style='text-align:right'>");
+                                        print($DatosFacturas["Fecha"]);
+                                    print("</td>");
+                                }
                                 print("<td class='mailbox-date' style='text-align:right'>");
                                     print('<b onclick="ModalEditarTercero(`ModalAcciones`,`DivFrmModalAcciones`,`'.$DatosFacturas["idCliente"].'`,`clientes`);">'.($DatosFacturas["NIT_Cliente"]).'</b>');
                                 print("</td>");
@@ -312,12 +349,23 @@ if( !empty($_REQUEST["Accion"]) ){
         case 3:// Ver detalles de un documento 
             $idItemFacturasLog=$obCon->normalizar($_REQUEST["idItemFacturasLog"]);
             $TipoListado=$obCon->normalizar($_REQUEST["TipoListado"]);
-            $DatosDocumento=$obCon->DevuelveValores("facturas_electronicas_log", "ID", $idItemFacturasLog);
-            $JSONFactura= json_decode($DatosDocumento["RespuestaCompletaServidor"]);
             
+            if($TipoListado==1 or $TipoListado==4){
+                $Tabla="facturas_electronicas_log";
+            }
+            if($TipoListado==2 or $TipoListado==3){
+                $Tabla="notas_credito";
+            }
+            $DatosDocumento=$obCon->DevuelveValores($Tabla, "ID", $idItemFacturasLog);
+            $JSONDocumento= json_decode($DatosDocumento["RespuestaCompletaServidor"]);
+            
+            if(!is_object($JSONDocumento)){
+                $JSONDocumento=$DatosDocumento["RespuestaCompletaServidor"];
+            }
+             
             $css->CrearTitulo("Detalles del Documento $idItemFacturasLog", "verde");
             print("<pre>");
-                print_r($JSONFactura);
+                print_r($JSONDocumento);
             print("</pre>");
         break;//Fin caso 3 
     
@@ -475,6 +523,20 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CierraFilaTabla();
             $css->CerrarTabla();
         break;//fin caso 6
+        
+        case 7:// Ver el JSON de una Nota Credito
+            include_once("../../../general/clases/facturacion_electronica.class.php");
+            $obFactura=new Factura_Electronica($idUser);
+                    
+            $idNotaCredito=$obCon->normalizar($_REQUEST["idNota"]);
+            $TipoListado=$obCon->normalizar($_REQUEST["TipoListado"]);
+            $JSONNota=$obFactura->JSONNotaCredito($idNotaCredito);
+            
+            $css->CrearTitulo("JSON para Reporte de la Nota Credito $idNotaCredito", "verde");
+            print("<pre>");
+                print_r($JSONNota);
+            print("</pre>");
+        break;//Fin caso 7
         
     }
     

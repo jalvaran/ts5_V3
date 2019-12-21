@@ -174,20 +174,47 @@ CREATE TABLE `notas_credito` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
   `idFactura` varchar(45) CHARACTER SET utf8 COLLATE utf8_spanish2_ci NOT NULL,
+  `idFacturaElectronica` bigint(20) NOT NULL,
   `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
+  `RutaPDF` varchar(250) COLLATE utf8_spanish_ci NOT NULL,
+  `RutaXML` varchar(250) COLLATE utf8_spanish_ci NOT NULL,
   `idUser` int(11) NOT NULL,
   `Estado` int(11) NOT NULL,
   `Created` datetime NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`),
-  KEY `idFactura` (`idFactura`)
+  KEY `idFactura` (`idFactura`),
+  KEY `idFacturaElectronica` (`idFacturaElectronica`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
+CREATE TABLE `notas_credito_conceptos` (
+  `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `TipoDocumento` bigint(20) unsigned NOT NULL,
+  `Nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Codigo` char(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Created` timestamp NULL DEFAULT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `notas_credito_conceptos` (`ID`, `TipoDocumento`, `Nombre`, `Codigo`, `Created`, `Updated`, `Sync`) VALUES
+(1,	5,	'Devolución de parte de los bienes; no aceptación de partes del servicio',	'1',	'2019-12-12 21:23:51',	'2019-12-19 20:53:15',	'0000-00-00 00:00:00'),
+(2,	5,	'Anulación de factura electrónica',	'2',	'2019-12-12 21:23:51',	'2019-12-19 20:53:15',	'0000-00-00 00:00:00'),
+(3,	5,	'Rebaja total aplicada',	'3',	'2019-12-12 21:23:51',	'2019-12-19 20:53:15',	'0000-00-00 00:00:00'),
+(4,	5,	'Descuento total aplicado',	'4',	'2019-12-12 21:23:51',	'2019-12-19 20:53:15',	'0000-00-00 00:00:00'),
+(5,	5,	'Rescisión: nulidad por falta de requisitos',	'5',	'2019-12-12 21:23:51',	'2019-12-19 20:53:15',	'0000-00-00 00:00:00'),
+(6,	5,	'Otros',	'6',	'2019-12-12 21:23:51',	'2019-12-19 20:53:15',	'0000-00-00 00:00:00'),
+(7,	6,	'Intereses',	'1',	'2019-12-12 21:23:51',	'2019-12-19 20:53:15',	'0000-00-00 00:00:00'),
+(8,	6,	'Gastos por cobrar',	'2',	'2019-12-12 21:23:51',	'2019-12-19 20:53:15',	'0000-00-00 00:00:00'),
+(9,	6,	'Cambio del valor',	'3',	'2019-12-12 21:23:51',	'2019-12-19 20:53:15',	'0000-00-00 00:00:00'),
+(10,	6,	'Otros',	'4',	'2019-12-12 21:23:51',	'2019-12-19 20:53:15',	'0000-00-00 00:00:00');
 
 CREATE TABLE `notas_credito_items` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idItemFactura` bigint(20) NOT NULL,
+  `idFacturaElectronica` bigint(20) NOT NULL,
   `idNotaCredito` bigint(20) NOT NULL,
   `TablaItems` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Referencia` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
@@ -213,4 +240,5 @@ CREATE TABLE `notas_credito_items` (
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
 

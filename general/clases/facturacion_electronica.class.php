@@ -97,6 +97,8 @@ class Factura_Electronica extends ProcesoVenta{
         }
         $json_factura='{
             "number": '.$NumeroFactura.',
+            "sync": true,
+            "send": true,
             "date": "'.$FechaFactura.'", 
             "time": "'.$HoraFactura.'", 
             "type_document_id": '.$TipoDocumento.',
@@ -238,6 +240,7 @@ class Factura_Electronica extends ProcesoVenta{
         $idFactura=$DatosNota["idFactura"];
         $DatosFactura=$this->DevuelveValores("facturas", "idFacturas", $idFactura);
         $DatosFacturaElectronica=$this->DevuelveValores("facturas_electronicas_log", "ID", $DatosNota["idFacturaElectronica"]);
+        $Cufe=$DatosFacturaElectronica["UUID"];
         $idEmpresaPro=$DatosFactura["EmpresaPro_idEmpresaPro"];
         $DatosEmpresaPro=$this->DevuelveValores("empresapro", "idEmpresaPro", $idEmpresaPro);
         $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
@@ -282,20 +285,20 @@ class Factura_Electronica extends ProcesoVenta{
             $idFormaPago=1;
         }
         
-        $jason_factura='{
+        $json_factura='{
                 "billing_reference": {
-                    "number": "'.$NumeroFactura.'",
-                    "uuid": "f660c9067f4f98505e07bb3dfa2721214f9699eae3b74c9e1f8ce3219a4ce3fa6a3849e50093ea46c03a551db4657ea1",
-                    "issue_date": "2019-11-01"
+                    "number": "'.$DatosFactura["Prefijo"].$NumeroFactura.'",
+                    "uuid": "'.$Cufe.'",
+                    "issue_date": "'.$FechaFactura.'"
                 },
                 "discrepancy_response": {
-                    "correction_concept_id": 2
+                    "correction_concept_id": 1
                 },';
         
-        $json_factura.='{
-            "number": '.$NumeroFactura.',
-            "date": "'.$FechaFactura.'", 
-            "time": "'.$HoraFactura.'", 
+        $json_factura.='
+            "number": '.$idNota.',
+            "sync": true,
+            "send": true,
             "type_document_id": '.$TipoDocumento.',
             "customer": {
                 "identification_number": '.$AdqNit.',
@@ -305,21 +308,12 @@ class Factura_Electronica extends ProcesoVenta{
                 "email": "'.$AdqContactoMail.'",
                 "merchant_registration": "NA"
             },
-            "payment_form": {
-                "payment_form_id": "'.$idFormaPago.'",
-                "payment_due_date": "'.$FechaVencimiento.'",
-                "duration_measure": "30"
-            },
+            
             ';
-        if($DatosFactura["ObservacionesFact"]<>''){
-            $json_factura.=' 
-            "notes": [{
-                "text":"'.$DatosFactura["ObservacionesFact"].'"
-            }],';
-        }
+        
         $json_factura.='"tax_totals": [';
-        $sql="SELECT SUM(SubtotalItem) as Subtotal, SUM(IVAItem) as IVA, SUM(TotalItem) as Total,PorcentajeIVA FROM facturas_items 
-                WHERE idFactura='$idFactura' GROUP BY PorcentajeIVA ";
+        $sql="SELECT SUM(SubtotalItem) as Subtotal, SUM(IVAItem) as IVA, SUM(TotalItem) as Total,PorcentajeIVA FROM notas_credito_items 
+                WHERE idNotaCredito='$idNota' GROUP BY PorcentajeIVA ";
         $Consulta= $this->Query($sql);
         $SubtotalFactura=0;
         $BaseGravable=0;
@@ -369,9 +363,9 @@ class Factura_Electronica extends ProcesoVenta{
                     "payable_amount": "'.round($TotalAPagar,2).'"
                 },';
             
-            $json_factura.='"invoice_lines":[';
+            $json_factura.='"credit_note_lines":[';
             
-            $sql="SELECT * FROM facturas_items WHERE idFactura='$idFactura'";
+            $sql="SELECT * FROM notas_credito_items WHERE idNotaCredito='$idNota'";
             $Consulta= $this->Query($sql);
             while($DatosItemsFactura = $this->FetchAssoc($Consulta)){
                 $PorcentajeIVA=$DatosItemsFactura["PorcentajeIVA"];

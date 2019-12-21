@@ -166,6 +166,52 @@ function GenereFacturasElectronicas(){
             }else if(respuestas[0]==="RE"){
                 
                 document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                GenereNotasCreditoElectronicas();
+                           
+            }else{
+                document.getElementById(idDivDraw).innerHTML=data;
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
+
+
+function GenereNotasCreditoElectronicas(){
+    var idDivDraw="NotificacionProcesos";
+    //document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
+    var form_data = new FormData();
+        form_data.append('Accion', 8);
+                      
+    $.ajax({
+        //async:false,
+        url: '../../general/procesadores/facturacionElectronica.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                GenereNotasCreditoElectronicas();
+            }else if(respuestas[0]==="E1"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                           
+            }else if(respuestas[0]==="RE"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
                 VerifiqueFacturasElectronicas();
                            
             }else{
@@ -181,6 +227,7 @@ function GenereFacturasElectronicas(){
           }
       })
 }
+
 
 function VerifiqueFacturasElectronicas(){
     var idDivDraw="NotificacionProcesos";
@@ -417,6 +464,34 @@ function VerJSONFacturaElectronica(idFactura){
       });
 }
 
+function VerJSONNotaCreditoFE(idNota){
+    var idDivDraw="DivFrmModalAcciones";
+    AbreModal('ModalAcciones');  
+    var form_data = new FormData();
+        form_data.append('Accion', 7);
+        form_data.append('idNota', idNota);
+        form_data.append('TipoListado', TipoListado);
+        $.ajax({
+        url: './Consultas/panel_factura_electronica.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+           document.getElementById(idDivDraw).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            LimpiarDivs();
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
 function ReportarFacturaElectronica(idFactura){
     var idDivDraw="DivFrmModalAcciones";
     AbreModal('ModalAcciones');
@@ -424,6 +499,51 @@ function ReportarFacturaElectronica(idFactura){
     var form_data = new FormData();
         form_data.append('Accion', 1);
         form_data.append('idFactura', idFactura);            
+    $.ajax({
+        //async:false,
+        url: '../../general/procesadores/facturacionElectronica.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                
+            }else if(respuestas[0]==="E1"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                           
+            }else if(respuestas[0]==="RE"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                                           
+            }else{
+                document.getElementById(idDivDraw).innerHTML=data;
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
+
+function ReportarNotaCreditoElectronica(idNota){
+    var idDivDraw="DivFrmModalAcciones";
+    AbreModal('ModalAcciones');
+    document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
+    var form_data = new FormData();
+        form_data.append('Accion', 8);
+        form_data.append('idNota', idNota);            
     $.ajax({
         //async:false,
         url: '../../general/procesadores/facturacionElectronica.process.php',

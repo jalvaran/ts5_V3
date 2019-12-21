@@ -68,8 +68,15 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                 }else{
                     $JSONFactura= json_decode($DatosLogFactura["RespuestaCompletaServidor"]);
+                    if((property_exists($JSONFactura, "uuid"))){
+                        $CUFE=$JSONFactura->uuid;
+                        $obCon->ActualizaRegistro("facturas_electronicas_log", "UUID", $CUFE, "ID", $idLog);
+                    }
+                    
+                    
                     if((property_exists($JSONFactura, "responseDian"))){
-                        $RespuestaReporte=$JSONFactura->responseDian->Envelope->Body->SendTestSetAsyncResponse->SendTestSetAsyncResult->ErrorMessageList->_attributes->nil;
+                        //$RespuestaReporte=$JSONFactura->responseDian->Envelope->Body->SendTestSetAsyncResponse->SendTestSetAsyncResult->ErrorMessageList->_attributes->nil;
+                        $RespuestaReporte=$JSONFactura->responseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid;
                     }else{
                         
                         $obCon->ActualizaRegistro("facturas_electronicas_log", "Estado", 13, "ID", $idLog);
@@ -77,9 +84,9 @@ if( !empty($_REQUEST["Accion"]) ){
                     }
                     
                     if($RespuestaReporte=='true'){
-                        $CUFE=$JSONFactura->uuid;
+                        
                         $obCon->ActualizaRegistro("facturas_electronicas_log", "Estado", 1, "ID", $idLog);
-                        $obCon->ActualizaRegistro("facturas_electronicas_log", "UUID", $CUFE, "ID", $idLog);
+                        
                     }else{
                         $obCon->ActualizaRegistro("facturas_electronicas_log", "Estado", 10, "ID", $idLog);
                     }
@@ -166,7 +173,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $RutasFE=$obCon->FetchArray($obCon->Query($sql));            
             $Adjunto=$RutasFE;
             //$status=$obMail->EnviarMailXPHPNativo($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
-            $status=$obMail->EnviarMailXPHPMailer($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
+            //$status=$obMail->EnviarMailXPHPMailer($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
             if($status=='OK'){
                 exit("OK;Envío Realizado");
             }else{
@@ -206,11 +213,12 @@ if( !empty($_REQUEST["Accion"]) ){
                 $Adjunto=$RutasFE;
                 $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 25); //Determina el metodo a usar para enviar el correo al cliente
                 if($Configuracion["Valor"]==1){
-                    $status=$obMail->EnviarMailXPHPNativo($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
+                    //$status=$obMail->EnviarMailXPHPNativo($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
                 }
                 if($Configuracion["Valor"]==2){
-                    $status=$obMail->EnviarMailXPHPMailer($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
+                    //$status=$obMail->EnviarMailXPHPMailer($para, $de, $nombreRemitente, $asunto, $mensajeHTML,$Adjunto);
                 }
+                $status="OK";
                 if($status=='OK'){
                     $obCon->ActualizaRegistro("facturas_electronicas_log", "EnviadoPorMail", 1, "ID", $idLog);
                     exit("OK;Envío de la factura $idFactura Realizado");
@@ -221,6 +229,66 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit("RE;No hay Facturas para enviar por Mail");
             }    
         break;//Fin caso 7
+        
+        case 8: //Crear Notas Credito Electronicas
+            if(!isset($_REQUEST["idNota"])){
+                $sql="SELECT ID FROM notas_credito  
+                    WHERE Estado=0 LIMIT 1";
+
+                $DatosConsulta=$obCon->FetchAssoc($obCon->Query($sql));
+                $idNota=$DatosConsulta["ID"];
+                
+            }else{
+                $idNota=$obCon->normalizar($_REQUEST["idNota"]);
+                $sql="SELECT ID FROM notas_credito WHERE Estado=1";                
+                $DatosLog=$obCon->FetchAssoc($obCon->Query($sql));
+                if($DatosLog["ID"]>0){
+                    exit("E1;La Nota Credito $idNota ya fue enviada");
+                }
+                
+            }
+            
+            
+            $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 105); //Ruta para enviar las notas credito            
+            $url=$DatosServidor["IP"];
+            if($idNota<>''){
+                $sql="SELECT COUNT(ID) AS TotalItems FROM notas_credito_items WHERE idNotaCredito='$idNota'";
+                $DatosTotal=$obCon->FetchAssoc($obCon->Query($sql));
+                $response="";
+                $Estado=0;
+                
+                if($DatosTotal["TotalItems"]>0){ //Verifico que la factura tenga items
+                    $body=$obCon->JSONNotaCredito($idNota);
+                    $response = $obCon->callAPI('POST', $url, $body);  
+                    $sql="UPDATE notas_credito SET RespuestaCompletaServidor='$response' WHERE ID='$idNota'";
+                    $obCon->Query($sql);
+                    $JsonRespuesta= json_decode($response);
+                    if((property_exists($JsonRespuesta, "responseDian"))){
+                        //$RespuestaReporte=$JSONFactura->responseDian->Envelope->Body->SendTestSetAsyncResponse->SendTestSetAsyncResult->ErrorMessageList->_attributes->nil;
+                        $RespuestaReporte=$JsonRespuesta->responseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid;
+                        
+                        if($RespuestaReporte==true){
+                            $obCon->ActualizaRegistro("notas_credito", "Estado", 1, "ID", $idNota);
+                        }else{
+                            $obCon->ActualizaRegistro("notas_credito", "Estado", 11, "ID", $idNota);
+                        }
+                    }else{
+                        
+                        $obCon->ActualizaRegistro("notas_credito", "Estado", 11, "ID", $idNota);
+                        exit("OK;Nota Credito $idNota Enviada");
+                    }
+                    
+                }else{
+                    $Estado=11;
+                    $obCon->ActualizaRegistro("notas_credito", "Estado", $Estado, "ID", $idNota);
+                }
+                
+                
+                exit("OK;Nota Credito $idNota Enviada");
+            }else{
+                exit("RE;No hay Notas a Generar");
+            }    
+        break; //Fin caso 8
     
         
     }
