@@ -240,7 +240,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 
             }else{
                 $idNota=$obCon->normalizar($_REQUEST["idNota"]);
-                $sql="SELECT ID FROM notas_credito WHERE Estado=1";                
+                $sql="SELECT ID FROM notas_credito WHERE Estado=1 AND idNotaCredito='$idNota'";                
                 $DatosLog=$obCon->FetchAssoc($obCon->Query($sql));
                 if($DatosLog["ID"]>0){
                     exit("E1;La Nota Credito $idNota ya fue enviada");
@@ -289,7 +289,160 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit("RE;No hay Notas a Generar");
             }    
         break; //Fin caso 8
-    
+        
+        case 9://Obtener logs de un documento electronico
+            $TipoDocumento=$obCon->normalizar($_REQUEST["TipoDocumento"]);
+            $idDocumento=$obCon->normalizar($_REQUEST["idDocumento"]);
+            if($TipoDocumento==1 or $TipoDocumento==4){
+                $Tabla="facturas_electronicas_log";
+            }
+            if($TipoDocumento==2 or $TipoDocumento==3){
+                $Tabla="notas_credito";
+            }
+             
+            $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 106); //Ruta para validar los logs de un documento         
+            $url=$DatosServidor["IP"];
+            if($idDocumento<>''){
+                $sql="SELECT RespuestaCompletaServidor FROM $Tabla WHERE ID='$idDocumento'";
+                $DatosConsulta=$obCon->FetchAssoc($obCon->Query($sql));
+                $response=$DatosConsulta["RespuestaCompletaServidor"];
+                $JsonRespuesta= json_decode($response);
+                if((property_exists($JsonRespuesta, "uuid"))){
+                    $uuid=$JsonRespuesta->uuid;
+                    $url=$url.$uuid;
+                    $body="";
+                    $response = $obCon->callAPI('POST', $url, $body);
+                    $sql="UPDATE $Tabla SET LogsDocumento='$response' WHERE ID='$idDocumento'";
+                    $obCon->Query($sql);
+                    $JsonLogs= json_decode($response);
+                    /*
+                    if(!property_exists($JsonLogs, "uuid")){
+                    
+                        $JsonLogs=$response;
+                    }
+                     * 
+                     */
+                    print("<pre>");
+                    print_r($JsonLogs);
+                    print("</pre>");
+                    exit();
+                }else{
+                    exit("E1;No se encontró el uuid del documento");
+                }
+                
+            }else{
+                exit("RE;No hay Notas para verificar");
+            }
+        break;//Fin caso 9    
+        
+        case 10://Validar los acuse de recibo de los documentos 
+            $Tabla="facturas_electronicas_log";
+            $sql="SELECT ID,idFactura,RespuestaCompletaServidor as Respuesta FROM $Tabla WHERE AcuseRecibo=''";
+            $Consulta=($obCon->Query($sql));
+            while($DatosDocumento=$obCon->FetchAssoc($Consulta)){
+                if($DatosDocumento["Respuesta"]<>''){
+                    $idDocumento=$DatosDocumento["ID"];
+                    $response=$DatosDocumento["Respuesta"];
+                    $JsonRespuesta= json_decode($response);
+                    if(is_object($JsonRespuesta)){
+                        if((property_exists($JsonRespuesta, "uuid"))){
+                            $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 106); //Ruta para validar los logs de un documento         
+                            $url=$DatosServidor["IP"];
+                            $uuid=$JsonRespuesta->uuid;
+                            $url=$url.$uuid;
+                            $body="";
+                            $response2 = $obCon->callAPI('POST', $url, $body);
+                            $sql="UPDATE $Tabla SET LogsDocumento='$response2' WHERE ID='$idDocumento'";
+                            $obCon->Query($sql);
+                            $JsonLogs= json_decode($response2);
+                            $Acuse=($JsonLogs[0]->acknowledgment_received);
+                            if($Acuse==''){
+                                $idFactura=$DatosDocumento["idFactura"];
+                                $sql="SELECT Fecha FROM facturas WHERE idFacturas='$idFactura'";
+                                $DatosFactura=$obCon->FetchAssoc($obCon->Query($sql));
+                                $FechaActual = date("Y-m-d");
+                                $date1 = new DateTime($DatosFactura["Fecha"]);
+                                $date2 = new DateTime($FechaActual);
+                                $diff = $date1->diff($date2);                                
+                                $DiasTranscurridos= $diff->days;
+                                $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 26); //Contiene el plazo que tiene un cliente para determinar el acuse de recibo
+                                $DiasPlazoAcuse=$Configuracion["Valor"];
+                                if($Configuracion["Valor"]==''){
+                                    $DiasPlazoAcuse=2;
+                                }
+                                if($DiasTranscurridos>$DiasPlazoAcuse){
+                                    $Acuse=11;
+                                }
+                                $sql="UPDATE $Tabla SET AcuseRecibo='$Acuse' WHERE ID='$idDocumento'";
+                                $obCon->Query($sql);
+                            }else{
+                                
+                                $sql="UPDATE $Tabla SET AcuseRecibo='$Acuse' WHERE ID='$idDocumento'";
+                                $obCon->Query($sql);                                
+                                
+                            }
+                            
+                            
+                            
+
+                        }  
+                    }
+                }    
+            }
+            
+            $Tabla="notas_credito";
+            $sql="SELECT ID,Fecha,RespuestaCompletaServidor as Respuesta FROM $Tabla WHERE AcuseRecibo=''";
+            $Consulta=($obCon->Query($sql));
+            while($DatosDocumento=$obCon->FetchAssoc($Consulta)){
+                if($DatosDocumento["Respuesta"]<>''){
+                    $idDocumento=$DatosDocumento["ID"];
+                    $response=$DatosDocumento["Respuesta"];
+                    $JsonRespuesta= json_decode($response);
+                    if(is_object($JsonRespuesta)){
+                        if((property_exists($JsonRespuesta, "uuid"))){
+                            $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 106); //Ruta para validar los logs de un documento         
+                            $url=$DatosServidor["IP"];
+                            $uuid=$JsonRespuesta->uuid;
+                            $url=$url.$uuid;
+                            $body="";
+                            $response2 = $obCon->callAPI('POST', $url, $body);
+                            $sql="UPDATE $Tabla SET LogsDocumento='$response2' WHERE ID='$idDocumento'";
+                            $obCon->Query($sql);
+                            $JsonLogs= json_decode($response2);
+                            
+                            $Acuse=$JsonLogs[0]->acknowledgment_received;                        
+                            
+                            if($Acuse==''){
+                                
+                                $FechaActual = date("Y-m-d");
+                                $date1 = new DateTime($DatosDocumento["Fecha"]);
+                                $date2 = new DateTime($FechaActual);
+                                $diff = $date1->diff($date2);                                
+                                $DiasTranscurridos= $diff->days;
+                                $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 26); //Contiene el plazo que tiene un cliente para determinar el acuse de recibo
+                                $DiasPlazoAcuse=$Configuracion["Valor"];
+                                if($Configuracion["Valor"]==''){
+                                    $DiasPlazoAcuse=2;
+                                }
+                                if($DiasTranscurridos>$DiasPlazoAcuse){
+                                    $Acuse=11;
+                                }
+                                $sql="UPDATE $Tabla SET AcuseRecibo='$Acuse' WHERE ID='$idDocumento'";
+                                $obCon->Query($sql);
+                            }else{
+                                
+                                $sql="UPDATE $Tabla SET AcuseRecibo='$Acuse' WHERE ID='$idDocumento'";
+                                $obCon->Query($sql);                                
+                                
+                            }
+                            
+                        } 
+                    }
+                }    
+            }
+            print("OK;Verificacion de acuse de recibo terminado");
+            
+        break;//Fin caso 10    
         
     }
     

@@ -61,6 +61,10 @@ $css->PageInit($myTitulo);
                 
             </div>
             
+            <div id="NotificacionProcesosLargos" class="box-body no-padding" style="">
+                
+            </div>
+            
            </div></div>
             ');
             

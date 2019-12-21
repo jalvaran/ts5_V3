@@ -216,6 +216,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CrearDiv("", "box-body no-padding", "", 1, 1);
                 $css->CrearDiv("", "mailbox-controls", "", 1, 1);
                     print('<button type="button" class="btn btn-default btn-sm" onclick="VerListado()"><i class="fa fa-refresh" title="Refrescar"></i></button>');
+                    print(' <button type="button" class="btn btn-default btn-sm" onclick="VerificarAcuseReciboDocumentos()" style="color:green" ><i class="fa fa-bookmark" title="Verificar acuse de recibo"></i></button>');
                     if($TipoListado==4){
                         print(' <button type="button" class="btn btn-default btn-sm" onclick="ActualizarErroresFacturasElectronicas();" style="color:red" title="Actualizar Errores"><i class="fa fa-cogs"></i></button>');
                     }
@@ -259,6 +260,9 @@ if( !empty($_REQUEST["Accion"]) ){
                                     print("<i class='fa fa-fw fa-circle' style='color:$ColorStatus;cursor:pointer' onclick='VerMensajeFacturaElectronica(`$idItem`)' title='Mensajes API'></i>");
                                 print("</td>"); 
                                 print("<td class='mailbox-date' style='text-align:center'>");
+                                    print("<i class='fa fa-fw fa-commenting' style='color:blue;cursor:pointer' onclick='ObtenerLogsDocumento(`$idItem`,`$TipoListado`)' title='Logs del documento'></i>");
+                                print("</td>"); 
+                                print("<td class='mailbox-date' style='text-align:center'>");
                                     if($TipoListado==3){
                                         print("<i class='fa fa-fw fa-code' style='color:blue;cursor:pointer' onclick='VerJSONNotaCreditoFE(`$idItem`)' title='Ver JSON'></i>");
                                     }else{
@@ -282,18 +286,20 @@ if( !empty($_REQUEST["Accion"]) ){
                                         print('<b>'.$DatosFacturas["PrefijoFactura"].'</b>');
                                     print("</td>");
                                 }
-                                if($TipoListado==1 or $TipoListado==4){
-                                    print("<td class='mailbox-date' style='text-align:right'>");
-                                        print('<a href="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2&ID='.$idFactura.'" target="_blank"><b>'.$DatosFacturas["NumeroFactura"].'</b></a>');
-                                        //print('<b>'.$DatosFacturas["NumeroFactura"].'</b>');
-                                    print("</td>");
-                                }
                                 if($TipoListado==2 or $TipoListado==3){
                                     print("<td class='mailbox-date' style='text-align:right'>");
                                         print('<a href="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2&ID='.$idFactura.'" target="_blank"><b>'.$DatosFacturas["ID"].'</b></a>');
                                         //print('<b>'.$DatosFacturas["NumeroFactura"].'</b>');
                                     print("</td>");
+                                    
                                 }
+                                
+                                print("<td class='mailbox-date' style='text-align:right'>");
+                                    print('<a href="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2&ID='.$idFactura.'" target="_blank"><b>'.$DatosFacturas["NumeroFactura"].'</b></a>');
+                                    //print('<b>'.$DatosFacturas["NumeroFactura"].'</b>');
+                                print("</td>");
+                                
+                                
                                 if($TipoListado==1 or $TipoListado==4){
                                     print("<td class='mailbox-date' style='text-align:right'>");
                                         print($DatosFacturas["FechaFactura"]);
@@ -325,6 +331,9 @@ if( !empty($_REQUEST["Accion"]) ){
                                 }
                                 print("<td class='mailbox-date' style='text-align:left'>");
                                     print($DatosFacturas["NombreEstado"]);
+                                print("</td>");
+                                print("<td class='mailbox-date' style='text-align:left'>");
+                                    print($DatosFacturas["NombreEstadoAcuse"]);
                                 print("</td>");
                                 if($TipoListado==1){
                                     print("<td class='mailbox-date' style='text-align:center'>");

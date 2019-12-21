@@ -341,11 +341,61 @@ function GenereXMLFacturasElectronicas(){
             }else if(respuestas[0]==="E1"){
                 
                 document.getElementById(idDivDraw).innerHTML=respuestas[1];
-                           
+                VerTablero();
+                VerListado();
+                setTimeout(GenereFacturasElectronicas, 600000);           
             }else if(respuestas[0]==="RE"){
                 
                 document.getElementById(idDivDraw).innerHTML=respuestas[1];
-                EnvieFacturasElectronicasXMail();
+                VerTablero();
+                VerListado();
+                setTimeout(GenereFacturasElectronicas, 60000);
+                                           
+            }else{
+                document.getElementById(idDivDraw).innerHTML=data;
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            setTimeout(GenereFacturasElectronicas, 600000);
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
+
+function VerificarAcuseReciboDocumentos(){
+    var idDivDraw="NotificacionProcesosLargos";
+    document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de verificacion de acuse de recibo</h3></a>';
+    var form_data = new FormData();
+        form_data.append('Accion', 10);
+                        
+    $.ajax({
+        //async:false,
+        url: '../../general/procesadores/facturacionElectronica.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                VerTablero();
+                VerListado();
+            }else if(respuestas[0]==="E1"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                    
+            }else if(respuestas[0]==="RE"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                VerTablero();
+                VerListado();
                                            
             }else{
                 document.getElementById(idDivDraw).innerHTML=data;
@@ -360,6 +410,7 @@ function GenereXMLFacturasElectronicas(){
           }
       })
 }
+
 
 function EnvieFacturasElectronicasXMail(){
     var idDivDraw="NotificacionProcesos";
@@ -872,7 +923,54 @@ function GuardarNotaCredito(idFacturaElectronica){
       })
 }
 
+
+function ObtenerLogsDocumento(idDocumento){
+    var idDivDraw="DivFrmModalAcciones";
+    AbreModal('ModalAcciones'); 
+    document.getElementById(idDivDraw).innerHTML='<a><h3>Obteniendo logs del documento</h3></a>';
+    var form_data = new FormData();
+        form_data.append('Accion', 9);
+        form_data.append('TipoDocumento', TipoListado);
+        form_data.append('idDocumento', idDocumento);
+    $.ajax({
+        //async:false,
+        url: '../../general/procesadores/facturacionElectronica.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[2];
+                
+            }else if(respuestas[0]==="E1"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                           
+            }else if(respuestas[0]==="RE"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                
+                           
+            }else{
+                document.getElementById(idDivDraw).innerHTML=data;
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
 document.getElementById('BtnMuestraMenuLateral').click();
 VerListado();
 VerTablero();
 GenereFacturasElectronicas();
+VerificarAcuseReciboDocumentos();
