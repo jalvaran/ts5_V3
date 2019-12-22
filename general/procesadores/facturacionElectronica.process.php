@@ -75,8 +75,15 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     
                     if((property_exists($JSONFactura, "responseDian"))){
-                        //$RespuestaReporte=$JSONFactura->responseDian->Envelope->Body->SendTestSetAsyncResponse->SendTestSetAsyncResult->ErrorMessageList->_attributes->nil;
-                        $RespuestaReporte=$JSONFactura->responseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid;
+                        $Parametros=$obCon->DevuelveValores("configuracion_general", "ID", 27); //Contiene el metodo de envio del documento a la DIAN
+                        $MetodoEnvio=$Parametros["Valor"]; //1 sincrono 2 asincrono
+                        if($MetodoEnvio==1){
+                            $RespuestaReporte=$JSONFactura->responseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid;
+                        }
+                        if($MetodoEnvio==2){
+                            $RespuestaReporte=$JSONFactura->responseDian->Envelope->Body->SendTestSetAsyncResponse->SendTestSetAsyncResult->ErrorMessageList->_attributes->nil;
+                        }
+                        
                     }else{
                         
                         $obCon->ActualizaRegistro("facturas_electronicas_log", "Estado", 13, "ID", $idLog);
@@ -111,7 +118,34 @@ if( !empty($_REQUEST["Accion"]) ){
                 $obCon->ActualizaRegistro("facturas_electronicas_log", "RutaPDF", $Ruta, "ID", $idLog);
                 exit("OK;PDF de la Factura Electronica $idFactura Creado Satisfactoriamente");
             }else{
-                exit("RE;No hay Facturas para crear PDF");
+                $sql="SELECT * FROM notas_credito WHERE Estado=1 AND PDFCreado=0 LIMIT 1";
+            
+                $DatosNota=$obCon->FetchAssoc($obCon->Query($sql));
+                
+                $idNota=$DatosNota["ID"];
+                if($idNota<>''){
+                    $Ruta="";
+                    $JSONFactura= json_decode($DatosNota["RespuestaCompletaServidor"]);
+                    if(is_object($JSONFactura)){
+                        if(property_exists($JSONFactura, "pdfBase64Bytes")){
+                            $NumeroNota="NOTC".$idNota;
+                            $Ruta=$obCon->CrearPDFDesdeBase64($JSONFactura->pdfBase64Bytes,$NumeroNota);
+                            $obCon->ActualizaRegistro("notas_credito", "PDFCreado", 1, "ID", $idNota);
+                            $obCon->ActualizaRegistro("notas_credito", "RutaPDF", $Ruta, "ID", $idNota);
+                        }else{
+                            $obCon->ActualizaRegistro("notas_credito", "PDFCreado", 4, "ID", $idNota);
+                        }
+                        
+                    }else{
+                        $obCon->ActualizaRegistro("notas_credito", "PDFCreado", 3, "ID", $idNota);
+                    }
+                    
+                    
+                    exit("OK;PDF de la Nota credito $idNota Creado Satisfactoriamente");
+                }else{
+                    exit("RE;No hay Facturas para crear PDF");
+                }
+                
             }
         break;//Fin caso 3 
     
@@ -240,7 +274,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 
             }else{
                 $idNota=$obCon->normalizar($_REQUEST["idNota"]);
-                $sql="SELECT ID FROM notas_credito WHERE Estado=1 AND idNotaCredito='$idNota'";                
+                $sql="SELECT ID FROM notas_credito WHERE Estado=1 AND ID='$idNota'";                
                 $DatosLog=$obCon->FetchAssoc($obCon->Query($sql));
                 if($DatosLog["ID"]>0){
                     exit("E1;La Nota Credito $idNota ya fue enviada");
@@ -264,8 +298,16 @@ if( !empty($_REQUEST["Accion"]) ){
                     $obCon->Query($sql);
                     $JsonRespuesta= json_decode($response);
                     if((property_exists($JsonRespuesta, "responseDian"))){
-                        //$RespuestaReporte=$JSONFactura->responseDian->Envelope->Body->SendTestSetAsyncResponse->SendTestSetAsyncResult->ErrorMessageList->_attributes->nil;
-                        $RespuestaReporte=$JsonRespuesta->responseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid;
+                        
+                        $Parametros=$obCon->DevuelveValores("configuracion_general", "ID", 27); //Contiene el metodo de envio del documento a la DIAN
+                        $MetodoEnvio=$Parametros["Valor"]; //1 sincrono 2 asincrono
+                        if($MetodoEnvio==1){
+                            $RespuestaReporte=$JsonRespuesta->responseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid;
+                        
+                        }
+                        if($MetodoEnvio==2){
+                            $RespuestaReporte=$JsonRespuesta->responseDian->Envelope->Body->SendTestSetAsyncResponse->SendTestSetAsyncResult->ErrorMessageList->_attributes->nil;
+                        }
                         
                         if($RespuestaReporte==true){
                             $obCon->ActualizaRegistro("notas_credito", "Estado", 1, "ID", $idNota);

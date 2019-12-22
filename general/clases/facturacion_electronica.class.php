@@ -56,6 +56,10 @@ class Factura_Electronica extends ProcesoVenta{
         $DatosEmpresaPro=$this->DevuelveValores("empresapro", "idEmpresaPro", $idEmpresaPro);
         $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
         $NumeroFactura=$DatosFactura["NumeroFactura"];
+        $Parametros=$this->DevuelveValores("configuracion_general", "ID", 27); //Contiene el metodo de envio del documento a la DIAN
+        $MetodoEnvio=$Parametros["Valor"]; //1 sincrono 2 asincrono
+        $Parametros=$this->DevuelveValores("configuracion_general", "ID", 28); //Determina si se envia al mail del cliente
+        $EnviarXMail=$Parametros["Valor"]; //1 se envia 0 no se envia
         $TipoDocumento=1; // 1 Factura nacional  ver type_documents de la base de datos del api
         $FechaFactura=$DatosFactura["Fecha"];
         $HoraFactura=$DatosFactura["Hora"];
@@ -95,10 +99,18 @@ class Factura_Electronica extends ProcesoVenta{
         if($DatosFactura["FormaPago"]=="Contado"){
             $idFormaPago=1;
         }
+        $Sinc="false";
+        if($MetodoEnvio==1){
+            $Sinc="true";
+        }
+        $FlagMail="false";
+        if($EnviarXMail==1){
+            $FlagMail="true";
+        }
         $json_factura='{
             "number": '.$NumeroFactura.',
-            "sync": true,
-            "send": true,
+            "sync": '.$Sinc.',
+            "send": '.$FlagMail.',
             "date": "'.$FechaFactura.'", 
             "time": "'.$HoraFactura.'", 
             "type_document_id": '.$TipoDocumento.',
@@ -243,6 +255,10 @@ class Factura_Electronica extends ProcesoVenta{
         $Cufe=$DatosFacturaElectronica["UUID"];
         $idEmpresaPro=$DatosFactura["EmpresaPro_idEmpresaPro"];
         $DatosEmpresaPro=$this->DevuelveValores("empresapro", "idEmpresaPro", $idEmpresaPro);
+        $Parametros=$this->DevuelveValores("configuracion_general", "ID", 27); //Contiene el metodo de envio del documento a la DIAN
+        $MetodoEnvio=$Parametros["Valor"]; //1 sincrono 2 asincrono
+        $Parametros=$this->DevuelveValores("configuracion_general", "ID", 28); //Determina si se envia al mail del cliente
+        $EnviarXMail=$Parametros["Valor"]; //1 se envia 0 no se envia
         $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
         $NumeroFactura=$DatosFactura["NumeroFactura"];
         $TipoDocumento=5; // 5 nota credito
@@ -294,11 +310,18 @@ class Factura_Electronica extends ProcesoVenta{
                 "discrepancy_response": {
                     "correction_concept_id": 1
                 },';
-        
+        $Sinc="false";
+        if($MetodoEnvio==1){
+            $Sinc="true";
+        }
+        $FlagMail="false";
+        if($EnviarXMail==1){
+            $FlagMail="true";
+        }
         $json_factura.='
             "number": '.$idNota.',
-            "sync": true,
-            "send": true,
+            "sync": '.$Sinc.',
+            "send": '.$FlagMail.',
             "type_document_id": '.$TipoDocumento.',
             "customer": {
                 "identification_number": '.$AdqNit.',

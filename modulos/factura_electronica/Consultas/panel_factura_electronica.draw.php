@@ -319,14 +319,16 @@ if( !empty($_REQUEST["Accion"]) ){
                                 print("<td class='mailbox-date' style='text-align:right'>");
                                     print(utf8_encode(number_format($DatosFacturas["Total"])));
                                 print("</td>");
-                                if($TipoListado==1){
+                                if($TipoListado==1 or $TipoListado==2){
                                     
                                     print("<td class='mailbox-date' style='text-align:center'>");
                                         print("<a href='$RutaPDF' target='_blank'><i class='fa fa-file-pdf-o' style='color:green;cursor:pointer;font-size:30px;'></i></a>");
                                     print("</td>"); 
-                                    print("<td class='mailbox-date' style='text-align:center'>");
-                                        print("<a href='$RutaXML' target='_blank'><i class='fa fa-file-zip-o' style='color:#c69900;cursor:pointer;font-size:30px;'></i></a>");
-                                    print("</td>"); 
+                                    if($TipoListado==1){
+                                        print("<td class='mailbox-date' style='text-align:center'>");
+                                            print("<a href='$RutaXML' target='_blank'><i class='fa fa-file-zip-o' style='color:#c69900;cursor:pointer;font-size:30px;'></i></a>");
+                                        print("</td>"); 
+                                    }
                                     
                                 }
                                 print("<td class='mailbox-date' style='text-align:left'>");
