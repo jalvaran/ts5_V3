@@ -916,7 +916,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;//Fin caso 23
         
-        case 24://ingresa un pago de una plataforma
+        case 24://Fin caso 24
             $obContabilidad = new contabilidad($idUser);
             $Fecha=date("Y-m-d");
             $Hora=date("H:i:s");
@@ -937,78 +937,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $obCon->IngresoPlataformasPago($CmbPlataforma,$Fecha, $Hora, $Tercero, $Abono, $idComprobante, $idUser);
             print("OK;Ingreso registrado en Comprobante $idComprobante");
             
-        break;    //Fin caso 24
-    
-        case 25:// agrega la cuota inicial a un acuerdo de pago temporal
-            
-            $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);
-            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
-            
-            $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
-            $TipoCuota=$obCon->normalizar($_REQUEST["TipoCuota"]);
-            $NumeroCuota=0;
-            $ValorPago=$obCon->normalizar($_REQUEST["ValorPago"]);
-            $MetodoPago=$obCon->normalizar($_REQUEST["MetodoPago"]);            
-            
-            if($idAcuerdoPago==''){
-                exit("E1;No se recibió el id del acuerdo de pago");
-            }
-            if($TipoCuota==''){
-                exit("E1;No se recibió el tipo de cuota");
-            }
-            if(!is_numeric($ValorPago) or $ValorPago<0){
-                exit("E1;La cuota inicial del acuerdo debe ser un numero mayor a cero;CuotaInicialAcuerdo");
-            }
-            if($MetodoPago==''){
-                exit("E1;Debe seleccionar un metodo de pago para la cuota inicial;metodoPagoCuotaInicial");
-            }
-            
-            $obCon->PagoAcuerdoPagosTemporal($NumeroCuota, $TipoCuota, $idAcuerdoPago, $ValorPago, $MetodoPago, $idUser);
-            
-            print("OK;Pago de cuota registrado");
-            
-        break; //Fin caso 25    
-        
-        case 26://Eliminar un item de alguna de las tablas del acuerdo de pago
-            
-            $Tabla=$obCon->normalizar($_REQUEST["Tabla"]);
-            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
-            if($Tabla==1){
-                $Tabla="acuerdo_pago_cuotas_pagadas_temp";
-            }
-            if($Tabla==2){
-                $Tabla="acuerdo_pago_proyeccion_pagos_temp";
-            }
-            $obCon->BorraReg($Tabla, "ID", $idItem);
-            print("OK;Registro eliminado");
-        break;//Fin caso 26    
-        
-        case 27:// agrega la cuotas programables a un acuerdo de pago temporal
-            
-            $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);
-            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);            
-            $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
-            $TipoCuota=$obCon->normalizar($_REQUEST["TipoCuota"]);            
-            $ValorCuota=$obCon->normalizar($_REQUEST["CuotaProgramadaAcuerdo"]);
-            $FechaCuotaProgramable=$obCon->normalizar($_REQUEST["TxtFechaCuotaProgramada"]);            
-            
-            if($idAcuerdoPago==''){
-                exit("E1;No se recibió el id del acuerdo de pago");
-            }
-            if($TipoCuota==''){
-                exit("E1;No se recibió el tipo de cuota");
-            }
-            if(!is_numeric($ValorCuota) or $ValorCuota<0){
-                exit("E1;El valor de la cuota debe ser un numero mayor a cero;CuotaProgramadaAcuerdo");
-            }
-            if($FechaCuotaProgramable==''){
-                exit("E1;Debe seleccionar una fecha de pago para la cuota programada;TxtFechaCuotaProgramada");
-            }
-            $obCon->CuotaAcuerdoPagosTemporal($FechaCuotaProgramable, 0, $TipoCuota, $idAcuerdoPago, $ValorCuota, $idUser);
-            
-            print("OK;Cuota registrado");
-            
-        break; //Fin caso 27
+        break;    
         
     }
     

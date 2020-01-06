@@ -177,18 +177,18 @@ if( !empty($_REQUEST["Accion"]) ){
             $statement=" librodiario 
                    WHERE Tercero_Identificacion='$Tercero' AND EXISTS "
                     . "(SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE librodiario.CuentaPUC LIKE t2.CuentaPUC)  GROUP BY CuentaPUC,Num_Documento_Externo ORDER BY Fecha DESC ";
-            //$statement=" `vista_cuentasxpagardetallado_v2` $Condicional ";
+            $statement=" `vista_cuentasxpagardetallado_v2` $Condicional ";
             if(isset($_REQUEST['st'])){
 
                 $statement= urldecode($_REQUEST['st']);
                 //print($statement);
             }
             
-            $limit = 100;
+            $limit = 10;
             $startpoint = ($NumPage * $limit) - $limit;
             $VectorST = explode("LIMIT", $statement);
             $statement = $VectorST[0]; 
-            $query = "SELECT COUNT(*) as `num`,SUM(Debito-Credito) AS Total FROM {$statement}";
+            $query = "SELECT COUNT(*) as `num`,SUM(Total) AS Total FROM {$statement}";
             $row = $obCon->FetchArray($obCon->Query($query));
             $ResultadosTotales = $row['num'];
             $Total=$row['Total'];
@@ -196,7 +196,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Limit=" LIMIT $startpoint,$limit";
             
             $query="SELECT * ";
-            $query="SELECT idLibroDiario as ID,CuentaPUC,Fecha,Num_Documento_Externo as NumeroDocumentoExterno,NombreCuenta,Tercero_Identificacion,Tercero_Razon_Social,SUM(Debito) as Debitos,SUM(Credito) as Creditos,SUM(Debito-Credito) AS Total ";
+            //$query="SELECT idLibroDiario as ID,CuentaPUC,Fecha,Num_Documento_Externo as NumeroDocumentoExterno,NombreCuenta,Tercero_Identificacion,Tercero_Razon_Social,SUM(Debito) as Debitos,SUM(Credito) as Creditos,SUM(Debito-Credito) AS Total ";
             //print("$query FROM $statement $Limit");
             $Consulta=$obCon->Query("$query FROM $statement $Limit");
             
@@ -311,7 +311,7 @@ if( !empty($_REQUEST["Accion"]) ){
         case 3:
             $idItem=$obCon->normalizar($_REQUEST["idItem"]);
             
-            $DatosMovimiento=$obCon->DevuelveValores("vista_cuentasxtercerosdocumentos_v2", "ID", $idItem);
+            $DatosMovimiento=$obCon->DevuelveValores("librodiario", "idLibroDiario", $idItem);
             
             
             $css->CrearTabla();
@@ -328,7 +328,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                 $css->CierraFilaTabla();
                 
-                $sql="SELECT * FROM librodiario WHERE Num_Documento_Externo='$DatosMovimiento[NumeroDocumentoExterno]' and Tercero_Identificacion='$DatosMovimiento[Tercero_Identificacion]' ";
+                $sql="SELECT * FROM librodiario WHERE Num_Documento_Externo='$DatosMovimiento[Num_Documento_Externo]' and Tercero_Identificacion='$DatosMovimiento[Tercero_Identificacion]' ";
                 $Consulta=$obCon->Query($sql);
             
                 while($DatosLibro=$obCon->FetchAssoc($Consulta)){

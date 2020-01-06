@@ -10,6 +10,46 @@ if(file_exists("../../modelo/php_conexion.php")){
 
 class Factura_Electronica extends ProcesoVenta{
     
+    public function EliminarAcentos($cadena) {
+         //Codificamos la cadena en formato utf8 en caso de que nos de errores
+        $cadena = utf8_encode($cadena);
+
+        //Ahora reemplazamos las letras
+        $cadena = str_replace(
+            array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'),
+            array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),
+            $cadena
+        );
+
+        $cadena = str_replace(
+            array('é', 'è', 'ë', 'ê', 'É', 'È', 'Ê', 'Ë'),
+            array('e', 'e', 'e', 'e', 'E', 'E', 'E', 'E'),
+            $cadena );
+
+        $cadena = str_replace(
+            array('í', 'ì', 'ï', 'î', 'Í', 'Ì', 'Ï', 'Î'),
+            array('i', 'i', 'i', 'i', 'I', 'I', 'I', 'I'),
+            $cadena );
+
+        $cadena = str_replace(
+            array('ó', 'ò', 'ö', 'ô', 'Ó', 'Ò', 'Ö', 'Ô'),
+            array('o', 'o', 'o', 'o', 'O', 'O', 'O', 'O'),
+            $cadena );
+
+        $cadena = str_replace(
+            array('ú', 'ù', 'ü', 'û', 'Ú', 'Ù', 'Û', 'Ü'),
+            array('u', 'u', 'u', 'u', 'U', 'U', 'U', 'U'),
+            $cadena );
+
+        $cadena = str_replace(
+            array('ñ', 'Ñ', 'ç', 'Ç'),
+            array('n', 'N', 'c', 'C'),
+            $cadena
+        );
+        
+        return $cadena;
+    }
+    
     public function callAPI($method, $url, $data) {
         
         $DatosParametrosFE=$this->DevuelveValores("facturas_electronicas_parametros", "ID", 4);
@@ -219,6 +259,9 @@ class Factura_Electronica extends ProcesoVenta{
                 $Totales[$idImpuestoAPI]["Total"]=$Totales[$idImpuestoAPI]["Total"]+$Total;
                 $NombreItem= str_replace('"', "", $DatosItemsFactura["Nombre"]);
                 $NombreItem= str_replace("'", "", $NombreItem);
+                $NombreItem=eregi_replace("[\n|\r|\n\r]", '', $NombreItem);
+                $NombreItem= $this->EliminarAcentos($NombreItem);
+                $NombreItem = preg_replace("/[^a-zA-Z0-9\_\ \-]+/", "", $NombreItem);
                 $ReferenciaItem= str_replace('"', "", $DatosItemsFactura["Referencia"]);
                 $ReferenciaItem= str_replace("'", "", $ReferenciaItem);
                 $json_factura.='{ 
@@ -417,8 +460,11 @@ class Factura_Electronica extends ProcesoVenta{
                 $Totales[$idImpuestoAPI]["Subtotal"]=$Totales[$idImpuestoAPI]["Subtotal"]+$Subtotal;
                 $Totales[$idImpuestoAPI]["Impuestos"]=$Totales[$idImpuestoAPI]["Impuestos"]+$Impuestos;
                 $Totales[$idImpuestoAPI]["Total"]=$Totales[$idImpuestoAPI]["Total"]+$Total;
-                $NombreItem= str_replace('"', "", $DatosItemsFactura["Nombre"]);
+                 $NombreItem= str_replace('"', "", $DatosItemsFactura["Nombre"]);
                 $NombreItem= str_replace("'", "", $NombreItem);
+                $NombreItem=eregi_replace("[\n|\r|\n\r]", '', $NombreItem);
+                $NombreItem= $this->EliminarAcentos($NombreItem);
+                $NombreItem = preg_replace("/[^a-zA-Z0-9\_\ \-]+/", "", $NombreItem);
                 $ReferenciaItem= str_replace('"', "", $DatosItemsFactura["Referencia"]);
                 $ReferenciaItem= str_replace("'", "", $ReferenciaItem);
                 $json_factura.='{ 

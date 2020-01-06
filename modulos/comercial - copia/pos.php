@@ -259,11 +259,11 @@ $css->PageInit($myTitulo);
                 $css->CerrarDiv(); 
             $css->Cfieldset();    
         $css->CerrarDiv();
-      
+        
     //$css->CerrarDiv();
     
     $css->Cdiv();
-    print("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>");
+
 $css->PageFin();
 print('<script src="../../componentes/shortcuts.js"></script>');  //script propio de la pagina
 print('<script src="jsPages/pos.js"></script>');  //script propio de la pagina

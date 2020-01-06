@@ -29,13 +29,14 @@ $css->PageInit($myTitulo);
         print("<h3>  No tienes una caja asignada, no puedes continuar</h3>");
         $Habilita=0;
     }
+    $css->input("hidden", "idCajero", "", "idCajero", "", $idUser, "", "", "", "");
+    /*
     $css->CrearDiv("", "", "", 0, 1);
         print('<a id="vinculoItems" href="#AnclaItems" title="Facturas">ITEMS </a>');
         print('<a id="vinculoOpcionesPago" href="#AnclaOpcionesPago" title="Facturas">OPCIONES DE PAGO </a>');
     $css->CerrarDiv();
-    
-    $css->input("hidden", "idCajero", "", "idCajero", "", $idUser, "", "", "", "");
-    $css->CrearDiv("", "col-md-12", "left", $Habilita, 1); 
+     * 
+     */
         $css->fieldset("", "", "FieldDatosCotizacion", "DatosCotizacion", "", "");
             $css->legend("", "");
                 print("<a href='#'>POS TS5,<span id='SpEstadoCaja'> Usted está asignad@ a la caja No. $DatosCaja[ID]</span></a>");
@@ -227,7 +228,7 @@ $css->PageInit($myTitulo);
     $css->CrearDiv("DivDatosCompras", "col-md-8", "left", $Habilita, 1); //Datos para la creacion de la compra
         $css->fieldset("", "", "FieldDatosCompra", "items en esta venta", "", "");
             $css->legend("", "");
-                print("<a href='#'>Items Agregados</a>");
+                print("<a name='AnclaItems'>Items Agregados</a>");
             $css->Clegend();    
             $css->CrearDiv("DivItems", "", "center", 1, 1,"","height: 400px;overflow: auto;");   
 
@@ -236,19 +237,19 @@ $css->PageInit($myTitulo);
         $css->CerrarDiv();
         
         
-        $css->CrearDiv("DivInfoTotales", "col-md-4", "left", $Habilita, 1); //Datos para la creacion de la compra
-        $css->fieldset("", "", "FieldDatosCompra", "Totales", "", "");
-            $css->legend("", "");
-                print("<a href='#'>Totales</a>");
-            $css->Clegend();    
-           
-            $css->CrearDiv("DivTotales", "", "center", 1, 1);   
-                
-            $css->CerrarDiv(); 
-        $css->Cfieldset();    
-    $css->CerrarDiv();
-        
-    $css->CrearDiv("DivInfoOpcionesPago", "col-md-12", "left", $Habilita, 1);
+        $css->CrearDiv("DivInfoTotales", "col-md-4", "left", $Habilita, 1);
+            $css->fieldset("", "", "FieldDatosCompra", "Totales", "", "");
+                $css->legend("", "");
+                    print("<a href='#'>Totales</a>");
+                $css->Clegend();    
+
+                $css->CrearDiv("DivTotales", "", "center", 1, 1);   
+
+                $css->CerrarDiv(); 
+            $css->Cfieldset();    
+        $css->CerrarDiv();
+        /*
+        $css->CrearDiv("DivInfoOpcionesPago", "col-md-12", "left", $Habilita, 1);
             $css->fieldset("", "", "FieldOpcionesPago", "Opciones de Pago", "", "");
                 $css->legend("", "");
                     print("<a name='AnclaOpcionesPago'>Opciones de Pago</a>");
@@ -259,11 +260,13 @@ $css->PageInit($myTitulo);
                 $css->CerrarDiv(); 
             $css->Cfieldset();    
         $css->CerrarDiv();
-      
+        
+         * 
+         */
     //$css->CerrarDiv();
     
     $css->Cdiv();
-    print("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>");
+
 $css->PageFin();
 print('<script src="../../componentes/shortcuts.js"></script>');  //script propio de la pagina
 print('<script src="jsPages/pos.js"></script>');  //script propio de la pagina
