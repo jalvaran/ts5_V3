@@ -9,6 +9,7 @@
  * @param {type} id
  * @returns {undefined}
  */
+
 function posiciona(id){ 
    
    document.getElementById(id).focus();
@@ -2536,6 +2537,7 @@ function DibujeFormularioAcuerdoPago(idPreventa=""){
         success: function(data){
             document.getElementById('DivAcuerdoPago').innerHTML=data;
             
+            inicieVideo();
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.status);
@@ -2738,3 +2740,46 @@ function EliminarItemAcuerdo(Tabla,idItem){
           }
       });
 }
+
+
+function TomarFoto(idAcuerdo='') {
+    if(idAcuerdo==''){
+        var idAcuerdo = document.getElementById('idAcuerdoPago').value;   
+    }
+    document.querySelector("#video").pause();
+    
+    //Obtener contexto del canvas y dibujar sobre él
+    let contexto = document.querySelector("#canvas").getContext("2d");
+    document.querySelector("#canvas").width = document.querySelector("#video").videoWidth;
+    document.querySelector("#canvas").height = document.querySelector("#video").videoHeight;
+    contexto.drawImage(document.querySelector("#video"), 0, 0, document.querySelector("#canvas").width, document.querySelector("#canvas").height);
+
+    let foto = document.querySelector("#canvas").toDataURL(); //Esta es la foto, en base 64
+    document.querySelector("#estado").innerHTML = "Enviando foto. Por favor, espera...";
+    
+    var form_data = new FormData();
+        form_data.append('Opcion', 1); 
+        form_data.append('idAcuerdo', idAcuerdo);      
+        form_data.append('foto', foto);
+        
+        $.ajax({
+        url: './procesadores/webcam.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.querySelector("#estado").innerHTML = data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    //Reanudar reproducción
+    document.querySelector("#video").play();
+};

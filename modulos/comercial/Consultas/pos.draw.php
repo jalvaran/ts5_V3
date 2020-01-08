@@ -8,12 +8,13 @@ if (!isset($_SESSION['username'])){
 $idUser=$_SESSION['idUser'];
 
 include_once("../clases/Facturacion.class.php");
+include_once("../clases/AcuerdoPago.class.php");
 include_once("../../../constructores/paginas_constructor.php");
 
 if( !empty($_REQUEST["Accion"]) ){
     $css =  new PageConstruct("", "", 1, "", 1, 0);
     $obCon = new Facturacion($idUser);
-    
+    $obAcuerdo = new AcuerdoPago($idUser);
     switch ($_REQUEST["Accion"]) {
                 
         case 1://Dibuja los items de una preventa
@@ -977,7 +978,22 @@ if( !empty($_REQUEST["Accion"]) ){
                         print("</td>");
                     $css->CierraFilaTabla();
                 $css->CerrarTabla();
+                $css->CrearTitulo("Tomar Fotografía", "naranja");
+                $css->CrearBotonEvento("btnTomarFoto", "Tomar Foto", 1, "onclick", "TomarFoto()", "azul");
+                print('                
+                <div>
+                    <select name="listaDeDispositivos" id="listaDeDispositivos"></select>
+                    
+                    <p id="estado"></p>
+                </div>
+                <br>
+                <video muted="muted" id="video" style="width:400px"></video>
+                <canvas id="canvas" style="display: none;"></canvas>');
+                
             $css->CerrarDiv();
+            
+            
+            
             
             $css->CrearDiv("DivProyeccionPagosAcuerdo", "col-md-6", "left", 1, 1);
                 
@@ -1113,13 +1129,8 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CrearTitulo("Por favor seleccione el ciclo de pagos", "rojo");
                     exit();
                 }
-                $NumeroCuotasCalculadas=ceil($ValorAProyectar/$ValorCuotaAcuerdo);
-                $DatosCicloPago=$obCon->DevuelveValores("acuerdo_pago_ciclos_pagos", "ID", $cicloPagos);
-                $NumeroDiasCiclo=$DatosCicloPago["NumeroDias"];
-                $TotalDiasPlazo=$NumeroCuotasCalculadas*$NumeroDiasCiclo;
-                $DatosCalculoFecha["Fecha"]=$FechaInicial;
-                $DatosCalculoFecha["Dias"]=$TotalDiasPlazo;
-                $FechaFinal=$obCon->SumeDiasFecha($DatosCalculoFecha);
+                $DatosProyeccion=$obAcuerdo->ContruyaProyeccionPagos($idAcuerdo,$ValorAProyectar, $ValorCuotaAcuerdo,$cicloPagos,$FechaInicial,$idUser);
+                
                 $css->CrearTabla();
                     $css->FilaTabla(16);
                         $css->ColTabla("<strong>Fecha Primera Cuota</strong>", 1);
@@ -1128,15 +1139,41 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla("<strong>Ciclo de Pago</strong>", 1);
                         $css->ColTabla("<strong>Plazo Maximo de pago</strong>", 1);
                     $css->CierraFilaTabla();
+                    
                     $css->FilaTabla(16);
                         $css->ColTabla($FechaInicial, 1);
                         //$css->ColTabla(number_format($ValorCuotaAcuerdo), 1);
-                        $css->ColTabla($NumeroCuotasCalculadas, 1);
+                        $css->ColTabla($DatosProyeccion["CuotasCalculadas"], 1);
                         $css->ColTabla($cicloPagos, 1);
-                        $css->ColTabla($FechaFinal, 1);
+                        $css->ColTabla($DatosProyeccion["FechaFinal"], 1);
                     $css->CierraFilaTabla();
+                    
+                    
                 $css->CerrarTabla();
-            
+                
+                $css->CrearTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Proyección de Pagos</strong>", 4,"C");                                                
+                    $css->CierraFilaTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Cuota</strong>", 1); 
+                        $css->ColTabla("<strong>Fecha</strong>", 1);   
+                        $css->ColTabla("<strong>Día</strong>", 1);                        
+                        $css->ColTabla("<strong>Valor Cuota</strong>", 1);                        
+                    $css->CierraFilaTabla();
+                    $sql="SELECT * FROM acuerdo_pago_proyeccion_pagos_temp WHERE TipoCuota=2 AND idAcuerdoPago='$idAcuerdo' ORDER BY Fecha ASC";    
+                    $Consulta=$obAcuerdo->Query($sql);
+                    while($DatosAcuerdoProyeccion=$obAcuerdo->FetchAssoc($Consulta)){ 
+                        $css->FilaTabla(16);
+                            $css->ColTabla($DatosAcuerdoProyeccion["NumeroCuota"], 1); 
+                            $css->ColTabla($DatosAcuerdoProyeccion["Fecha"], 1); 
+                            $css->ColTabla(($obAcuerdo->obtenerNombreDiaFecha($DatosAcuerdoProyeccion["Fecha"])), 1);
+                            $css->ColTabla(number_format($DatosAcuerdoProyeccion["ValorCuota"]), 1);                            
+                        $css->CierraFilaTabla();
+                    }
+                
+                $css->CerrarTabla();
+                
         break; //Fin caso 16    
     }
     

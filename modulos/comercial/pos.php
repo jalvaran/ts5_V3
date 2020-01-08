@@ -267,6 +267,7 @@ $css->PageInit($myTitulo);
 $css->PageFin();
 print('<script src="../../componentes/shortcuts.js"></script>');  //script propio de la pagina
 print('<script src="jsPages/pos.js"></script>');  //script propio de la pagina
+print('<script src="../../componentes/webcam/webcam.js"></script>');  //script para usar la web cam
 
 $css->Cbody();
 $css->Chtml();
