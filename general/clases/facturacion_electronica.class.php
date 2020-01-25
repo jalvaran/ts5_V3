@@ -94,6 +94,7 @@ class Factura_Electronica extends ProcesoVenta{
         $DatosFactura=$this->DevuelveValores("facturas", "idFacturas", $idFactura);
         $idEmpresaPro=$DatosFactura["EmpresaPro_idEmpresaPro"];
         $DatosEmpresaPro=$this->DevuelveValores("empresapro", "idEmpresaPro", $idEmpresaPro);
+        $EmpresaTipoCompania=$DatosEmpresaPro["TipoPersona"];
         $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
         $NumeroFactura=$DatosFactura["NumeroFactura"];
         $Parametros=$this->DevuelveValores("configuracion_general", "ID", 27); //Contiene el metodo de envio del documento a la DIAN
@@ -122,6 +123,10 @@ class Factura_Electronica extends ProcesoVenta{
         $AdqRazonSocial= str_replace('"', "", $AdqRazonSocial);
         $AdqDireccion=str_replace("'", "",$DatosCliente["Direccion"]);
         $AdqDireccion=str_replace('"', "",$AdqDireccion);
+        $AdqTipoOrganizacion= $DatosCliente["TipoOrganizacion"];
+        if($DatosCliente["TipoOrganizacion"]==0){
+            $AdqTipoOrganizacion=2;  //Juridico
+        }
         if($AdqDireccion==''){
             $AdqDireccion="CALLE 1 1 106";
         }
@@ -154,8 +159,12 @@ class Factura_Electronica extends ProcesoVenta{
             "date": "'.$FechaFactura.'", 
             "time": "'.$HoraFactura.'", 
             "type_document_id": '.$TipoDocumento.',
+            "type_organization_id": '.$EmpresaTipoCompania.', 
+            "type_regime_id": '.$EmpresaTipoCompania.', 
             "customer": {
                 "identification_number": '.$AdqNit.',
+                "type_organization_id": '.$AdqTipoOrganizacion.', 
+                "type_regime_id": '.$AdqTipoOrganizacion.',     
                 "name": "'.$AdqRazonSocial.'",
                 "phone": "'.$AdqContactoTelefono.'",
                 "address": "'.$AdqDireccion.'",
@@ -259,11 +268,13 @@ class Factura_Electronica extends ProcesoVenta{
                 $Totales[$idImpuestoAPI]["Total"]=$Totales[$idImpuestoAPI]["Total"]+$Total;
                 $NombreItem= str_replace('"', "", $DatosItemsFactura["Nombre"]);
                 $NombreItem= str_replace("'", "", $NombreItem);
-                $NombreItem=eregi_replace("[\n|\r|\n\r]", '', $NombreItem);
+                $NombreItem= str_replace("*", "", $NombreItem);
+                $NombreItem= preg_replace("[\n|\r|\n\r]", '', $NombreItem);
                 $NombreItem= $this->EliminarAcentos($NombreItem);
                 $NombreItem = preg_replace("/[^a-zA-Z0-9\_\ \-]+/", "", $NombreItem);
                 $ReferenciaItem= str_replace('"', "", $DatosItemsFactura["Referencia"]);
                 $ReferenciaItem= str_replace("'", "", $ReferenciaItem);
+                $ReferenciaItem= str_replace("*", "", $ReferenciaItem);
                 $json_factura.='{ 
                     "unit_measure_id": 642, 
                     "invoiced_quantity": "'.round($DatosItemsFactura["Cantidad"]*$DatosItemsFactura["Dias"],6).'", 
@@ -460,13 +471,15 @@ class Factura_Electronica extends ProcesoVenta{
                 $Totales[$idImpuestoAPI]["Subtotal"]=$Totales[$idImpuestoAPI]["Subtotal"]+$Subtotal;
                 $Totales[$idImpuestoAPI]["Impuestos"]=$Totales[$idImpuestoAPI]["Impuestos"]+$Impuestos;
                 $Totales[$idImpuestoAPI]["Total"]=$Totales[$idImpuestoAPI]["Total"]+$Total;
-                 $NombreItem= str_replace('"', "", $DatosItemsFactura["Nombre"]);
+                $NombreItem= str_replace('"', "", $DatosItemsFactura["Nombre"]);
                 $NombreItem= str_replace("'", "", $NombreItem);
-                $NombreItem=eregi_replace("[\n|\r|\n\r]", '', $NombreItem);
+                $NombreItem= str_replace("*", "", $NombreItem);
+                $NombreItem= preg_replace("[\n|\r|\n\r]", '', $NombreItem);
                 $NombreItem= $this->EliminarAcentos($NombreItem);
                 $NombreItem = preg_replace("/[^a-zA-Z0-9\_\ \-]+/", "", $NombreItem);
                 $ReferenciaItem= str_replace('"', "", $DatosItemsFactura["Referencia"]);
                 $ReferenciaItem= str_replace("'", "", $ReferenciaItem);
+                $ReferenciaItem= str_replace("*", "", $ReferenciaItem);
                 $json_factura.='{ 
                     "unit_measure_id": 642, 
                     "invoiced_quantity": "'.round($DatosItemsFactura["Cantidad"]*$DatosItemsFactura["Dias"],6).'", 

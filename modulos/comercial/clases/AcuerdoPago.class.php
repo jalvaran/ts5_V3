@@ -174,6 +174,95 @@ class AcuerdoPago extends ProcesoVenta{
         return($NombreArchivo);
     }
      
+    public function ValidarDatosCreacionAcuerdoPagoPOS($VariablesAcuerdo) {
+        
+        if($VariablesAcuerdo["idAcuerdoPago"]==''){
+            exit("E4;No se recibió un id para el acuerdo de pago");            
+        }
+        if($VariablesAcuerdo["SaldoActualAcuerdoPago"]==''){
+            exit("E4;No se recibió un el saldo actual del cliente");            
+        }
+        if($VariablesAcuerdo["NuevoSaldoAcuerdoPago"]==''){
+            exit("E4;No se recibió un el nuevo saldo del cliente");            
+        }
+        if($VariablesAcuerdo["TxtObservacionesAcuerdoPago"]==''){
+            exit("E4;Debe escribir las observaciones del acuerdo de pago");            
+        }
+        $idAcuerdo= $this->normalizar($VariablesAcuerdo["idAcuerdoPago"]);
+        if($VariablesAcuerdo["TxtFechaInicialPagos"]==''){
+            exit("E4;No se recibió la fecha inicial de pagos para el acuerdo;TxtFechaInicialPagos");            
+        }
+        if(!is_numeric($VariablesAcuerdo["ValorCuotaAcuerdo"]) AND $VariablesAcuerdo["ValorCuotaAcuerdo"]<=0){
+            exit("E4;El valor de la cuota del acuerdo debe ser un numero mayor a cero;ValorCuotaAcuerdo");            
+        }
+        if($VariablesAcuerdo["cicloPagos"]==''){
+            exit("E4;Debe seleccionar el ciclo de pagos;cicloPagos");            
+        }
+        $sql="SELECT ID FROM acuerdo_pago_cuotas_pagadas_temp WHERE idAcuerdoPago='$idAcuerdo' AND TipoCuota=1 LIMIT 1";
+        $DatosAcuerdo= $this->FetchAssoc($this->Query($sql));
+        if($DatosAcuerdo["ID"]==""){
+            exit("E4;Debe agregar una cuota inicial");
+        }
+        $sql="SELECT ID FROM acuerdo_pago_proyeccion_pagos_temp WHERE idAcuerdoPago='$idAcuerdo' AND TipoCuota=2 LIMIT 1";
+        $DatosAcuerdo= $this->FetchAssoc($this->Query($sql));
+        if($DatosAcuerdo["ID"]==""){
+            exit("E4;No se ha realizado la proyeccion de pagos");
+        }
+        $DatosRuta=$this->DevuelveValores("configuracion_general", "ID", 29); //Contiene la ruta donde se crea la foto para el acuerdo de pago
+        $Ruta=$DatosRuta["Valor"];
+        $NombreArchivo= $Ruta.$idAcuerdo.".png";
+        if(!file_exists($NombreArchivo)){
+            exit("E4;No se ha tomado la foto para evidencia del acuerdo de pago");
+        }
+        
+        
+    }
+    
+    public function CrearAcuerdoPago($idAcuerdoPago,$FechaInicialParaPagos,$Tercero,$ValorCuotaGeneral,$CicloPagos,$Observaciones,$SaldoAnterior,$TotalAbonos,$SaldoInicial,$SaldoFinal,$Estado,$idUser) {
+        $Datos["idAcuerdoPago"]=$idAcuerdoPago;
+        $Datos["Fecha"]=date("Y-m-d");
+        $Datos["FechaInicialParaPagos"]=$FechaInicialParaPagos;
+        $Datos["Tercero"]=$Tercero;
+        $Datos["ValorCuotaGeneral"]=$ValorCuotaGeneral;
+        $Datos["CicloPagos"]=$CicloPagos;        
+        $Datos["Observaciones"]=$Observaciones;
+        $Datos["SaldoAnterior"]=$SaldoAnterior;
+        $Datos["SaldoInicial"]=$SaldoInicial;
+        $Datos["TotalAbonos"]=$TotalAbonos;
+        $Datos["SaldoFinal"]=$SaldoFinal;
+        $Datos["Estado"]=$Estado;
+        $Datos["idUser"]=$idUser;
+        $Datos["Created"]=date("Y-m-d H:i:s");
+        $sql= $this->getSQLInsert("acuerdo_pago", $Datos);
+        $this->Query($sql);
+        
+    }
+    
+    public function CopiarProyeccionCuotasDesdeTemporal($idAcuerdo) {
+        $sql="INSERT INTO acuerdo_pago_proyeccion_pagos (idAcuerdoPago,TipoCuota,NumeroCuota,Fecha,ValorCuota,Estado,idUser,Created)
+              SELECT   idAcuerdoPago,TipoCuota,NumeroCuota,Fecha,ValorCuota,Estado,idUser,Created FROM  acuerdo_pago_proyeccion_pagos_temp 
+              WHERE acuerdo_pago_proyeccion_pagos_temp.idAcuerdoPago='$idAcuerdo' ";
+        $this->Query($sql);
+    }
+    
+    public function CopiarCuotasPagadasDesdeTemporal($idAcuerdo) {
+        $sql="INSERT INTO acuerdo_pago_cuotas_pagadas (idAcuerdoPago,TipoCuota,NumeroCuota,FechaPago,ValorPago,MetodoPago,idUser,idCierre,Created)
+              SELECT   idAcuerdoPago,TipoCuota,NumeroCuota,FechaPago,ValorPago,MetodoPago,idUser,idCierre,Created 
+              FROM  acuerdo_pago_cuotas_pagadas_temp 
+              WHERE acuerdo_pago_cuotas_pagadas_temp.idAcuerdoPago='$idAcuerdo' ";
+        $this->Query($sql);
+    }
+    public function CrearAcuerdoPagoDesdePOS($idAcuerdoPago, $FechaInicialParaPagos, $Tercero,$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$TotalAbonos, $SaldoInicial, $SaldoFinal, $Estado, $idUser) {
+        
+        $this->CrearAcuerdoPago($idAcuerdoPago, $FechaInicialParaPagos, $Tercero,$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$TotalAbonos, $SaldoInicial, $SaldoFinal, $Estado, $idUser);
+        $this->CopiarCuotasPagadasDesdeTemporal($idAcuerdoPago);
+        $this->CopiarProyeccionCuotasDesdeTemporal($idAcuerdoPago);
+        $this->BorraReg("acuerdo_pago_cuotas_pagadas_temp", 'idAcuerdoPago', $idAcuerdoPago);
+        $this->BorraReg("acuerdo_pago_proyeccion_pagos_temp", 'idAcuerdoPago', $idAcuerdoPago);
+        $sql="UPDATE acuerdo_pago SET Estado=10 WHERE Tercero='$Tercero' AND idAcuerdoPago<>'$idAcuerdoPago'";
+        $this->Query($sql);
+        
+    }
     /**
      * Fin Clase
      */

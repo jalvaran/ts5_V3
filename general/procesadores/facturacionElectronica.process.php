@@ -44,7 +44,9 @@ if( !empty($_REQUEST["Accion"]) ){
                 $Estado=0;
                 if($DatosTotal["TotalItems"]>0){ //Verifico que la factura tenga items
                     $body=$obCon->JSONFactura($idFactura);
-                    $response = $obCon->callAPI('POST', $url, $body);  
+                    
+                    $response = $obCon->callAPI('POST', $url, $body); 
+                    
                 }else{
                     $Estado=11;
                 }

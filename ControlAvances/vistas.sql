@@ -262,9 +262,13 @@ FROM librodiario GROUP BY Tercero_Identificacion,CuentaPUC,Num_Documento_Externo
 
 DROP VIEW IF EXISTS `vista_cuentasxpagardetallado_v2`;
 CREATE VIEW vista_cuentasxpagardetallado_v2 AS
-SELECT *
+SELECT t1.*
 FROM vista_cuentasxtercerosdocumentos_v2 t1 WHERE (t1.Total<-1 or t1.Total>1) AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Fecha;
 
+DROP VIEW IF EXISTS `vista_cuentasxpagardetallado_v2`;
+CREATE VIEW vista_cuentasxpagardetallado_v2 AS
+SELECT t1.*,( DATE_ADD(t1.Fecha,INTERVAL (SELECT t2.Plazo FROM proveedores t2 WHERE t2.Num_Identificacion=t1.Tercero_Identificacion LIMIT 1 ) DAY) ) AS PlazoPago 
+FROM vista_cuentasxtercerosdocumentos_v2 t1 WHERE (t1.Total<-1 or t1.Total>1) AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY PlazoPago;
 
 DROP VIEW IF EXISTS `vista_cuentasxcobrar`;
 CREATE VIEW vista_cuentasxcobrar AS

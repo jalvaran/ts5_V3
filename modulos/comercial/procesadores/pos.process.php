@@ -9,11 +9,12 @@ $idUser=$_SESSION['idUser'];
 $fecha=date("Y-m-d");
 
 include_once("../clases/Facturacion.class.php");
+include_once("../clases/AcuerdoPago.class.php");
 include_once("../../../modelo/PrintPos.php");
 include_once("../../../general/clases/contabilidad.class.php");
 if( !empty($_REQUEST["Accion"]) ){
     $obCon = new Facturacion($idUser);
-    
+    $obContabilidad = new contabilidad($idUser);
     switch ($_REQUEST["Accion"]) {
         
         case 1: //Crear una preventa
@@ -216,7 +217,7 @@ if( !empty($_REQUEST["Accion"]) ){
         case 7: //Guarda la factura
             $obPrint = new PrintPos($idUser);
             $obFactura = new Facturacion($idUser);
-            
+            $obAcuerdo = new AcuerdoPago($idUser);
             $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);       
             $Fecha=date("Y-m-d");
             $DatosCaja=$obCon->DevuelveValores("cajas", "idUsuario", $idUser);
@@ -249,6 +250,9 @@ if( !empty($_REQUEST["Accion"]) ){
                 $FormaPagoFactura="Credito a $CmbFormaPago dias";
             }
             
+            if($CmbFormaPago=="Acuerdo"){
+                $obAcuerdo->ValidarDatosCreacionAcuerdoPagoPOS($_REQUEST);
+            }
             
             $Hora=date("H:i:s");
             
@@ -347,7 +351,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $CentroCosto=$DatosCaja["CentroCostos"];
                     $idTerceroInteres=$DatosCaja["idTerceroIntereses"];
                     $CentroCosto=$DatosCaja["CentroCostos"];
-                    if($CmbFormaPago<>'SisteCredito' AND $CmbFormaPago<>'KUPY'){
+                    if($CmbFormaPago<>'SisteCredito' AND $CmbFormaPago<>'KUPY' AND $CmbFormaPago<>'Acuerdo'){
                         $Concepto="ABONO A FACTURA No $DatosFactura[Prefijo] - $DatosFactura[NumeroFactura]";
                         $VectorIngreso["fut"]="";
                         $TipoPago="";
@@ -420,13 +424,41 @@ if( !empty($_REQUEST["Accion"]) ){
                     . " FROM preventa WHERE VestasActivas_idVestasActivas='$idPreventa' AND Descuento <> 0;";
             $obCon->Query($sql);
             
-            $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);
+            
             
             $LinkFactura="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2&ID=$idFactura";
             $Mensaje="<br><strong>Factura $NumFactura Creada Correctamente </strong><a href='$LinkFactura'  target='blank'> Imprimir</a>";
             $Mensaje.="<br><h3>Devuelta: ".number_format($Devuelta)."</h3>";
             
+            if($CmbFormaPago=="Acuerdo"){
+                $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
+                $FechaInicialParaPagos=$obCon->normalizar($_REQUEST["TxtFechaInicialPagos"]);
+                $ValorCuotaGeneral=$obCon->normalizar($_REQUEST["ValorCuotaAcuerdo"]);
+                $CicloPagos=$obCon->normalizar($_REQUEST["cicloPagos"]);                
+                $Observaciones=$obCon->normalizar($_REQUEST["TxtObservacionesAcuerdoPago"]);
+                $SaldoAnterior=$obCon->normalizar($_REQUEST["SaldoActualAcuerdoPago"]);
+                $SaldoFinal=$obCon->normalizar($_REQUEST["NuevoSaldoAcuerdoPago"]);
+                $sql="SELECT SUM(ValorPago) as TotalCuotaInicial FROM acuerdo_pago_cuotas_pagadas_temp WHERE idAcuerdoPago='$idAcuerdoPago' AND TipoCuota=1";
+                $TotalesCuotaInicial=$obAcuerdo->FetchAssoc($obAcuerdo->Query($sql));
+                $CuotaInicial=$TotalesCuotaInicial["TotalCuotaInicial"];
+                $SaldoInicial=$SaldoFinal-$CuotaInicial;
+                $obAcuerdo->CrearAcuerdoPagoDesdePOS($idAcuerdoPago, $FechaInicialParaPagos, $DatosCliente["Num_Identificacion"],$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$CuotaInicial, $SaldoInicial, $SaldoFinal, 1, $idUser);
+                
+                $CuentaDestino=$DatosCaja["CuentaPUCEfectivo"];
+                $CentroCosto=$DatosCaja["CentroCostos"];
+                $Tercero=$DatosCliente["Num_Identificacion"];
+
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6);
+                $Abono=$CuotaInicial;
+                $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $Abono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdoPago", "CERRADO");
+                $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
+                
+                $NuevoIdAcuerdo=$obAcuerdo->getId("ap_");
+                $obAcuerdo->ActualizaRegistro("vestasactivas", "IdentificadorUnico", $NuevoIdAcuerdo, "idVestasActivas", $idPreventa);
+                
+            }
             
+            $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);
             print("OK;$Mensaje");
             
             
@@ -1009,6 +1041,20 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Cuota registrado");
             
         break; //Fin caso 27
+        
+        case 28://calcule el valor a proyectar
+            
+            $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdo"]);
+            $NumeroCuotas=$obCon->normalizar($_REQUEST["NumeroCuotas"]);
+            if($Tabla==1){
+                $Tabla="acuerdo_pago_cuotas_pagadas_temp";
+            }
+            if($Tabla==2){
+                $Tabla="acuerdo_pago_proyeccion_pagos_temp";
+            }
+            $obCon->BorraReg($Tabla, "ID", $idItem);
+            print("OK;Registro eliminado");
+        break;//Fin caso 28
         
     }
     

@@ -280,6 +280,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 $css->FilaTabla(16);
                     $css->ColTabla("<strong>Fecha</strong>", 1);
+                    $css->ColTabla("<strong>Plazo Pago</strong>", 1);
                     $css->ColTabla("<strong>Referencia</strong>", 1);
                     $css->ColTabla("<strong>Cuenta</strong>", 1);
                     $css->ColTabla("<strong>Nombre Cuenta</strong>", 1);                    
@@ -292,6 +293,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->FilaTabla(14);
                         $idItem=$DatosCuentasXPagar["ID"];
                         $css->ColTabla($DatosCuentasXPagar["Fecha"], 1);
+                        $css->ColTabla($DatosCuentasXPagar["PlazoPago"], 1);
                         print("<td style='text-align:center'>");
                             print('<a href="#" onclick="VerMovimientosCuentaXPagar('.$idItem.');">'.$DatosCuentasXPagar["NumeroDocumentoExterno"].' <i class="fa fa-eye"></i></a>');
                         print("</td>");

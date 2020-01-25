@@ -105,35 +105,9 @@ if(isset($_REQUEST["Opcion"])){
             $sqlColumnas=substr($sqlColumnas, 0, -1);
             $sqlColumnas.=" UNION ALL ";
             
-            $sql=$sqlColumnas." SELECT * FROM $Tabla $Condicion";
+            $sql=$sqlColumnas." SELECT * FROM $Tabla $Condicion INTO OUTFILE '$OuputFile' FIELDS TERMINATED BY '$Separador' $Enclosed LINES TERMINATED BY '\r\n';";
             $Fecha=date("Ymd_His");
-            
-            $Consulta=$obCon->Query($sql);
-            
-            if($archivo = fopen($Link, "a")){
-                
-                $mensaje="";
-                $r=0;
-                while($DatosExportacion= $obCon->FetchAssoc($Consulta)){
-                    $r++;
-                    foreach ($Columnas["Field"] as $NombreColumna){
-                        $Dato="";
-                        if(isset($DatosExportacion[$NombreColumna])){
-                            $Dato=$DatosExportacion[$NombreColumna];
-                        }
-                        $mensaje.='"'.str_replace(";", "", $Dato).'";'; 
-                    }
-                    $mensaje=substr($mensaje, 0, -1);
-                    $mensaje.="\r\n";
-                    if($r==1000){
-                        $r=0;
-                        fwrite($archivo, $mensaje);
-                        $mensaje="";
-                    }
-                }
-                fwrite($archivo, $mensaje);
-                fclose($archivo);
-            }
+            $obCon->Query($sql);
             
             $NombreArchivo=$Tabla;
             print("<div id='DivImagenDescargarTablaDB'><a href='$Link' download='$NombreArchivo.csv' target='_top' ><h1>Descargar</h1></a></div>");

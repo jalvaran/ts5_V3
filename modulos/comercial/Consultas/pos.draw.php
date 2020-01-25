@@ -831,6 +831,8 @@ if( !empty($_REQUEST["Accion"]) ){
             if($idAcuerdo==''){
                 $idUnicoPreventa=$obCon->getId("ap_");
                 $obCon->ActualizaRegistro("vestasactivas", "IdentificadorUnico", $idUnicoPreventa, "idVestasActivas", $idPreventa);
+                $idAcuerdo=$idUnicoPreventa;
+                
             }
             
             $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
@@ -852,6 +854,9 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $css->CrearDiv("", "col-md-6", "left", 1, 1);
             $css->input("text", "idAcuerdoPago", "form-control", "idAcuerdoPago", "idAcuerdoPago", $idAcuerdo, "id Acuerdo", "off", "", " disabled");
+            $css->input("hidden", "SaldoActualAcuerdoPago", "form-control", "SaldoActualAcuerdoPago", "SaldoActualAcuerdoPago", $SaldoActualCliente, "", "off", "", " disabled");
+            $css->input("hidden", "NuevoSaldoAcuerdoPago", "form-control", "NuevoSaldoAcuerdoPago", "NuevoSaldoAcuerdoPago", $NuevoSaldo, "", "off", "", " disabled");
+                
                 $css->CrearTabla();
                     $css->FilaTabla(16);                    
                         $css->ColTabla("<strong>Saldo Actual</strong>", 1);
@@ -907,7 +912,8 @@ if( !empty($_REQUEST["Accion"]) ){
                         print("</td>");
                     $css->CierraFilaTabla();
                     $css->FilaTabla(16);
-                        $css->ColTabla("<strong>Cuota Programada</strong>", 1);
+                        
+                        $css->ColTabla("<strong>Cuota Programada</strong>", 1);                        
                         $css->ColTabla("<strong>Fecha cuota programada</strong>", 1);  
                         $css->ColTabla("<strong></strong>", 1);
                     $css->CierraFilaTabla();
@@ -922,7 +928,39 @@ if( !empty($_REQUEST["Accion"]) ){
                             $css->CrearBotonEvento("btnAgregarCuotaProgramada", "+", 1, "onclick", "AgregarCuotaProgramadaAcuerdoPagoTemporal('$idAcuerdo')", "verde");
                         print("</td>");
                     $css->CierraFilaTabla();
+                    
                     $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Cuotas</strong>", 1);
+                        $css->ColTabla("<strong>Ciclo</strong>", 1);
+                        $css->ColTabla("", 1);
+                    $css->CierraFilaTabla();
+
+                    $css->FilaTabla(16);
+                        
+                        print("<td>");
+                            $css->input("number", "NumeroCuotas", "form-control", "NumeroCuotas", "NumeroCuotas", "", "Numero de Cuotas", "off", "", "onchange=CalculeValorCuotaAcuerdo('$idAcuerdo')");
+                        print("</td>");
+                        print("<td>");
+                            $css->select("cicloPagos", "form-control", "cicloPagos", "", "", "onchange=CalculeCuotasAcuerdo()", "");
+                                $css->option("", "", "", "", "", "");
+                                    print("Seleccione el ciclo de pagos");
+                                $css->Coption();
+                                $sql="SELECT * FROM acuerdo_pago_ciclos_pagos";
+                                $Consulta=$obCon->Query($sql);
+                                while($DatosCiclo=$obCon->FetchAssoc($Consulta)){
+                                    $css->option("", "", "", $DatosCiclo["ID"], "", "");
+                                    print($DatosCiclo["NombreCiclo"]);
+                                $css->Coption();
+                                }
+                            $css->Cselect();
+                        print("</td>");
+                        print("<td>");
+                           // $css->CrearBotonEvento("btnAgregar", "+", 1, "onclick", "AgregarNumeroDeCuotas('$idAcuerdo')", "verde");
+                        print("</td>");
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        
                         $css->ColTabla("<strong>Fecha Inicial de pagos</strong>", 1);
                         $css->ColTabla("<strong>Valor de la Cuota</strong>", 1);  
                          
@@ -943,35 +981,19 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                     $css->CierraFilaTabla(); 
                     
+                    
+                    
                     $css->FilaTabla(16);
-                        $css->ColTabla("<strong>Cuotas</strong>", 1);
-                        $css->ColTabla("<strong>Ciclo</strong>", 1);
-                        $css->ColTabla("", 1);
-                    $css->CierraFilaTabla();
-
-                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Observaciones</strong>", 3,"C");
                         
-                        print("<td>");
-                            $css->input("number", "NumeroCuotas", "form-control", "NumeroCuotas", "NumeroCuotas", "", "Numero de Cuotas", "off", "", "onchange=CalculeCuotas");
-                        print("</td>");
-                        print("<td>");
-                            $css->select("cicloPagos", "form-control", "cicloPagos", "", "", "onchange=CalculeCuotasAcuerdo()", "");
-                                $css->option("", "", "", "", "", "");
-                                    print("Seleccione el ciclo de pagos");
-                                $css->Coption();
-                                $sql="SELECT * FROM acuerdo_pago_ciclos_pagos";
-                                $Consulta=$obCon->Query($sql);
-                                while($DatosCiclo=$obCon->FetchAssoc($Consulta)){
-                                    $css->option("", "", "", $DatosCiclo["ID"], "", "");
-                                    print($DatosCiclo["NombreCiclo"]);
-                                $css->Coption();
-                                }
-                            $css->Cselect();
-                        print("</td>");
-                        print("<td>");
-                           // $css->CrearBotonEvento("btnAgregar", "+", 1, "onclick", "AgregarNumeroDeCuotas('$idAcuerdo')", "verde");
+                    $css->CierraFilaTabla();
+                    $css->FilaTabla(16);
+                        print("<td colspan=3>");
+                            $css->textarea("TxtObservacionesAcuerdoPago", "form-control", "TxtObservacionesAcuerdoPago", "", "Observaciones", "", "");
+                            $css->Ctextarea();
                         print("</td>");
                     $css->CierraFilaTabla();
+                    
                     $css->FilaTabla(16);
                         print("<td colspan=3>");
                             $css->CrearBotonEvento("btnCalcularProyeccion", "Proyectar pagos", 1, "onclick", "CalculeProyeccionPagosAcuerdo('$idAcuerdo')", "verde");
@@ -1120,10 +1142,13 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CrearTitulo("El valor de la cuota debe ser un número mayor a Cero", "rojo");
                     exit();
                 }
+                /*
                 if( !is_numeric($NumeroCuotas) or $NumeroCuotas<=0 ){
                     $css->CrearTitulo("El número de cuotas debe ser un valor mayor a cero", "rojo");
                     exit();
                 }
+                 * 
+                 */
                 
                 if( $cicloPagos=='' ){
                     $css->CrearTitulo("Por favor seleccione el ciclo de pagos", "rojo");

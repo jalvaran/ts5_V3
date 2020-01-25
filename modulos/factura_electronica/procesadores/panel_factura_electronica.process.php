@@ -59,7 +59,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $CantidadActual=$obCon->FetchAssoc($obCon->Query($sql));
             
             $CantidadTotal=$Cantidad+$CantidadActual["CantidadActual"];
-            if($CantidadTotal>$DatosItem["Cantidad"]){
+            if($CantidadTotal>($DatosItem["Cantidad"]*$DatosItem["Dias"])){
                 exit("E1;La cantidad de este producto no puede superar la cantidad que hay en la factura;TxtCantidad_$idItemFactura");
             }
             $Respuesta=$obCon->AgregarItemANotaCredito($idFacturaElectronica,$idItemFactura,$Cantidad,$idUser);

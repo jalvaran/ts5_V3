@@ -1,11 +1,10 @@
--- Adminer 4.7.0 MySQL dump
+-- Adminer 4.7.5 MySQL dump
 
 SET NAMES utf8;
 SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
-DROP TABLE IF EXISTS `abonos_libro`;
 CREATE TABLE `abonos_libro` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -19,7 +18,6 @@ CREATE TABLE `abonos_libro` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `activos`;
 CREATE TABLE `activos` (
   `idActivos` int(16) NOT NULL AUTO_INCREMENT,
   `Referencia` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -35,7 +33,6 @@ CREATE TABLE `activos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `act_movimientos`;
 CREATE TABLE `act_movimientos` (
   `idAct_Movimientos` int(16) NOT NULL AUTO_INCREMENT,
   `Fecha` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -56,7 +53,6 @@ CREATE TABLE `act_movimientos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `act_ordenes`;
 CREATE TABLE `act_ordenes` (
   `idAct_Ordenes` int(16) NOT NULL AUTO_INCREMENT,
   `NumOrden` int(16) NOT NULL,
@@ -74,7 +70,6 @@ CREATE TABLE `act_ordenes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `act_pre_movimientos`;
 CREATE TABLE `act_pre_movimientos` (
   `idAct_Movimientos` int(16) NOT NULL AUTO_INCREMENT,
   `Fecha` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -95,7 +90,6 @@ CREATE TABLE `act_pre_movimientos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `act_pre_ordenes`;
 CREATE TABLE `act_pre_ordenes` (
   `idAct_Ordenes` int(16) NOT NULL DEFAULT '0',
   `NumOrden` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -109,7 +103,6 @@ CREATE TABLE `act_pre_ordenes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `acueducto_configuraciones`;
 CREATE TABLE `acueducto_configuraciones` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `ConsumoBase` bigint(20) NOT NULL,
@@ -119,7 +112,6 @@ CREATE TABLE `acueducto_configuraciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `acueducto_lecturas`;
 CREATE TABLE `acueducto_lecturas` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -133,7 +125,121 @@ CREATE TABLE `acueducto_lecturas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `alertas`;
+CREATE TABLE `acuerdo_pago` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'identificador unico de un acuerdo de pago',
+  `Fecha` date NOT NULL COMMENT 'Fecha del acuerdo',
+  `FechaInicialParaPagos` date NOT NULL COMMENT 'Fecha donde se inicia a pagar el credito',
+  `Tercero` bigint(20) NOT NULL COMMENT 'NIT del tercero con el cual se realiza el acuerdo de pago',
+  `ValorCuotaGeneral` double NOT NULL COMMENT 'Valor de la cuota que se elige al crear un acuerdo de pago',
+  `CicloPagos` int(11) NOT NULL COMMENT 'Ciclo de pagos, proviene de la tabla acuerdo_pago_ciclos_pagos, normalmente sera semanal, quincenal o mensual',
+  `NumeroCuotas` int(11) NOT NULL COMMENT 'Cantidad de cuotas para el acuerdo de pago',
+  `SaldoAnterior` double NOT NULL COMMENT 'Saldo anterior del cliente, viene de la sumatoria de la cuenta contable 1305',
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL COMMENT 'observaciones del acuerdo',
+  `SaldoInicial` double NOT NULL COMMENT 'Saldo inicial del acuerdo, sera el valor de la factura a credito mas el saldo anterior',
+  `TotalAbonos` double NOT NULL COMMENT 'Registra el total de abonos realizados al documento',
+  `SaldoFinal` double NOT NULL COMMENT 'Registra el saldo final con el que queda el documento',
+  `Estado` int(11) NOT NULL COMMENT 'Estado en el que se encuentra el documento, relacionado con la tabla acuerdo_pago_estados',
+  `idUser` int(11) NOT NULL COMMENT 'usuario que lo crea',
+  `Created` datetime NOT NULL COMMENT 'Fecha de creacion del registro',
+  PRIMARY KEY (`ID`),
+  KEY `Tercero` (`Tercero`),
+  KEY `CicloPagos` (`CicloPagos`),
+  KEY `NumeroCuotas` (`NumeroCuotas`),
+  KEY `Estado` (`Estado`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_ciclos_pagos` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NombreCiclo` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `NumeroDias` int(11) NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_cuotas_pagadas` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `NumeroCuota` int(11) NOT NULL COMMENT 'Numero de la cuota que se paga, relacionada con la tabla acuerdo_pago_cuotas_planeadas',
+  `TipoCuota` int(11) NOT NULL COMMENT '1 para Inicial, 2 para cuota programada, 3 para cuota normal',
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'id unico del acuerdo de pago',
+  `FechaPago` date NOT NULL COMMENT 'Fecha del pago',
+  `ValorPago` double NOT NULL COMMENT 'Valor que paga el cliente',
+  `MetodoPago` int(11) NOT NULL COMMENT 'Relacion con la tabla metodos_pago, efectivo, tarjetas, cheques, bonos etc',
+  `idUser` int(11) NOT NULL COMMENT 'usuario que recibe la cuota',
+  `idCierre` bigint(20) NOT NULL COMMENT 'id del cierre donde se suma el abono del cliente, relaciona con la tabla cajas_aperturas_cierres',
+  `Created` datetime NOT NULL COMMENT 'Fecha en que se crea el registro',
+  PRIMARY KEY (`ID`),
+  KEY `idCierre` (`idCierre`),
+  KEY `idUser` (`idUser`),
+  KEY `NumeroCuota` (`NumeroCuota`),
+  KEY `TipoCuota` (`TipoCuota`),
+  KEY `MetodoPago` (`MetodoPago`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_cuotas_pagadas_temp` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `NumeroCuota` int(11) NOT NULL COMMENT 'Numero de la cuota que se paga, relacionada con la tabla acuerdo_pago_cuotas_planeadas',
+  `TipoCuota` int(11) NOT NULL COMMENT '1 para Inicial, 2 para cuota programada, 3 para cuota normal',
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'id unico del acuerdo de pago',
+  `FechaPago` date NOT NULL COMMENT 'Fecha del pago',
+  `ValorPago` double NOT NULL COMMENT 'Valor que paga el cliente',
+  `MetodoPago` int(11) NOT NULL COMMENT 'Relacion con la tabla metodos_pago, efectivo, tarjetas, cheques, bonos etc',
+  `idUser` int(11) NOT NULL COMMENT 'usuario que recibe la cuota',
+  `idCierre` bigint(20) NOT NULL COMMENT 'id del cierre donde se suma el abono del cliente, relaciona con la tabla cajas_aperturas_cierres',
+  `Created` datetime NOT NULL COMMENT 'Fecha en que se crea el registro',
+  PRIMARY KEY (`ID`),
+  KEY `idCierre` (`idCierre`),
+  KEY `idUser` (`idUser`),
+  KEY `NumeroCuota` (`NumeroCuota`),
+  KEY `TipoCuota` (`TipoCuota`),
+  KEY `MetodoPago` (`MetodoPago`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_estados` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NombreEstado` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'Nombre del estado',
+  `Observaciones` tinytext COLLATE utf8_spanish_ci NOT NULL COMMENT 'Observaciones del estado, aplicacion, cuando aplica',
+  `Created` datetime NOT NULL COMMENT 'Fecha de creacion del registro',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_proyeccion_pagos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'id del acuerdo de pago',
+  `TipoCuota` int(11) NOT NULL COMMENT 'Tipo de cuota, 1 cuota programable, 2 Cuota Normal',
+  `NumeroCuota` int(11) NOT NULL COMMENT 'Numero de Cuota',
+  `Fecha` date NOT NULL COMMENT 'Fecha proyectada para pago',
+  `ValorCuota` double NOT NULL COMMENT 'Valor de la cuota',
+  `Estado` int(11) NOT NULL COMMENT '0 sin pagar, 1 pago parcial, 2 pago completo',
+  `idUser` int(11) NOT NULL COMMENT 'usuario creador',
+  `Created` datetime NOT NULL COMMENT 'Fecha y hora del registro',
+  PRIMARY KEY (`ID`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`),
+  KEY `Estado` (`Estado`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_proyeccion_pagos_temp` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `TipoCuota` int(11) NOT NULL COMMENT 'Tipo de cuota, 1 cuota programable, 2 Cuota Normal',
+  `NumeroCuota` int(11) NOT NULL COMMENT 'Numero de Cuota',
+  `Fecha` date NOT NULL COMMENT 'Fecha proyectada para pago',
+  `ValorCuota` double NOT NULL COMMENT 'Valor de la cuota',
+  `Estado` int(11) NOT NULL COMMENT '0 sin pagar, 1 pago parcial, 2 pago completo',
+  `idUser` int(11) NOT NULL,
+  `Created` datetime NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`),
+  KEY `Estado` (`Estado`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
 CREATE TABLE `alertas` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `AlertaTipo` enum('Backups,Normal') NOT NULL,
@@ -147,7 +253,6 @@ CREATE TABLE `alertas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `autorizaciones_generales`;
 CREATE TABLE `autorizaciones_generales` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Proceso` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -158,7 +263,6 @@ CREATE TABLE `autorizaciones_generales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `bodega`;
 CREATE TABLE `bodega` (
   `idBodega` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -172,7 +276,6 @@ CREATE TABLE `bodega` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cajas`;
 CREATE TABLE `cajas` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
@@ -195,7 +298,6 @@ CREATE TABLE `cajas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cajas_aperturas_cierres`;
 CREATE TABLE `cajas_aperturas_cierres` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -226,7 +328,6 @@ CREATE TABLE `cajas_aperturas_cierres` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cartera`;
 CREATE TABLE `cartera` (
   `idCartera` int(11) NOT NULL AUTO_INCREMENT,
   `Facturas_idFacturas` varchar(45) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
@@ -250,7 +351,42 @@ CREATE TABLE `cartera` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `centrocosto`;
+CREATE TABLE `catalogo_departamentos` (
+  `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `country_id` bigint(20) unsigned NOT NULL,
+  `Nombre` varchar(255) COLLATE utf8_spanish_ci NOT NULL,
+  `CodigoDANE` char(255) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NULL DEFAULT NULL,
+  `Sync` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `CodigoDANE` (`CodigoDANE`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `catalogo_impuestos` (
+  `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `Nombre` varchar(255) COLLATE utf8_spanish_ci NOT NULL,
+  `Descripcion` varchar(255) COLLATE utf8_spanish_ci NOT NULL,
+  `code` char(255) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NULL DEFAULT NULL,
+  `Sync` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `catalogo_municipios` (
+  `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `department_id` bigint(20) unsigned NOT NULL,
+  `Nombre` varchar(255) COLLATE utf8_spanish_ci NOT NULL,
+  `CodigoDANE` char(255) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NULL DEFAULT NULL,
+  `Sync` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `CodigoDANE` (`CodigoDANE`),
+  KEY `department_id` (`department_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
 CREATE TABLE `centrocosto` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -261,7 +397,6 @@ CREATE TABLE `centrocosto` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cierres_contables`;
 CREATE TABLE `cierres_contables` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -272,7 +407,6 @@ CREATE TABLE `cierres_contables` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ciuu`;
 CREATE TABLE `ciuu` (
   `Codigo` int(11) NOT NULL,
   `Descripcion` varchar(300) COLLATE utf8_spanish_ci NOT NULL,
@@ -282,7 +416,6 @@ CREATE TABLE `ciuu` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `clasecuenta`;
 CREATE TABLE `clasecuenta` (
   `PUC` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Clase` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -293,7 +426,6 @@ CREATE TABLE `clasecuenta` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `clientes`;
 CREATE TABLE `clientes` (
   `idClientes` int(11) NOT NULL AUTO_INCREMENT,
   `Tipo_Documento` int(11) NOT NULL,
@@ -306,8 +438,8 @@ CREATE TABLE `clientes` (
   `Otros_Nombres` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `RazonSocial` varchar(100) COLLATE utf8_spanish_ci DEFAULT NULL,
   `Direccion` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `Cod_Dpto` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
-  `Cod_Mcipio` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `Cod_Dpto` int(2) unsigned zerofill NOT NULL,
+  `Cod_Mcipio` int(3) unsigned zerofill NOT NULL,
   `Pais_Domicilio` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
   `Telefono` varchar(100) COLLATE utf8_spanish_ci DEFAULT NULL,
   `Ciudad` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -315,6 +447,7 @@ CREATE TABLE `clientes` (
   `TelContacto` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Email` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `CIUU` int(11) NOT NULL,
+  `TipoOrganizacion` int(11) NOT NULL COMMENT '1 juridico, 2 natural',
   `Cupo` double NOT NULL,
   `CodigoTarjeta` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
   `Soporte` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -324,7 +457,6 @@ CREATE TABLE `clientes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cod_departamentos`;
 CREATE TABLE `cod_departamentos` (
   `Cod_dpto` int(11) NOT NULL,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -334,7 +466,6 @@ CREATE TABLE `cod_departamentos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cod_documentos`;
 CREATE TABLE `cod_documentos` (
   `Codigo` int(11) NOT NULL,
   `Descripcion` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
@@ -345,7 +476,6 @@ CREATE TABLE `cod_documentos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cod_municipios_dptos`;
 CREATE TABLE `cod_municipios_dptos` (
   `ID` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
   `Cod_mcipio` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
@@ -358,7 +488,6 @@ CREATE TABLE `cod_municipios_dptos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cod_paises`;
 CREATE TABLE `cod_paises` (
   `Codigo` int(11) NOT NULL,
   `Pais` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -368,7 +497,6 @@ CREATE TABLE `cod_paises` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `colaboradores`;
 CREATE TABLE `colaboradores` (
   `idColaboradores` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(90) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -389,7 +517,6 @@ CREATE TABLE `colaboradores` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `colaboradores_ventas`;
 CREATE TABLE `colaboradores_ventas` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -402,7 +529,6 @@ CREATE TABLE `colaboradores_ventas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `col_registrohoras`;
 CREATE TABLE `col_registrohoras` (
   `IdColRegistro` int(11) NOT NULL AUTO_INCREMENT,
   `IdColaborador` int(11) NOT NULL,
@@ -415,7 +541,6 @@ CREATE TABLE `col_registrohoras` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `comercial_plataformas_pago`;
 CREATE TABLE `comercial_plataformas_pago` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -427,7 +552,6 @@ CREATE TABLE `comercial_plataformas_pago` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `comercial_plataformas_pago_ingresos`;
 CREATE TABLE `comercial_plataformas_pago_ingresos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -447,7 +571,6 @@ CREATE TABLE `comercial_plataformas_pago_ingresos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `comercial_plataformas_pago_ventas`;
 CREATE TABLE `comercial_plataformas_pago_ventas` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -464,7 +587,6 @@ CREATE TABLE `comercial_plataformas_pago_ventas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `comisiones`;
 CREATE TABLE `comisiones` (
   `idComisiones` int(11) NOT NULL AUTO_INCREMENT,
   `Descripcion` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -475,7 +597,6 @@ CREATE TABLE `comisiones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `comisionesporventas`;
 CREATE TABLE `comisionesporventas` (
   `idComisionesPorVentas` int(11) NOT NULL AUTO_INCREMENT,
   `CuentaPUC` varchar(45) COLLATE utf8_spanish_ci DEFAULT '5105',
@@ -492,7 +613,6 @@ CREATE TABLE `comisionesporventas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `compras`;
 CREATE TABLE `compras` (
   `idCompras` int(11) NOT NULL AUTO_INCREMENT,
   `CuentaPUC` varchar(45) COLLATE utf8_spanish_ci DEFAULT '62',
@@ -512,7 +632,6 @@ CREATE TABLE `compras` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `compras_activas`;
 CREATE TABLE `compras_activas` (
   `idComprasActivas` int(11) NOT NULL AUTO_INCREMENT,
   `idProveedor` int(11) NOT NULL,
@@ -533,7 +652,6 @@ CREATE TABLE `compras_activas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `compras_precompra`;
 CREATE TABLE `compras_precompra` (
   `idPreCompra` int(11) NOT NULL AUTO_INCREMENT,
   `idProductosVenta` int(11) NOT NULL,
@@ -552,7 +670,6 @@ CREATE TABLE `compras_precompra` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `comprobantes_contabilidad`;
 CREATE TABLE `comprobantes_contabilidad` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -566,7 +683,6 @@ CREATE TABLE `comprobantes_contabilidad` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `comprobantes_contabilidad_items`;
 CREATE TABLE `comprobantes_contabilidad_items` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
   `idComprobante` int(16) NOT NULL,
@@ -587,7 +703,6 @@ CREATE TABLE `comprobantes_contabilidad_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `comprobantes_egreso_items`;
 CREATE TABLE `comprobantes_egreso_items` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idComprobante` bigint(20) NOT NULL,
@@ -611,7 +726,6 @@ CREATE TABLE `comprobantes_egreso_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `comprobantes_ingreso`;
 CREATE TABLE `comprobantes_ingreso` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Fecha` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -629,7 +743,6 @@ CREATE TABLE `comprobantes_ingreso` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `comprobantes_ingreso_anulaciones`;
 CREATE TABLE `comprobantes_ingreso_anulaciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -644,7 +757,6 @@ CREATE TABLE `comprobantes_ingreso_anulaciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `comprobantes_ingreso_items`;
 CREATE TABLE `comprobantes_ingreso_items` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idComprobante` int(16) NOT NULL,
@@ -668,7 +780,6 @@ CREATE TABLE `comprobantes_ingreso_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `comprobantes_pre`;
 CREATE TABLE `comprobantes_pre` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -681,7 +792,6 @@ CREATE TABLE `comprobantes_pre` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `concejales`;
 CREATE TABLE `concejales` (
   `ID` bigint(20) NOT NULL,
   `Nombre` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
@@ -694,7 +804,6 @@ CREATE TABLE `concejales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `concejales_intervenciones`;
 CREATE TABLE `concejales_intervenciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idConcejal` bigint(20) NOT NULL,
@@ -709,7 +818,6 @@ CREATE TABLE `concejales_intervenciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `concejo_sesiones`;
 CREATE TABLE `concejo_sesiones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Sesion` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -721,7 +829,6 @@ CREATE TABLE `concejo_sesiones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `concejo_tipo_sesiones`;
 CREATE TABLE `concejo_tipo_sesiones` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Tipo` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -731,7 +838,6 @@ CREATE TABLE `concejo_tipo_sesiones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `conceptos`;
 CREATE TABLE `conceptos` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `FechaHoraCreacion` datetime NOT NULL,
@@ -748,7 +854,6 @@ CREATE TABLE `conceptos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `conceptos_montos`;
 CREATE TABLE `conceptos_montos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idConcepto` int(11) NOT NULL,
@@ -763,7 +868,6 @@ CREATE TABLE `conceptos_montos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `conceptos_movimientos`;
 CREATE TABLE `conceptos_movimientos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idConcepto` int(11) NOT NULL,
@@ -778,7 +882,6 @@ CREATE TABLE `conceptos_movimientos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `configuraciones_nombres_campos`;
 CREATE TABLE `configuraciones_nombres_campos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `NombreDB` varchar(50) COLLATE utf8_spanish_ci NOT NULL,
@@ -789,7 +892,6 @@ CREATE TABLE `configuraciones_nombres_campos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `configuracion_campos_asociados`;
 CREATE TABLE `configuracion_campos_asociados` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `TablaOrigen` varchar(50) COLLATE utf8_spanish_ci NOT NULL,
@@ -803,7 +905,6 @@ CREATE TABLE `configuracion_campos_asociados` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `configuracion_control_tablas`;
 CREATE TABLE `configuracion_control_tablas` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `TablaDB` varchar(50) COLLATE utf8_spanish_ci NOT NULL,
@@ -820,7 +921,19 @@ CREATE TABLE `configuracion_control_tablas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `configuracion_general`;
+CREATE TABLE `configuracion_correos_smtp` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `SMTPSecure` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `Host` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
+  `Port` bigint(20) NOT NULL,
+  `Username` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `Password` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
 CREATE TABLE `configuracion_general` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Descripcion` text COLLATE utf8_spanish_ci NOT NULL,
@@ -831,7 +944,6 @@ CREATE TABLE `configuracion_general` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `configuracion_tablas_acciones_adicionales`;
 CREATE TABLE `configuracion_tablas_acciones_adicionales` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `TablaDB` varchar(50) COLLATE utf8_spanish_ci NOT NULL,
@@ -846,7 +958,6 @@ CREATE TABLE `configuracion_tablas_acciones_adicionales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `config_codigo_barras`;
 CREATE TABLE `config_codigo_barras` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `TituloEtiqueta` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -865,7 +976,6 @@ CREATE TABLE `config_codigo_barras` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `config_puertos`;
 CREATE TABLE `config_puertos` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Puerto` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -877,7 +987,6 @@ CREATE TABLE `config_puertos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `config_tiketes_promocion`;
 CREATE TABLE `config_tiketes_promocion` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `NombreTiket` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -890,7 +999,6 @@ CREATE TABLE `config_tiketes_promocion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `contabilidad_parametros_cuentasxcobrar`;
 CREATE TABLE `contabilidad_parametros_cuentasxcobrar` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `CuentaPUC` bigint(20) NOT NULL,
@@ -900,7 +1008,6 @@ CREATE TABLE `contabilidad_parametros_cuentasxcobrar` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `contabilidad_parametros_cuentasxpagar`;
 CREATE TABLE `contabilidad_parametros_cuentasxpagar` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `CuentaPUC` bigint(20) NOT NULL,
@@ -910,7 +1017,6 @@ CREATE TABLE `contabilidad_parametros_cuentasxpagar` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `costos`;
 CREATE TABLE `costos` (
   `idCostos` int(20) NOT NULL AUTO_INCREMENT,
   `NombreCosto` varchar(45) NOT NULL,
@@ -921,7 +1027,6 @@ CREATE TABLE `costos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `cotizacionesv5`;
 CREATE TABLE `cotizacionesv5` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -939,7 +1044,6 @@ CREATE TABLE `cotizacionesv5` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cotizaciones_anexos`;
 CREATE TABLE `cotizaciones_anexos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `FechaCreacion` datetime NOT NULL,
@@ -953,7 +1057,6 @@ CREATE TABLE `cotizaciones_anexos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cotizaciones_anticipos`;
 CREATE TABLE `cotizaciones_anticipos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -971,7 +1074,6 @@ CREATE TABLE `cotizaciones_anticipos` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cot_itemscotizaciones`;
 CREATE TABLE `cot_itemscotizaciones` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
   `idCliente` int(11) NOT NULL DEFAULT '0',
@@ -1007,7 +1109,6 @@ CREATE TABLE `cot_itemscotizaciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `crono_controles`;
 CREATE TABLE `crono_controles` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `idSesionConcejo` bigint(20) NOT NULL,
@@ -1021,7 +1122,6 @@ CREATE TABLE `crono_controles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cuentas`;
 CREATE TABLE `cuentas` (
   `idPUC` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -1033,7 +1133,6 @@ CREATE TABLE `cuentas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cuentasfrecuentes`;
 CREATE TABLE `cuentasfrecuentes` (
   `CuentaPUC` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Nombre` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
@@ -1045,7 +1144,6 @@ CREATE TABLE `cuentasfrecuentes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cuentasxpagar`;
 CREATE TABLE `cuentasxpagar` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -1082,7 +1180,6 @@ CREATE TABLE `cuentasxpagar` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cuentasxpagar_abonos`;
 CREATE TABLE `cuentasxpagar_abonos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -1097,7 +1194,6 @@ CREATE TABLE `cuentasxpagar_abonos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `cuentas_frecuentes`;
 CREATE TABLE `cuentas_frecuentes` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Tercero` bigint(20) NOT NULL,
@@ -1115,7 +1211,6 @@ CREATE TABLE `cuentas_frecuentes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `devolucionesventas`;
 CREATE TABLE `devolucionesventas` (
   `idComprasDevoluciones` int(11) NOT NULL AUTO_INCREMENT,
   `NumVenta` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -1130,7 +1225,6 @@ CREATE TABLE `devolucionesventas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `documentos_contables`;
 CREATE TABLE `documentos_contables` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Prefijo` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
@@ -1142,7 +1236,6 @@ CREATE TABLE `documentos_contables` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `documentos_contables_control`;
 CREATE TABLE `documentos_contables_control` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idDocumento` int(11) NOT NULL,
@@ -1166,7 +1259,6 @@ CREATE TABLE `documentos_contables_control` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `documentos_contables_items`;
 CREATE TABLE `documentos_contables_items` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idDocumento` int(11) NOT NULL,
@@ -1185,7 +1277,6 @@ CREATE TABLE `documentos_contables_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `documentos_contables_items_temp`;
 CREATE TABLE `documentos_contables_items_temp` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idDocumento` int(11) NOT NULL,
@@ -1208,7 +1299,6 @@ CREATE TABLE `documentos_contables_items_temp` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `documentos_contables_registro_bases`;
 CREATE TABLE `documentos_contables_registro_bases` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idDocumentoContable` bigint(20) NOT NULL,
@@ -1230,7 +1320,6 @@ CREATE TABLE `documentos_contables_registro_bases` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `documentos_generados`;
 CREATE TABLE `documentos_generados` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
@@ -1243,7 +1332,6 @@ CREATE TABLE `documentos_generados` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `documento_equivalente`;
 CREATE TABLE `documento_equivalente` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -1255,7 +1343,6 @@ CREATE TABLE `documento_equivalente` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `documento_equivalente_items`;
 CREATE TABLE `documento_equivalente_items` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Descripcion` text COLLATE utf8_spanish_ci NOT NULL,
@@ -1269,7 +1356,6 @@ CREATE TABLE `documento_equivalente_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `egresos`;
 CREATE TABLE `egresos` (
   `idEgresos` int(45) NOT NULL AUTO_INCREMENT,
   `Fecha` varchar(45) NOT NULL,
@@ -1305,7 +1391,6 @@ CREATE TABLE `egresos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `egresos_activos`;
 CREATE TABLE `egresos_activos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) NOT NULL,
@@ -1317,7 +1402,6 @@ CREATE TABLE `egresos_activos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-DROP TABLE IF EXISTS `egresos_anulaciones`;
 CREATE TABLE `egresos_anulaciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -1331,7 +1415,6 @@ CREATE TABLE `egresos_anulaciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `egresos_items`;
 CREATE TABLE `egresos_items` (
   `ID` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `CuentaDestino` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -1350,7 +1433,6 @@ CREATE TABLE `egresos_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `egresos_pre`;
 CREATE TABLE `egresos_pre` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idCuentaXPagar` bigint(20) NOT NULL,
@@ -1364,7 +1446,6 @@ CREATE TABLE `egresos_pre` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `egresos_tipo`;
 CREATE TABLE `egresos_tipo` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(100) NOT NULL,
@@ -1376,7 +1457,6 @@ CREATE TABLE `egresos_tipo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-DROP TABLE IF EXISTS `empresapro`;
 CREATE TABLE `empresapro` (
   `idEmpresaPro` int(11) NOT NULL AUTO_INCREMENT,
   `RazonSocial` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -1387,6 +1467,7 @@ CREATE TABLE `empresapro` (
   `Telefono` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
   `Celular` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
   `Ciudad` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `CodigoDaneCiudad` int(5) unsigned zerofill NOT NULL,
   `ResolucionDian` text COLLATE utf8_spanish_ci NOT NULL,
   `Regimen` enum('SIMPLIFICADO','COMUN') COLLATE utf8_spanish_ci DEFAULT 'SIMPLIFICADO',
   `TipoPersona` enum('1','2','3') COLLATE utf8_spanish_ci NOT NULL COMMENT '1 Persona jurica, 2 persona natural,3 grandes contribuyentes',
@@ -1401,13 +1482,13 @@ CREATE TABLE `empresapro` (
   `RutaImagen` varchar(200) COLLATE utf8_spanish_ci NOT NULL DEFAULT 'LogosEmpresas/logotipo1.png',
   `FacturaSinInventario` varchar(2) COLLATE utf8_spanish_ci NOT NULL,
   `CXPAutomaticas` varchar(2) COLLATE utf8_spanish_ci NOT NULL DEFAULT 'SI',
+  `TokenAPIFE` text COLLATE utf8_spanish_ci NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`idEmpresaPro`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `empresapro_regimenes`;
 CREATE TABLE `empresapro_regimenes` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Regimen` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
@@ -1417,7 +1498,6 @@ CREATE TABLE `empresapro_regimenes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `empresapro_resoluciones_facturacion`;
 CREATE TABLE `empresapro_resoluciones_facturacion` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `NombreInterno` text COLLATE utf8_spanish_ci NOT NULL,
@@ -1426,10 +1506,13 @@ CREATE TABLE `empresapro_resoluciones_facturacion` (
   `NumSolicitud` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Tipo` varchar(4) COLLATE utf8_spanish_ci NOT NULL,
   `Factura` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `FacturaElectronica` int(1) NOT NULL,
   `Prefijo` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Desde` int(16) NOT NULL,
   `Hasta` int(16) NOT NULL,
+  `FechaDesde` date NOT NULL,
   `FechaVencimiento` date NOT NULL,
+  `technical_key` varchar(95) COLLATE utf8_spanish_ci NOT NULL,
   `idEmpresaPro` int(11) NOT NULL,
   `Estado` varchar(2) COLLATE utf8_spanish_ci NOT NULL COMMENT 'OC: Ocupada',
   `Completada` varchar(2) COLLATE utf8_spanish_ci NOT NULL DEFAULT 'NO',
@@ -1439,7 +1522,6 @@ CREATE TABLE `empresapro_resoluciones_facturacion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `empresa_pro_sucursales`;
 CREATE TABLE `empresa_pro_sucursales` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -1455,7 +1537,6 @@ CREATE TABLE `empresa_pro_sucursales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `estadosfinancieros_mayor_temporal`;
 CREATE TABLE `estadosfinancieros_mayor_temporal` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `FechaCorte` date NOT NULL,
@@ -1471,7 +1552,6 @@ CREATE TABLE `estadosfinancieros_mayor_temporal` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `events`;
 CREATE TABLE `events` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
@@ -1484,7 +1564,6 @@ CREATE TABLE `events` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `facturas`;
 CREATE TABLE `facturas` (
   `idFacturas` varchar(45) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
   `idResolucion` int(11) NOT NULL,
@@ -1522,31 +1601,11 @@ CREATE TABLE `facturas` (
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`idFacturas`),
-  KEY `ReporteFacturaElectronica` (`ReporteFacturaElectronica`)
+  KEY `ReporteFacturaElectronica` (`ReporteFacturaElectronica`),
+  KEY `TipoFactura` (`TipoFactura`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DELIMITER ;;
-
-CREATE TRIGGER `InsertFacturaOri` AFTER INSERT ON `facturas` FOR EACH ROW
-BEGIN
-
-INSERT INTO ori_facturas SELECT * FROM facturas WHERE idFacturas=New.idFacturas;
-
-
-END;;
-
-CREATE TRIGGER `Actualiza_OriFacturas` AFTER UPDATE ON `facturas` FOR EACH ROW
-BEGIN
-
-REPLACE INTO ori_facturas SELECT * FROM facturas WHERE idFacturas=New.idFacturas;
-
-
-END;;
-
-DELIMITER ;
-
-DROP TABLE IF EXISTS `facturas_abonos`;
 CREATE TABLE `facturas_abonos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -1564,7 +1623,6 @@ CREATE TABLE `facturas_abonos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `facturas_anticipos`;
 CREATE TABLE `facturas_anticipos` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -1580,7 +1638,6 @@ CREATE TABLE `facturas_anticipos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `facturas_autoretenciones`;
 CREATE TABLE `facturas_autoretenciones` (
   `idFacturasAutoretenciones` int(11) NOT NULL AUTO_INCREMENT,
   `Fecha` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -1598,20 +1655,6 @@ CREATE TABLE `facturas_autoretenciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `facturas_electronicas`;
-CREATE TABLE `facturas_electronicas` (
-  `idFactura` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
-  `XmlFiscal` text COLLATE utf8_spanish_ci NOT NULL,
-  `NumeroDocumento` text COLLATE utf8_spanish_ci NOT NULL,
-  `idDocumento` text COLLATE utf8_spanish_ci NOT NULL,
-  `EstadoCUFE` text COLLATE utf8_spanish_ci NOT NULL,
-  `CUFE` text COLLATE utf8_spanish_ci NOT NULL,
-  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
-
-
-DROP TABLE IF EXISTS `facturas_electronicas_contador`;
 CREATE TABLE `facturas_electronicas_contador` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `FechaHabilitacion` date NOT NULL,
@@ -1624,7 +1667,60 @@ CREATE TABLE `facturas_electronicas_contador` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `facturas_formapago`;
+CREATE TABLE `facturas_electronicas_estados_acuse` (
+  `ID` varchar(2) NOT NULL,
+  `NombreEstadoAcuse` varchar(25) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `facturas_electronicas_log` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idFactura` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `RespuestaCompletaServidor` longtext COLLATE utf8_spanish_ci NOT NULL,
+  `UUID` text COLLATE utf8_spanish_ci NOT NULL,
+  `RutaPDF` text COLLATE utf8_spanish_ci NOT NULL,
+  `RutaXML` text COLLATE utf8_spanish_ci NOT NULL,
+  `Estado` int(11) NOT NULL,
+  `PDFCreado` int(11) NOT NULL,
+  `ZIPCreado` int(11) NOT NULL,
+  `EnviadoPorMail` int(11) NOT NULL,
+  `LogsDocumento` text COLLATE utf8_spanish_ci NOT NULL,
+  `AcuseRecibo` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `FechaReporte` datetime NOT NULL,
+  `Created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idFactura` (`idFactura`),
+  KEY `Estado` (`Estado`),
+  KEY `AcuseRecibido` (`AcuseRecibo`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `facturas_electronicas_log_estados` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NombreEstado` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `facturas_electronicas_parametros` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Recurso` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Valor` text COLLATE utf8_spanish_ci NOT NULL,
+  `Clave` text COLLATE utf8_spanish_ci NOT NULL,
+  `Funcion` text COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
 CREATE TABLE `facturas_formapago` (
   `idFacturas_FormaPago` int(16) NOT NULL AUTO_INCREMENT,
   `Total` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -1638,7 +1734,6 @@ CREATE TABLE `facturas_formapago` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `facturas_frecuentes`;
 CREATE TABLE `facturas_frecuentes` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idCliente` bigint(20) NOT NULL,
@@ -1655,7 +1750,6 @@ CREATE TABLE `facturas_frecuentes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `facturas_frecuentes_items_adicionales`;
 CREATE TABLE `facturas_frecuentes_items_adicionales` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `TablaOrigen` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -1670,7 +1764,6 @@ CREATE TABLE `facturas_frecuentes_items_adicionales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `facturas_intereses_sistecredito`;
 CREATE TABLE `facturas_intereses_sistecredito` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -1685,7 +1778,6 @@ CREATE TABLE `facturas_intereses_sistecredito` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `facturas_items`;
 CREATE TABLE `facturas_items` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `FechaFactura` date NOT NULL,
@@ -1727,18 +1819,6 @@ CREATE TABLE `facturas_items` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
-DELIMITER ;;
-
-CREATE TRIGGER `InsertFacturasItems` AFTER INSERT ON `facturas_items` FOR EACH ROW
-BEGIN
-
-INSERT INTO ori_facturas_items SELECT * FROM facturas_items WHERE ID=New.ID;
-
-END;;
-
-DELIMITER ;
-
-DROP TABLE IF EXISTS `facturas_kardex`;
 CREATE TABLE `facturas_kardex` (
   `idFacturas` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `CuentaDestino` bigint(20) NOT NULL,
@@ -1750,7 +1830,6 @@ CREATE TABLE `facturas_kardex` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `facturas_pre`;
 CREATE TABLE `facturas_pre` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `FechaFactura` date NOT NULL,
@@ -1785,7 +1864,6 @@ CREATE TABLE `facturas_pre` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `facturas_reten_aplicadas`;
 CREATE TABLE `facturas_reten_aplicadas` (
   `idFacturasRetAplicadas` int(11) NOT NULL AUTO_INCREMENT,
   `Fecha` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -1803,47 +1881,6 @@ CREATE TABLE `facturas_reten_aplicadas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DELIMITER ;;
-
-CREATE TRIGGER `ActualizaSaldoFact` AFTER INSERT ON `facturas_reten_aplicadas` FOR EACH ROW
-BEGIN
-
-SELECT SaldoFact into @SaldoAnt FROM facturas WHERE idFacturas=NEW.Facturas_idFacturas;
-
-SET @Saldo=@SaldoAnt-NEW.Monto;
-
-UPDATE facturas SET SaldoFact=@Saldo WHERE idFacturas=NEW.Facturas_idFacturas;
-
-
-END;;
-
-CREATE TRIGGER `ActualizaSaldoFactUpdate` AFTER UPDATE ON `facturas_reten_aplicadas` FOR EACH ROW
-BEGIN
-
-SELECT SaldoFact into @SaldoAnt FROM facturas WHERE idFacturas=NEW.Facturas_idFacturas;
-
-SET @Saldo=@SaldoAnt+(OLD.Monto-NEW.Monto);
-
-UPDATE facturas SET SaldoFact=@Saldo WHERE idFacturas=NEW.Facturas_idFacturas;
-
-
-END;;
-
-CREATE TRIGGER `ActualizaSaldoFactDel` BEFORE DELETE ON `facturas_reten_aplicadas` FOR EACH ROW
-BEGIN
-
-SELECT SaldoFact into @SaldoAnt FROM facturas WHERE idFacturas=OLD.Facturas_idFacturas;
-
-SET @Saldo=@SaldoAnt+OLD.Monto;
-
-UPDATE facturas SET SaldoFact=@Saldo WHERE idFacturas=OLD.Facturas_idFacturas;
-
-
-END;;
-
-DELIMITER ;
-
-DROP TABLE IF EXISTS `facturas_tipo_pago`;
 CREATE TABLE `facturas_tipo_pago` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `TipoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -1854,7 +1891,6 @@ CREATE TABLE `facturas_tipo_pago` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `factura_compra`;
 CREATE TABLE `factura_compra` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -1877,7 +1913,6 @@ CREATE TABLE `factura_compra` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `factura_compra_anulaciones`;
 CREATE TABLE `factura_compra_anulaciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -1891,7 +1926,6 @@ CREATE TABLE `factura_compra_anulaciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `factura_compra_descuentos`;
 CREATE TABLE `factura_compra_descuentos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idCompra` bigint(20) NOT NULL,
@@ -1905,7 +1939,6 @@ CREATE TABLE `factura_compra_descuentos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `factura_compra_impuestos_adicionales`;
 CREATE TABLE `factura_compra_impuestos_adicionales` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idCompra` bigint(20) NOT NULL,
@@ -1919,7 +1952,6 @@ CREATE TABLE `factura_compra_impuestos_adicionales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `factura_compra_insumos`;
 CREATE TABLE `factura_compra_insumos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idFacturaCompra` bigint(20) NOT NULL,
@@ -1940,7 +1972,6 @@ CREATE TABLE `factura_compra_insumos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `factura_compra_items`;
 CREATE TABLE `factura_compra_items` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idFacturaCompra` bigint(20) NOT NULL,
@@ -1963,7 +1994,6 @@ CREATE TABLE `factura_compra_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `factura_compra_items_devoluciones`;
 CREATE TABLE `factura_compra_items_devoluciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idNotaDevolucion` bigint(20) NOT NULL,
@@ -1981,7 +2011,6 @@ CREATE TABLE `factura_compra_items_devoluciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `factura_compra_notas_devolucion`;
 CREATE TABLE `factura_compra_notas_devolucion` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -1997,7 +2026,6 @@ CREATE TABLE `factura_compra_notas_devolucion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `factura_compra_retenciones`;
 CREATE TABLE `factura_compra_retenciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idCompra` bigint(20) NOT NULL,
@@ -2011,7 +2039,6 @@ CREATE TABLE `factura_compra_retenciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `factura_compra_servicios`;
 CREATE TABLE `factura_compra_servicios` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idFacturaCompra` bigint(20) NOT NULL,
@@ -2028,7 +2055,6 @@ CREATE TABLE `factura_compra_servicios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `fechas_descuentos`;
 CREATE TABLE `fechas_descuentos` (
   `idFechaDescuentos` int(11) NOT NULL AUTO_INCREMENT,
   `Fecha` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -2044,19 +2070,18 @@ CREATE TABLE `fechas_descuentos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `fe_webservice`;
 CREATE TABLE `fe_webservice` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `DireccionWebService` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
   `User` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Pass` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Descripcion` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `formatos_calidad`;
 CREATE TABLE `formatos_calidad` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` text COLLATE utf8_spanish_ci NOT NULL,
@@ -2071,7 +2096,6 @@ CREATE TABLE `formatos_calidad` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `gupocuentas`;
 CREATE TABLE `gupocuentas` (
   `PUC` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -2083,7 +2107,6 @@ CREATE TABLE `gupocuentas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `impret`;
 CREATE TABLE `impret` (
   `idImpRet` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -2098,7 +2121,6 @@ CREATE TABLE `impret` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ingresos`;
 CREATE TABLE `ingresos` (
   `idIngresos` int(200) NOT NULL AUTO_INCREMENT,
   `Observaciones` varchar(500) NOT NULL,
@@ -2116,7 +2138,6 @@ CREATE TABLE `ingresos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `ingresosvarios`;
 CREATE TABLE `ingresosvarios` (
   `idIngresosVarios` int(11) NOT NULL AUTO_INCREMENT,
   `Fecha` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -2128,7 +2149,6 @@ CREATE TABLE `ingresosvarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `insumos`;
 CREATE TABLE `insumos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Referencia` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -2144,7 +2164,6 @@ CREATE TABLE `insumos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `insumos_kardex`;
 CREATE TABLE `insumos_kardex` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date DEFAULT NULL,
@@ -2163,7 +2182,6 @@ CREATE TABLE `insumos_kardex` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `inventarios_conteo_selectivo`;
 CREATE TABLE `inventarios_conteo_selectivo` (
   `Referencia` bigint(20) NOT NULL,
   `Cantidad` double NOT NULL,
@@ -2173,7 +2191,6 @@ CREATE TABLE `inventarios_conteo_selectivo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `inventarios_diferencias`;
 CREATE TABLE `inventarios_diferencias` (
   `idProductosVenta` bigint(20) NOT NULL AUTO_INCREMENT,
   `CodigoBarras` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -2198,7 +2215,6 @@ CREATE TABLE `inventarios_diferencias` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `inventarios_temporal`;
 CREATE TABLE `inventarios_temporal` (
   `idProductosVenta` bigint(20) NOT NULL AUTO_INCREMENT,
   `CodigoBarras` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -2235,7 +2251,6 @@ CREATE TABLE `inventarios_temporal` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `inventario_comprobante_movimientos`;
 CREATE TABLE `inventario_comprobante_movimientos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -2248,7 +2263,6 @@ CREATE TABLE `inventario_comprobante_movimientos` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `inventario_comprobante_movimientos_items`;
 CREATE TABLE `inventario_comprobante_movimientos_items` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idProducto` bigint(20) NOT NULL,
@@ -2270,7 +2284,6 @@ CREATE TABLE `inventario_comprobante_movimientos_items` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `kardexmercancias`;
 CREATE TABLE `kardexmercancias` (
   `idKardexMercancias` bigint(20) NOT NULL AUTO_INCREMENT,
   `idBodega` int(11) NOT NULL DEFAULT '1',
@@ -2290,7 +2303,6 @@ CREATE TABLE `kardexmercancias` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `kardexmercancias_temporal`;
 CREATE TABLE `kardexmercancias_temporal` (
   `idKardexMercancias` bigint(20) NOT NULL AUTO_INCREMENT,
   `idBodega` int(11) NOT NULL DEFAULT '1',
@@ -2310,7 +2322,6 @@ CREATE TABLE `kardexmercancias_temporal` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `kardex_alquiler`;
 CREATE TABLE `kardex_alquiler` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -2333,7 +2344,6 @@ CREATE TABLE `kardex_alquiler` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `kits`;
 CREATE TABLE `kits` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -2344,7 +2354,6 @@ CREATE TABLE `kits` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `kits_relaciones`;
 CREATE TABLE `kits_relaciones` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `TablaProducto` varchar(60) COLLATE utf8_spanish_ci NOT NULL,
@@ -2357,7 +2366,6 @@ CREATE TABLE `kits_relaciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `librodiario`;
 CREATE TABLE `librodiario` (
   `idLibroDiario` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date DEFAULT NULL,
@@ -2403,7 +2411,6 @@ CREATE TABLE `librodiario` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `libromayorbalances`;
 CREATE TABLE `libromayorbalances` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `FechaInicial` date NOT NULL,
@@ -2420,7 +2427,6 @@ CREATE TABLE `libromayorbalances` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `maquinas`;
 CREATE TABLE `maquinas` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -2431,7 +2437,6 @@ CREATE TABLE `maquinas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `menu`;
 CREATE TABLE `menu` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(80) COLLATE utf8_spanish_ci NOT NULL,
@@ -2448,7 +2453,6 @@ CREATE TABLE `menu` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `menu_carpetas`;
 CREATE TABLE `menu_carpetas` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Ruta` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
@@ -2458,7 +2462,6 @@ CREATE TABLE `menu_carpetas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `menu_pestanas`;
 CREATE TABLE `menu_pestanas` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -2471,7 +2474,6 @@ CREATE TABLE `menu_pestanas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `menu_submenus`;
 CREATE TABLE `menu_submenus` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -2492,7 +2494,14 @@ CREATE TABLE `menu_submenus` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `modelos_agenda`;
+CREATE TABLE `metodos_pago` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Metodo` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
+  `Estado` int(11) NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
 CREATE TABLE `modelos_agenda` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idModelo` int(11) NOT NULL,
@@ -2521,7 +2530,6 @@ CREATE TABLE `modelos_agenda` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;
 
 
-DROP TABLE IF EXISTS `modelos_cierres`;
 CREATE TABLE `modelos_cierres` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -2533,7 +2541,6 @@ CREATE TABLE `modelos_cierres` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;
 
 
-DROP TABLE IF EXISTS `modelos_config_factura`;
 CREATE TABLE `modelos_config_factura` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `idItemFactura` bigint(20) NOT NULL,
@@ -2544,7 +2551,6 @@ CREATE TABLE `modelos_config_factura` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `modelos_db`;
 CREATE TABLE `modelos_db` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -2562,7 +2568,6 @@ CREATE TABLE `modelos_db` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `modelos_pagos_realizados`;
 CREATE TABLE `modelos_pagos_realizados` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` datetime NOT NULL,
@@ -2578,7 +2583,6 @@ CREATE TABLE `modelos_pagos_realizados` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `modelos_tipo_servicios`;
 CREATE TABLE `modelos_tipo_servicios` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Servicio` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
@@ -2592,7 +2596,6 @@ CREATE TABLE `modelos_tipo_servicios` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `nomina_configuracion_documentos_equivalentes`;
 CREATE TABLE `nomina_configuracion_documentos_equivalentes` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Titulo` text COLLATE utf8_spanish_ci NOT NULL,
@@ -2605,7 +2608,6 @@ CREATE TABLE `nomina_configuracion_documentos_equivalentes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `nomina_documentos_equivalentes`;
 CREATE TABLE `nomina_documentos_equivalentes` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -2621,7 +2623,6 @@ CREATE TABLE `nomina_documentos_equivalentes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `nomina_parametros_contables`;
 CREATE TABLE `nomina_parametros_contables` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `CuentaPUC` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
@@ -2632,7 +2633,6 @@ CREATE TABLE `nomina_parametros_contables` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `nomina_parametros_generales`;
 CREATE TABLE `nomina_parametros_generales` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Descripcion` text COLLATE utf8_spanish_ci NOT NULL,
@@ -2643,7 +2643,6 @@ CREATE TABLE `nomina_parametros_generales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `nomina_servicios_turnos`;
 CREATE TABLE `nomina_servicios_turnos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -2661,7 +2660,6 @@ CREATE TABLE `nomina_servicios_turnos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `notascontables`;
 CREATE TABLE `notascontables` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -2682,7 +2680,6 @@ CREATE TABLE `notascontables` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `notascontables_anulaciones`;
 CREATE TABLE `notascontables_anulaciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -2696,7 +2693,6 @@ CREATE TABLE `notascontables_anulaciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `notascredito`;
 CREATE TABLE `notascredito` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -2711,7 +2707,77 @@ CREATE TABLE `notascredito` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ordenesdecompra`;
+CREATE TABLE `notas_credito` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `idFactura` varchar(45) CHARACTER SET utf8 COLLATE utf8_spanish2_ci NOT NULL,
+  `idFacturaElectronica` bigint(20) NOT NULL,
+  `RespuestaCompletaServidor` longtext COLLATE utf8_spanish_ci NOT NULL,
+  `UUID` text COLLATE utf8_spanish_ci NOT NULL,
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
+  `RutaPDF` varchar(250) COLLATE utf8_spanish_ci NOT NULL,
+  `RutaXML` varchar(250) COLLATE utf8_spanish_ci NOT NULL,
+  `PDFCreado` int(11) NOT NULL,
+  `AcuseRecibo` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `LogsDocumento` text COLLATE utf8_spanish_ci NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Estado` int(11) NOT NULL,
+  `Created` datetime NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idFactura` (`idFactura`),
+  KEY `idFacturaElectronica` (`idFacturaElectronica`),
+  KEY `AcuseRecibido` (`AcuseRecibo`),
+  KEY `Estado` (`Estado`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+SET NAMES utf8mb4;
+
+CREATE TABLE `notas_credito_conceptos` (
+  `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `TipoDocumento` bigint(20) unsigned NOT NULL,
+  `Nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Codigo` char(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Created` timestamp NULL DEFAULT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `notas_credito_items` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idItemFactura` bigint(20) NOT NULL,
+  `idFacturaElectronica` bigint(20) NOT NULL,
+  `idNotaCredito` bigint(20) NOT NULL,
+  `TablaItems` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Referencia` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `Nombre` text COLLATE utf8_spanish_ci NOT NULL,
+  `ValorUnitarioItem` double NOT NULL,
+  `Cantidad` double NOT NULL,
+  `Dias` double NOT NULL,
+  `SubtotalItem` double NOT NULL,
+  `IVAItem` double NOT NULL,
+  `ValorOtrosImpuestos` double NOT NULL,
+  `TotalItem` double NOT NULL,
+  `PorcentajeIVA` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `idOtrosImpuestos` int(11) NOT NULL,
+  `idPorcentajeIVA` int(11) NOT NULL,
+  `PrecioCostoUnitario` double NOT NULL,
+  `SubtotalCosto` double NOT NULL,
+  `TipoItem` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `CuentaPUC` bigint(20) NOT NULL,
+  `idCierre` bigint(20) NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Created` datetime NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
 CREATE TABLE `ordenesdecompra` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -2732,7 +2798,6 @@ CREATE TABLE `ordenesdecompra` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ordenesdecompra_items`;
 CREATE TABLE `ordenesdecompra_items` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `NumOrden` bigint(20) NOT NULL,
@@ -2759,7 +2824,6 @@ CREATE TABLE `ordenesdecompra_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ordenesdetrabajo`;
 CREATE TABLE `ordenesdetrabajo` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
   `FechaOT` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -2779,7 +2843,6 @@ CREATE TABLE `ordenesdetrabajo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ordenesdetrabajo_items`;
 CREATE TABLE `ordenesdetrabajo_items` (
   `ID` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `idOT` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -2796,7 +2859,6 @@ CREATE TABLE `ordenesdetrabajo_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ordenesdetrabajo_tipo`;
 CREATE TABLE `ordenesdetrabajo_tipo` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Tipo` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -2806,7 +2868,6 @@ CREATE TABLE `ordenesdetrabajo_tipo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ori_facturas`;
 CREATE TABLE `ori_facturas` (
   `idFacturas` varchar(45) CHARACTER SET utf8 NOT NULL,
   `idResolucion` int(11) NOT NULL,
@@ -2847,7 +2908,6 @@ CREATE TABLE `ori_facturas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ori_facturas_items`;
 CREATE TABLE `ori_facturas_items` (
   `ID` varchar(45) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
   `FechaFactura` date NOT NULL,
@@ -2885,7 +2945,6 @@ CREATE TABLE `ori_facturas_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `paginas`;
 CREATE TABLE `paginas` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(50) COLLATE utf8_spanish_ci NOT NULL,
@@ -2897,7 +2956,6 @@ CREATE TABLE `paginas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `paginas_bloques`;
 CREATE TABLE `paginas_bloques` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `TipoUsuario` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -2909,7 +2967,6 @@ CREATE TABLE `paginas_bloques` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `parametros_contables`;
 CREATE TABLE `parametros_contables` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Descripcion` text COLLATE utf8_spanish_ci NOT NULL,
@@ -2921,7 +2978,6 @@ CREATE TABLE `parametros_contables` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `parametros_generales`;
 CREATE TABLE `parametros_generales` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `KardexCotizacion` bit(1) NOT NULL,
@@ -2931,7 +2987,6 @@ CREATE TABLE `parametros_generales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `plataforma_tablas`;
 CREATE TABLE `plataforma_tablas` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -2941,7 +2996,6 @@ CREATE TABLE `plataforma_tablas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `porcentajes_iva`;
 CREATE TABLE `porcentajes_iva` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -2951,6 +3005,7 @@ CREATE TABLE `porcentajes_iva` (
   `CuentaPUC` bigint(20) NOT NULL,
   `CuentaPUCIVAGenerado` bigint(20) NOT NULL,
   `NombreCuenta` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `idImpuestoAPIFE` int(11) NOT NULL,
   `Habilitado` varchar(2) COLLATE utf8_spanish_ci NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -2958,7 +3013,6 @@ CREATE TABLE `porcentajes_iva` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `pos_registro_descuentos`;
 CREATE TABLE `pos_registro_descuentos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -2975,7 +3029,6 @@ CREATE TABLE `pos_registro_descuentos` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `precotizacion`;
 CREATE TABLE `precotizacion` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `NumSolicitud` varchar(45) NOT NULL,
@@ -3001,7 +3054,6 @@ CREATE TABLE `precotizacion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `prestamos_terceros`;
 CREATE TABLE `prestamos_terceros` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -3022,7 +3074,6 @@ CREATE TABLE `prestamos_terceros` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prestamos_terceros_abonos`;
 CREATE TABLE `prestamos_terceros_abonos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idPrestamo` bigint(20) NOT NULL,
@@ -3038,7 +3089,6 @@ CREATE TABLE `prestamos_terceros_abonos` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `preventa`;
 CREATE TABLE `preventa` (
   `idPrecotizacion` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Fecha` date DEFAULT NULL,
@@ -3067,7 +3117,6 @@ CREATE TABLE `preventa` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `produccion_actividades`;
 CREATE TABLE `produccion_actividades` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idOrdenTrabajo` bigint(20) NOT NULL,
@@ -3094,7 +3143,6 @@ CREATE TABLE `produccion_actividades` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `produccion_horas_cronograma`;
 CREATE TABLE `produccion_horas_cronograma` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Hora` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
@@ -3104,7 +3152,6 @@ CREATE TABLE `produccion_horas_cronograma` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `produccion_ordenes_trabajo`;
 CREATE TABLE `produccion_ordenes_trabajo` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -3130,7 +3177,6 @@ CREATE TABLE `produccion_ordenes_trabajo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `produccion_pausas_predefinidas`;
 CREATE TABLE `produccion_pausas_predefinidas` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
@@ -3142,7 +3188,6 @@ CREATE TABLE `produccion_pausas_predefinidas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `produccion_registro_tiempos`;
 CREATE TABLE `produccion_registro_tiempos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idActividad` bigint(20) NOT NULL,
@@ -3156,7 +3201,6 @@ CREATE TABLE `produccion_registro_tiempos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `productosalquiler`;
 CREATE TABLE `productosalquiler` (
   `idProductosVenta` int(11) NOT NULL AUTO_INCREMENT,
   `Referencia` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -3187,7 +3231,6 @@ CREATE TABLE `productosalquiler` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `productosventa`;
 CREATE TABLE `productosventa` (
   `idProductosVenta` bigint(20) NOT NULL AUTO_INCREMENT,
   `CodigoBarras` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3224,32 +3267,6 @@ CREATE TABLE `productosventa` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DELIMITER ;;
-
-CREATE TRIGGER `insKardex` AFTER INSERT ON `productosventa` FOR EACH ROW
-BEGIN
-
-SET @fecha=CURDATE();
-    INSERT INTO kardexmercancias (`Fecha`, `Movimiento`, `Detalle`, `Cantidad`,`ValorUnitario`, `ValorTotal`, `ProductosVenta_idProductosVenta`) VALUES (@fecha,'ENTRADA','INICIO',NEW.Existencias,NEW.CostoUnitario,NEW.CostoTotal,NEW.idProductosVenta);
-    
-    INSERT INTO kardexmercancias (`Fecha`, `Movimiento`, `Detalle`, `Cantidad`,`ValorUnitario`, `ValorTotal`, `ProductosVenta_idProductosVenta`) VALUES (@fecha,'SALDOS','INICIO',NEW.Existencias,NEW.CostoUnitario,NEW.CostoTotal,NEW.idProductosVenta);
-
-SET @Dep=LPAD(NEW.Departamento,2,'0');
-
-SET @Sub1=LPAD(NEW.Sub1,2,'0');
-
-SET @id=LPAD(NEW.idProductosVenta,7,'0');
-    
-    
-SET @Codigo=CONCAT(@Dep,@Sub1,@id);
-
-INSERT INTO prod_codbarras (`CodigoBarras`,`ProductosVenta_idProductosVenta`) VALUES (@Codigo,NEW.idProductosVenta);
-
-END;;
-
-DELIMITER ;
-
-DROP TABLE IF EXISTS `productosventa_bodega_1`;
 CREATE TABLE `productosventa_bodega_1` (
   `idProductosVenta` bigint(20) NOT NULL AUTO_INCREMENT,
   `CodigoBarras` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3279,7 +3296,6 @@ CREATE TABLE `productosventa_bodega_1` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `productosventa_bodega_2`;
 CREATE TABLE `productosventa_bodega_2` (
   `idProductosVenta` bigint(20) NOT NULL AUTO_INCREMENT,
   `CodigoBarras` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3309,7 +3325,6 @@ CREATE TABLE `productosventa_bodega_2` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `productosventa_bodega_3`;
 CREATE TABLE `productosventa_bodega_3` (
   `idProductosVenta` bigint(20) NOT NULL AUTO_INCREMENT,
   `CodigoBarras` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3339,7 +3354,6 @@ CREATE TABLE `productosventa_bodega_3` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `productosventa_bodega_4`;
 CREATE TABLE `productosventa_bodega_4` (
   `idProductosVenta` bigint(20) NOT NULL AUTO_INCREMENT,
   `CodigoBarras` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3369,7 +3383,6 @@ CREATE TABLE `productosventa_bodega_4` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `productosventa_bodega_5`;
 CREATE TABLE `productosventa_bodega_5` (
   `idProductosVenta` bigint(20) NOT NULL AUTO_INCREMENT,
   `CodigoBarras` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3399,7 +3412,6 @@ CREATE TABLE `productosventa_bodega_5` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `productos_impuestos_adicionales`;
 CREATE TABLE `productos_impuestos_adicionales` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `NombreImpuesto` text COLLATE utf8_spanish_ci NOT NULL,
@@ -3414,7 +3426,6 @@ CREATE TABLE `productos_impuestos_adicionales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `productos_lista_precios`;
 CREATE TABLE `productos_lista_precios` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -3426,7 +3437,6 @@ CREATE TABLE `productos_lista_precios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `productos_precios_adicionales`;
 CREATE TABLE `productos_precios_adicionales` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idProducto` bigint(20) NOT NULL,
@@ -3440,7 +3450,6 @@ CREATE TABLE `productos_precios_adicionales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci COMMENT='tabla para agregar precios a los productos';
 
 
-DROP TABLE IF EXISTS `prod_bajas_altas`;
 CREATE TABLE `prod_bajas_altas` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Movimiento` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -3458,7 +3467,6 @@ CREATE TABLE `prod_bajas_altas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_bodega`;
 CREATE TABLE `prod_bodega` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `idProductoAlquiler` int(11) NOT NULL,
@@ -3470,7 +3478,6 @@ CREATE TABLE `prod_bodega` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_codbarras`;
 CREATE TABLE `prod_codbarras` (
   `idCodBarras` bigint(20) NOT NULL AUTO_INCREMENT,
   `ProductosVenta_idProductosVenta` bigint(20) NOT NULL,
@@ -3482,7 +3489,6 @@ CREATE TABLE `prod_codbarras` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_codbarras_bodega_1`;
 CREATE TABLE `prod_codbarras_bodega_1` (
   `idCodBarras` bigint(20) NOT NULL AUTO_INCREMENT,
   `ProductosVenta_idProductosVenta` bigint(20) NOT NULL,
@@ -3493,7 +3499,6 @@ CREATE TABLE `prod_codbarras_bodega_1` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_codbarras_bodega_2`;
 CREATE TABLE `prod_codbarras_bodega_2` (
   `idCodBarras` bigint(20) NOT NULL AUTO_INCREMENT,
   `ProductosVenta_idProductosVenta` bigint(20) NOT NULL,
@@ -3504,7 +3509,6 @@ CREATE TABLE `prod_codbarras_bodega_2` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_codbarras_bodega_3`;
 CREATE TABLE `prod_codbarras_bodega_3` (
   `idCodBarras` bigint(20) NOT NULL AUTO_INCREMENT,
   `ProductosVenta_idProductosVenta` bigint(20) NOT NULL,
@@ -3515,7 +3519,6 @@ CREATE TABLE `prod_codbarras_bodega_3` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_codbarras_bodega_4`;
 CREATE TABLE `prod_codbarras_bodega_4` (
   `idCodBarras` bigint(20) NOT NULL AUTO_INCREMENT,
   `ProductosVenta_idProductosVenta` bigint(20) NOT NULL,
@@ -3526,7 +3529,6 @@ CREATE TABLE `prod_codbarras_bodega_4` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_codbarras_bodega_5`;
 CREATE TABLE `prod_codbarras_bodega_5` (
   `idCodBarras` bigint(20) NOT NULL AUTO_INCREMENT,
   `ProductosVenta_idProductosVenta` bigint(20) NOT NULL,
@@ -3537,7 +3539,6 @@ CREATE TABLE `prod_codbarras_bodega_5` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_comisiones`;
 CREATE TABLE `prod_comisiones` (
   `idProd_Comisiones` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre_Comision` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -3553,7 +3554,6 @@ CREATE TABLE `prod_comisiones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_departamentos`;
 CREATE TABLE `prod_departamentos` (
   `idDepartamentos` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3566,7 +3566,6 @@ CREATE TABLE `prod_departamentos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_kits`;
 CREATE TABLE `prod_kits` (
   `idKits` int(11) NOT NULL AUTO_INCREMENT,
   `TablaProducto` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -3578,7 +3577,6 @@ CREATE TABLE `prod_kits` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_sinc`;
 CREATE TABLE `prod_sinc` (
   `Referencia` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Departamento` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -3590,20 +3588,6 @@ CREATE TABLE `prod_sinc` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DELIMITER ;;
-
-CREATE TRIGGER `Productos_Sinc` AFTER INSERT ON `prod_sinc` FOR EACH ROW
-BEGIN
-
-UPDATE productosventa SET PrecioVenta=NEW.PrecioVenta WHERE Referencia=NEW.Referencia AND Departamento=NEW.Departamento;
-
-UPDATE productosventa SET PrecioMayorista=NEW.PrecioMayorista WHERE Referencia=NEW.Referencia AND Departamento=NEW.Departamento;
-
-END;;
-
-DELIMITER ;
-
-DROP TABLE IF EXISTS `prod_sub1`;
 CREATE TABLE `prod_sub1` (
   `idSub1` int(11) NOT NULL AUTO_INCREMENT,
   `NombreSub1` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3614,7 +3598,6 @@ CREATE TABLE `prod_sub1` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_sub2`;
 CREATE TABLE `prod_sub2` (
   `idSub2` int(11) NOT NULL AUTO_INCREMENT,
   `NombreSub2` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3625,7 +3608,6 @@ CREATE TABLE `prod_sub2` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_sub3`;
 CREATE TABLE `prod_sub3` (
   `idSub3` int(11) NOT NULL AUTO_INCREMENT,
   `NombreSub3` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3636,7 +3618,6 @@ CREATE TABLE `prod_sub3` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_sub4`;
 CREATE TABLE `prod_sub4` (
   `idSub4` int(11) NOT NULL AUTO_INCREMENT,
   `NombreSub4` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3647,7 +3628,6 @@ CREATE TABLE `prod_sub4` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_sub5`;
 CREATE TABLE `prod_sub5` (
   `idSub5` int(11) NOT NULL AUTO_INCREMENT,
   `NombreSub5` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3658,7 +3638,6 @@ CREATE TABLE `prod_sub5` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `prod_sub6`;
 CREATE TABLE `prod_sub6` (
   `idSub6` int(11) NOT NULL AUTO_INCREMENT,
   `NombreSub6` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3669,7 +3648,6 @@ CREATE TABLE `prod_sub6` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `proveedores`;
 CREATE TABLE `proveedores` (
   `idProveedores` int(11) NOT NULL AUTO_INCREMENT,
   `Tipo_Documento` int(11) NOT NULL,
@@ -3682,8 +3660,8 @@ CREATE TABLE `proveedores` (
   `Otros_Nombres` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `RazonSocial` varchar(300) COLLATE utf8_spanish_ci DEFAULT NULL,
   `Direccion` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `Cod_Dpto` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
-  `Cod_Mcipio` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `Cod_Dpto` int(2) unsigned zerofill NOT NULL,
+  `Cod_Mcipio` int(3) unsigned zerofill NOT NULL,
   `Pais_Domicilio` varchar(10) COLLATE utf8_spanish_ci NOT NULL DEFAULT '169',
   `Telefono` varchar(100) COLLATE utf8_spanish_ci DEFAULT NULL,
   `Ciudad` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -3695,6 +3673,7 @@ CREATE TABLE `proveedores` (
   `TipoCuenta` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `EntidadBancaria` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
   `CIUU` int(11) NOT NULL,
+  `TipoOrganizacion` int(11) NOT NULL COMMENT '1 juridico, 2 natural',
   `Cupo` double NOT NULL,
   `CodigoTarjeta` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
   `Soporte` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -3704,7 +3683,6 @@ CREATE TABLE `proveedores` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `publicidad_encabezado_cartel`;
 CREATE TABLE `publicidad_encabezado_cartel` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Titulo` text COLLATE utf8_spanish_ci NOT NULL,
@@ -3722,7 +3700,6 @@ CREATE TABLE `publicidad_encabezado_cartel` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `publicidad_paginas`;
 CREATE TABLE `publicidad_paginas` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `idProducto` bigint(20) NOT NULL,
@@ -3733,7 +3710,6 @@ CREATE TABLE `publicidad_paginas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `recetas_relaciones`;
 CREATE TABLE `recetas_relaciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `ReferenciaProducto` varchar(100) COLLATE utf8_spanish_ci NOT NULL COMMENT 'Referencia del producto que se realiza con receta',
@@ -3750,7 +3726,6 @@ CREATE TABLE `recetas_relaciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `registra_apertura_documentos`;
 CREATE TABLE `registra_apertura_documentos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -3764,7 +3739,6 @@ CREATE TABLE `registra_apertura_documentos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `registra_ediciones`;
 CREATE TABLE `registra_ediciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -3781,7 +3755,6 @@ CREATE TABLE `registra_ediciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `registra_eliminaciones`;
 CREATE TABLE `registra_eliminaciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -3800,7 +3773,6 @@ CREATE TABLE `registra_eliminaciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `registra_eliminaciones_pedidos_items_restaurant`;
 CREATE TABLE `registra_eliminaciones_pedidos_items_restaurant` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idProducto` bigint(20) NOT NULL,
@@ -3818,7 +3790,6 @@ CREATE TABLE `registra_eliminaciones_pedidos_items_restaurant` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `registro_autorizaciones_pos`;
 CREATE TABLE `registro_autorizaciones_pos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` datetime NOT NULL,
@@ -3837,7 +3808,6 @@ CREATE TABLE `registro_autorizaciones_pos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `registro_basculas`;
 CREATE TABLE `registro_basculas` (
   `Gramos` double NOT NULL,
   `idBascula` int(11) NOT NULL,
@@ -3848,7 +3818,6 @@ CREATE TABLE `registro_basculas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `relacioncompras`;
 CREATE TABLE `relacioncompras` (
   `idRelacionCompras` int(11) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -3866,43 +3835,6 @@ CREATE TABLE `relacioncompras` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DELIMITER ;;
-
-CREATE TRIGGER `KardexCompras` AFTER INSERT ON `relacioncompras` FOR EACH ROW
-BEGIN
-
-
-SELECT Existencias into @Cantidad FROM productosventa WHERE idProductosVenta=NEW.ProductosVenta_idProductosVenta;
-
-
-SET @Saldo=@Cantidad+NEW.Cantidad;
-
-SET @PrecioPromedio=NEW.TotalAntesIVA;
-          
-SET @TotalSaldo=NEW.ValorUnitarioAntesIVA*@Saldo;
-
-    
- INSERT INTO kardexmercancias (`Fecha`, `Movimiento`, `Detalle`,`idDocumento`, `Cantidad`,`ValorUnitario`, `ValorTotal`, `ProductosVenta_idProductosVenta`) VALUES (NEW.Fecha,'ENTRADA',NEW.Documento,NEW.NumDocumento,NEW.Cantidad,NEW.ValorUnitarioAntesIVA,NEW.TotalAntesIVA,NEW.ProductosVenta_idProductosVenta);
-    
-
-INSERT INTO kardexmercancias (`Fecha`, `Movimiento`, `Detalle`,`idDocumento`, `Cantidad`,`ValorUnitario`, `ValorTotal`, `ProductosVenta_idProductosVenta`) VALUES (NEW.Fecha,'SALDOS',NEW.Documento,NEW.NumDocumento,@Saldo,NEW.ValorUnitarioAntesIVA,@TotalSaldo,NEW.ProductosVenta_idProductosVenta);
-
-SELECT Existencias into @Saldoext FROM productosventa WHERE idProductosVenta = NEW.ProductosVenta_idProductosVenta;
-
-SET @Saldoext=@Saldoext+NEW.Cantidad;
-
-UPDATE productosventa SET `Existencias`= @Saldoext WHERE idProductosVenta = NEW.ProductosVenta_idProductosVenta;
-
-UPDATE productosventa SET `CostoUnitario`= NEW.ValorUnitarioAntesIVA WHERE idProductosVenta = NEW.ProductosVenta_idProductosVenta;
-
-UPDATE productosventa SET `CostoTotal`= @TotalSaldo WHERE idProductosVenta = NEW.ProductosVenta_idProductosVenta;
-
-
-END;;
-
-DELIMITER ;
-
-DROP TABLE IF EXISTS `remisiones`;
 CREATE TABLE `remisiones` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
   `Fecha` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -3927,7 +3859,6 @@ CREATE TABLE `remisiones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `rem_devoluciones`;
 CREATE TABLE `rem_devoluciones` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
   `idRemision` int(16) NOT NULL,
@@ -3947,7 +3878,6 @@ CREATE TABLE `rem_devoluciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `rem_devoluciones_totalizadas`;
 CREATE TABLE `rem_devoluciones_totalizadas` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
   `FechaDevolucion` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -3964,7 +3894,6 @@ CREATE TABLE `rem_devoluciones_totalizadas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `rem_pre_devoluciones`;
 CREATE TABLE `rem_pre_devoluciones` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
   `idRemision` int(16) NOT NULL,
@@ -3981,7 +3910,6 @@ CREATE TABLE `rem_pre_devoluciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `rem_relaciones`;
 CREATE TABLE `rem_relaciones` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `FechaEntrega` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -3996,7 +3924,6 @@ CREATE TABLE `rem_relaciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `repuestas_forma_pago`;
 CREATE TABLE `repuestas_forma_pago` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `DiasCartera` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -4007,7 +3934,6 @@ CREATE TABLE `repuestas_forma_pago` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `requerimientos_proyectos`;
 CREATE TABLE `requerimientos_proyectos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
@@ -4022,7 +3948,6 @@ CREATE TABLE `requerimientos_proyectos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `reservas_espacios`;
 CREATE TABLE `reservas_espacios` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -4038,7 +3963,6 @@ CREATE TABLE `reservas_espacios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `reservas_eventos`;
 CREATE TABLE `reservas_eventos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idEspacio` int(11) NOT NULL,
@@ -4059,7 +3983,6 @@ CREATE TABLE `reservas_eventos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `respuestas_condicional`;
 CREATE TABLE `respuestas_condicional` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Valor` varchar(4) COLLATE utf8_spanish_ci NOT NULL,
@@ -4069,7 +3992,6 @@ CREATE TABLE `respuestas_condicional` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `respuestas_tipo_item`;
 CREATE TABLE `respuestas_tipo_item` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Valor` varchar(4) COLLATE utf8_spanish_ci NOT NULL,
@@ -4079,7 +4001,6 @@ CREATE TABLE `respuestas_tipo_item` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `restaurante_cierres`;
 CREATE TABLE `restaurante_cierres` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4092,14 +4013,12 @@ CREATE TABLE `restaurante_cierres` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
 
-DROP TABLE IF EXISTS `restaurante_estados_mesas`;
 CREATE TABLE `restaurante_estados_mesas` (
   `ID` int(11) NOT NULL,
   `NombreEstado` varchar(25) COLLATE utf8_spanish_ci NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `restaurante_estados_pedidos`;
 CREATE TABLE `restaurante_estados_pedidos` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `NombreEstado` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
@@ -4107,14 +4026,12 @@ CREATE TABLE `restaurante_estados_pedidos` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `restaurante_estados_pedidos_items`;
 CREATE TABLE `restaurante_estados_pedidos_items` (
   `ID` int(11) NOT NULL,
   `NombreEstado` varchar(25) COLLATE utf8_spanish_ci NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `restaurante_mesas`;
 CREATE TABLE `restaurante_mesas` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -4127,7 +4044,6 @@ CREATE TABLE `restaurante_mesas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `restaurante_pedidos`;
 CREATE TABLE `restaurante_pedidos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4149,7 +4065,6 @@ CREATE TABLE `restaurante_pedidos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `restaurante_pedidos_items`;
 CREATE TABLE `restaurante_pedidos_items` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4184,7 +4099,6 @@ CREATE TABLE `restaurante_pedidos_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `restaurante_registro_propinas`;
 CREATE TABLE `restaurante_registro_propinas` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4200,7 +4114,6 @@ CREATE TABLE `restaurante_registro_propinas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `restaurante_registro_ventas_mesero`;
 CREATE TABLE `restaurante_registro_ventas_mesero` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `idFactura` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -4216,7 +4129,6 @@ CREATE TABLE `restaurante_registro_ventas_mesero` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `restaurante_resumen_cierre`;
 CREATE TABLE `restaurante_resumen_cierre` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4247,7 +4159,6 @@ CREATE TABLE `restaurante_resumen_cierre` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `restaurante_tipos_pedido`;
 CREATE TABLE `restaurante_tipos_pedido` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -4255,7 +4166,6 @@ CREATE TABLE `restaurante_tipos_pedido` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `salud_rips_pagos_validados`;
 CREATE TABLE `salud_rips_pagos_validados` (
   `id_rips_pagos_validados` int(20) NOT NULL,
   `cod_prest_servicio` bigint(12) NOT NULL COMMENT 'Código del prestador de servicios de salud " Ver Alineamientos tecnicos para ips ver pag 12"',
@@ -4289,7 +4199,6 @@ CREATE TABLE `salud_rips_pagos_validados` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci COMMENT='Archivo de pagos validados';
 
 
-DROP TABLE IF EXISTS `salud_rips_vencidos`;
 CREATE TABLE `salud_rips_vencidos` (
   `id_rips_vencidos` int(20) NOT NULL,
   `cod_prest_servicio` bigint(12) NOT NULL COMMENT 'Código del prestador de servicios de salud " Ver Alineamientos tecnicos para ips ver pag 12"',
@@ -4323,7 +4232,6 @@ CREATE TABLE `salud_rips_vencidos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci COMMENT='archivos de rips vencidos';
 
 
-DROP TABLE IF EXISTS `salud_tesoreria`;
 CREATE TABLE `salud_tesoreria` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `cod_enti_administradora` varchar(6) COLLATE utf8_spanish_ci NOT NULL COMMENT 'Código entidad que paga',
@@ -4343,7 +4251,6 @@ CREATE TABLE `salud_tesoreria` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci COMMENT='Archivo de tesoreria';
 
 
-DROP TABLE IF EXISTS `salud_tipo_glosas`;
 CREATE TABLE `salud_tipo_glosas` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `TipoGlosa` varchar(15) COLLATE utf8_spanish_ci NOT NULL,
@@ -4353,7 +4260,6 @@ CREATE TABLE `salud_tipo_glosas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `salud_upload_control`;
 CREATE TABLE `salud_upload_control` (
   `id_upload_control` bigint(20) NOT NULL AUTO_INCREMENT,
   `nom_cargue` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -4367,7 +4273,6 @@ CREATE TABLE `salud_upload_control` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `separados`;
 CREATE TABLE `separados` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4385,7 +4290,6 @@ CREATE TABLE `separados` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `separados_abonos`;
 CREATE TABLE `separados_abonos` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4402,7 +4306,6 @@ CREATE TABLE `separados_abonos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `separados_items`;
 CREATE TABLE `separados_items` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4435,7 +4338,6 @@ CREATE TABLE `separados_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `servicios`;
 CREATE TABLE `servicios` (
   `idProductosVenta` int(16) NOT NULL AUTO_INCREMENT,
   `Referencia` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -4460,21 +4362,22 @@ CREATE TABLE `servicios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `servidores`;
 CREATE TABLE `servidores` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `IP` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `IP` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Usuario` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
   `Password` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
   `DataBase` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `Puerto` int(11) NOT NULL,
+  `TipoServidor` varchar(15) COLLATE utf8_spanish_ci NOT NULL,
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `sistemas`;
 CREATE TABLE `sistemas` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Nombre` text COLLATE utf8_spanish_ci NOT NULL,
@@ -4488,7 +4391,6 @@ CREATE TABLE `sistemas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `sistemas_relaciones`;
 CREATE TABLE `sistemas_relaciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `TablaOrigen` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
@@ -4502,7 +4404,6 @@ CREATE TABLE `sistemas_relaciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `subcuentas`;
 CREATE TABLE `subcuentas` (
   `PUC` int(11) NOT NULL,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -4514,7 +4415,6 @@ CREATE TABLE `subcuentas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `subcuentas_equivalencias_niif`;
 CREATE TABLE `subcuentas_equivalencias_niif` (
   `CuentaNIIF` int(11) NOT NULL,
   `NombreCuentaNIIF` int(11) NOT NULL,
@@ -4526,7 +4426,6 @@ CREATE TABLE `subcuentas_equivalencias_niif` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `tablas_campos_control`;
 CREATE TABLE `tablas_campos_control` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `NombreTabla` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -4542,7 +4441,6 @@ CREATE TABLE `tablas_campos_control` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `tablas_ventas`;
 CREATE TABLE `tablas_ventas` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `NombreTabla` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -4556,7 +4454,6 @@ CREATE TABLE `tablas_ventas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `tarjetas_forma_pago`;
 CREATE TABLE `tarjetas_forma_pago` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Tipo` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -4570,7 +4467,6 @@ CREATE TABLE `tarjetas_forma_pago` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `terceros_cuentas_cobro`;
 CREATE TABLE `terceros_cuentas_cobro` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4585,7 +4481,6 @@ CREATE TABLE `terceros_cuentas_cobro` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci COMMENT='Tabla para realizar cuentas de cobro por parte de terceros';
 
 
-DROP TABLE IF EXISTS `tiposretenciones`;
 CREATE TABLE `tiposretenciones` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -4599,7 +4494,6 @@ CREATE TABLE `tiposretenciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `titulos_abonos`;
 CREATE TABLE `titulos_abonos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4617,7 +4511,6 @@ CREATE TABLE `titulos_abonos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `titulos_asignaciones`;
 CREATE TABLE `titulos_asignaciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4633,7 +4526,6 @@ CREATE TABLE `titulos_asignaciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `titulos_comisiones`;
 CREATE TABLE `titulos_comisiones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4651,7 +4543,6 @@ CREATE TABLE `titulos_comisiones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `titulos_cuentasxcobrar`;
 CREATE TABLE `titulos_cuentasxcobrar` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `FechaIngreso` date NOT NULL,
@@ -4677,7 +4568,6 @@ CREATE TABLE `titulos_cuentasxcobrar` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `titulos_devoluciones`;
 CREATE TABLE `titulos_devoluciones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4694,7 +4584,6 @@ CREATE TABLE `titulos_devoluciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `titulos_listados_promocion_1`;
 CREATE TABLE `titulos_listados_promocion_1` (
   `Mayor1` int(11) NOT NULL,
   `Mayor2` int(11) NOT NULL,
@@ -4715,7 +4604,6 @@ CREATE TABLE `titulos_listados_promocion_1` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `titulos_listados_promocion_6`;
 CREATE TABLE `titulos_listados_promocion_6` (
   `Mayor1` int(11) NOT NULL,
   `Mayor2` int(11) NOT NULL,
@@ -4735,7 +4623,6 @@ CREATE TABLE `titulos_listados_promocion_6` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `titulos_listados_promocion_7`;
 CREATE TABLE `titulos_listados_promocion_7` (
   `Mayor1` int(11) NOT NULL,
   `Mayor2` int(11) NOT NULL,
@@ -4756,7 +4643,6 @@ CREATE TABLE `titulos_listados_promocion_7` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `titulos_promociones`;
 CREATE TABLE `titulos_promociones` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -4776,7 +4662,6 @@ CREATE TABLE `titulos_promociones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `titulos_traslados`;
 CREATE TABLE `titulos_traslados` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4793,7 +4678,6 @@ CREATE TABLE `titulos_traslados` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `titulos_ventas`;
 CREATE TABLE `titulos_ventas` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4818,7 +4702,6 @@ CREATE TABLE `titulos_ventas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `traslados_estados`;
 CREATE TABLE `traslados_estados` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Estado` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -4829,7 +4712,6 @@ CREATE TABLE `traslados_estados` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `traslados_items`;
 CREATE TABLE `traslados_items` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `Fecha` date NOT NULL,
@@ -4865,7 +4747,6 @@ CREATE TABLE `traslados_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `traslados_mercancia`;
 CREATE TABLE `traslados_mercancia` (
   `ID` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
   `Fecha` date NOT NULL,
@@ -4886,7 +4767,6 @@ CREATE TABLE `traslados_mercancia` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE `usuarios` (
   `idUsuarios` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -4905,7 +4785,6 @@ CREATE TABLE `usuarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `usuarios_ip`;
 CREATE TABLE `usuarios_ip` (
   `Direccion` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `idUsuario` int(11) NOT NULL,
@@ -4915,7 +4794,6 @@ CREATE TABLE `usuarios_ip` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `usuarios_keys`;
 CREATE TABLE `usuarios_keys` (
   `KeyUsuario` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
   `Usuarios_idUsuarios` int(11) NOT NULL,
@@ -4925,7 +4803,6 @@ CREATE TABLE `usuarios_keys` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `usuarios_tipo`;
 CREATE TABLE `usuarios_tipo` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Tipo` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -4935,7 +4812,6 @@ CREATE TABLE `usuarios_tipo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ventas`;
 CREATE TABLE `ventas` (
   `idVentas` int(11) NOT NULL AUTO_INCREMENT,
   `NumVenta` int(16) DEFAULT NULL,
@@ -4967,43 +4843,6 @@ CREATE TABLE `ventas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DELIMITER ;;
-
-CREATE TRIGGER `UpdateProductos` AFTER INSERT ON `ventas` FOR EACH ROW
-BEGIN
-
-
-SELECT Existencias into @Cantidad FROM productosventa WHERE idProductosVenta=NEW.Productos_idProductos;
-
-SET @PrecioPromedio=NEW.ValorCostoUnitario;
-
-SET @Saldo=@Cantidad-NEW.Cantidad;
-
-SET @TotalSaldo=@Saldo*@PrecioPromedio;
-SET @TotalMov=NEW.Cantidad*@PrecioPromedio;
-    
- INSERT INTO kardexmercancias (`Fecha`, `Movimiento`, `Detalle`,`idDocumento`, `Cantidad`,`ValorUnitario`, `ValorTotal`, `ProductosVenta_idProductosVenta`) VALUES (NEW.Fecha,'SALIDA','VENTA',NEW.NumVenta,NEW.Cantidad,@PrecioPromedio,@TotalMov,NEW.Productos_idProductos);
-    
-
-INSERT INTO kardexmercancias (`Fecha`, `Movimiento`, `Detalle`,`idDocumento`, `Cantidad`,`ValorUnitario`, `ValorTotal`, `ProductosVenta_idProductosVenta`) VALUES (NEW.Fecha,'SALDOS','VENTA',NEW.NumVenta,@Saldo,@PrecioPromedio,@TotalSaldo,NEW.Productos_idProductos);
-
-UPDATE productosventa SET `Existencias`= @Saldo WHERE idProductosVenta = NEW.Productos_idProductos;
-
-UPDATE productosventa SET `CostoTotal`= @TotalSaldo WHERE idProductosVenta = NEW.Productos_idProductos;
-
-SET @SubTotal=NEW.TotalVenta-NEW.Impuestos;
-
-IF (NEW.Especial = "NO" ) THEN
-
-INSERT INTO cotizaciones (`NumCotizacion`, `Fecha`, `Descripcion`,`Referencia`, `ValorUnitario`,`Cantidad`, `Subtotal`, `IVA`, `Total`, `ValorDescuento`,`Clientes_idClientes`, `SubtotalCosto`,`Usuarios_idUsuarios`, `TipoItem`, `PrecioCosto`) VALUES (NEW.Cotizaciones_idCotizaciones,NEW.Fecha,NEW.Producto,NEW.Referencia,NEW.ValorVentaUnitario,NEW.Cantidad,@SubTotal,NEW.Impuestos, NEW.TotalVenta,NEW.Descuentos,NEW.Clientes_idClientes,NEW.TotalCosto,NEW.Usuarios_idUsuarios,'PR',@PrecioPromedio);
-
-END IF;
-
-END;;
-
-DELIMITER ;
-
-DROP TABLE IF EXISTS `ventas_devoluciones`;
 CREATE TABLE `ventas_devoluciones` (
   `idDevoluciones` int(16) NOT NULL AUTO_INCREMENT,
   `Facturas_idFacturas` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -5029,7 +4868,6 @@ CREATE TABLE `ventas_devoluciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ventas_fechas_especiales`;
 CREATE TABLE `ventas_fechas_especiales` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `NombreFecha` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -5042,7 +4880,6 @@ CREATE TABLE `ventas_fechas_especiales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ventas_fechas_especiales_precios`;
 CREATE TABLE `ventas_fechas_especiales_precios` (
   `Referencia` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
   `PrecioVenta` double NOT NULL,
@@ -5052,7 +4889,6 @@ CREATE TABLE `ventas_fechas_especiales_precios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ventas_nota_credito`;
 CREATE TABLE `ventas_nota_credito` (
   `idNotasCredito` int(11) NOT NULL AUTO_INCREMENT,
   `Fecha` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
@@ -5068,7 +4904,6 @@ CREATE TABLE `ventas_nota_credito` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `ventas_separados`;
 CREATE TABLE `ventas_separados` (
   `idVentas_Separados` int(11) NOT NULL AUTO_INCREMENT,
   `Facturas_idFacturas` int(11) NOT NULL,
@@ -5081,220 +4916,191 @@ CREATE TABLE `ventas_separados` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP TABLE IF EXISTS `vestasactivas`;
 CREATE TABLE `vestasactivas` (
   `idVestasActivas` int(11) NOT NULL AUTO_INCREMENT,
+  `IdentificadorUnico` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
   `Usuario_idUsuario` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
   `Clientes_idClientes` int(11) NOT NULL DEFAULT '0',
   `SaldoFavor` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  PRIMARY KEY (`idVestasActivas`)
+  PRIMARY KEY (`idVestasActivas`),
+  KEY `IdentificadorUnico` (`IdentificadorUnico`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
-DROP VIEW IF EXISTS `vista_abonos`;
 CREATE TABLE `vista_abonos` (`Tabla` varchar(16), `TipoAbono` varchar(45), `Fecha` date, `Valor` double, `idUsuario` int(11), `idCierre` bigint(20));
 
 
-DROP VIEW IF EXISTS `vista_af`;
 CREATE TABLE `vista_af` ();
 
 
-DROP VIEW IF EXISTS `vista_balancextercero1`;
 CREATE TABLE `vista_balancextercero1` (`Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `CuentaPUC` varchar(45), `Debitos` double, `Creditos` double, `Neto` double);
 
 
-DROP VIEW IF EXISTS `vista_balancextercero2`;
 CREATE TABLE `vista_balancextercero2` (`ID` varchar(8), `Fecha` date, `Identificacion` varchar(45), `Razon_Social` varchar(100), `CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `TipoDocumento` varchar(45), `NumDocumento` varchar(45), `DocumentoExterno` varchar(45), `SaldoInicialSubCuenta` double, `Clase` varchar(1), `NombreClase` varchar(45), `SaldoInicialClase` double, `DebitosClase` double, `CreditosClase` double, `Grupo` varchar(2), `NombreGrupo` varchar(45), `SaldoInicialGrupo` double, `DebitosGrupo` double, `CreditosGrupo` double, `CuentaPadre` varchar(4), `NombreCuentaPadre` varchar(45), `SaldoInicialCuentaPadre` double, `DebitosCuentaPadre` double, `CreditosCuentaPadre` double, `Debito` double, `Credito` double, `idEmpresa` int(11), `idCentroCosto` int(11));
 
 
-DROP VIEW IF EXISTS `vista_cierres_restaurante`;
 CREATE TABLE `vista_cierres_restaurante` (`ID` bigint(20), `Fecha` date, `Hora` time, `idUsuario` bigint(20), `PedidosFacturados` double, `PedidosDescartados` double, `DomiciliosFacturados` double, `DomiciliosDescartados` double, `ParaLlevarFacturado` double, `ParaLlevarDescartado` double, `PropinasEfectivo` double, `PropinasTarjetas` double);
 
 
-DROP VIEW IF EXISTS `vista_compras_productos`;
 CREATE TABLE `vista_compras_productos` (`ID` bigint(20), `Fecha` date, `NumeroFactura` varchar(100), `RazonSocial` varchar(300), `NIT` bigint(20), `idProducto` bigint(20), `Referencia` varchar(200), `Producto` varchar(70), `PrecioVenta` double, `Cantidad` double, `CostoUnitario` double, `Subtotal` double, `Impuestos` double, `Total` double, `Tipo_Impuesto` varchar(10), `Departamento` varchar(45), `Sub1` varchar(45), `Sub2` varchar(45), `Sub3` varchar(45), `Sub4` varchar(45), `Sub5` varchar(45), `Concepto` text, `Observaciones` text, `TipoCompra` varchar(2), `Soporte` varchar(150), `idUsuario` bigint(20), `idCentroCostos` int(11), `idSucursal` int(11), `Updated` timestamp, `Sync` datetime);
 
 
-DROP VIEW IF EXISTS `vista_compras_productos_devueltos`;
 CREATE TABLE `vista_compras_productos_devueltos` (`ID` bigint(20), `Fecha` date, `NumeroFactura` varchar(100), `RazonSocial` varchar(300), `NIT` bigint(20), `idProducto` bigint(20), `Referencia` varchar(200), `Producto` varchar(70), `PrecioVenta` double, `Cantidad` double, `CostoUnitario` double, `Subtotal` double, `Impuestos` double, `Total` double, `Tipo_Impuesto` varchar(10), `Departamento` varchar(45), `Sub1` varchar(45), `Sub2` varchar(45), `Sub3` varchar(45), `Sub4` varchar(45), `Sub5` varchar(45), `Concepto` text, `Observaciones` text, `TipoCompra` varchar(2), `Soporte` varchar(150), `idUsuario` bigint(20), `idCentroCostos` int(11), `idSucursal` int(11), `Updated` timestamp, `Sync` datetime);
 
 
-DROP VIEW IF EXISTS `vista_compras_servicios`;
 CREATE TABLE `vista_compras_servicios` (`ID` bigint(20), `Fecha` date, `NumeroFactura` varchar(100), `RazonSocial` varchar(300), `NIT` bigint(20), `Cuenta` bigint(20), `NombreCuenta` varchar(100), `Concepto_Servicio` text, `Subtotal` double, `Impuestos` double, `Total` double, `Tipo_Impuesto` double, `Concepto` text, `Observaciones` text, `TipoCompra` varchar(2), `Soporte` varchar(150), `idUsuario` bigint(20), `idCentroCostos` int(11), `idSucursal` int(11), `Updated` timestamp, `Sync` datetime);
 
 
-DROP VIEW IF EXISTS `vista_cuentasxcobrar`;
 CREATE TABLE `vista_cuentasxcobrar` (`CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `Debitos` double, `Creditos` double, `Total` double);
 
 
-DROP VIEW IF EXISTS `vista_cuentasxcobrardetallado`;
 CREATE TABLE `vista_cuentasxcobrardetallado` (`ID` bigint(20), `CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `Fecha` date, `NumeroDocumentoExterno` varchar(45), `Debitos` double, `Creditos` double, `Total` double);
 
 
-DROP VIEW IF EXISTS `vista_cuentasxpagardetallado_v2`;
 CREATE TABLE `vista_cuentasxpagardetallado_v2` (`ID` bigint(20), `CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `Fecha` date, `NumeroDocumentoExterno` varchar(45), `Debitos` double, `Creditos` double, `Total` double);
 
 
-DROP VIEW IF EXISTS `vista_cuentasxpagar_v2`;
 CREATE TABLE `vista_cuentasxpagar_v2` (`CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `Debitos` double, `Creditos` double, `Total` double);
 
 
-DROP VIEW IF EXISTS `vista_cuentasxtercerosdocumentosexternos_v2`;
 CREATE TABLE `vista_cuentasxtercerosdocumentosexternos_v2` (`CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `NumeroDocumentoExterno` varchar(45), `Debitos` double, `Creditos` double, `Total` double);
 
 
-DROP VIEW IF EXISTS `vista_cuentasxtercerosdocumentos_v2`;
 CREATE TABLE `vista_cuentasxtercerosdocumentos_v2` (`ID` bigint(20), `CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `Fecha` date, `NumeroDocumentoExterno` varchar(45), `Debitos` double, `Creditos` double, `Total` double);
 
 
-DROP VIEW IF EXISTS `vista_cuentasxterceros_v2`;
 CREATE TABLE `vista_cuentasxterceros_v2` (`CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `Debitos` double, `Creditos` double, `Total` double);
 
 
-DROP VIEW IF EXISTS `vista_diferencia_inventarios`;
 CREATE TABLE `vista_diferencia_inventarios` (`idProductosVenta` bigint(20), `Referencia` varchar(200), `Nombre` varchar(70), `ExistenciaAnterior` double, `ExistenciaActual` double, `Diferencia` double, `PrecioVenta` double, `CostoUnitario` double, `TotalCostosDiferencia` double, `Departamento` varchar(45), `Sub1` varchar(45), `Sub2` varchar(45), `Sub3` varchar(45), `Sub4` varchar(45), `Sub5` varchar(45));
 
 
-DROP VIEW IF EXISTS `vista_diferencia_inventarios_selectivos`;
 CREATE TABLE `vista_diferencia_inventarios_selectivos` (`idProductosVenta` bigint(20), `Referencia` varchar(200), `Nombre` varchar(70), `ExistenciaAnterior` double, `ExistenciaActual` double, `Diferencia` double, `PrecioVenta` double, `CostoUnitario` double, `TotalCostosDiferencia` double, `Departamento` varchar(45), `Sub1` varchar(45), `Sub2` varchar(45), `Sub3` varchar(45), `Sub4` varchar(45), `Sub5` varchar(45));
 
 
-DROP VIEW IF EXISTS `vista_documentos_contables`;
 CREATE TABLE `vista_documentos_contables` (`ID` bigint(20), `Fecha` date, `Prefijo` varchar(20), `Nombre` varchar(45), `Consecutivo` bigint(20), `Descripcion` text, `Estado` varchar(10), `idUser` int(11), `idDocumento` int(11), `idEmpresa` int(11), `idSucursal` int(11), `idCentroCostos` int(11));
 
 
-DROP VIEW IF EXISTS `vista_documentos_equivalentes`;
 CREATE TABLE `vista_documentos_equivalentes` (`ID` bigint(20), `Fecha` date, `Tercero` bigint(20), `Estado` enum('AB','CE'), `Total` double);
 
 
-DROP VIEW IF EXISTS `vista_estado_resultados_anio`;
 CREATE TABLE `vista_estado_resultados_anio` (`idLibroDiario` bigint(20), `Fecha` date, `Tipo_Documento_Intero` varchar(45), `Num_Documento_Interno` varchar(45), `Num_Documento_Externo` varchar(45), `Tercero_Tipo_Documento` varchar(45), `Tercero_Identificacion` varchar(45), `Tercero_DV` varchar(3), `Tercero_Primer_Apellido` varchar(45), `Tercero_Segundo_Apellido` varchar(45), `Tercero_Primer_Nombre` varchar(45), `Tercero_Otros_Nombres` varchar(45), `Tercero_Razon_Social` varchar(100), `Tercero_Direccion` varchar(100), `Tercero_Cod_Dpto` varchar(10), `Tercero_Cod_Mcipio` varchar(10), `Tercero_Pais_Domicilio` varchar(10), `Concepto` varchar(500), `CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Detalle` varchar(45), `Debito` double, `Credito` double, `Neto` double, `Mayor` varchar(45), `Esp` varchar(45), `idCentroCosto` int(11), `idEmpresa` int(11), `idSucursal` int(11), `Estado` varchar(20), `idUsuario` int(11), `idCierre` bigint(20), `Updated` timestamp, `Sync` datetime);
 
 
-DROP VIEW IF EXISTS `vista_exogena`;
 CREATE TABLE `vista_exogena` (`Tipo_Documento_Intero` varchar(45), `NumDocumento` varchar(45), `Num_Documento_Externo` varchar(45), `Tercero_Tipo_Documento` varchar(45), `Tercero_Identificacion` varchar(45), `Tercero_DV` varchar(3), `Tercero_Primer_Apellido` varchar(45), `Tercero_Segundo_Apellido` varchar(45), `Tercero_Primer_Nombre` varchar(45), `Tercero_Otros_Nombres` varchar(45), `Tercero_Razon_Social` varchar(100), `Tercero_Direccion` varchar(100), `Tercero_Cod_Mcipio` varchar(10), `Tercero_Pais_Domicilio` varchar(10), `Concepto` varchar(500), `CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Detalle` varchar(45), `Debitos` double(17,0), `Creditos` double(17,0));
 
 
-DROP VIEW IF EXISTS `vista_exogena2`;
 CREATE TABLE `vista_exogena2` (`Tercero_Tipo_Documento` varchar(45), `Tercero_Identificacion` varchar(45), `Tercero_DV` varchar(3), `Tercero_Primer_Apellido` varchar(45), `Tercero_Segundo_Apellido` varchar(45), `Tercero_Primer_Nombre` varchar(45), `Tercero_Otros_Nombres` varchar(45), `Tercero_Razon_Social` varchar(100), `Tercero_Direccion` varchar(100), `Tercero_Cod_Mcipio` varchar(10), `Tercero_Pais_Domicilio` varchar(10), `Concepto` varchar(500), `CuentaPUC` varchar(4), `NombreCuenta` varchar(200), `Detalle` varchar(45), `Debitos` double(17,0), `Creditos` double(17,0));
 
 
-DROP VIEW IF EXISTS `vista_facturacion_detalles`;
 CREATE TABLE `vista_facturacion_detalles` (`ID` bigint(20) unsigned, `FechaFactura` date, `NumeroFactura` bigint(16), `TipoFactura` varchar(20), `TablaItems` varchar(100), `Referencia` varchar(200), `Nombre` text, `Departamento` int(11), `SubGrupo1` int(11), `SubGrupo2` int(11), `SubGrupo3` int(11), `SubGrupo4` int(11), `SubGrupo5` int(11), `ValorUnitarioItem` double, `Cantidad` double, `SubtotalItem` double, `IVAItem` double, `TotalItem` double, `PorcentajeIVA` varchar(10), `PrecioCostoUnitario` double, `SubtotalCosto` double, `CuentaPUC` int(11), `idUsuarios` int(11), `idCierre` bigint(20), `Observaciones` mediumtext);
 
 
-DROP VIEW IF EXISTS `vista_factura_compra_totales`;
 CREATE TABLE `vista_factura_compra_totales` (`idFacturaCompra` bigint(20), `Sede` varchar(100), `Fecha` date, `NumeroFactura` varchar(100), `Tercero` bigint(20), `RazonSocial` varchar(300), `Subtotal` double, `Impuestos` double, `TotalRetenciones` double, `Total` double, `Concepto` text, `SubtotalServicios` double, `ImpuestosServicios` double, `TotalServicios` double, `SubtotalDevoluciones` double, `ImpuestosDevueltos` double, `TotalDevolucion` double, `Usuario` bigint(20));
 
 
-DROP VIEW IF EXISTS `vista_inventario_separados`;
 CREATE TABLE `vista_inventario_separados` (`ID` bigint(20) unsigned, `idSeparado` bigint(20), `Referencia` varchar(45), `Nombre` text, `ValorUnitarioItem` int(11), `Cantidad` int(11), `TotalItem` int(11), `PrecioCostoUnitario` int(11), `SubtotalCosto` int(11), `Departamento` int(11), `SubGrupo1` int(11), `SubGrupo2` int(11), `SubGrupo3` int(11), `SubGrupo4` int(11), `SubGrupo5` int(11));
 
 
-DROP VIEW IF EXISTS `vista_kardex`;
 CREATE TABLE `vista_kardex` (`ID` bigint(20), `Fecha` date, `Movimiento` varchar(45), `Detalle` varchar(400), `idDocumento` varchar(100), `Cantidad` double, `ValorUnitario` double, `ValorTotal` double, `ProductosVenta_idProductosVenta` bigint(20), `Referencia` varchar(200), `Nombre` varchar(70), `Existencias` double, `CostoUnitario` double, `CostoTotal` double, `IVA` varchar(10), `Departamento` varchar(45), `Sub1` varchar(45), `Sub2` varchar(45), `Sub3` varchar(45), `Sub4` varchar(45), `Sub5` varchar(45), `Updated` timestamp, `Sync` datetime);
 
 
-DROP VIEW IF EXISTS `vista_libro_diario`;
 CREATE TABLE `vista_libro_diario` (`idLibroDiario` bigint(20), `Fecha` date, `Tipo_Documento_Intero` varchar(45), `NumDocumento` varchar(45), `Num_Documento_Externo` varchar(45), `Tercero_Tipo_Documento` varchar(45), `Tercero_Identificacion` varchar(45), `Tercero_DV` varchar(3), `Tercero_Primer_Apellido` varchar(45), `Tercero_Segundo_Apellido` varchar(45), `Tercero_Primer_Nombre` varchar(45), `Tercero_Otros_Nombres` varchar(45), `Tercero_Razon_Social` varchar(100), `Tercero_Direccion` varchar(100), `Tercero_Cod_Dpto` varchar(10), `Tercero_Cod_Mcipio` varchar(10), `Tercero_Pais_Domicilio` varchar(10), `Concepto` varchar(500), `CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Detalle` varchar(45), `Debito` double, `Credito` double, `Neto` double, `idCentroCosto` int(11), `idEmpresa` int(11), `idSucursal` int(11), `Estado` varchar(20), `idUsuario` int(11));
 
 
-DROP VIEW IF EXISTS `vista_movimientos_clase`;
+CREATE TABLE `vista_listado_facturas_electronicas` (`ID` bigint(20), `idFactura` varchar(45), `RespuestaCompletaServidor` longtext, `UUID` text, `RutaPDF` text, `RutaXML` text, `Estado` int(11), `PDFCreado` int(11), `ZIPCreado` int(11), `EnviadoPorMail` int(11), `FechaReporte` datetime, `Created` datetime, `Updated` timestamp, `Sync` datetime, `FechaFactura` date, `PrefijoFactura` varchar(45), `NumeroFactura` bigint(16), `Total` double, `idCliente` bigint(11), `RazonSocialCliente` varchar(100), `NIT_Cliente` varchar(45), `NombreEstado` varchar(45));
+
+
 CREATE TABLE `vista_movimientos_clase` (`Clase` varchar(1), `DebitosClase` double, `CreditosClase` double);
 
 
-DROP VIEW IF EXISTS `vista_movimientos_cuenta_padre`;
 CREATE TABLE `vista_movimientos_cuenta_padre` (`CuentaPadre` varchar(4), `DebitosCuentaPadre` double, `CreditosCuentaPadre` double);
 
 
-DROP VIEW IF EXISTS `vista_movimientos_grupo`;
 CREATE TABLE `vista_movimientos_grupo` (`Grupo` varchar(2), `DebitosGrupo` double, `CreditosGrupo` double);
 
 
-DROP VIEW IF EXISTS `vista_nomina_servicios_turnos`;
 CREATE TABLE `vista_nomina_servicios_turnos` (`ID` bigint(20), `Fecha` date, `Tercero` bigint(20), `Sucursal` int(11), `Valor` double, `idUser` int(11), `Pagado` int(1), `Estado` varchar(10), `idDocumentoEquivalente` bigint(20), `Updated` timestamp, `Sync` datetime, `NombreSucursal` varchar(100), `NombreTercero` varchar(300));
 
 
-DROP VIEW IF EXISTS `vista_notas_devolucion`;
 CREATE TABLE `vista_notas_devolucion` (`ID` bigint(20), `Fecha` date, `Tercero` bigint(20), `Concepto` text, `Subtotal` double, `IVA` double, `Total` double, `idCentroCostos` int(11), `idSucursal` int(11), `idUser` bigint(20), `Estado` varchar(10));
 
 
-DROP VIEW IF EXISTS `vista_ori_facturas`;
 CREATE TABLE `vista_ori_facturas` (`Fecha` date, `idFactura` varchar(45), `Referencia` varchar(200), `Nombre` varchar(500), `Departamento` int(11), `SubGrupo1` int(11), `SubGrupo2` int(11), `SubGrupo3` int(11), `SubGrupo4` int(11), `SubGrupo5` int(11), `ValorUnitarioItem` int(11), `Cantidad` varchar(45), `Dias` varchar(45), `SubtotalItem` varchar(45), `IVAItem` varchar(45), `ValorOtrosImpuestos` double, `TotalItem` double, `PorcentajeIVA` varchar(10), `idOtrosImpuestos` int(11), `idPorcentajeIVA` int(11), `PrecioCostoUnitario` varchar(45), `SubtotalCosto` varchar(45), `TipoItem` varchar(10), `CuentaPUC` int(11), `GeneradoDesde` varchar(100), `NumeroIdentificador` varchar(45), `idUsuarios` int(11), `idCierre` bigint(20), `idResolucion` int(11), `TipoFactura` varchar(10), `Prefijo` varchar(45), `NumeroFactura` int(16), `Hora` varchar(20), `FormaPago` varchar(20), `CentroCosto` int(11), `idSucursal` int(11), `EmpresaPro_idEmpresaPro` int(11), `Clientes_idClientes` int(11), `ObservacionesFact` text);
 
 
-DROP VIEW IF EXISTS `vista_pedidos_restaurante`;
 CREATE TABLE `vista_pedidos_restaurante` (`ID` bigint(20), `Fecha` date, `Hora` time, `Estado` varchar(4), `idMesa` int(11), `idCliente` bigint(20), `NombreCliente` varchar(60), `DireccionEnvio` varchar(100), `TelefonoConfirmacion` varchar(100), `Observaciones` text, `idCierre` bigint(20), `Subtotal` double, `IVA` double, `Total` double, `TotalCostos` double, `idUsuario` bigint(20));
 
 
-DROP VIEW IF EXISTS `vista_preventa`;
 CREATE TABLE `vista_preventa` (`VestasActivas_idVestasActivas` int(11), `TablaItems` varchar(14), `Referencia` varchar(200), `Nombre` varchar(70), `Departamento` varchar(45), `SubGrupo1` varchar(45), `SubGrupo2` varchar(45), `SubGrupo3` varchar(45), `SubGrupo4` varchar(45), `SubGrupo5` varchar(45), `ValorUnitarioItem` double, `Cantidad` double, `Dias` varchar(1), `SubtotalItem` double, `IVAItem` double, `ValorOtrosImpuestos` double, `TotalItem` double, `PorcentajeIVA` varchar(24), `PrecioCostoUnitario` double, `SubtotalCosto` double, `TipoItem` varchar(2), `CuentaPUC` varchar(45), `Updated` timestamp, `Sync` datetime);
 
 
-DROP VIEW IF EXISTS `vista_resumen_facturacion`;
+CREATE TABLE `vista_prueba` (
+  `Fecha` date DEFAULT NULL,
+  `Tipo_Documento_Intero` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `Num_Documento_Interno` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `Num_Documento_Externo` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Tercero_Identificacion` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `Tercero_Razon_Social` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `CuentaPUC` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `NombreCuenta` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `SaldoInicialCuenta` longblob,
+  `Debitos` double DEFAULT NULL,
+  `Creditos` double DEFAULT NULL,
+  `Saldo` double DEFAULT NULL,
+  `SaldoFinalCuenta` double DEFAULT NULL,
+  `@SaldoInicial := @SaldoInicial+(SELECT Saldo)` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
 CREATE TABLE `vista_resumen_facturacion` (`ID` bigint(20) unsigned, `FechaInicial` date, `FechaFinal` date, `Referencia` varchar(200), `idProducto` bigint(20), `Nombre` text, `Departamento` int(11), `SubGrupo1` int(11), `SubGrupo2` int(11), `SubGrupo3` int(11), `SubGrupo4` int(11), `SubGrupo5` int(11), `Cantidad` double, `TotalVenta` double(19,2), `Costo` double(19,2));
 
 
-DROP VIEW IF EXISTS `vista_resumen_ventas_departamentos`;
 CREATE TABLE `vista_resumen_ventas_departamentos` (`FechaFactura` date, `Departamento` int(11), `SubGrupo1` int(11), `SubGrupo2` int(11), `SubGrupo3` int(11), `SubGrupo4` int(11), `SubGrupo5` int(11), `Total` double);
 
 
-DROP VIEW IF EXISTS `vista_retenciones`;
 CREATE TABLE `vista_retenciones` (`idCompra` bigint(20), `Fecha` date, `Tercero` bigint(20), `Estado` varchar(30), `RazonSocial` varchar(300), `DV` varchar(5), `Direccion` varchar(45), `Ciudad` varchar(100), `CuentaPUC` bigint(20), `Cuenta` varchar(200), `ValorRetencion` double, `PorcentajeRetenido` double, `BaseRetencion` double(19,2), `idEmpresa` bigint(11), `idCentroCostos` bigint(11), `idSucursal` bigint(11));
 
 
-DROP VIEW IF EXISTS `vista_retenciones_tercero`;
 CREATE TABLE `vista_retenciones_tercero` (`idCompra` bigint(20), `Fecha` date, `Tercero` bigint(20), `RazonSocial` varchar(300), `DV` varchar(5), `Direccion` varchar(45), `Ciudad` varchar(100), `CuentaPUC` bigint(20), `Cuenta` varchar(200), `ValorRetencion` double, `PorcentajeRetenido` double, `BaseRetencion` double(19,2));
 
 
-DROP VIEW IF EXISTS `vista_saldos_iniciales_clase`;
 CREATE TABLE `vista_saldos_iniciales_clase` (`Clase` varchar(1), `SaldoInicialClase` double);
 
 
-DROP VIEW IF EXISTS `vista_saldos_iniciales_cuenta_padre`;
 CREATE TABLE `vista_saldos_iniciales_cuenta_padre` (`CuentaPadre` varchar(4), `SaldoInicialCuentaPadre` double);
 
 
-DROP VIEW IF EXISTS `vista_saldos_iniciales_grupo`;
 CREATE TABLE `vista_saldos_iniciales_grupo` (`Grupo` varchar(2), `SaldoInicialGrupo` double);
 
 
-DROP VIEW IF EXISTS `vista_saldo_inicial_clase_cuenta`;
 CREATE TABLE `vista_saldo_inicial_clase_cuenta` (`ID` varchar(1), `SaldoInicial` double);
 
 
-DROP VIEW IF EXISTS `vista_saldo_inicial_cuenta`;
 CREATE TABLE `vista_saldo_inicial_cuenta` (`ID` varchar(4), `SaldoInicial` double);
 
 
-DROP VIEW IF EXISTS `vista_saldo_inicial_cuentapuc`;
 CREATE TABLE `vista_saldo_inicial_cuentapuc` (`ID` varchar(45), `Tercero_Identificacion` varchar(45), `SaldoInicial` double);
 
 
-DROP VIEW IF EXISTS `vista_saldo_inicial_grupopuc`;
 CREATE TABLE `vista_saldo_inicial_grupopuc` (`ID` varchar(2), `SaldoInicial` double);
 
 
-DROP VIEW IF EXISTS `vista_sistemas`;
 CREATE TABLE `vista_sistemas` (`ID` bigint(20), `idSistema` bigint(20), `Nombre_Sistema` mediumtext, `Observaciones` mediumtext, `TablaOrigen` varchar(90), `CodigoInterno` bigint(20), `Nombre` text, `Cantidad` double, `PrecioUnitario` double, `PrecioVenta` double(17,0), `CostoUnitario` double(17,0), `Costo_Total_Item` double(17,0), `IVA` varchar(10), `Departamento` varchar(45), `Sub1` varchar(45), `Sub2` varchar(45), `Sub3` varchar(45), `Sub4` varchar(45), `Sub5` varchar(45), `Updated` timestamp, `Sync` datetime);
 
 
-DROP VIEW IF EXISTS `vista_titulos_abonos`;
 CREATE TABLE `vista_titulos_abonos` (`ID` bigint(20), `Fecha` date, `Hora` time, `Monto` double, `idVenta` bigint(20), `Promocion` int(11), `Mayor` int(11), `Concepto` text, `idColaborador` bigint(20), `NombreColaborador` varchar(90), `Estado` varchar(45), `idComprobanteIngreso` bigint(20), `Mayor2` int(11), `Adicional` int(11), `Valor` bigint(20), `TotalAbonos` bigint(20), `Saldo` bigint(20), `idCliente` bigint(20), `NombreCliente` varchar(90));
 
 
-DROP VIEW IF EXISTS `vista_titulos_comisiones`;
 CREATE TABLE `vista_titulos_comisiones` (`ID` bigint(20), `Fecha` date, `Hora` time, `Monto` double, `idVenta` bigint(20), `Promocion` int(11), `Mayor` int(11), `Concepto` text, `idColaborador` bigint(20), `NombreColaborador` varchar(90), `idUsuario` int(11), `idEgreso` bigint(20), `Mayor2` int(11), `Adicional` int(11), `Valor` bigint(20), `TotalAbonos` bigint(20), `Saldo` bigint(20), `idCliente` bigint(20), `NombreCliente` varchar(90));
 
 
-DROP VIEW IF EXISTS `vista_titulos_devueltos`;
 CREATE TABLE `vista_titulos_devueltos` (`ID` bigint(20), `Fecha` date, `idVenta` bigint(20), `Promocion` int(11), `Mayor` bigint(20), `Concepto` text, `idColaborador` bigint(20), `NombreColaborador` varchar(90), `idUsuario` int(11), `Mayor2` int(11), `Adicional` int(11), `Valor` bigint(20), `TotalAbonos` bigint(20), `Saldo` bigint(20), `idCliente` bigint(20), `NombreCliente` varchar(90));
 
 
-DROP VIEW IF EXISTS `vista_totales_facturacion`;
 CREATE TABLE `vista_totales_facturacion` (`FechaFactura` date, `Items` double, `Subtotal` double(17,0), `IVA` double(17,0), `OtrosImpuestos` double(17,0), `Total` double(17,0));
 
 
@@ -5379,6 +5185,9 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 DROP TABLE IF EXISTS `vista_libro_diario`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_libro_diario` AS select `librodiario`.`idLibroDiario` AS `idLibroDiario`,`librodiario`.`Fecha` AS `Fecha`,`librodiario`.`Tipo_Documento_Intero` AS `Tipo_Documento_Intero`,(select if((`librodiario`.`Tipo_Documento_Intero` = 'FACTURA'),(select `facturas`.`NumeroFactura` from `facturas` where (`facturas`.`idFacturas` = `librodiario`.`Num_Documento_Interno`)),`librodiario`.`Num_Documento_Interno`)) AS `NumDocumento`,`librodiario`.`Num_Documento_Externo` AS `Num_Documento_Externo`,`librodiario`.`Tercero_Tipo_Documento` AS `Tercero_Tipo_Documento`,`librodiario`.`Tercero_Identificacion` AS `Tercero_Identificacion`,`librodiario`.`Tercero_DV` AS `Tercero_DV`,`librodiario`.`Tercero_Primer_Apellido` AS `Tercero_Primer_Apellido`,`librodiario`.`Tercero_Segundo_Apellido` AS `Tercero_Segundo_Apellido`,`librodiario`.`Tercero_Primer_Nombre` AS `Tercero_Primer_Nombre`,`librodiario`.`Tercero_Otros_Nombres` AS `Tercero_Otros_Nombres`,`librodiario`.`Tercero_Razon_Social` AS `Tercero_Razon_Social`,`librodiario`.`Tercero_Direccion` AS `Tercero_Direccion`,`librodiario`.`Tercero_Cod_Dpto` AS `Tercero_Cod_Dpto`,`librodiario`.`Tercero_Cod_Mcipio` AS `Tercero_Cod_Mcipio`,`librodiario`.`Tercero_Pais_Domicilio` AS `Tercero_Pais_Domicilio`,`librodiario`.`Concepto` AS `Concepto`,`librodiario`.`CuentaPUC` AS `CuentaPUC`,`librodiario`.`NombreCuenta` AS `NombreCuenta`,`librodiario`.`Detalle` AS `Detalle`,`librodiario`.`Debito` AS `Debito`,`librodiario`.`Credito` AS `Credito`,`librodiario`.`Neto` AS `Neto`,`librodiario`.`idCentroCosto` AS `idCentroCosto`,`librodiario`.`idEmpresa` AS `idEmpresa`,`librodiario`.`idSucursal` AS `idSucursal`,`librodiario`.`Estado` AS `Estado`,`librodiario`.`idUsuario` AS `idUsuario` from `librodiario`;
 
+DROP TABLE IF EXISTS `vista_listado_facturas_electronicas`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_listado_facturas_electronicas` AS select `t1`.`ID` AS `ID`,`t1`.`idFactura` AS `idFactura`,`t1`.`RespuestaCompletaServidor` AS `RespuestaCompletaServidor`,`t1`.`UUID` AS `UUID`,`t1`.`RutaPDF` AS `RutaPDF`,`t1`.`RutaXML` AS `RutaXML`,`t1`.`Estado` AS `Estado`,`t1`.`PDFCreado` AS `PDFCreado`,`t1`.`ZIPCreado` AS `ZIPCreado`,`t1`.`EnviadoPorMail` AS `EnviadoPorMail`,`t1`.`FechaReporte` AS `FechaReporte`,`t1`.`Created` AS `Created`,`t1`.`Updated` AS `Updated`,`t1`.`Sync` AS `Sync`,(select `t2`.`Fecha` from `facturas` `t2` where (`t1`.`idFactura` = `t2`.`idFacturas`)) AS `FechaFactura`,(select `t2`.`Prefijo` from `facturas` `t2` where (`t1`.`idFactura` = `t2`.`idFacturas`)) AS `PrefijoFactura`,(select `t2`.`NumeroFactura` from `facturas` `t2` where (`t1`.`idFactura` = `t2`.`idFacturas`)) AS `NumeroFactura`,(select `t2`.`Total` from `facturas` `t2` where (`t1`.`idFactura` = `t2`.`idFacturas`)) AS `Total`,(select `t2`.`Clientes_idClientes` from `facturas` `t2` where (`t1`.`idFactura` = `t2`.`idFacturas`)) AS `idCliente`,(select `t2`.`RazonSocial` from `clientes` `t2` where (`t2`.`idClientes` = (select `idCliente`))) AS `RazonSocialCliente`,(select `t2`.`Num_Identificacion` from `clientes` `t2` where (`t2`.`idClientes` = (select `idCliente`))) AS `NIT_Cliente`,(select `t2`.`NombreEstado` from `facturas_electronicas_log_estados` `t2` where (`t1`.`Estado` = `t2`.`ID`)) AS `NombreEstado` from `facturas_electronicas_log` `t1`;
+
 DROP TABLE IF EXISTS `vista_movimientos_clase`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_movimientos_clase` AS select substr(`librodiario`.`CuentaPUC`,1,1) AS `Clase`,sum(`librodiario`.`Debito`) AS `DebitosClase`,sum(`librodiario`.`Credito`) AS `CreditosClase` from `librodiario` where ((`librodiario`.`Fecha` >= '2019-02-01') and (`librodiario`.`Fecha` <= '2019-09-12')) group by substr(`librodiario`.`CuentaPUC`,1,1);
 
@@ -5451,4 +5260,4 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 DROP TABLE IF EXISTS `vista_totales_facturacion`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_totales_facturacion` AS select `facturas_items`.`FechaFactura` AS `FechaFactura`,sum(`facturas_items`.`Cantidad`) AS `Items`,round(sum(`facturas_items`.`SubtotalItem`),0) AS `Subtotal`,round(sum(`facturas_items`.`IVAItem`),0) AS `IVA`,round(sum(`facturas_items`.`ValorOtrosImpuestos`),0) AS `OtrosImpuestos`,round(sum(`facturas_items`.`TotalItem`),0) AS `Total` from `facturas_items` group by `facturas_items`.`FechaFactura`;
 
--- 2019-09-13 12:14:44
+-- 2020-01-14 14:50:22

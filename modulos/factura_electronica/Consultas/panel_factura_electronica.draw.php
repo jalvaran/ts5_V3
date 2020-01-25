@@ -462,7 +462,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla($DatosItemsFactura["Nombre"], 1);
                         //$css->ColTabla(number_format($DatosItemsFactura["ValorUnitarioItem"]), 1);
                         print("<td>");
-                            $css->input("number", "TxtCantidad_".$idItem, "form-control", "TxtCantidad_".$idItem, "cantidad", $DatosItemsFactura["Cantidad"], "Cantidad", "off", "", "");
+                            $css->input("number", "TxtCantidad_".$idItem, "form-control", "TxtCantidad_".$idItem, "cantidad", $DatosItemsFactura["Cantidad"]*$DatosItemsFactura["Dias"], "Cantidad", "off", "", "");
                         print("</td>");
                         
                         $css->ColTabla(number_format($DatosItemsFactura["SubtotalItem"]), 1);

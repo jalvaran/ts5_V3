@@ -140,6 +140,7 @@ function AgregarItem(){
                 posiciona('Codigo');
                 
                 DibujePreventa();
+                MostrarOpcionesFacturacionPOS(1);
                 document.getElementById('CmbBusquedaItems').value='';
                 
             }else{
@@ -650,7 +651,7 @@ function atajosPOS(){
     });
     
     shortcut("Ctrl+A",function(){
-    //document.getElementById("BntModalPOS").click();
+    document.getElementById("BtnFacturarPOS").click();
     });
 
 }
@@ -1018,7 +1019,15 @@ function GuardarFactura(){
         document.getElementById("AnticiposCruzados").style.backgroundColor="white";
     }
     
-    
+    if(CmbFormaPago=='Acuerdo'){
+        var idAcuerdoPago = (document.getElementById('idAcuerdoPago').value);
+        var TxtFechaInicialPagos = (document.getElementById('TxtFechaInicialPagos').value);
+        var ValorCuotaAcuerdo = (document.getElementById('ValorCuotaAcuerdo').value);
+        var cicloPagos = (document.getElementById('cicloPagos').value);
+        var SaldoActualAcuerdoPago = (document.getElementById('SaldoActualAcuerdoPago').value);
+        var NuevoSaldoAcuerdoPago = (document.getElementById('NuevoSaldoAcuerdoPago').value);
+        var TxtObservacionesAcuerdoPago = (document.getElementById('TxtObservacionesAcuerdoPago').value);
+    }
     var form_data = new FormData();
         form_data.append('Accion', '7'); 
         form_data.append('idPreventa', idPreventa);
@@ -1035,6 +1044,17 @@ function GuardarFactura(){
         form_data.append('CmbPrint', CmbPrint);
         form_data.append('idCajero', idCajero);
         form_data.append('TxtCuotaInicialCredito', TxtCuotaInicialCredito);
+        if(CmbFormaPago=='Acuerdo'){
+            form_data.append('idAcuerdoPago', idAcuerdoPago);
+            form_data.append('TxtFechaInicialPagos', TxtFechaInicialPagos);
+            form_data.append('ValorCuotaAcuerdo', ValorCuotaAcuerdo);
+            form_data.append('cicloPagos', cicloPagos);
+            
+            form_data.append('SaldoActualAcuerdoPago', SaldoActualAcuerdoPago);
+            form_data.append('NuevoSaldoAcuerdoPago', NuevoSaldoAcuerdoPago);
+            form_data.append('TxtObservacionesAcuerdoPago', TxtObservacionesAcuerdoPago);
+            
+        }
         AnticiposCruzados=0;
         $.ajax({
         url: './procesadores/pos.process.php',
@@ -1057,6 +1077,7 @@ function GuardarFactura(){
                 document.getElementById("idCliente").value=1;
                 document.getElementById("select2-idCliente-container").innerHTML="Clientes Varios";
                 DibujePreventa();
+                document.getElementById("DivOpcionesPagoManta").innerHTML='';
                 posiciona('Codigo');
                 
             }else if(respuestas[0]=="E1"){
@@ -2476,9 +2497,10 @@ $('#CmbListado').bind('change', function() {
 });
 
 
-function MostrarOpcionesFacturacionPOS(){
-    document.getElementById("vinculoOpcionesPago").click();
-    
+function MostrarOpcionesFacturacionPOS(Ancla=0){
+    if(Ancla==0){
+        document.getElementById("vinculoOpcionesPago").click();
+    }
     var idPreventa=document.getElementById('idPreventa').value;
     var idCliente=document.getElementById('idCliente').value;
     var form_data = new FormData();
@@ -2496,8 +2518,9 @@ function MostrarOpcionesFacturacionPOS(){
         type: 'post',
         success: function(data){
             document.getElementById('DivOpcionesPagoManta').innerHTML=data;
-            setTimeout(function(){document.getElementById("Efectivo").select();}, 100);
-            
+            if(Ancla==0){
+                setTimeout(function(){document.getElementById("Efectivo").select();}, 100);
+            }
             
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -2715,6 +2738,41 @@ function EliminarItemAcuerdo(Tabla,idItem){
         form_data.append('Accion', 26);        
         form_data.append('Tabla', Tabla);
         form_data.append('idItem', idItem);
+        $.ajax({
+        url: './procesadores/pos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                alertify.error(respuestas[1]);
+            }
+            if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+            }
+            CalculeProyeccionPagosAcuerdo();
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function CalculeValorCuotaAcuerdo(idAcuerdo=''){
+    if(idAcuerdo==''){
+        var idAcuerdo = document.getElementById('idAcuerdoPago').value;   
+    }   
+    var NumeroCuotas = document.getElementById('NumeroCuotas').value;   
+    var form_data = new FormData();
+        form_data.append('Accion', 28);        
+        form_data.append('idAcuerdo', idAcuerdo);
+        form_data.append('NumeroCuotas', NumeroCuotas);
         $.ajax({
         url: './procesadores/pos.process.php',
         //dataType: 'json',

@@ -283,3 +283,8 @@ CREATE TABLE `notas_credito_items` (
 
 
 
+ALTER TABLE `clientes` ADD `TipoOrganizacion` INT(5) UNSIGNED  NOT NULL AFTER `CIUU`;
+ALTER TABLE `proveedores` ADD `TipoOrganizacion` INT(5) UNSIGNED  NOT NULL AFTER `CIUU`;
+
+ALTER TABLE `proveedores` ADD `Plazo` INT(5) UNSIGNED  NOT NULL AFTER `Cupo`;
+ALTER TABLE `clientes` ADD `Plazo` INT(5) UNSIGNED  NOT NULL AFTER `Cupo`;

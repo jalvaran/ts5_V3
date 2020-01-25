@@ -20,7 +20,10 @@ if(isset($_REQUEST["Opcion"])){
             $imagenCodificadaLimpia = str_replace("data:image/png;base64,", "", ($imagenCodificada));
             $Ruta=$obCon->CrearFotoDesdeBase64($imagenCodificadaLimpia, $idAcuerdo);
             //Terminar y regresar el nombre de la foto
-            exit($Ruta);
+            $Ruta= str_replace("../", "", $Ruta);
+            $Ruta="../../".$Ruta;
+            print("<a href='$Ruta' target='_blank'><h5>Ver foto</h5></a>");
+            //exit($Ruta);
             break;//Fin caso 2
         
         }

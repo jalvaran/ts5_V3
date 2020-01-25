@@ -61,7 +61,7 @@ class db_conexion{
 public function Query($sql)
   {	
     $this->Conectar();
-    $Consul=$this->mysqli->query($sql) or die ($this->mysqli->error);    
+    $Consul=$this->mysqli->query($sql) or die ($this->mysqli->error." al ejecutar: $sql");    
     return($Consul);
     $this->CerrarCon();
 }

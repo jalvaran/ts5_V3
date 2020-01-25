@@ -97,7 +97,9 @@ if( !empty($_REQUEST["Accion"]) ){
                         print("<td>");
                             $css->input("number", "TxtCantidad_".$idItem, "form-control", "TxtCantidad_".$idItem, "cantidad", $DatosItemsFactura["Cantidad"], "Cantidad", "off", "", "");
                         print("</td>");
-                        
+                        print("<td>");
+                            $css->input("number", "TxtMultiplicador_".$idItem, "form-control", "TxtMultiplicador_".$idItem, "multiplicador", $DatosItemsFactura["Dias"], "Cantidad", "off", "", "");
+                        print("</td>");
                         $css->ColTabla(number_format($DatosItemsFactura["SubtotalItem"]), 1);
                         $css->ColTabla(number_format($DatosItemsFactura["IVAItem"]), 1);
                         $css->ColTabla(number_format($DatosItemsFactura["TotalItem"]), 1);
