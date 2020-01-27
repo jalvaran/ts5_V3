@@ -1042,19 +1042,30 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break; //Fin caso 27
         
-        case 28://calcule el valor a proyectar
-            
+        case 28://calcule el valor de las cuotas según el numero de cuotas
+            $obAcuerdo = new AcuerdoPago($idUser);
             $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdo"]);
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
+            $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);
             $NumeroCuotas=$obCon->normalizar($_REQUEST["NumeroCuotas"]);
-            if($Tabla==1){
-                $Tabla="acuerdo_pago_cuotas_pagadas_temp";
-            }
-            if($Tabla==2){
-                $Tabla="acuerdo_pago_proyeccion_pagos_temp";
-            }
-            $obCon->BorraReg($Tabla, "ID", $idItem);
-            print("OK;Registro eliminado");
+                       
+            $sql="SELECT SUM(TotalVenta) AS Total FROM preventa WHERE VestasActivas_idVestasActivas='$idPreventa' ";
+            $Totales=$obCon->FetchAssoc($obCon->Query($sql));
+            $TotalPreventa=$Totales["Total"];
+            $ValorAProyectar=$obAcuerdo->ValorAProyectarTemporalAcuerdo($idAcuerdo, $TotalPreventa, $idCliente);
+            $ValorCuotaCalculada=round($ValorAProyectar/$NumeroCuotas);
+            print("OK;Cuota Calculada;$ValorCuotaCalculada");
         break;//Fin caso 28
+    
+        case 29://Eliminar un item de alguna de las tablas del acuerdo de pago
+            
+            $Valor=$obCon->normalizar($_REQUEST["ValorCuota"]);          
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);            
+            $Tabla="acuerdo_pago_proyeccion_pagos_temp";
+            
+            $obCon->ActualizaRegistro($Tabla, "ValorCuota", $Valor, "ID", $idItem, 1);
+            print("OK;Cuota Actualizada");
+        break;//Fin caso 29
         
     }
     

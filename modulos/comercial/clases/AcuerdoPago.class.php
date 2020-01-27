@@ -99,7 +99,7 @@ class AcuerdoPago extends ProcesoVenta{
          $this->Query($sql);         
      }
      
-     public function ContruyaProyeccionPagos($idAcuerdoPago,$ValorAProyectar,$ValorCuotaAcuerdo,$cicloPagos,$FechaInicial,$idUser) {
+     public function ConstruyaProyeccionPagos($idAcuerdoPago,$ValorAProyectar,$ValorCuotaAcuerdo,$cicloPagos,$FechaInicial,$idUser) {
         $NumeroCuotasCalculadas=ceil($ValorAProyectar/$ValorCuotaAcuerdo);
         $DatosCicloPago=$this->DevuelveValores("acuerdo_pago_ciclos_pagos", "ID", $cicloPagos);
         $NumeroDiasCiclo=$DatosCicloPago["NumeroDias"];
@@ -120,7 +120,16 @@ class AcuerdoPago extends ProcesoVenta{
                 $DatosProyeccion["FechaCuotas"][$i]=$this->SumeSemanasAFecha($FechaInicial, $i-1);
             }
             if($cicloPagos==2){ //Si el ciclo es Quincenal
-                $DatosProyeccion["FechaCuotas"][$i]=$this->SumeSemanasAFecha($FechaInicial, ($i-1)*2);
+                if($i>2){
+                    if($i%2==0){ //Saber si es par
+                        $DatosProyeccion["FechaCuotas"][$i]=$this->SumeMesesAFecha($DatosProyeccion["FechaCuotas"][$i-2], 1);
+                    }else{
+                        $DatosProyeccion["FechaCuotas"][$i]=$this->SumeMesesAFecha($DatosProyeccion["FechaCuotas"][$i-2], 1);
+                    }
+                }else{
+                    $DatosProyeccion["FechaCuotas"][$i]=$this->SumeDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i-1], 15);
+                }
+                
             }
             if($cicloPagos==3){ //Si el ciclo es Mensual
                 $DatosProyeccion["FechaCuotas"][$i]=$this->SumeMesesAFecha($FechaInicial, ($i-1));
@@ -148,10 +157,17 @@ class AcuerdoPago extends ProcesoVenta{
         return($DiaSemana);
         
      }
+     public function SumeDiasAFechaAcuerdo($Fecha,$NumeroDias) {         
+        $nuevafecha = date('Y-m-d', strtotime($Fecha) + 86400);        
+        $nuevafecha = date('Y-m-d', strtotime("$Fecha + $NumeroDias day"));
+        
+        return($nuevafecha);
+     }
      
      public function SumeSemanasAFecha($Fecha,$NumeroSemanas) {         
-        $nuevafecha = date('Y-m-d', strtotime($Fecha) + 86400);
+        $nuevafecha = date('Y-m-d', strtotime($Fecha) + 86400);        
         $nuevafecha = date('Y-m-d', strtotime("$Fecha + $NumeroSemanas week"));
+        
         return($nuevafecha);
      }
      
@@ -215,7 +231,16 @@ class AcuerdoPago extends ProcesoVenta{
             exit("E4;No se ha tomado la foto para evidencia del acuerdo de pago");
         }
         
-        
+        $idCliente= $this->normalizar($VariablesAcuerdo["idCliente"]);
+        $idPreventa= $this->normalizar($VariablesAcuerdo["idPreventa"]);
+        $sql="SELECT SUM(TotalVenta) AS Total FROM preventa WHERE VestasActivas_idVestasActivas='$idPreventa' ";
+        $Totales=$this->FetchAssoc($this->Query($sql));
+        $TotalPreventa=$Totales["Total"];
+        $ValorAProyectar=$this->ValorAProyectarTemporalAcuerdo($idAcuerdo, $TotalPreventa, $idCliente);
+        $TotalCuotasAcuerdo=$this->TotalCuotasTemporalAcuerdoPago($idAcuerdo);
+        if(round($ValorAProyectar)<>round($TotalCuotasAcuerdo)){
+            exit("E4;La sumatoria de las cuotas no es igual al Valor a Proyectar");
+        }
     }
     
     public function CrearAcuerdoPago($idAcuerdoPago,$FechaInicialParaPagos,$Tercero,$ValorCuotaGeneral,$CicloPagos,$Observaciones,$SaldoAnterior,$TotalAbonos,$SaldoInicial,$SaldoFinal,$Estado,$idUser) {
@@ -263,6 +288,46 @@ class AcuerdoPago extends ProcesoVenta{
         $this->Query($sql);
         
     }
+    
+    public function SaldoActualCliente($Tercero) {
+        $sql="SELECT SUM(Debito - Credito) as Total FROM librodiario t2 WHERE t2.Tercero_Identificacion='$Tercero' 
+        AND EXISTS(SELECT 1 FROM contabilidad_parametros_cuentasxcobrar t3 WHERE t2.CuentaPUC like t3.CuentaPUC) ";
+
+        $Totales=$this->FetchAssoc($this->Query($sql));
+        $SaldoActualCliente=$Totales["Total"];
+        return($SaldoActualCliente);
+    }
+    
+    public function TotalCuotaInicialTemporalAcuerdoPago($idAcuerdo) {
+        $sql="SELECT SUM(ValorPago) AS Total FROM acuerdo_pago_cuotas_pagadas_temp WHERE idAcuerdoPago='$idAcuerdo' AND TipoCuota=1";
+        $DatosCuotas= $this->FetchAssoc($this->Query($sql));
+        return($DatosCuotas["Total"]);
+        
+    }
+    
+    public function TotalCuotasProgramadasTemporalAcuerdoPago($idAcuerdo) {
+        $sql="SELECT SUM(ValorCuota) AS Total FROM acuerdo_pago_proyeccion_pagos_temp WHERE idAcuerdoPago='$idAcuerdo' AND TipoCuota=1";
+        $DatosCuotas= $this->FetchAssoc($this->Query($sql));
+        return($DatosCuotas["Total"]);        
+    }
+    
+    public function TotalCuotasTemporalAcuerdoPago($idAcuerdo) {
+        $sql="SELECT SUM(ValorCuota) AS Total FROM acuerdo_pago_proyeccion_pagos_temp WHERE idAcuerdoPago='$idAcuerdo' AND TipoCuota=2";
+        $DatosCuotas= $this->FetchAssoc($this->Query($sql));
+        return($DatosCuotas["Total"]);        
+    }
+    
+    public function ValorAProyectarTemporalAcuerdo($idAcuerdo,$ValorAdicional,$idCliente) {
+        $DatosCliente= $this->DevuelveValores("clientes", "idClientes", $idCliente);
+        $NIT= $DatosCliente["Num_Identificacion"];
+        $SaldoActual=$this->SaldoActualCliente($NIT);
+        $SaldoActual=$SaldoActual+$ValorAdicional;
+        $CuotaInicial=$this->TotalCuotaInicialTemporalAcuerdoPago($idAcuerdo);
+        $CuotasProgramadas=$this->TotalCuotasProgramadasTemporalAcuerdoPago($idAcuerdo);
+        $ValorAProyectar=$SaldoActual-$CuotaInicial-$CuotasProgramadas;
+        return($ValorAProyectar);
+    }
+    
     /**
      * Fin Clase
      */

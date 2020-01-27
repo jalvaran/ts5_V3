@@ -30,7 +30,11 @@ if( !empty($_REQUEST["Accion"]) ){
                 $target="#DialTabla";
                 $css->CrearBotonImagen($Titulo,$Nombre,$target,$RutaImage,$javascript,50,50,"fixed","right:10px;top:50px;z-index:100;",$VectorBim);
             }
-            
+            if($idPreventa>=1){
+                $css->div("DivAcuerdoFlotanteTotales","", "", "", "", "", "style=position:fixed;right:10px;top:150px;z-index:100;");
+                   
+                $css->Cdiv();
+            }
             $css->CrearTabla();
                 $css->FilaTabla(16);
                     
@@ -1031,8 +1035,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $CuotaProgramadaAcuerdo=$obCon->normalizar($_REQUEST["CuotaProgramadaAcuerdo"]);
             $TxtFechaCuotaProgramada=$obCon->normalizar($_REQUEST["TxtFechaCuotaProgramada"]);
             $NumeroCuotas=$obCon->normalizar($_REQUEST["NumeroCuotas"]);
-            $cicloPagos=$obCon->normalizar($_REQUEST["cicloPagos"]);
-            
+            $cicloPagos=$obCon->normalizar($_REQUEST["cicloPagos"]);  
             $css->CrearTitulo("Proyeccion de pagos", "verde");
             
             $css->CrearTabla();
@@ -1114,6 +1117,9 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 $TotalAcuerdoPago=$SaldoActualCliente+$TotalPreventa;
                 $ValorAProyectar=$TotalAcuerdoPago-$TotalCuotaInicial-$TotalCuotasProgramadas;
+                
+                
+            
                 $css->CrearTabla();
                     $css->FilaTabla(16);
                         $css->ColTabla("<strong>Total Del Acuerdo</strong>", 1);
@@ -1154,7 +1160,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CrearTitulo("Por favor seleccione el ciclo de pagos", "rojo");
                     exit();
                 }
-                $DatosProyeccion=$obAcuerdo->ContruyaProyeccionPagos($idAcuerdo,$ValorAProyectar, $ValorCuotaAcuerdo,$cicloPagos,$FechaInicial,$idUser);
+                $DatosProyeccion=$obAcuerdo->ConstruyaProyeccionPagos($idAcuerdo,$ValorAProyectar, $ValorCuotaAcuerdo,$cicloPagos,$FechaInicial,$idUser);
                 
                 $css->CrearTabla();
                     $css->FilaTabla(16);
@@ -1189,17 +1195,38 @@ if( !empty($_REQUEST["Accion"]) ){
                     $sql="SELECT * FROM acuerdo_pago_proyeccion_pagos_temp WHERE TipoCuota=2 AND idAcuerdoPago='$idAcuerdo' ORDER BY Fecha ASC";    
                     $Consulta=$obAcuerdo->Query($sql);
                     while($DatosAcuerdoProyeccion=$obAcuerdo->FetchAssoc($Consulta)){ 
+                        $idItem=$DatosAcuerdoProyeccion["ID"];
                         $css->FilaTabla(16);
                             $css->ColTabla($DatosAcuerdoProyeccion["NumeroCuota"], 1); 
                             $css->ColTabla($DatosAcuerdoProyeccion["Fecha"], 1); 
                             $css->ColTabla(($obAcuerdo->obtenerNombreDiaFecha($DatosAcuerdoProyeccion["Fecha"])), 1);
-                            $css->ColTabla(number_format($DatosAcuerdoProyeccion["ValorCuota"]), 1);                            
+                            print("<td>");
+                                $css->input("number", "TxtValorCuotaNormal_$idItem", "form-control", "TxtValorCuotaNormal_$idItem", "Cuota", round($DatosAcuerdoProyeccion["ValorCuota"]), "Valor de la cuota", "off", "", "onChange=EditarCuotaTemporal(`$idItem`)", "style=width:150px");
+                            print("</td>");
+                                                     
                         $css->CierraFilaTabla();
                     }
                 
                 $css->CerrarTabla();
                 
         break; //Fin caso 16    
+        
+        case 17://Dibuja los totales de la proyeccion comparados con la sumatoria de las cuotas
+            $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
+            $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdo"]);
+            $sql="SELECT SUM(TotalVenta) AS Total FROM preventa WHERE VestasActivas_idVestasActivas='$idPreventa' ";
+            $Totales=$obCon->FetchAssoc($obCon->Query($sql));
+            $TotalPreventa=$Totales["Total"];
+            
+            $ValorAProyectar=$obAcuerdo->ValorAProyectarTemporalAcuerdo($idAcuerdo, $TotalPreventa, $idCliente);
+            print("Valor a Proyectar: <h2><strong>". number_format($ValorAProyectar)."</strong></h2>");
+            $TotalCuotasProyectadas=$obAcuerdo->TotalCuotasTemporalAcuerdoPago($idAcuerdo);
+            print("Total Cuotas: <h2><strong>". number_format($TotalCuotasProyectadas)."</strong></h2>");
+            $Diferencia=$ValorAProyectar-$TotalCuotasProyectadas;
+            print("Diferencia: <h2><strong>". number_format($Diferencia)."</strong></h2>");
+        break;//Fin caso 17    
+        
     }
     
     

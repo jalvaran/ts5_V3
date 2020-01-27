@@ -167,6 +167,14 @@ function DibujePreventa(idPreventa=""){
     
     DibujeItems(idPreventa);
     DibujeTotales(idPreventa);
+    if(document.getElementById('DivAcuerdoPago')){
+        document.getElementById('DivAcuerdoPago').innerHTML="";
+    }
+    
+    
+    //document.getElementById('DivInfoOpcionesPago').innerHTML="";
+    
+    
 }
 /**
  * Dibuja los items de una preventa
@@ -2765,14 +2773,19 @@ function EliminarItemAcuerdo(Tabla,idItem){
 }
 
 function CalculeValorCuotaAcuerdo(idAcuerdo=''){
+    
     if(idAcuerdo==''){
         var idAcuerdo = document.getElementById('idAcuerdoPago').value;   
     }   
+    var idCliente = document.getElementById('idCliente').value; 
+    var idPreventa = document.getElementById('idPreventa').value; 
     var NumeroCuotas = document.getElementById('NumeroCuotas').value;   
     var form_data = new FormData();
         form_data.append('Accion', 28);        
         form_data.append('idAcuerdo', idAcuerdo);
         form_data.append('NumeroCuotas', NumeroCuotas);
+        form_data.append('idCliente', idCliente);
+        form_data.append('idPreventa', idPreventa);
         $.ajax({
         url: './procesadores/pos.process.php',
         //dataType: 'json',
@@ -2782,14 +2795,17 @@ function CalculeValorCuotaAcuerdo(idAcuerdo=''){
         data: form_data,
         type: 'post',
         success: function(data){
+            
             var respuestas = data.split(';'); 
             if(respuestas[0]=="OK"){
-                alertify.error(respuestas[1]);
-            }
-            if(respuestas[0]=="E1"){
+                alertify.success(respuestas[1]);
+                 document.getElementById('ValorCuotaAcuerdo').value=respuestas[2];
+            }else if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
+            }else{
+                alertify.alert(data);
             }
-            CalculeProyeccionPagosAcuerdo();
+            
             
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -2841,3 +2857,71 @@ function TomarFoto(idAcuerdo='') {
     //Reanudar reproducción
     document.querySelector("#video").play();
 };
+
+
+function EditarCuotaTemporal(idItem){
+    var ValorCuota = document.getElementById('TxtValorCuotaNormal_'+idItem).value;        
+    var form_data = new FormData();
+        form_data.append('Accion', 29);        
+        form_data.append('ValorCuota', ValorCuota);
+        form_data.append('idItem', idItem);
+        $.ajax({
+        url: './procesadores/pos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                VisualizarTotalesAcuerdo();
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+            }else{
+                alertify.alert(data);
+            }
+                       
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function VisualizarTotalesAcuerdo(idAcuerdo=''){
+    if(idAcuerdo==''){
+        var idAcuerdo = document.getElementById('idAcuerdoPago').value;   
+    }
+    var DivDraw = "DivAcuerdoFlotanteTotales";
+    var idCliente=document.getElementById('idCliente').value;
+    var idPreventa=document.getElementById('idPreventa').value;
+        
+    var form_data = new FormData();
+        form_data.append('Accion', 17);
+        form_data.append('idPreventa', idPreventa);
+        form_data.append('idCliente', idCliente);
+        form_data.append('idAcuerdo', idAcuerdo);
+                
+        $.ajax({
+        url: './Consultas/pos.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(DivDraw).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+      
+      
+}
