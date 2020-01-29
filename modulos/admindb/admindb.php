@@ -9,14 +9,15 @@
  * TxtTabla, TxtCondicion,TxtOrdenNombreColumna,TxtOrdenTabla,TxtLimit,TxtPage,tabla
  * 
  */
+
 $myPage="admindb.php";  // identifica la pagina para poder controlar el acceso
 $myTitulo="Administrador de Bases de Datos TSS";  //Titulo en la pestaña del navegador
 include_once("../../sesiones/php_control_usuarios.php"); //Controla los permisos de los usuarios
 include_once("../../constructores/paginas_constructor.php"); //Construye la pagina, estan las herramientas para construir los objetos de la pagina
 
-$css =  new PageConstruct($myTitulo, ""); //objeto con las funciones del html
+$css =  new PageConstruct($myTitulo, ""); //instancia para el objeto con las funciones del html
 
-$obCon = new conexion($idUser); //Conexion a la base de datos
+$obCon = new conexion($idUser); //instancia para Conexion a la base de datos
 
 $css->PageInit($myTitulo);
     /*
@@ -29,36 +30,41 @@ $css->PageInit($myTitulo);
     //print("<br>");
     $css->section("", "content", "", "");
         $css->CrearDiv("", "row", "left", 1, 1);
-        $css->CrearDiv("", "col-md-3", "left", 1, 1);
-        $css->CrearBotonEvento("BtnNuevoRegistro", "Nuevo Registro", 1, "onclick", "FormularioNuevoRegistro()", "azul");
-        $css->CrearDiv("", "box box-solid", "left", 1, 1);
-        $css->CrearDiv("", "box-header with-border", "left", 1, 1);
-        print('<h3 class="box-title">Bases de Datos</h3>');
-        $css->CrearDiv("", "box-tools", "left", 1, 1);    
-        print('<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                    </button>
-                  </div>
-                </div>');
+         $css->CrearDiv("", "col-md-3", "left", 1, 1);
+          $css->CrearBotonEvento("BtnNuevoRegistro", "Nuevo Registro", 1, "onclick", "FormularioNuevoRegistro()", "azul");
+           $css->CrearDiv("", "box box-solid", "left", 1, 1);
+             $css->CrearDiv("", "box-header with-border", "left", 1, 1);
+               print('<h3 class="box-title">Bases de Datos</h3>');
+               
+               $css->CrearDiv("", "box-tools", "left", 1, 1);    
+                  print('<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                      </div>
+                  </div>');
         
-        $css->div("DivBasesDatos", "box-body no-padding", "", "", "", "", "");
-            $sql="show databases";
-            $Consulta=$obCon->Query($sql);            
-            //Creamos el Selector que contiene las bases de datos
-            $css->select("cmbDataBase", "form-control", "cmbDataBase", "", "", "onchange=ListTables()", "");
-                $css->option("", "", "", "", "", "");
-                    print("Seleccione una Base de Datos");
-                $css->Coption();
-                
-                while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
-                    $NombreBaseDatos=$DatosConsulta["Database"];
-                    $css->option("", "", "", $NombreBaseDatos, "", "");
-                        print($NombreBaseDatos);
-                    $css->Coption();
-                }
-                
-            $css->Cselect();
+                   $css->div("DivBasesDatos", "box-body no-padding", "", "", "", "", "");
+                                $sql="show databases";// sentencia sql para mostrar las base de datos
+                                $Consulta=$obCon->Query($sql); //se corre la sentencia sql por medio del objecto conexion           
             
-        $css->Cdiv();
+                                //Creamos el Selector que contiene las bases de datos
+                         $css->select("cmbDataBase", "form-control", "cmbDataBase", "", "", "onchange=ListTables()"/*funcion js para listar las tablas de  una base de datos*/, "");
+                                $css->option("", "", "", "", "", "");
+                                        print("Seleccione una Base de Datos");
+                                $css->Coption();
+                
+                                  while($DatosConsulta=$obCon->FetchAssoc($Consulta)){//se corre el bucle para que se muestre uno a uno los registros de la consulta
+                                   $NombreBaseDatos=$DatosConsulta["Database"];//se almacena en la variable los nombres de cada base de datos
+                    
+                                $css->option("", "", "", $NombreBaseDatos, "", "");// meto dentro de cada opcion el nombre de la base de datos dada por la consulta 
+                                print($NombreBaseDatos);
+                                $css->Coption();
+                    
+                    
+                                }
+                
+                      $css->Cselect();
+            
+                    $css->Cdiv();
         
         print('                  
                 <!-- /.box-body -->
@@ -92,9 +98,13 @@ $css->PageInit($myTitulo);
                     print('<span class="input-group-addon"><i class="fa fa-fw fa-search"></i></span>
                               </div>');
                 $css->CerrarDiv(); 
-            $css->CerrarDiv();     
+            $css->CerrarDiv();   
+            
             $css->CrearDiv("", "col-md-9", "left", 1, 1);
-
+                $css->CrearDiv("DivPager", "", "left", 1, 1);
+                    
+                $css->CerrarDiv();  
+            
                 $css->CrearDiv("", "box box-primary", "left", 1, 1);
                     $css->CrearDiv("DivDrawTables", "box-header with-border", "left", 1, 1);
                         print("Informacion de las tablas");

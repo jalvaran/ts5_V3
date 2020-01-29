@@ -171,8 +171,8 @@ function DibujePreventa(idPreventa=""){
         document.getElementById('DivAcuerdoPago').innerHTML="";
     }
     
+    MostrarOpcionesFacturacionPOS(1);
     
-    //document.getElementById('DivInfoOpcionesPago').innerHTML="";
     
     
 }
