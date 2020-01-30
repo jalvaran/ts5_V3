@@ -48,11 +48,15 @@ function ListTables(){
 function muestraRegistros(tabla){
     
     var cmbDataBase =document.getElementById("cmbDataBase").value;
+    var Busqueda =document.getElementById("TxtBusquedas").value;
     
     var form_data = new FormData();
         form_data.append('Accion', 2);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
         form_data.append('cmbDataBase', cmbDataBase);// pasamos en in indice llamado cmbDataBase el nombre de la base de datos'
         form_data.append('tableDataBase', tabla);// pasamos en un indice llamado tabla el nombre de la base de datos
+        form_data.append('limit', limit);// enviamos la variable global limit
+        form_data.append('page', page);// enviamos la variable global page
+        form_data.append('Busqueda', Busqueda);// enviamos la variable global page
         
        $.ajax({// se arma un objecto por medio de ajax  
         url: 'Consultas/admindb.draw.php',// se indica donde llegara la informacion del objecto
@@ -101,4 +105,19 @@ function dibujaPaginacion(tabla){
             alert(thrownError);
           }
       });
+}
+
+function DisminuirPagina(tabla){
+   
+        page=page-1;
+        muestraRegistros(tabla);
+  
+   
+}
+
+function AumentarPagina(tabla){
+   
+   page=page+1;
+    
+   muestraRegistros(tabla);
 }

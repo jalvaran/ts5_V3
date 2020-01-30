@@ -94,47 +94,67 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indicce accion es diferent
             $RegistrosTotales=$Totales["Total"];
             $TotalPaginas= ceil($RegistrosTotales/$Limit);
             
-            print('  
-            <div class="row">
-                    <div class="col-md-5">
-                       <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
-                           Página '.$Page.' de '.$TotalPaginas.'<br> Total de Registros: '.number_format($RegistrosTotales).'
-                       </div>
-                    </div>
-                    <div class="col-md-7">
-                       <div class="box-tools pull-right" >
-                       <div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
-                           <ul class="pagination">
-                               <li class="paginate_button previous disabled" id="example2_previous">
-                                   <a href="#" aria-controls="example2" data-dt-idx="0" tabindex="0">Previous</a>
-                               </li>
-                               <li class="paginate_button active">
-                                   <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">1</a>
-                               </li>
-                               <li class="paginate_button ">
-                                   <a href="#" aria-controls="example2" data-dt-idx="2" tabindex="0">2</a>
-                               </li>
-                               <li class="paginate_button ">
-                                   <a href="#" aria-controls="example2" data-dt-idx="3" tabindex="0">3</a>
-                               </li>
-                               <li class="paginate_button ">
-                                   <a href="#" aria-controls="example2" data-dt-idx="4" tabindex="0">4</a>
-                               </li>
-                               <li class="paginate_button ">
-                                   <a href="#" aria-controls="example2" data-dt-idx="5" tabindex="0">5</a>
-                               </li>
-                               <li class="paginate_button ">
-                                   <a href="#" aria-controls="example2" data-dt-idx="6" tabindex="0">6</a>
-                               </li>
-                               <li class="paginate_button next" id="example2_next">
-                                   <a href="#" aria-controls="example2" data-dt-idx="7" tabindex="0">Next</a>
-                               </li>
-                           </ul>
-                       </div>
-                    </div>
+            if($RegistrosTotales>0){           
+            
+                print('  
+                <div class="row">
+                        <div class="col-md-5">
+                           <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
+                               Página '.$Page.' de '.$TotalPaginas.'<br> Total de Registros: '.number_format($RegistrosTotales).'
+                           </div>
                         </div>
-                 </div>
-            ');
+                        <div class="col-md-7">
+                           <div class="box-tools pull-right" >
+                           <div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
+                               <ul class="pagination">');
+                               
+                               if($Page>1){
+                                   
+                              
+                                    print('  
+                                        <li class="paginate_button next " id="example2_next" >
+                                            <a href="#" aria-controls="example2" data-dt-idx="7" tabindex="0">Inicio</a>
+                                        </li>
+                                        <li class="paginate_button previous " id="example2_previous" >
+                                            <a href="#" aria-controls="example2" data-dt-idx="0" tabindex="0" onclick="DisminuirPagina(`'.$Table.'`)">Anterior</a>
+                                        </li>');
+                                    }
+                                       print('<li class="paginate_button active">
+                                           <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">'.$Page.'</a>
+                                       </li>');
+                                       if(($Page+1)<=$TotalPaginas){
+                                            print('<li class="paginate_button">
+                                                <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">'.($Page+1).'</a>
+                                            </li>');
+                                       }
+                                       if(($Page+2)<=$TotalPaginas){
+                                       print('<li class="paginate_button">
+                                           <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">'.($Page+2).'</a>
+                                       </li>');
+                                       }
+                                       if(($Page+3)<=$TotalPaginas){
+                                       print('<li class="paginate_button">
+                                           <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">'.($Page+3).'</a>
+                                       </li>');
+                                       }
+                                   
+                                   if($Page<$TotalPaginas){
+                                        print(' 
+                                        <li class="paginate_button next " id="example2_next">
+                                            <a href="#" aria-controls="example2" data-dt-idx="7" tabindex="0" onclick="AumentarPagina(`'.$Table.'`)">Siguiente</a>
+                                        </li>
+                                        <li class="paginate_button next" id="example2_next">
+                                            <a href="#" aria-controls="example2" data-dt-idx="7" tabindex="0">Ultimo</a>
+                                        </li>');
+                                   }
+                                   print('   
+                               </ul>
+                           </div>
+                        </div>
+                            </div>
+                     </div>
+                ');
+            }           
         break; //fin caso 3    
         
  }

@@ -16,6 +16,9 @@ $sql = "SELECT * FROM productosventa pv INNER JOIN prod_codbarras cod ON cod.Pro
 		WHERE pv.Nombre LIKE '%$key%' or pv.idProductosVenta = '$key' OR  pv.Referencia = '$key' OR cod.CodigoBarras like '%$key%'
 		ORDER BY pv.Nombre ASC LIMIT 100"; 
 $result = $obRest->Query($sql);
+
+
+
 $json = [];
 
 while($row = $obRest->FetchAssoc($result)){
