@@ -480,6 +480,104 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CerrarDiv();
         break; //fin caso 7
         
+        case 8: //Crea las opciones para el reporte del balance general
+            $css->CrearDiv("", "col-md-2", "center", 1, 1);
+                $css->fieldset("", "", "FieldReporte", "Reporte", "", "");
+                    $css->legend("", "");
+                        print("<a href='#'>Año</a>");
+                    $css->Clegend();
+                    
+                    $AnioActual=$obCon->normalizar($_REQUEST["CmbAnio"]);
+                    
+                    if($AnioActual==""){
+                        $AnioActual=date("Y");
+                    }
+                    
+                    $css->select("CmbAnio", "form-control", "CmbAnio", "", "", "", "onchange=DibujeOpcionesReporte()"); 
+                        $sql="SELECT DISTINCT(SUBSTRING(Fecha,1,4)) as Anio FROM librodiario GROUP BY SUBSTRING(Fecha,1,4)";
+                        $Consulta=$obCon->Query($sql);
+                        while($DatosLibro=$obCon->FetchAssoc($Consulta)){
+                            $sel=0;
+                            $Anio=$DatosLibro["Anio"];
+                            if($Anio==$AnioActual){
+                                $sel=1;
+                            }
+                            $css->option("", "", "Rango", "$Anio", "", "",$sel);
+                                print($Anio);
+                            $css->Coption();
+                        }
+                        
+                                       
+                    $css->Cselect();
+                $css->Cfieldset();
+            $css->CerrarDiv();
+            $FechaMin=$AnioActual."-01-01";
+            $FechaMax=$AnioActual."-12-31";
+            $FechaSel=$AnioActual."-".date("m-d");
+            $css->CrearDiv("", "col-md-2", "center", 1, 1);
+                $css->fieldset("", "", "FieldReporte", "Reporte", "", "");
+                    $css->legend("", "");
+                        print("<a href='#'>Fecha Inicial</a>");
+                    $css->Clegend();           
+                    $css->input("date", "TxtFechaInicial", "form-control", "TxtFechaInicial", "", $FechaSel, "Fecha Inicial", "off", "", "style='line-height: 15px;'","min='$FechaMin' max='$FechaMax'");
+                $css->Cfieldset();
+            $css->CerrarDiv();
+            $css->CrearDiv("", "col-md-2", "center", 1, 1);
+                $css->fieldset("", "", "FieldReporte", "Reporte", "", "");
+                    $css->legend("", "");
+                        print("<a href='#'>Fecha Final</a>");
+                    $css->Clegend();           
+                    $css->input("date", "TxtFechaFinal", "form-control", "TxtFechaFinal", "", $FechaSel, "Fecha Inicial", "off", "", "style='line-height: 15px;'","min='$FechaMin' max='$FechaMax'");
+                $css->Cfieldset();
+            $css->CerrarDiv();
+            $css->CrearDiv("", "col-md-3", "center", 1, 1);
+                $css->fieldset("", "", "FieldReporte", "Reporte", "", "");
+                    $css->legend("", "");
+                        print("<a href='#'>Empresa</a>");
+                    $css->Clegend();
+                    $css->select("CmbEmpresa", "form-control", "CmbEmpresa", "", "", "", "");                
+                        $css->option("", "", "", "ALL", "", "");
+                            print("Completo");
+                        $css->Coption();
+                        $consulta=$obCon->ConsultarTabla("empresapro", "");
+                        while($DatosEmpresa=$obCon->FetchAssoc($consulta)){
+                            $css->option("", "", "", $DatosEmpresa["idEmpresaPro"], "", "");
+                                print($DatosEmpresa["idEmpresaPro"]." ".$DatosEmpresa["RazonSocial"]." ".$DatosEmpresa["NIT"]);
+                            $css->Coption();
+                        }
+                    $css->Cselect();
+                $css->Cfieldset();
+            $css->CerrarDiv();
+            $css->CrearDiv("", "col-md-3", "center", 1, 1);
+                $css->fieldset("", "", "FieldReporte", "Reporte", "", "");
+                    $css->legend("", "");
+                        print("<a href='#'>Centro de Costos</a>");
+                    $css->Clegend();
+                    $css->select("CmbCentroCosto", "form-control", "CmbCentroCosto", "", "", "", "");                
+                        $css->option("", "", "", "ALL", "", "");
+                            print("Completo");
+                        $css->Coption();
+                        $consulta=$obCon->ConsultarTabla("centrocosto", "");
+                        while($DatosEmpresa=$obCon->FetchAssoc($consulta)){
+                            $css->option("", "", "", $DatosEmpresa["ID"], "", "");
+                                print($DatosEmpresa["ID"]." ".$DatosEmpresa["Nombre"]);
+                            $css->Coption();
+                        }
+                    $css->Cselect();
+                $css->Cfieldset();
+            $css->CerrarDiv();
+            print("<br><br><br><br><br>");
+            $css->CrearDiv("DivAccion", "col-md-4", "center", 1, 1);
+            $css->CerrarDiv();
+            $css->CrearDiv("DivAccion", "col-md-4", "center", 1, 1);
+
+                $css->CrearBotonEvento("BtnCrearReporte", "Generar", 1, "onClick", "GenereHTMLBalanceGeneralAnio()", "naranja", "");
+
+            $css->CerrarDiv();
+            $css->CrearDiv("DivAccion", "col-md-4", "center", 1, 1);
+            $css->CerrarDiv();
+        break; //fin caso 8
+        
     }
     
     

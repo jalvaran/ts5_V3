@@ -25,7 +25,7 @@ if(isset($_REQUEST["idDocumento"])){
             $obDoc->EstadosResultadosAnio_PDF($FechaInicial,$FechaFinal,$idEmpresa,$CentroCosto,"" );
     
             
-        break;
+        break;//Fin caso 1
     
         case 2://Genera el html con los datos del estado de resultados
             
@@ -47,7 +47,7 @@ if(isset($_REQUEST["idDocumento"])){
             //$obDoc->EstadosResultadosAnio_PDF($FechaInicial,$FechaFinal,$idEmpresa,$CentroCosto,"" );
     
             
-        break;
+        break;//Fin caso 2
     
         case 3://Genera el html con los datos del movimiento de cuentas
             
@@ -105,7 +105,29 @@ if(isset($_REQUEST["idDocumento"])){
             //$obDoc->EstadosResultadosAnio_PDF($FechaInicial,$FechaFinal,$idEmpresa,$CentroCosto,"" );
     
             
-        break;
+        break;//Fin caso 3
+        
+        case 4://Genera el html con los datos del balance general
+            
+            $FechaInicial=$obCon->normalizar($_REQUEST["TxtFechaInicial"]);
+            $FechaFinal=$obCon->normalizar($_REQUEST["TxtFechaFinal"]);
+            $idEmpresa=$obCon->normalizar($_REQUEST["CmbEmpresa"]);
+            $CentroCosto=$obCon->normalizar($_REQUEST["CmbCentroCosto"]);             
+            $Anio=$obCon->normalizar($_REQUEST["CmbAnio"]);
+            $obCon->ConstruirVistaEstadoResultados($Anio, $idEmpresa, $CentroCosto, "");
+            $FechaReporte="Del $FechaInicial al $FechaFinal";
+            $TotalClases=$obDoc->ArmeTemporalSubCuentas("Rango", $FechaFinal, $FechaInicial, $CentroCosto, $idEmpresa, "");
+            $html=$obDoc->HTMLBalanceGeneralDetallado($TotalClases, $FechaReporte);
+            $page="Consultas/PDF_ReportesContables.draw.php?idDocumento=1&TxtFechaInicial=$FechaInicial&TxtFechaFinal=$FechaFinal"; 
+            $page.="&CmbEmpresa=$idEmpresa&CmbCentroCosto=$CentroCosto&CmbAnio=$Anio";
+            print("<a href='$page' target='_blank'><button class='btn btn-warning' >Exportar a PDF</button></a>");
+            print("<input type='button' class='btn btn-success' value='Exportar a Excel' onclick=ExportarTablaToExcel('EstadoResultados')> ");
+            //$css->CrearBotonEvento("BtnExportar", "Exportar", 1, "onclick", "ExportarTablaToExcel('TblReporte')", "verde", "");
+            print($html);
+            //$obDoc->EstadosResultadosAnio_PDF($FechaInicial,$FechaFinal,$idEmpresa,$CentroCosto,"" );
+    
+            
+        break;//Fin caso 4
         
     }
 }else{

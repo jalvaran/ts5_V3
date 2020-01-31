@@ -4,7 +4,7 @@
  * TECHNO SOLUCIONES SAS 
  * 317 774 0609
  */
-
+document.getElementById("BtnMuestraMenuLateral").click();
 
 /*
  * Genera el reporte contable balance por terceros
@@ -135,6 +135,10 @@ function DibujeOpcionesReporte(){
     
     if(Reporte==4){//Movimiento de cuentas
         var Accion=7;
+    }
+    
+    if(Reporte==5){//Balance general
+        var Accion=8;
     }
     
     var form_data = new FormData();
@@ -533,4 +537,77 @@ function ExportarTablaToExcel(idTabla){
         "type": "table"
     });
     excel.generate();
+}
+
+
+function GenereHTMLBalanceGeneralAnio(){    
+    document.getElementById("DivReportesContables").innerHTML='<div id="GifProcess">Procesando...<br><img   src="../../images/process.gif" alt="Cargando" height="100" width="100"></div>';
+    var TxtFechaInicial = document.getElementById('TxtFechaInicial').value;
+    var TxtFechaFinal = document.getElementById('TxtFechaFinal').value;
+    var CmbCentroCosto = document.getElementById('CmbCentroCosto').value;
+    var CmbEmpresa = document.getElementById('CmbEmpresa').value;
+    var CmbAnio = document.getElementById('CmbAnio').value;
+        
+    if(TxtFechaInicial==""){
+        alertify.alert("Debe seleccionar una fecha inicial");
+        document.getElementById('TxtFechaInicial').style.backgroundColor="pink";
+        return;
+    }else{
+        document.getElementById('TxtFechaInicial').style.backgroundColor="white";
+    }
+    
+    if(TxtFechaFinal==""){
+        alertify.alert("Debe seleccionar una fecha final");
+        document.getElementById('TxtFechaFinal').style.backgroundColor="pink";
+        return;
+    }else{
+        document.getElementById('TxtFechaFinal').style.backgroundColor="white";
+    }
+    
+    if(CmbCentroCosto==""){
+        alertify.alert("Debe seleccionar un Centro de costos");
+        document.getElementById('CmbCentroCosto').style.backgroundColor="pink";
+        return;
+    }else{
+        document.getElementById('CmbCentroCosto').style.backgroundColor="white";
+    }
+    
+    if(CmbEmpresa==""){
+        alertify.alert("Debe seleccionar una  Empresa");
+        document.getElementById('CmbEmpresa').style.backgroundColor="pink";
+        return;
+    }else{
+        document.getElementById('CmbEmpresa').style.backgroundColor="white";
+    }
+    
+    
+    var form_data = new FormData();
+        form_data.append('idDocumento', 4);
+        
+        form_data.append('TxtFechaInicial', TxtFechaInicial);
+        form_data.append('TxtFechaFinal', TxtFechaFinal);
+        form_data.append('CmbCentroCosto', CmbCentroCosto);
+        form_data.append('CmbEmpresa', CmbEmpresa);
+        form_data.append('CmbAnio', CmbAnio);
+          
+        $.ajax({
+        url: './Consultas/PDF_ReportesContables.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            console.log(data);
+            document.getElementById("DivOpcionesReportes").innerHTML="";
+            document.getElementById("DivReportesContables").innerHTML=data;
+            document.getElementById("DivPDFReportes").style.display="none";
+          
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })        
 }

@@ -26,7 +26,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indicce accion es diferent
             
             while($DatosTablas=$obCon->FetchAssoc($Consulta)){
                 $tabla=$DatosTablas["table_name"];
-                print("<a href='#'  target='_self' onclick=muestraRegistros(`$tabla`) >");
+                print("<a href='#'  target='_self' onclick=page=1;muestraRegistros(`$tabla`) >");
                 print($DatosTablas["table_name"]."</a><br>");
             }
             
@@ -38,10 +38,31 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indicce accion es diferent
             
             $DataBase=$obCon->normalizar($_REQUEST["cmbDataBase"]);// la funcion normalizar lo que haces es verificar que el contenido no lleve instrucciones para hacer daños en la base de datos 
             $TableDataBase=$obCon->normalizar($_REQUEST["tableDataBase"]);// la funcion normalizar lo que haces es verificar que el contenido no lleve instrucciones para hacer daños en la base de datos 
-     
-            $sql="SELECT * FROM  $DataBase.$TableDataBase LIMIT 50;";
+            
+            $Limit=$obCon->normalizar($_REQUEST["limit"]);
+            $Page=$obCon->normalizar($_REQUEST["page"]);
+            $Busqueda=$obCon->normalizar($_REQUEST["Busqueda"]);
+            
+            $Condicion="";
+            
+            if($Busqueda<>''){
+                $Columnas=$obCon->ShowColums($TableDataBase); //muestra las columnas de la tabla
+                $Condicion=" WHERE ";
+                foreach ($Columnas["Field"] as $key => $value) { // recorre el array que tiene las columnas de la tabla
+                    
+                    $Condicion.="`".$value."` LIKE '%$Busqueda%' OR"; // arma la condicion para la consulta teniendo en cuenta todas las columnas de la tabla
+                }
+                $Condicion= substr($Condicion,0, -2); // le elimina los dos ultimos caracteres a la condicion
+                
+            }
+            
+            $PuntoInicio = ($Page * $Limit) - $Limit;
+            
+            
+            $sql="SELECT * FROM  $DataBase.$TableDataBase $Condicion LIMIT $PuntoInicio,$Limit;";
             $Consulta=$obCon->Query($sql);
             
+            $css->input("hidden", "TxtTableName", "", "", "", $TableDataBase, "", "", "", "","disabled");
             $css->CrearTitulo($TableDataBase, "verde");
             
             $css->CrearTabla();
@@ -120,21 +141,21 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indicce accion es diferent
                                         </li>');
                                     }
                                        print('<li class="paginate_button active">
-                                           <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">'.$Page.'</a>
+                                           <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0" onclick="page=`'.$Page.'`;muestraRegistros(`'.$Table.'`)">'.$Page.'</a>
                                        </li>');
                                        if(($Page+1)<=$TotalPaginas){
                                             print('<li class="paginate_button">
-                                                <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">'.($Page+1).'</a>
+                                                <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0" onclick="page=`'.($Page+1).'`;muestraRegistros(`'.$Table.'`)">'.($Page+1).'</a>
                                             </li>');
                                        }
                                        if(($Page+2)<=$TotalPaginas){
                                        print('<li class="paginate_button">
-                                           <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">'.($Page+2).'</a>
+                                           <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0" onclick="page=`'.($Page+2).'`;muestraRegistros(`'.$Table.'`)">'.($Page+2).'</a>
                                        </li>');
                                        }
                                        if(($Page+3)<=$TotalPaginas){
                                        print('<li class="paginate_button">
-                                           <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">'.($Page+3).'</a>
+                                           <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0" onclick="page=`'.($Page+3).'`;muestraRegistros(`'.$Table.'`)">'.($Page+3).'</a>
                                        </li>');
                                        }
                                    

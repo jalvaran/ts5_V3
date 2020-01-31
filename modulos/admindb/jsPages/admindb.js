@@ -4,8 +4,14 @@
  * 2020-01-26
  */
 // variables globales para paginacion
-var limit=10;
+
+var limit =document.getElementById("limit").value;
 var page=1;
+
+function CambiarLimite(){
+    limit =document.getElementById("limit").value;
+    muestraRegistros();
+}
 
 document.getElementById("BtnMuestraMenuLateral").click(); //da click sobre el boton que esconde el menu izquierdo de la pagina principal
 
@@ -45,8 +51,10 @@ function ListTables(){
       });
 }
 
-function muestraRegistros(tabla){
-    
+function muestraRegistros(tabla=''){
+    if(tabla==''){
+        var tabla =document.getElementById("TxtTableName").value;
+    }
     var cmbDataBase =document.getElementById("cmbDataBase").value;
     var Busqueda =document.getElementById("TxtBusquedas").value;
     

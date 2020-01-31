@@ -12,14 +12,14 @@ if($idUser==''){
 $obRest=new ProcesoVenta($idUser);
 $key=$obRest->normalizar($_REQUEST['q']);
 
-$sql = "SELECT * FROM clientes 
+$sql = "SELECT idClientes,RazonSocial,Num_Identificacion,Telefono,Direccion FROM clientes 
 		WHERE RazonSocial LIKE '%$key%' or Num_Identificacion LIKE '%$key%' OR  Telefono LIKE '%$key%'
-		LIMIT 50"; 
+		LIMIT 200"; 
 $result = $obRest->Query($sql);
 $json = [];
 
 while($row = $obRest->FetchAssoc($result)){
-    $Texto=$row['RazonSocial']." ".$row['Num_Identificacion']." ".$row['Telefono'];
-     $json[] = ['id'=>$row['idClientes'], 'text'=>$Texto];
+    $Texto= utf8_encode($row['RazonSocial'])." || ".$row['Direccion']." || ".$row['Telefono'];
+    $json[] = ['id'=>$row['idClientes'], 'text'=>$Texto];
 }
 echo json_encode($json);

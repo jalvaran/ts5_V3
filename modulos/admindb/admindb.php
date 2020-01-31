@@ -91,9 +91,28 @@ $css->PageInit($myTitulo);
               <!-- /.box -->
             </div>');
             $css->CrearDiv("", "col-md-9", "left", 1, 1);
+            
+            $css->select("limit", "form-control", "limit", "", "", "onchange=CambiarLimite();", "style=width:100px");
+                $css->option("", "", "", 10, "", "");
+                    print("10");
+                $css->Coption();
+                $css->option("", "", "", 25, "", "");
+                    print("25");
+                $css->Coption();
+                $css->option("", "", "", 50, "", "");
+                    print("50");
+                $css->Coption();
+                $css->option("", "", "", 100, "", "");
+                    print("100");
+                $css->Coption();
+                $css->option("", "", "", 500, "", "");
+                    print("500");
+                $css->Coption();
+            $css->Cselect();
+            
             $css->CrearDiv("", "box-tools pull-right", "left", 1, 1);                
                     print('<div class="input-group">');               
-                        $css->input("text", "TxtBusquedas", "form-control", "TxtBusquedas", "", "", "Buscar", "", "", "onchange=BuscarRegistros()");
+                        $css->input("text", "TxtBusquedas", "form-control", "TxtBusquedas", "", "", "Buscar", "", "", "onchange=page=1;muestraRegistros()");
 
                     print('<span class="input-group-addon"><i class="fa fa-fw fa-search"></i></span>
                               </div>');

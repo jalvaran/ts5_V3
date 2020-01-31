@@ -268,22 +268,63 @@ class PDF_ReportesContables extends Documento{
            $html.='</tr>'; 
         }
         $html.='</table>'; 
-        /*
-        $TotalIngresos=0;
-        if($TotalClases[4]<>""){
-            $TotalIngresos=  number_format($TotalClases[4]);
+        
+        return($html);
+    }
+    
+    
+    //Armar el html para el estado de resultados
+    public function HTMLBalanceGeneralDetallado($TotalClases,$FechaCorte) {
+        $Back="#CEE3F6";
+        $html='<table id="BalanceGeneral" class="table table-bordered table table-hover" cellspacing="1" cellpadding="2" border="0"  align="center" >';
+        $html.='<tr style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">';
+        $html.='<td colspan="5"><strong>Estado de Situacion Financiera <br> '.$FechaCorte.'</strong></td></tr>'; 
+        $html.='<tr style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">';
+        $html.='<td colspan="5"><strong>ACTIVOS</strong></td></tr>';
+        
+        ///Se dibujan los activos
+        $h=0;  
+        $Back="white";
+        $Consulta=$this->obCon->ConsultarTabla("estadosfinancieros_mayor_temporal", " WHERE Clase=1");
+        $html.='<tr align="left" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+        $html.='<td><strong>CUENTA</strong></td><td><strong>NOMBRE</strong></td><td><strong>SALDO ANTERIOR</strong></td><td><strong>SALDO</strong></td><td><strong>SALDO FINAL</strong></td>'; 
+        
+        $html.='</tr>';   
+        
+        while($DatosMayor=$this->obCon->FetchArray($Consulta)){
+            
+            if($h==0){
+                $Back="#f2f2f2";
+                $h=1;
+            }else{
+                $Back="white";
+                $h=0;
+            }
+           $Valor=  number_format($DatosMayor["Neto"]);
+           $SaldoAnterior=  number_format($DatosMayor["SaldoAnterior"]);
+           $SaldoFinal=  number_format($DatosMayor["SaldoFinal"]);
+           
+           $html.='<tr align="left" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+           //$html.='<td><strong>CUENTA</strong></td><td><strong>NOMBRE</strong></td><td><strong>SALDO ANTERIOR</strong></td><td><strong>SALDO</strong></td><td><strong>SALDO FINAL</strong></td>'; 
+           $html.='<td>'.$DatosMayor["CuentaPUC"].'</td><td>'.utf8_encode($DatosMayor["NombreCuenta"]).'</td><td align="right">'.$SaldoAnterior.'</td>'.'<td align="right">'.$Valor.'</td>'.'<td align="right">'.$SaldoFinal.'</td>' ; 
+           $html.='</tr>'; 
+        }
+        
+        $TotalActivos=$TotalClases[1];
+        if($TotalClases[1]<>""){
+            $TotalActivosN=  number_format($TotalClases[1]);
         }
         $Back="#f9e79f";
         $html.='<tr align="right" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
-        $html.='<td colspan="3"><strong>Total de Ingresos:</strong></td><td><strong>'.$TotalIngresos.'</strong></td><td> </td>'; 
+        $html.='<td colspan="3"><strong>Total de Activos:</strong></td><td><strong>'.$TotalActivosN.'</strong></td><td> </td>'; 
         $html.='</tr>'; 
         
-         ///Se dibujan los costos de venta y produccion
+         ///Se dibujan los pasivos
         $Back="#CEE3F6";
         $html.='<tr style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">';
-        $html.='<td colspan="5"><strong>COSTOS DE VENTA Y/O PRODUCCION</strong></td></tr>';
+        $html.='<td colspan="5"><strong>PASIVOS</strong></td></tr>';
         $h=1; 
-        $Consulta=$this->obCon->ConsultarTabla("estadosfinancieros_mayor_temporal", " WHERE Clase=6 OR Clase=7");
+        $Consulta=$this->obCon->ConsultarTabla("estadosfinancieros_mayor_temporal", " WHERE Clase=2");
               
         while($DatosMayor=$this->obCon->FetchArray($Consulta)){
             if($h==0){
@@ -299,39 +340,27 @@ class PDF_ReportesContables extends Documento{
            $SaldoAnterior=  number_format($DatosMayor["SaldoAnterior"]);
            $SaldoFinal=  number_format($DatosMayor["SaldoFinal"]);
            
-           $html.='<td>'.$DatosMayor["CuentaPUC"].'</td><td>'.$DatosMayor["NombreCuenta"].'</td><td align="right">'.$SaldoAnterior.'</td>'.'<td align="right">'.$Valor.'</td>'.'<td align="right">'.$SaldoFinal.'</td>' ; 
+           $html.='<td>'.$DatosMayor["CuentaPUC"].'</td><td>'.utf8_encode($DatosMayor["NombreCuenta"]).'</td><td align="right">'.$SaldoAnterior.'</td>'.'<td align="right">'.$Valor.'</td>'.'<td align="right">'.$SaldoFinal.'</td>' ; 
            $html.='</tr>'; 
         }
         
         
-        $TotalCostos=$TotalClases[6]+$TotalClases[7];
-        $TotalCostosN=0;
-        if($TotalCostos<>""){
-            $TotalCostosN=  number_format($TotalCostos);
+    $TotalPasivos=$TotalClases[2]*(-1);
+        $TotalPasivosN=0;
+        if($TotalPasivos<>""){
+            $TotalPasivosN=  number_format($TotalPasivos);
         }
         $Back="#fef9e7";
         $html.='<tr align="right" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
-        $html.='<td colspan="3"><strong>Total Costos de Venta y/o Produccion:</strong></td><td><strong>'.$TotalCostosN.'</strong></td><td> </td>'; 
+        $html.='<td colspan="3"><strong>Total Pasivos:</strong></td><td><strong>'.$TotalPasivosN.'</strong></td><td> </td>'; 
         $html.='</tr>'; 
-        
-        ///Dibujamos Utilidad Bruta
-        
-        $UtilidadBruta=0;
-        if($TotalClases["UB"]<>""){
-            $UtilidadBruta=  number_format($TotalClases["UB"]);
-        }
-        $Back="#f9e79f";
-        $html.='<tr align="right" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
-        $html.='<td colspan="3"><strong>Utilidad Bruta:</strong></td><td><strong>'.$UtilidadBruta.'</strong></td><td> </td>'; 
-        $html.='</tr>'; 
-        
         
         ///Se dibujan los gastos y utilidad de la operacion
         $Back="#CEE3F6";
         $html.='<tr style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">';
-        $html.='<td colspan="5"><strong>GASTOS</strong></td></tr>';
+        $html.='<td colspan="5"><strong>PATRIMONIO</strong></td></tr>';
         $h=1; 
-        $Consulta=$this->obCon->ConsultarTabla("estadosfinancieros_mayor_temporal", " WHERE Clase=5");
+        $Consulta=$this->obCon->ConsultarTabla("estadosfinancieros_mayor_temporal", " WHERE Clase=3");
               
         while($DatosMayor=$this->obCon->FetchArray($Consulta)){
             if($h==0){
@@ -346,34 +375,46 @@ class PDF_ReportesContables extends Documento{
            $SaldoAnterior=  number_format($DatosMayor["SaldoAnterior"]);
            $SaldoFinal=  number_format($DatosMayor["SaldoFinal"]);
            
-           $html.='<td>'.$DatosMayor["CuentaPUC"].'</td><td>'.$DatosMayor["NombreCuenta"].'</td><td align="right">'.$SaldoAnterior.'</td>'.'<td align="right">'.$Valor.'</td>'.'<td align="right">'.$SaldoFinal.'</td>' ; 
+           $html.='<td>'.$DatosMayor["CuentaPUC"].'</td><td>'.utf8_encode($DatosMayor["NombreCuenta"]).'</td><td align="right">'.$SaldoAnterior.'</td>'.'<td align="right">'.$Valor.'</td>'.'<td align="right">'.$SaldoFinal.'</td>' ; 
            $html.='</tr>';  
-         
         }
         
-        
-        if($TotalClases[5]<>""){
-            $TotalGastos=  number_format($TotalClases[5]);
+        $TotalPatrimonio=$TotalClases[3]*(-1);
+        $TotalPatrimonioN=0;
+        if($TotalPatrimonio<>""){
+            $TotalPatrimonioN=  number_format($TotalPatrimonio);
         }
         $Back="#fef9e7";
         $html.='<tr align="right" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
-        $html.='<td colspan="3"><strong>Total Gastos:</strong></td><td><strong>'.$TotalGastos.'</strong></td><td> </td>'; 
+        $html.='<td colspan="3"><strong>Total Patrimonio:</strong></td><td><strong>'.$TotalPatrimonioN.'</strong></td><td> </td>'; 
         $html.='</tr>'; 
         
-        ///Dibujamos Utilidad Bruta
+        ///Dibujamos la suma de los pasivos mas el patrimonio
         
-        $UtilidadOperacional=0;
-        if($TotalClases["UO"]<>""){
-            $UtilidadOperacional=  number_format($TotalClases["UO"]);
+        $PasivoPatrimonio=$TotalPasivos+$TotalPatrimonio;
+        $PasivoPatrimonioN=0;
+        if($PasivoPatrimonio<>""){
+            $PasivoPatrimonioN=  number_format($PasivoPatrimonio);
         }
         $Back="#f9e79f";
         $html.='<tr align="right" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
-        $html.='<td colspan="3"><strong>Utilidad de la Operacion:</strong></td><td><strong>'.$UtilidadOperacional.'</strong></td><td> </td>'; 
+        $html.='<td colspan="3"><strong>PASIVO + PATRIMONIO:</strong></td><td><strong>'.$PasivoPatrimonioN.'</strong></td><td> </td>'; 
+        $html.='</tr>'; 
+        
+        
+        //Diferencia
+        
+        $Diferencia=$TotalActivos+$PasivoPatrimonio;
+        $DiferenciaN=0;
+        if($Diferencia<>""){
+            $DiferenciaN=  number_format($Diferencia);
+        }
+        $Back="#f9e79f";
+        $html.='<tr align="right" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+        $html.='<td colspan="3"><strong>DIFERENCIA:</strong></td><td><strong>'.$DiferenciaN.'</strong></td><td> </td>'; 
         $html.='</tr>'; 
         
         $html.="</table>";
-         * 
-         */
         return($html);
     }
     

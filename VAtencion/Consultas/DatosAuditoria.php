@@ -19,8 +19,8 @@ $Valida=$obVenta->normalizar($_GET['Valida']);
 
 if($Valida==1){
     
-    $sql="SELECT SUM(`Neto`) as Total, `Tipo_Documento_Intero`,`Num_Documento_Interno` FROM `librodiario` "
-            . " GROUP BY `Tipo_Documento_Intero`,`Num_Documento_Interno` ORDER BY SUM(`Neto`) DESC LIMIT 100";
+    $sql="SELECT SUM(`Neto`) as Total, `Tipo_Documento_Intero`,`Num_Documento_Interno` FROM `librodiario` 
+            GROUP BY `Tipo_Documento_Intero`,`Num_Documento_Interno` ORDER BY SUM(`Neto`) DESC LIMIT 100";
     $consulta=$obVenta->Query($sql);
     if($obVenta->NumRows($consulta)){
         $css->CrearNotificacionRoja("Documentos encontrados", 16);
@@ -33,7 +33,7 @@ if($Valida==1){
         $css->CierraFilaTabla();
         
         while($DatosDocumento=$obVenta->FetchArray($consulta)){
-            if($DatosDocumento["Total"]>(0.01) or $DatosDocumento["Total"]<(-0.01)){
+            if(($DatosDocumento["Total"]>(0.01) or $DatosDocumento["Total"]<(-0.01)) ){
                 
                 $css->FilaTabla(16);
                 $css->ColTabla($DatosDocumento["Tipo_Documento_Intero"], 1);
