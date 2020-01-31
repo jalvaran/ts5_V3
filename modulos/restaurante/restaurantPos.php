@@ -112,7 +112,7 @@ $css->PageInit($myTitulo);
         
         $css->CerrarDiv();
         
-        $css->CrearDiv("DivMensajesModulo", "col-md-12", "center", 1, 1); 
+        $css->CrearDiv("DivMensajes", "col-md-12", "center", 1, 1); 
             
         $css->CerrarDiv();
         $css->CrearDiv("", "col-md-12", "center", 1, 1); 
@@ -131,28 +131,44 @@ $css->PageInit($myTitulo);
                 $css->CerrarDiv();
                 
                 $css->CrearDiv("", "col-md-3", "center", 1, 1);
-                    $css->input("text", "Codigo", "form-control", "Codigo", "Codigo", "", "Código", "off", "", "onchange=AgregarItem()");
+                    $css->input("text", "Codigo", "form-control", "Codigo", "Codigo", "", "Código", "off", "", "");
                 $css->CerrarDiv();  
                 
                 $css->CrearDiv("", "col-md-2", "center", 1, 1);
                     print('<div class="input-group input-group-md">');
                         $css->input("number", "Cantidad", "form-control", "Cantidad", "Cantidad", "1", "Cantidad", "off", "", "");
                          print('<span class="input-group-btn">
-                            <button type="button" class="btn btn-success btn-flat" onclick=AgregarItem()><i class="fa fa-plus"></i></button>
+                            <button type="button" id="BtnAgregarItem" class="btn btn-success btn-flat" onclick=AgregarItem()><i class="fa fa-plus"></i></button>
                           </span>');
                     $css->CerrarDiv();
                 $css->CerrarDiv();
-
+                
+                $css->CrearDiv("", "col-md-12", "center", 1, 1);
+                    $css->textarea("Observaciones", "form-control", "Observaciones", "", "Observaciones", "", "");
+                        
+                    $css->Ctextarea();
+                $css->CerrarDiv();
             $css->Cfieldset();    
         $css->CerrarDiv();                
         
         $css->CrearDiv("", "col-md-12", "center", 1, 1); 
-            $css->CrearDiv("DivDatosCompras", "col-md-8", "left", $Habilita, 1); //Datos para la creacion de la compra
-                $css->fieldset("", "", "FieldDatosCompra", "items en esta venta", "", "");
+            $css->CrearDiv("DivDatosItems", "col-md-8", "left", $Habilita, 1); //Datos para la creacion de la compra
+                $css->fieldset("", "", "FieldDatosPedido", "items en esta venta", "", "");
                     $css->legend("", "");
                         print("<a href='#'>Items Agregados</a>");
                     $css->Clegend();    
                     $css->CrearDiv("DivItems", "", "center", 1, 1,"","height: 400px;overflow: auto;");   
+
+                    $css->CerrarDiv();       
+                $css->Cfieldset();
+            $css->CerrarDiv();
+            
+            $css->CrearDiv("DivTotales", "col-md-4", "left", $Habilita, 1); //Datos para la creacion de la compra
+                $css->fieldset("", "", "FieldDatosPedido", "Totales en esta venta", "", "");
+                    $css->legend("", "");
+                        print("<a href='#'>Totales</a>");
+                    $css->Clegend();    
+                    $css->CrearDiv("DivTotalesPedido", "", "center", 1, 1,"","height: 400px;overflow: auto;");   
 
                     $css->CerrarDiv();       
                 $css->Cfieldset();
