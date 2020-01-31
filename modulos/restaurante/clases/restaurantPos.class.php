@@ -16,7 +16,7 @@ class VentasRestaurantePOS extends Facturacion{
      * @param type $Vector
      * @return type
      */
-    public function CrearPedido($idMesa,$idCliente,$NombreCliente, $DireccionEnvio,$Telefono,$Observaciones, $idUser,$Vector ) {
+    public function CrearPedido($idMesa,$idCliente,$NombreCliente, $DireccionEnvio,$Telefono,$Observaciones, $idUser,$Tipo=1 ) {
         $Fecha=date("Y-m-d");
         $Hora=date("H:i:s");
         $FechaCreacion=$Fecha." ".$Hora;
@@ -26,7 +26,7 @@ class VentasRestaurantePOS extends Facturacion{
         $Datos["idUsuario"]=$idUser;
         $Datos["idMesa"]=$idMesa;
         $Datos["Estado"]="1";
-        $Datos["Tipo"]=1;
+        $Datos["Tipo"]=$Tipo;
         $Datos["idCliente"]=$idCliente;
         $Datos["NombreCliente"]=$NombreCliente;
         $Datos["DireccionEnvio"]=$DireccionEnvio;

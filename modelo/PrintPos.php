@@ -1372,6 +1372,7 @@ class PrintPos extends ProcesoVenta{
             die('ERROR:\nNo se puedo Imprimir, Verifique la conexion de la IMPRESORA');
         }
        $DatosPedido=$this->DevuelveValores("restaurante_pedidos", "ID", $idPedido);
+       $TipoPedido=$DatosPedido["Tipo"];
        $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosPedido["idCliente"]);
         $Fecha=$DatosPedido["Fecha"];
         $Hora=$DatosPedido["Hora"];
@@ -1403,7 +1404,12 @@ class PrintPos extends ProcesoVenta{
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
         fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
-        fwrite($handle,"DOMICILIO No $idPedido"); // Titulo
+        $DatosTipoPedido= $this->DevuelveValores("restaurante_tipos_pedido", "ID", $TipoPedido);
+        $Titulo="DOMICILIO No $idPedido";
+        if($DatosTipoPedido["Nombre"]<>''){
+            $Titulo=$DatosTipoPedido["Nombre"]." No $idPedido";
+        }
+        fwrite($handle,$Titulo); // Titulo
         fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
         fwrite($handle,"********************");
         fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA

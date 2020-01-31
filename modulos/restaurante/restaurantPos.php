@@ -30,8 +30,9 @@ $css->PageInit($myTitulo);
         $Habilita=0;
     }
     $css->CrearDiv("", "", "", 0, 1);
+        print('<a id="vinculoInicio" href="#AnclaInicio" title="Facturas">INICIO </a>');
         print('<a id="vinculoItems" href="#AnclaItems" title="Facturas">ITEMS </a>');
-        print('<a id="vinculoOpcionesPago" href="#AnclaOpcionesPago" title="Facturas">OPCIONES DE PAGO </a>');
+        
     $css->CerrarDiv();
     
     $css->input("hidden", "idCajero", "", "idCajero", "", $idUser, "", "", "", "");
@@ -39,7 +40,8 @@ $css->PageInit($myTitulo);
         
         $css->fieldset("", "", "FieldDatosCotizacion", "DatosCotizacion", "", "");
             $css->legend("", "");
-                print("<a href='#'>POS TS5,<span id='SpEstadoCaja'> Usted está asignad@ a la caja No. $DatosCaja[ID]</span></a>");
+                
+                print("<a name='AnclaInicio' >POS TS5,<span id='SpEstadoCaja'> Usted está asignad@ a la caja No. $DatosCaja[ID]</span></a>");
                 
             $css->Clegend(); 
             
@@ -131,7 +133,7 @@ $css->PageInit($myTitulo);
                 $css->CerrarDiv();
                 
                 $css->CrearDiv("", "col-md-3", "center", 1, 1);
-                    $css->input("text", "Codigo", "form-control", "Codigo", "Codigo", "", "Código", "off", "", "");
+                    $css->input("number", "Codigo", "form-control", "Codigo", "Codigo", "", "Código", "off", "", "");
                 $css->CerrarDiv();  
                 
                 $css->CrearDiv("", "col-md-2", "center", 1, 1);
@@ -178,14 +180,16 @@ $css->PageInit($myTitulo);
         
     $css->CerrarDiv();
     
-    $css->CrearDiv("DivListadoPedidos", "col-md-4", "left", $Habilita, 1); 
+    $css->CrearDiv("", "col-md-4", "left", $Habilita, 1); 
         $css->fieldset("", "", "FieldDatosCotizacion", "DatosCotizacion", "", "");
             $css->legend("", "");
                 print("<a href='#'>Lista de Pedidos</a>");
                 
             $css->Clegend(); 
             
-            
+            $css->CrearDiv("DivListadoPedidos", "", "center", 1, 1,"","height: 800px;overflow: auto;");   
+
+            $css->CerrarDiv();
             
         $css->Cfieldset();   
     $css->CerrarDiv();

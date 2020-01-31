@@ -107,7 +107,9 @@ function posiciona(id){
  */
 function AccionesPOS(){
     var Accion = document.getElementById("idFormulario").value;
-        
+    if(Accion==1){
+        CrearDomicilioLlevar();
+    }    
     if(Accion==100){
         CrearTercero('ModalAccionesPOS','BntModalPOS');
     }
@@ -134,12 +136,10 @@ function FormularioCrearPedido(){
     if(TipoPedido==1){ //Pedidos para mesas
         FormularioPedidoMesa();
     }
-    if(TipoPedido==2){ //Pedidos para Domicilios
-        FormularioPedidoDomicilio();
+    if(TipoPedido==2 || TipoPedido==3){ //Pedidos para Domicilios
+        FormularioDomicilioLlevar();
     }
-    if(TipoPedido==3){ //Pedidos para llevar
-        FormularioPedidoLlevar();
-    }
+    
 }
 /*
  * Dibuja el formulario para crear un pedido a una mesa
@@ -152,6 +152,39 @@ function FormularioPedidoMesa(){
     var form_data = new FormData();
         
         form_data.append('Accion', 1);
+        form_data.append('TipoPedido', TipoPedido);
+        
+        $.ajax({
+        url: './Consultas/restaurantPos.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivFrmPOS').innerHTML=data;
+                  
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+} 
+
+/*
+ * Dibuja el formulario para crear un domicilio 
+ */
+function FormularioDomicilioLlevar(){
+    
+    $("#ModalAccionesPOS").modal();
+    var TipoPedido = document.getElementById("TipoPedido").value;
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 7);
         form_data.append('TipoPedido', TipoPedido);
         
         $.ajax({
@@ -201,6 +234,54 @@ function CrearPedidoMesa(idMesa){
                 alertify.success(respuestas[1]);
                 CierraModal('ModalAccionesPOS');
                 DibujePedidoActivo();
+                
+            }else{
+                document.getElementById(idDivMensajes).innerHTML=data;
+                
+            }
+                       
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
+function CrearDomicilioLlevar(){
+    var idDivMensajes='DivMensajes';
+    var TelefonoPedido=document.getElementById("TelefonoPedido").value;    
+    var NombrePedido=document.getElementById("NombrePedido").value;    
+    var DireccionPedido=document.getElementById("DireccionPedido").value;    
+    var ObservacionesPedido=document.getElementById("ObservacionesPedido").value;  
+    var TipoPedido=document.getElementById("TipoPedido").value; 
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '12'); 
+        form_data.append('TelefonoPedido', TelefonoPedido);
+        form_data.append('NombrePedido', NombrePedido);
+        form_data.append('DireccionPedido', DireccionPedido);
+        form_data.append('ObservacionesPedido', ObservacionesPedido);
+        form_data.append('TipoPedido', TipoPedido);
+        
+        $.ajax({
+        url: './procesadores/restaurantPos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                
+                idPedidoActivo=respuestas[2];
+                alertify.success(respuestas[1]);                
+                DibujePedidoActivo();
+                CierraModal('ModalAccionesPOS');
                 
             }else{
                 document.getElementById(idDivMensajes).innerHTML=data;
@@ -490,3 +571,279 @@ function ImprimirPrecuenta(idPedido=''){
     
     
 }
+
+
+function AbrirOpcionesFacturacion(idPedido=''){
+    if(idPedido==''){
+        var idPedido=idPedidoActivo;
+    }
+    $("#ModalAccionesPOS").modal();
+    document.getElementById("DivFrmPOS").innerHTML='<div id="GifProcess"><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '5');        
+        form_data.append('idPedido', idPedido);
+        
+                
+        $.ajax({
+        url: './Consultas/restaurantPos.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivFrmPOS').innerHTML=data;
+            $('#idCliente').select2({
+            
+            placeholder: 'Clientes Varios',
+            ajax: {
+              url: 'buscadores/clientes.search.php',
+              dataType: 'json',
+              delay: 250,
+              processResults: function (data) {
+
+        return {                     
+          results: data
+        };
+      },
+     cache: true
+    }
+  });
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+}
+
+//calcular la devuelta
+function CalculeDevueltaRestaurante(Total){
+    var Efectivo=$('#TxtEfectivo').val();
+    var Tarjetas=$('#TxtTarjetas').val();
+    var Cheques=$('#TxtCheques').val();
+    var Bonos=$('#TxtBonos').val();
+    var PropinaEfectivo=$('#TxtPropinaEfectivo').val();
+    var PropinaTarjetas=$('#TxtPropinaTarjetas').val();
+    var TotalPagos=parseInt(Efectivo)+parseInt(Tarjetas)+parseInt(Cheques)+parseInt(Bonos);
+    var TotalPropinas=parseInt(PropinaEfectivo)+parseInt(PropinaTarjetas);
+    document.getElementById("GranTotalPropinas").value = TotalPropinas;
+    document.getElementById("TxtDevuelta").value = TotalPagos-(parseInt(Total)+parseInt(TotalPropinas));
+}
+
+
+
+function FacturarPedido(idPedido='',Options=0){
+    var idBoton="BtnFacturarPedido";
+    document.getElementById(idBoton).disabled=true;
+    if(idPedido==''){
+        idPedido=idPedidoActivo;
+    }  
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 5)
+    if(Options==0){
+    
+        form_data.append('idPedido', idPedido)
+        form_data.append('idCliente', $('#idCliente').val())
+        form_data.append('TxtTarjetas', $('#TxtTarjetas').val())
+        form_data.append('TxtCheques', $('#TxtCheques').val()) 
+        form_data.append('TxtBonos', $('#TxtBonos').val())
+        form_data.append('CmbTipoPago', $('#CmbTipoPago').val())
+        form_data.append('CmbColaboradores', $('#CmbColaboradores').val()) 
+        form_data.append('TxtObservaciones', $('#TxtObservacionesFactura').val())
+        form_data.append('TxtEfectivo', $('#TxtEfectivo').val()) 
+        form_data.append('TxtDevuelta', $('#TxtDevuelta').val())
+        form_data.append('TxtPropinaEfectivo', $('#TxtPropinaEfectivo').val()) 
+        form_data.append('TxtPropinaTarjetas', $('#TxtPropinaTarjetas').val())
+        
+    }
+    if(Options==1){
+    
+        form_data.append('idPedido', idPedido)
+        form_data.append('idCliente', 1)
+        form_data.append('TxtTarjetas', 0)
+        form_data.append('TxtCheques', 0) 
+        form_data.append('TxtBonos', 0)
+        form_data.append('CmbTipoPago', 'Contado')
+        form_data.append('CmbColaboradores', '') 
+        form_data.append('TxtObservaciones', '')
+        form_data.append('TxtEfectivo', 'NA') 
+        form_data.append('TxtDevuelta', '0')
+        form_data.append('TxtPropinaEfectivo', 0) 
+        form_data.append('TxtPropinaTarjetas', 0)
+        
+    }
+        document.getElementById('DivMensajes').innerHTML ='Procesando...<br><img src="../../images/process.gif" alt="Cargando" height="100" width="100">';
+                
+        $.ajax({
+        url: './procesadores/restaurantPos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                
+                var mensaje=respuestas[1];            
+                alertify.success(mensaje);
+                document.getElementById('DivMensajes').innerHTML =mensaje;
+                CierraModal('ModalAccionesPOS');
+                idPedidoActivo=0;
+                document.getElementById("vinculoInicio").click();
+                DibujePedidoActivo();
+                
+            }else if(respuestas[0]=="E1"){
+                var mensaje=respuestas[1];
+                alertify.alert(mensaje);
+                document.getElementById('DivMensajes').innerHTML =mensaje;
+            
+            }else{
+                alertify.alert(data);
+                document.getElementById('DivMensajes').innerHTML =data;
+                              
+            }
+            document.getElementById(idBoton).disabled=false;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
+
+/**
+ * Dibuja el listado de pedidos
+ * @returns {undefined}
+ */
+function DibujeListaPedidos(){
+    var idDiv="DivListadoPedidos";
+    var TipoPedido=document.getElementById("TipoPedido").value;
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 6);
+        form_data.append('TipoPedido', TipoPedido);
+        
+        $.ajax({
+        url: './Consultas/restaurantPos.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            setTimeout(DibujeListaPedidos, 3000); 
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+
+function EntregarPedido(idPedido){
+      
+    var form_data = new FormData();
+        form_data.append('Accion', '8');        
+        form_data.append('idPedido', idPedido);
+        
+                
+        $.ajax({
+        url: './procesadores/restaurantPos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                                
+                var mensaje=respuestas[1];            
+                alertify.success(mensaje);
+                
+            }else if(respuestas[0]=="E1"){
+                var mensaje=respuestas[1];
+                alertify.alert(mensaje);
+            
+            }else{
+                alertify.alert(data);
+                              
+            }
+            
+           
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
+
+function AutocompleteDatos(){
+    var TelefonoPedido=document.getElementById("TelefonoPedido").value;   
+    var form_data = new FormData();
+        form_data.append('Accion', '11');        
+        form_data.append('TelefonoPedido', TelefonoPedido);
+        
+                
+        $.ajax({
+        url: './procesadores/restaurantPos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                                
+                document.getElementById("NombrePedido").value=respuestas[1];
+                document.getElementById("DireccionPedido").value=respuestas[2];
+                
+            }else if(respuestas[0]=="E1"){
+                var mensaje=respuestas[1];
+                alertify.alert(mensaje);
+            
+            }else{
+                alertify.alert(data);
+                              
+            }
+            
+           
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
+
+DibujeListaPedidos();

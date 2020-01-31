@@ -20,7 +20,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit("E1;Debe seleccionar una mesa");
             }
             $Observaciones="";             
-            $idPedido=$obCon->CrearPedido($idMesa, 1, "CLIENTES VARIOS", "", "", $Observaciones, $idUser, "");
+            $idPedido=$obCon->CrearPedido($idMesa, 1, "CLIENTES VARIOS", "", "", $Observaciones, $idUser, 1);
             $obCon->ActualizaRegistro("restaurante_mesas", "Estado", 1, "ID", $idMesa);
             print("OK;Pedido $idPedido, creado;$idPedido");            
             
@@ -57,10 +57,16 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit("E1;Debe seleccionar un pedido");
             }
             $DatosPedido=$obCon->DevuelveValores("restaurante_pedidos", "ID", $idPedido);
-            if($DatosPedido["Tipo"]==1){
+            if($DatosPedido["Tipo"]==1){//Imprime pedido mesa
                 $DatosConfiguracion=$obCon->DevuelveValores("configuracion_general", "ID", 10);
                 $obPrint->ImprimePedidoRestaurante($idPedido,"",$DatosConfiguracion["Valor"],"");
             }
+            if($DatosPedido["Tipo"]==2 or $DatosPedido["Tipo"]==3){//Imprime un domicilio o un para llevar
+                $DatosConfiguracion=$obCon->DevuelveValores("configuracion_general", "ID", 10);
+                $obPrint->ImprimeDomicilioRestaurante($idPedido, "", $DatosConfiguracion["Valor"], "");
+                
+            }
+            
             
             print("OK;Pedido $idPedido Impreso");
             
@@ -311,6 +317,43 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             print("OK;Egreso $idEgreso Realizado");
         break;//fin caso 10
+        
+        case 11://Busque los datos de un cliente de domicilio
+            $Telefono=$obCon->normalizar($_REQUEST["TelefonoPedido"]);
+            $sql="SELECT NombreCliente,DireccionEnvio FROM restaurante_pedidos WHERE TelefonoConfirmacion='$Telefono' ORDER BY ID DESC LIMIT 1 ";
+            $DatosPedido=$obCon->FetchAssoc($obCon->Query($sql));
+            print("OK;$DatosPedido[NombreCliente];$DatosPedido[DireccionEnvio]");
+        break;//Fin caso 11  
+    
+        case 12: //Crear un domicilio o un pedido para llevar
+            
+            $idMesa=0;
+            $TipoPedido=$obCon->normalizar($_REQUEST["TipoPedido"]);
+            $TelefonoPedido=$obCon->normalizar($_REQUEST["TelefonoPedido"]);
+            $NombrePedido=$obCon->normalizar($_REQUEST["NombrePedido"]);
+            $DireccionPedido=$obCon->normalizar($_REQUEST["DireccionPedido"]);
+            $ObservacionesPedido=$obCon->normalizar($_REQUEST["ObservacionesPedido"]);
+            if($TipoPedido==''){
+                exit("E1;Debe seleccionar un tipo de pedido");
+            }
+            if($NombrePedido=='' ){
+                exit("E1;Debe escribir un nombre para el pedido");
+            }
+            if($TipoPedido==2){
+                if($TelefonoPedido==''){
+                    exit("E1;Debe escribir un numero telefonico");
+                }
+                if($DireccionPedido==''){
+                    exit("E1;Debe escribir una direccion");
+                }
+            }
+            $Observaciones="";    
+            $idPedido=$obCon->CrearPedido($idMesa, 1, $NombrePedido, $DireccionPedido, $TelefonoPedido, $ObservacionesPedido, $idUser, $TipoPedido);
+            
+            print("OK;Pedido $idPedido, creado;$idPedido");            
+            
+        break; 
+        
     }
     
     
