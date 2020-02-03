@@ -9,7 +9,7 @@
  * @type Number|
  */
 var idPedidoActivo=0;
-
+var Timer1;
 /*
  * Eventos iniciales
  */
@@ -109,7 +109,10 @@ function AccionesPOS(){
     var Accion = document.getElementById("idFormulario").value;
     if(Accion==1){
         CrearDomicilioLlevar();
-    }    
+    }
+    if(Accion==2){
+        CerrarTurno();
+    }
     if(Accion==100){
         CrearTercero('ModalAccionesPOS','BntModalPOS');
     }
@@ -282,6 +285,9 @@ function CrearDomicilioLlevar(){
                 alertify.success(respuestas[1]);                
                 DibujePedidoActivo();
                 CierraModal('ModalAccionesPOS');
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
                 
             }else{
                 document.getElementById(idDivMensajes).innerHTML=data;
@@ -747,7 +753,7 @@ function DibujeListaPedidos(){
         type: 'post',
         success: function(data){
             document.getElementById(idDiv).innerHTML=data;
-            setTimeout(DibujeListaPedidos, 3000); 
+            Timer1=setTimeout(DibujeListaPedidos, 3000); 
             
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -845,5 +851,96 @@ function AutocompleteDatos(){
     
 }
 
+function stopTimer1(){
+    clearTimeout(Timer1);
+}
+
+function CambiarListaPedidos(){
+    stopTimer1();
+    DibujeListaPedidos();
+}
+
+function FormularioCerrarTurno(){
+    
+    $("#ModalAccionesPOS").modal();
+    document.getElementById("DivFrmPOS").innerHTML='<div id="GifProcess"><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '8');        
+                        
+        $.ajax({
+        url: './Consultas/restaurantPos.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivFrmPOS').innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+     
+}
+
+
+function CerrarTurno(){
+    
+    var idDivMensajes='DivFrmPOS';
+    var EfectivoEnCaja=document.getElementById("EfectivoEnCaja").value; 
+    var ObservacionesCierre=document.getElementById("ObservacionesCierre").value;  
+    
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '9'); 
+        form_data.append('EfectivoEnCaja', EfectivoEnCaja);
+        form_data.append('ObservacionesCierre', ObservacionesCierre);
+        
+        $.ajax({
+        url: './procesadores/restaurantPos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                
+                alertify.success(respuestas[1]);                
+                
+                CierraModal('ModalAccionesPOS');
+            }else if(respuestas[0]=="E1"){
+                alertify.error(respuestas[1],0);
+                MarqueErrorElemento(respuestas[2]);
+            }else{
+                document.getElementById(idDivMensajes).innerHTML=data;
+                
+            }
+                       
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
+function MarqueErrorElemento(idElemento){
+    
+    if(idElemento==undefined){
+       return; 
+    }
+    document.getElementById(idElemento).style.backgroundColor="pink";
+    document.getElementById(idElemento).focus();
+}
 
 DibujeListaPedidos();

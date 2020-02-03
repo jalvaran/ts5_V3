@@ -264,15 +264,24 @@ if( !empty($_REQUEST["Accion"]) ){
         break;
     
         case 9: //Cerrar turno
-            $TxtObservaciones=$obCon->normalizar($_REQUEST["TxtObservaciones"]);
-            if($TxtObservaciones==''){
-                exit("E1;El campo Observaciones no puede estar vacío;TxtObservaciones");
+            
+            $TxtObservaciones=$obCon->normalizar($_REQUEST["ObservacionesCierre"]);
+            $EfectivoEnCaja=$obCon->normalizar($_REQUEST["EfectivoEnCaja"]);
+            if(!is_numeric($EfectivoEnCaja) or  $EfectivoEnCaja<0){
+                exit("E1;El campo Efectivo en caja no puede estar vacío;EfectivoEnCaja");
             }
-            $idCierre=$obCon->CierreTurnoRestaurantePos($TxtObservaciones,$idUser);
-            $obCon->RegistreResumenCierre($idCierre, $idUser);
-            $Ruta="../../general/consultas/PDF_Documentos.draw.php?idDocumento=36&ID=$idCierre";
-            $Link="<a href='$Ruta' target='_BLANK'><h1>Imprimir Cierre $idCierre</h1></a>";
-            print("OK;Se ha Cerrado el turno $idCierre;$Link");
+            if($TxtObservaciones==''){
+                exit("E1;El campo Observaciones no puede estar vacío;ObservacionesCierre");
+            }
+            $sql="SELECT COUNT(ID) AS Items FROM restaurante_pedidos WHERE Estado<>2 AND Estado<>7 AND idCierre=0";
+            $Totales=$obCon->FetchAssoc($obCon->Query($sql));
+            if($Totales["Items"]>0){
+                exit("E1;No es posible cerrar el turno, hay pedidos que aún no se han facturado");
+            }
+            $idCierre=$obCon->CierreTurnoRestaurantePos($TxtObservaciones,$idUser,$EfectivoEnCaja);
+            //$obCon->RegistreResumenCierre($idCierre, $idUser);
+            $obPrint->ImprimirCierreRestaurantePos($idCierre,"",1,"");
+            print("OK;Se ha Cerrado el turno $idCierre");
         break; //Fin caso 9
         
         case 10://Crear un egreso
@@ -337,14 +346,14 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit("E1;Debe seleccionar un tipo de pedido");
             }
             if($NombrePedido=='' ){
-                exit("E1;Debe escribir un nombre para el pedido");
+                exit("E1;Debe escribir un nombre para el pedido;NombrePedido");
             }
             if($TipoPedido==2){
                 if($TelefonoPedido==''){
-                    exit("E1;Debe escribir un numero telefonico");
+                    exit("E1;Debe escribir un numero telefonico;TelefonoPedido");
                 }
                 if($DireccionPedido==''){
-                    exit("E1;Debe escribir una direccion");
+                    exit("E1;Debe escribir una direccion;DireccionPedido");
                 }
             }
             $Observaciones="";    
@@ -352,7 +361,20 @@ if( !empty($_REQUEST["Accion"]) ){
             
             print("OK;Pedido $idPedido, creado;$idPedido");            
             
-        break; 
+        break; //Fin caso 12
+        
+        case 13: //imprimir un cierre
+            
+            $idCierre=$obCon->normalizar($_REQUEST["idCierre"]);
+            
+            if(!is_numeric($idCierre) or  $idCierre<=0){
+                exit("E1;El id del cierre debe ser un numero mayor a cero");
+            }
+            
+            
+            $obPrint->ImprimirCierreRestaurantePos($idCierre,"",1,"");
+            print("OK;Se imprimió el cierre $idCierre");
+        break; //Fin caso 13
         
     }
     

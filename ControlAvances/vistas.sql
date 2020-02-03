@@ -359,3 +359,13 @@ CREATE VIEW vista_resumen_restaurante_turno_actual AS
     FROM productosventa t1;
 
 
+DROP VIEW IF EXISTS `vista_pedidos_restaurante_pos`;
+CREATE VIEW vista_pedidos_restaurante_pos AS
+SELECT t1.*,
+(SELECT SUM(t2.Total) FROM restaurante_pedidos_items t2 WHERE t2.idPedido=t1.ID) AS Total,
+(SELECT (t3.NombreEstado) FROM restaurante_estados_pedidos t3 WHERE t3.ID=t1.Estado) AS NombreEstado,
+(SELECT (t4.Nombre) FROM restaurante_tipos_pedido t4 WHERE t4.ID=t1.Tipo) AS NombreTipoPedido,
+(SELECT CONCAT(t5.Nombre,' ',t5.Apellido) FROM usuarios t5 WHERE t5.idUsuarios=t1.idUsuario) AS NombreUsuario
+
+FROM restaurante_pedidos t1;
+

@@ -1166,6 +1166,24 @@ class PrintPos extends ProcesoVenta{
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"ABONOS SISTECREDITO  ".str_pad("$".number_format($DatosCierre["AbonosSisteCredito"]),20," ",STR_PAD_LEFT));
     
+    $sql="SELECT SUM(ValorPago) as Total FROM acuerdo_pago_cuotas_pagadas WHERE idCierre='$idCierre' AND MetodoPago=1";
+    $DatosPagosAcuerdo= $this->FetchAssoc($this->Query($sql));
+    $AbonosAcuerdoEfectivo=$DatosPagosAcuerdo["Total"];
+    
+    $sql="SELECT SUM(ValorPago) as Total FROM acuerdo_pago_cuotas_pagadas WHERE idCierre='$idCierre' AND MetodoPago<>1";
+    $DatosPagosAcuerdo= $this->FetchAssoc($this->Query($sql));
+    $AbonosAcuerdoOtrosMetodos=$DatosPagosAcuerdo["Total"];
+    
+    if($AbonosAcuerdoEfectivo>0 or $AbonosAcuerdoOtrosMetodos>0){
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"ABONOS ACUERDOS EFECTIVO:  ".str_pad("$".number_format($AbonosAcuerdoEfectivo),20," ",STR_PAD_LEFT));
+        
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"ABONOS ACUERDOS NO EFECTIVO:  ".str_pad("$".number_format($AbonosAcuerdoOtrosMetodos),17," ",STR_PAD_LEFT));
+    
+        
+    }
+    
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"INTERESES SISTECREDITO  ".str_pad("$".number_format($TotalInteresesSisteCredito),17," ",STR_PAD_LEFT));
     if($TotalAnticiposRecibidos>0){
@@ -1196,10 +1214,10 @@ class PrintPos extends ProcesoVenta{
     fwrite($handle,"OTROS IMPUESTOS      ".str_pad("$".number_format($TotalOtrosImpuestos),20," ",STR_PAD_LEFT));
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"TOTAL ENTREGA        ".str_pad("$".number_format($DatosCierre["TotalEntrega"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados),20," ",STR_PAD_LEFT));
+    fwrite($handle,"TOTAL ENTREGA        ".str_pad("$".number_format($DatosCierre["TotalEntrega"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$AbonosAcuerdoOtrosMetodos),20," ",STR_PAD_LEFT));
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"SALDO EN CAJA        ".str_pad("$".number_format($DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados),20," ",STR_PAD_LEFT));
+    fwrite($handle,"SALDO EN CAJA        ".str_pad("$".number_format($DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo),20," ",STR_PAD_LEFT));
     
     $this->SeparadorHorizontal($handle, "_", 37);
 
@@ -2212,6 +2230,213 @@ fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
     }
     fclose($handle); // cierra el fichero PRN
     $salida = shell_exec('lpr $COMPrinter');
+    }
+    
+    
+     //imprime un cierre de restaurante
+    public function ImprimirCierreRestaurantePos($idCierre,$COMPrinter,$Copias,$Vector) {
+        $DatosImpresora=$this->DevuelveValores("config_puertos", "ID", 1);   
+        if($DatosImpresora["Habilitado"]<>"SI"){
+            return;
+        }
+        $COMPrinter= $this->COMPrinter;
+        if(($handle = @fopen("$COMPrinter", "w")) === FALSE){
+            die('ERROR:\nNo se puedo Imprimir, Verifique la conexion de la IMPRESORA');
+        }
+        $Titulo="Comprobante de Cierre No. $idCierre";
+        $DatosCierre=$this->DevuelveValores("restaurante_cierres", "ID", $idCierre);
+        $Fecha=$DatosCierre["Fecha"];
+        $Hora=$DatosCierre["Hora"];
+        $idUsuario=$DatosCierre["idUsuario"];
+        $Observaciones=$DatosCierre["Observaciones"];
+        $EfectivoEnCaja=$DatosCierre["EfectivoEnCaja"];
+        $Usuarios[]="";
+        $TotalesPedidos[]="";
+        
+        for($i=1; $i<=$Copias;$i++){
+        fwrite($handle,chr(27). chr(64));//REINICIO
+        fwrite($handle, chr(27). chr(112). chr(48));//ABRIR EL CAJON
+        fwrite($handle, chr(27). chr(100). chr(0));// SALTO DE CARRO VACIO
+        fwrite($handle, chr(27). chr(33). chr(8));// NEGRITA
+        fwrite($handle, chr(27). chr(97). chr(1));// CENTRADO
+        fwrite($handle,"*************************************");
+        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        fwrite($handle,$Titulo); // Titulo
+        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        fwrite($handle,"*************************************");
+        
+        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        fwrite($handle, chr(27). chr(97). chr(0));// IZQUIERDA
+        fwrite($handle,"FECHA: $Fecha      HORA: $Hora");
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"*************************************");
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        $GranTotal=0;
+        
+        $sql="SELECT COUNT(ID) AS NumPedidos,idUsuario,NombreTipoPedido,NombreEstado,NombreUsuario,SUM(Total) as Total FROM vista_pedidos_restaurante_pos t1 
+                WHERE idCierre='$idCierre' 
+                GROUP BY Tipo,Estado, idUsuario;";
+            
+        $Consulta= $this->Query($sql);
+        $idUsuarioActual="";
+        while($DatosVentas= $this->FetchAssoc($Consulta)){
+            $GranTotal=$GranTotal+$DatosVentas["Total"];
+            if($idUsuarioActual<>$DatosVentas["idUsuario"] ){
+                fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+                fwrite($handle,"*************************************");
+                fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+                fwrite($handle,"USUARIO: ".($DatosVentas["NombreUsuario"]));
+            }
+            $idUsuarioActual=$DatosVentas["idUsuario"];
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle,"TIPO DE PEDIDO: ".($DatosVentas["NombreTipoPedido"]).", EN ESTADO: ".$DatosVentas["NombreEstado"] );
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle,"CANTIDAD: ".($DatosVentas["NumPedidos"]));
+            fwrite($handle," || TOTAL: ".str_pad("$".number_format($DatosVentas["Total"]),10," ",STR_PAD_RIGHT));
+            
+            fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        }
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"TOTAL: $".number_format($GranTotal));
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"EFECTIVO EN CAJA: $".number_format($EfectivoEnCaja));
+        $Diferencia=$EfectivoEnCaja-$GranTotal;
+        $this->ActualizaRegistro("restaurante_cierres", "Diferencia", $Diferencia, "ID", $idCierre);
+        if($Diferencia<0){
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle,"FALTANTE: $".number_format(ABS($Diferencia)));   
+        }
+        if($Diferencia>0){
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle,"SOBRANTE: $".number_format(ABS($Diferencia)));   
+        }
+        if($Diferencia==0){
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle,"CAJA CUADRADA");   
+        }
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"OBSERVACIONES: ");   
+        
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,$DatosCierre["Observaciones"]);   
+        
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+    fwrite($handle, chr(29). chr(86). chr(49));//CORTA PAPEL
+    }
+    fclose($handle); // cierra el fichero PRN
+    $salida = shell_exec('lpr $COMPrinter');
+    $this->RelacionItemsXFechaRestaurantePos($idCierre,$Fecha, $Copias, "");
+    }
+    
+    
+    //Imprime Relacion de items vendidos
+    public function RelacionItemsXFechaRestaurantePos($idCierre,$Fecha,$Copias,$Vector) {
+        
+        
+        $DatosImpresora=$this->DevuelveValores("config_puertos", "ID", 1);   
+        if($DatosImpresora["Habilitado"]<>"SI"){
+            return;
+        }
+        $COMPrinter= $this->COMPrinter;
+        if(($handle = @fopen("$COMPrinter", "w")) === FALSE){
+            die('ERROR:\nNo se puedo Imprimir, Verifique la conexion de la IMPRESORA');
+        }
+        $Titulo="Relacion de Productos y Servicios Vendidos el día $Fecha";
+                
+        for($i=1; $i<=$Copias;$i++){
+            fwrite($handle,chr(27). chr(64));//REINICIO
+            //fwrite($handle, chr(27). chr(112). chr(48));//ABRIR EL CAJON
+            fwrite($handle, chr(27). chr(100). chr(0));// SALTO DE CARRO VACIO
+            fwrite($handle, chr(27). chr(33). chr(8));// NEGRITA
+            fwrite($handle, chr(27). chr(97). chr(1));// CENTRADO
+            fwrite($handle,"*************************************");
+            fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+            fwrite($handle,$Titulo); // Titulo
+            fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+            fwrite($handle,"*************************************");
+
+            fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+            fwrite($handle, chr(27). chr(97). chr(0));// IZQUIERDA
+            fwrite($handle,"FECHA: $Fecha");
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle,"*************************************");
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            $sql="SELECT NombreProducto as Nombre, SUM(`Total`) as Total,SUM(`Cantidad`) AS NumItems "
+                    . "FROM `restaurante_pedidos_items`  "
+                    . "WHERE idCierre='$idCierre' GROUP BY `idProducto`";
+            $Consulta= $this->Query($sql);
+            
+            $Total=0;
+            $TotalItems=0;
+            while($DatosItems=$this->FetchArray($Consulta)){
+                $Total=$Total+$DatosItems["Total"];
+                $TotalItems=$TotalItems+$DatosItems["NumItems"];
+                
+                fwrite($handle,str_pad($DatosItems["NumItems"],4," ",STR_PAD_RIGHT));
+
+                fwrite($handle,str_pad(substr($DatosItems["Nombre"],0,24),24," ",STR_PAD_BOTH)."   ");
+
+                fwrite($handle,str_pad("$".number_format($DatosItems["Total"]),10," ",STR_PAD_LEFT));
+
+                fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+            }
+
+            //fwrite($handle,"Total Modelo: $DatosAgenda[HoraInicial] // ");
+            fwrite($handle,"Total Items: ".number_format($TotalItems));
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle,"Total:       ".number_format($Total));
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            
+            fwrite($handle,"RELACION DE CIERRES ESTE DIA"); // Titulo
+            fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+            
+            fwrite($handle,"*************************************");
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            $sql="SELECT * FROM restaurante_cierres WHERE Fecha='$Fecha' ";
+            $Consulta= $this->Query($sql);
+           
+            while($DatosCierres=$this->FetchArray($Consulta)){
+                fwrite($handle,"CIERRE $DatosCierres[ID]: ".$DatosCierres["Hora"].", USUARIO: ".$DatosCierres["idUsuario"]);
+                fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+                $TotalEfectivo=$DatosCierres["EfectivoEnCaja"];
+                //fwrite($handle,str_pad($DatosCierres["idUsuario"],10," ",STR_PAD_RIGHT));
+
+                fwrite($handle,str_pad(substr("EFECTIVO EN CAJA: ",0,24),24," ",STR_PAD_BOTH)."   ");
+
+                fwrite($handle,str_pad("$".number_format($TotalEfectivo),10," ",STR_PAD_LEFT));
+
+                fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+                
+                fwrite($handle,str_pad(substr("DIFERENCIA: ",0,24),24," ",STR_PAD_BOTH)."   ");
+
+                fwrite($handle,str_pad("$".number_format($DatosCierres["Diferencia"]),10," ",STR_PAD_LEFT));
+
+                fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+                
+            }
+
+            
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(29). chr(86). chr(49));//CORTA PAPEL
+        }
+        fclose($handle); // cierra el fichero PRN
+        $salida = shell_exec('lpr $COMPrinter');
     }
     
     //Fin Clases

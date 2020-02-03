@@ -270,11 +270,13 @@ if( !empty($_REQUEST["Accion"]) ){
                     (SELECT t5.NombreEstado FROM restaurante_estados_pedidos t5 WHERE t1.Estado=t5.ID) as NombreEstado,
                     (SELECT CONCAT(Nombre, ' ', Apellido) FROM usuarios t3 WHERE t1.idUsuario=t3.idUsuarios) as NombreUsuario,
                     (SELECT SUM(Total) FROM restaurante_pedidos_items t4 WHERE t4.idPedido=t1.ID) as TotalPedido
-                    FROM restaurante_pedidos t1 WHERE Tipo='$TipoPedido' AND (Estado<>2 AND Estado<>7 ) ; ";
+                    FROM restaurante_pedidos t1 WHERE Tipo='$TipoPedido' AND (Estado<>2 AND Estado<>7 ) ORDER BY Estado,ID ASC; ";
             $Consulta=$obCon->Query($sql);
             while($DatosPedido=$obCon->FetchAssoc($Consulta)){
                 $idPedido=$DatosPedido["ID"];
                 $bg="bg-blue";
+                $InfoAdicional="";
+                $EntregaTardia=0;
                 if($TipoPedido==1){//Si es un pedido de mesa
                     $Titulo=$DatosPedido["NombreMesa"];
                     $NombreUsuario=$DatosPedido["NombreUsuario"];
@@ -291,8 +293,17 @@ if( !empty($_REQUEST["Accion"]) ){
                     $Titulo=$DatosPedido["NombreCliente"];
                     $NombreUsuario=$DatosPedido["DireccionEnvio"];
                 }
+                if($DatosPedido["Estado"]==1){//Estado abierto o reabierto se mostrará el tiempo que lleva 
+                    
+                    $FechaCreacion=$DatosPedido["FechaCreacion"];
+                    $TiempoTranscurrido=$obCon->CalcularTiempoPedido($FechaCreacion);
+                    $InfoAdicional=" HACE $TiempoTranscurrido MINUTOS";
+                    if($TiempoTranscurrido>14){
+                        $EntregaTardia=1;
+                    }
+                }
                 
-                if($DatosPedido["Estado"]==6){//Estado Abierto
+                if($DatosPedido["Estado"]==6){//Estado entregado
                     $bg="bg-green";
                 }
                 
@@ -304,17 +315,29 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     <div class="widget-user-header '.$bg.'" onclick="idPedidoActivo='.$DatosPedido["ID"].'; DibujePedidoActivo();" style="cursor:pointer;height:140px;">
                         <h3 class="widget-user-username"><strong>Pedido:  '.$idPedido.'</strong></h3>
-                        <h3 class="widget-user-username"><strong>'.$Titulo.'</strong></h3>
+                        <h3 class="widget-user-username"><strong >'.$Titulo.'</strong></h3>
                         <h5 class="widget-user-desc">'.$NombreUsuario.'</h5>
-                        <h5 class="widget-user-desc">'.$DatosPedido["NombreEstado"].'</h5>
+                        <h5 class="widget-user-desc">'.$DatosPedido["NombreEstado"].$InfoAdicional.'</h5>
                     </div>
-                    <div class="widget-user-image">
+                    <div class="widget-user-image" style=color >
+                    
+                        <img class="img-circle" >
+                        </img>
+                      
+                    
+                    </div>
                     ');
                     
-                    print('   
-                      <img class="img-circle">
-                    </div>
-                    <div class="box-footer">
+                    if($EntregaTardia==1){
+                        print('                       
+                        <div style="font-size:40px;color:red">
+                         <li class="fa fa-clock-o">Entrega Tardía
+                          </li>
+                        </div>
+                        ');
+                    }
+                    print('
+                     <div class="box-footer">
                       <div class="row">
                         <div class="col-sm-4 border-right">
                           <div class="description-block">
@@ -399,6 +422,24 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CerrarTabla();
         break;//fin caso 7    
            
+        case 8:// dibuja el formulario para cerrar turno
+            $sql="SELECT COUNT(ID) AS Items FROM restaurante_pedidos WHERE Estado<>2 AND Estado<>7 AND idCierre=0 ";
+            $Totales=$obCon->FetchAssoc($obCon->Query($sql));
+            if($Totales["Items"]>0){
+                $css->CrearTitulo("<strong>No es posible cerrar el turno, hay pedidos que aún no se han facturado</strong>", "rojo");
+                exit();
+            }
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 2, "", "off", "", "");
+            $css->CrearDiv("", "col-md-12", "center", 1, 1);
+                $css->CrearTitulo("<strong>Cerrar Turno</strong>", "verde");
+                $css->input("number", "EfectivoEnCaja", "form-control", "EfectivoEnCaja", "", "", "Efectivo en Caja", "off", "", "style=width:250px;");
+                print("<br>");
+                $css->textarea("ObservacionesCierre", "form-control", "ObservacionesCierre", "", "Observaciones", "", "style=width:250px;");
+
+                $css->Ctextarea();
+            $css->CerrarDiv();    
+            
+        break;// fin caso 8    
     }
     
     

@@ -182,7 +182,7 @@ function BuscarDocumentoReferencia(){
 }
 
 
-function AgregueMovimientoDesdeCuentaXPagar(idItem,DocReferencia){
+function AgregueMovimientoDesdeCuentaXPagar(idItem,DocReferencia,Total,CuentaPUC,NombreCuenta,Tercero){
     document.getElementById("TabCuentas2").click();
     document.getElementById("TxtDocReferencia").value=DocReferencia;
     var idDocumento=document.getElementById('idDocumento').value;
@@ -198,7 +198,12 @@ function AgregueMovimientoDesdeCuentaXPagar(idItem,DocReferencia){
         form_data.append('Accion', 13);        
         form_data.append('idDocumento', idDocumento);
         form_data.append('idItem', idItem);
-         
+        form_data.append('Total', Total);
+        form_data.append('CuentaPUC', CuentaPUC);
+        form_data.append('NombreCuenta', NombreCuenta);
+        form_data.append('Tercero', Tercero);
+        form_data.append('DocReferencia', DocReferencia);
+        form_data.append('idItem', idItem);
         $.ajax({
         url: './procesadores/DocumentosContables.process.php',
         //dataType: 'json',

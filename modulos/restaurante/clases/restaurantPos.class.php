@@ -427,29 +427,30 @@ class VentasRestaurantePOS extends Facturacion{
     }
     
     //cerrar el turno en restaurante
-    public function CierreTurnoRestaurantePos($Observaciones,$idUser) {
+    public function CierreTurnoRestaurantePos($Observaciones,$idUser,$EfectivoEnCaja) {
         $fecha=date("Y-m-d");
         $hora=date("H:i:s");
         $tab="restaurante_cierres";
-        $NumRegistros=4; 
+        $NumRegistros=5; 
         
         $Columnas[0]="Fecha";               $Valores[0]=$fecha;
         $Columnas[1]="Hora";                $Valores[1]=$hora;
         $Columnas[2]="idUsuario";           $Valores[2]=$idUser;
         $Columnas[3]="Observaciones";       $Valores[3]=$Observaciones;
-                
+        $Columnas[4]="EfectivoEnCaja";      $Valores[4]=$EfectivoEnCaja;
+        
         $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
         $idCierre=$this->ObtenerMAX($tab,"ID", 1,"");
         $this->update("restaurante_pedidos", "idCierre", $idCierre, " WHERE idCierre=0 AND Estado<>'1'");
         $this->update("restaurante_pedidos_items", "idCierre", $idCierre, " WHERE idCierre=0 AND Estado<>'1' ");
-        $this->update("traslados_items", "idCierre", $idCierre, " WHERE idCierre=0");
+        //$this->update("traslados_items", "idCierre", $idCierre, " WHERE idCierre=0");
         $this->update("restaurante_registro_propinas", "idCierre", $idCierre, " WHERE idCierre=0;");
         $this->update("restaurante_registro_ventas_mesero", "idCierre", $idCierre, " WHERE idCierre=0;");
         $this->update("inventario_comprobante_movimientos_items", "idCierre", $idCierre, " WHERE idCierre=0;");
         
-        $this->update("modelos_pagos_realizados", "idCierre", $idCierre, " WHERE idCierre=0;");
-        $this->update("modelos_agenda", "idCierre", $idCierre, " WHERE idCierre=0;");
-        $this->update("librodiario", "idCierre", $idCierre, " WHERE idCierre=0;"); //Ojo para este caso se cierra sin tener en cuenta el id del usuario
+        //$this->update("modelos_pagos_realizados", "idCierre", $idCierre, " WHERE idCierre=0;");
+        //$this->update("modelos_agenda", "idCierre", $idCierre, " WHERE idCierre=0;");
+        //$this->update("librodiario", "idCierre", $idCierre, " WHERE idCierre=0;"); //Ojo para este caso se cierra sin tener en cuenta el id del usuario
         $this->update("facturas", "CerradoDiario", $idCierre, "WHERE (CerradoDiario='0' or CerradoDiario='' ) ");
         $this->update("facturas_items", "idCierre", $idCierre, "WHERE (idCierre='0' or idCierre='')");
         $this->update("factura_compra_items", "idCierre", $idCierre, "WHERE (idCierre='0' or idCierre='') ");

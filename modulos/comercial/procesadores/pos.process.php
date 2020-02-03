@@ -9,8 +9,10 @@ $idUser=$_SESSION['idUser'];
 $fecha=date("Y-m-d");
 
 include_once("../clases/Facturacion.class.php");
-include_once("../clases/AcuerdoPago.class.php");
 include_once("../../../modelo/PrintPos.php");
+include_once("../clases/AcuerdoPago.class.php");
+include_once("../clases/AcuerdoPago.print.class.php");
+
 include_once("../../../general/clases/contabilidad.class.php");
 if( !empty($_REQUEST["Accion"]) ){
     $obCon = new Facturacion($idUser);
@@ -216,6 +218,7 @@ if( !empty($_REQUEST["Accion"]) ){
         
         case 7: //Guarda la factura
             $obPrint = new PrintPos($idUser);
+            
             $obFactura = new Facturacion($idUser);
             $obAcuerdo = new AcuerdoPago($idUser);
             $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);       
@@ -266,7 +269,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $TotalCostos=$DatosTotalesCotizacion["TotalCostos"];
             $SaldoFactura=$Total;
             if($TxtCuotaInicialCredito>$Total){
-                exit("E4; El valor de la cuota inicial no puede ser superior al valor de la factura");
+                //exit("E4; El valor de la cuota inicial no puede ser superior al valor de la factura");
             }
             $Descuentos=0;
             $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
@@ -431,6 +434,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Mensaje.="<br><h3>Devuelta: ".number_format($Devuelta)."</h3>";
             
             if($CmbFormaPago=="Acuerdo"){
+                $obPrintAcuerdo = new AcuerdoPagoPrint($idUser);
                 $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
                 $FechaInicialParaPagos=$obCon->normalizar($_REQUEST["TxtFechaInicialPagos"]);
                 $ValorCuotaGeneral=$obCon->normalizar($_REQUEST["ValorCuotaAcuerdo"]);
@@ -441,7 +445,8 @@ if( !empty($_REQUEST["Accion"]) ){
                 $sql="SELECT SUM(ValorPago) as TotalCuotaInicial FROM acuerdo_pago_cuotas_pagadas_temp WHERE idAcuerdoPago='$idAcuerdoPago' AND TipoCuota=1";
                 $TotalesCuotaInicial=$obAcuerdo->FetchAssoc($obAcuerdo->Query($sql));
                 $CuotaInicial=$TotalesCuotaInicial["TotalCuotaInicial"];
-                $SaldoInicial=$SaldoFinal-$CuotaInicial;
+                $SaldoInicial=$SaldoFinal;
+                $SaldoFinal=$SaldoInicial-$CuotaInicial;
                 $obAcuerdo->CrearAcuerdoPagoDesdePOS($idAcuerdoPago, $FechaInicialParaPagos, $DatosCliente["Num_Identificacion"],$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$CuotaInicial, $SaldoInicial, $SaldoFinal, 1, $idUser);
                 
                 $CuentaDestino=$DatosCaja["CuentaPUCEfectivo"];
@@ -455,7 +460,8 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 $NuevoIdAcuerdo=$obAcuerdo->getId("ap_");
                 $obAcuerdo->ActualizaRegistro("vestasactivas", "IdentificadorUnico", $NuevoIdAcuerdo, "idVestasActivas", $idPreventa);
-                
+                $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);
+                $obPrintAcuerdo->PrintAcuerdoPago($idAcuerdoPago, 2, 0);
             }
             
             $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);
@@ -1066,6 +1072,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $obCon->ActualizaRegistro($Tabla, "ValorCuota", $Valor, "ID", $idItem, 1);
             print("OK;Cuota Actualizada");
         break;//Fin caso 29
+     
         
     }
     

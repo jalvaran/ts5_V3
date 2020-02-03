@@ -296,7 +296,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla($DatosCuentasXPagar["NombreCuenta"], 1);                        
                         $css->ColTabla(number_format($DatosCuentasXPagar["Total"]), 1);
                         print("<td style='text-align:center'>");
-                            print('<a href="#" onclick="AgregueMovimientoDesdeCuentaXPagar(`'.$idItem.'`,`'.$DatosCuentasXPagar["NumeroDocumentoExterno"].'`);"><i class="fa fa-plus"></i></a>');
+                            print('<a href="#" onclick="AgregueMovimientoDesdeCuentaXPagar(`'.$idItem.'`,`'.$DatosCuentasXPagar["NumeroDocumentoExterno"].'`,`'.$DatosCuentasXPagar["Total"].'`,`'.$DatosCuentasXPagar["CuentaPUC"].'`,`'.$DatosCuentasXPagar["NombreCuenta"].'`,`'.$Tercero.'`);"><i class="fa fa-plus"></i></a>');
                         print("</td>");
                     $css->CierraFilaTabla();
                 }

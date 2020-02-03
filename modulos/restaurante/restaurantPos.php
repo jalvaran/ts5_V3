@@ -47,7 +47,7 @@ $css->PageInit($myTitulo);
             
             $css->CrearDiv("", "col-md-3", "center", 1, 1);
                 print('<div class="input-group input-group-md">');
-                $css->select("TipoPedido", "form-control", "TipoPedido", "", "", "", "onchange=DibujePreventa()");
+                $css->select("TipoPedido", "form-control", "TipoPedido", "", "", "", "onchange=CambiarListaPedidos()");
 
                     $sql="SELECT * FROM restaurante_tipos_pedido ";
                     $Consulta=$obCon->Query($sql);
@@ -101,13 +101,15 @@ $css->PageInit($myTitulo);
                 $css->CerrarDiv();
                 
                 print("<br><br>");
-                
+                /*
                 $css->CrearDiv("", "col-md-2", "left", 1, 1);
                    $css->CrearBotonEvento("BtnCrearEgreso", "Crear Egreso", 1, "onclick", "ModalCrearEgreso();", "azul", "");
                 $css->CerrarDiv();   
                 
+                 * 
+                 */
                 $css->CrearDiv("", "col-md-2", "left", 1, 1);
-                   $css->CrearBotonEvento("BtnCerrarTurno", "Cerrar Turno", 1, "onclick", "CerrarTurno();", "rojo", "");
+                   $css->CrearBotonEvento("BtnCerrarTurno", "Cerrar Turno", 1, "onclick", "FormularioCerrarTurno();", "rojo", "");
                 $css->CerrarDiv();
                 
             $css->Clegend();    
@@ -193,6 +195,10 @@ $css->PageInit($myTitulo);
             
         $css->Cfieldset();   
     $css->CerrarDiv();
+    print("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>");
+    print("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>");
+    print("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>");
+    print("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>");
 $css->PageFin();
 print('<script src="../../componentes/shortcuts.js"></script>');  //script propio de la pagina
 print('<script src="jsPages/restaurantPos.js"></script>');  //script propio de la pagina

@@ -288,3 +288,6 @@ ALTER TABLE `proveedores` ADD `TipoOrganizacion` INT(5) UNSIGNED  NOT NULL AFTER
 
 ALTER TABLE `proveedores` ADD `Plazo` INT(5) UNSIGNED  NOT NULL AFTER `Cupo`;
 ALTER TABLE `clientes` ADD `Plazo` INT(5) UNSIGNED  NOT NULL AFTER `Cupo`;
+
+ALTER TABLE `restaurante_cierres` ADD `EfectivoEnCaja` DOUBLE NOT NULL AFTER `Observaciones`;
+ALTER TABLE `restaurante_cierres` ADD `Diferencia` DOUBLE NOT NULL AFTER `EfectivoEnCaja`;
