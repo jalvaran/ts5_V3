@@ -171,6 +171,13 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CrearTitulo("<strong>Debes Seleccionar un pedido</strong>", "rojo");
             exit();
         }
+        $DatosPedido=$obCon->DevuelveValores("restaurante_pedidos", "ID", $idPedido);
+        
+        $ObservacionesFactura="";
+        if($DatosPedido["Tipo"]>1){
+            $ObservacionesFactura="Domicilio para: ".$DatosPedido["NombreCliente"]." || ".$DatosPedido["TelefonoConfirmacion"]." || ".$DatosPedido["DireccionEnvio"];
+        }
+        
         $sql="SELECT SUM(Subtotal) as Subtotal,SUM(IVA) AS IVA, SUM(Total) AS Total FROM restaurante_pedidos_items WHERE idPedido='$idPedido'";
         $Datos=$obCon->Query($sql);
         $Totales=$obCon->FetchAssoc($Datos);
@@ -229,7 +236,8 @@ if( !empty($_REQUEST["Accion"]) ){
                         print("<br>");
                         $css->CrearInputNumber("TxtPropinaTarjetas", "number", "Propina Tarjetas:<br>", 0, "P Tarjeta", "", "onKeyUp", "CalculeDevueltaRestaurante($Totales[Total])", 200, 50, 0, 0, 0, "", 1);
                         print("<br>");
-                        $css->CrearTextArea("TxtObservacionesFactura", "", "", "Observaciones", "", "", "", 200, 80, 0, 0);
+                        //print("Observaciones: $ObservacionesFactura");
+                        $css->CrearTextArea("TxtObservacionesFactura", "", $ObservacionesFactura, "Observaciones", "", "", "", 200, 80, 0, 0);
                     $css->CerrarDiv();
                 print("</td>");
             $css->CierraFilaTabla();      
@@ -339,7 +347,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     print('
                      <div class="box-footer">
                       <div class="row">
-                        <div class="col-sm-4 border-right">
+                        <div class="col-sm-3 border-right">
                           <div class="description-block">
                             
                             ');
@@ -353,7 +361,7 @@ if( !empty($_REQUEST["Accion"]) ){
                           <!-- /.description-block -->
                         </div>
                         <!-- /.col -->
-                        <div class="col-sm-4 border-right">
+                        <div class="col-sm-3 border-right">
                           <div class="description-block">
                             
                             
@@ -362,20 +370,32 @@ if( !empty($_REQUEST["Accion"]) ){
                             <button type="button" id="BtnImprimePedido" class="btn btn-success btn-flat" onclick=ImprimirPedido(`'.$idPedido.'`) title="Imprimir Pedido" style="font-size:30px;"><i class="fa fa-print"></i></button>
                           </span>');
                     print('  
-                            <span class="description-text" style="font-size:20px;"><strong>PEDIDO</strong></span>
+                            <span class="description-text" style="font-size:15px;"><strong>PEDIDO</strong></span>
                           </div>
                           <!-- /.description-block -->
                         </div>
                         <!-- /.col -->
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
                           <div class="description-block">
                             ');
                     print('<span class="input-group-btn">
                             <button type="button" id="BtnImprimePedido" class="btn btn-info btn-flat" onclick=EntregarPedido(`'.$idPedido.'`) title="Entregar Pedido" style="font-size:30px;"><i class="fa fa-hand-paper-o"></i></button>
                           </span>');
                     print('  
+                            <span class="description-text" style="font-size:15px;"><strong>ENTREGAR</strong></span>
+                          </div>
+                          <!-- /.description-block -->
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-sm-3">
+                          <div class="description-block">
+                            ');
+                    print('<span class="input-group-btn">
+                            <button type="button" id="BtnAnular" class="btn btn-danger btn-flat" onclick=AnularPedido(`'.$idPedido.'`) title="Anular Pedido" style="font-size:30px;"><i class="fa fa-remove"></i></button>
+                          </span>');
+                    print('  
                         
-                            <span class="description-text" style="font-size:20px;"><strong>ENTREGAR</strong></span>
+                            <span class="description-text" style="font-size:15px;"><strong>ANULAR</strong></span>
                           </div> 
                           <!-- /.description-block -->
                         </div>

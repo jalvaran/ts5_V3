@@ -943,4 +943,63 @@ function MarqueErrorElemento(idElemento){
     document.getElementById(idElemento).focus();
 }
 
+function AnularPedido(idPedido){
+    alertify.confirm('Está seguro que desea Anular el pedido '+idPedido+'?',
+        function (e) {
+            if (e) {
+                
+                EnviaAnularPedido(idPedido);
+            }else{
+                alertify.error("Se canceló el proceso");
+
+                return;
+            }
+        });
+}
+
+function EnviaAnularPedido(idPedido){
+      
+    var form_data = new FormData();
+        form_data.append('Accion', '14');        
+        form_data.append('idPedido', idPedido);
+        
+                
+        $.ajax({
+        url: './procesadores/restaurantPos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                                
+                var mensaje=respuestas[1];            
+                alertify.success(mensaje);
+                idPedidoActivo=0;
+                DibujePedidoActivo();
+            }else if(respuestas[0]=="E1"){
+                var mensaje=respuestas[1];
+                alertify.alert(mensaje);
+            
+            }else{
+                alertify.alert(data);
+                              
+            }
+            
+           
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
 DibujeListaPedidos();

@@ -178,6 +178,29 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indicce accion es diferent
             }           
         break; //fin caso 3    
         
+        case 4:// formulario para nuevo registro
+            
+            
+            $css->div("div", "col-md-4", "", "", "", "", "");
+                $css->input("date", "Fecha", "form-control", "Fecha", "Fecha", "", "Fecha", "off", "", "");
+            $css->Cdiv();
+            $css->div("div", "col-md-4", "", "", "", "", "");
+                $css->input("number", "Cantidad", "form-control", "Cantidad", "Cantidad", "", "Cantidad", "off", "", "");
+            $css->Cdiv();
+            $css->div("div", "col-md-4", "", "", "", "", "");
+                $css->input("number", "idLibroDiario", "form-control", "idLibroDiario", "idLibroDiario", "", "idLibroDiario", "off", "", "");
+            $css->Cdiv();
+            $css->div("div", "col-md-4", "", "", "", "", "");
+                $css->input("number", "idComprobanteContable", "form-control", "idComprobanteContable", "idComprobanteContable", "", "idComprobanteContable", "off", "", "");
+            $css->Cdiv();
+            $css->div("div", "col-md-4", "", "", "", "", "");
+                $css->input("text", "TipoAbono", "form-control", "TipoAbono", "TipoAbono", "", "TipoAbono", "off", "", "");
+            $css->Cdiv();
+            
+            $css->CrearBotonEvento("BtnGuardar", "Guardar", 1, "onclick", "InsertarDatos()", "rojo");
+            
+        break;// fin caso 4    
+        
  }
     
           

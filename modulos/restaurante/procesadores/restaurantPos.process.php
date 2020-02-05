@@ -213,7 +213,14 @@ if( !empty($_REQUEST["Accion"]) ){
             if($Print=="S"){
                 $DatosImpresora=$obCon->DevuelveValores("config_puertos", "ID", 1);
                 if($DatosImpresora["Habilitado"]=="SI"){
-                    $obPrint->ImprimeFacturaPOS($idFactura,$DatosImpresora["Puerto"],1);
+                    $DatosGenerales=$obCon->DevuelveValores("configuracion_general", "ID", 2);//Saber si se imprime una factura pos
+                    
+                    if($DatosGenerales["Valor"]==1){
+                        $obPrint->ImprimeFacturaPOS($idFactura,$DatosImpresora["Puerto"],1);
+                    }else{
+                        $obPrint->AbreCajon("");
+                    }
+                    
                     $DatosTikete=$obCon->DevuelveValores("config_tiketes_promocion", "ID", 1);
                     if($Total>=$DatosTikete["Tope"] AND $DatosTikete["Activo"]=="SI"){
                         $VectorTiket["F"]=0;
@@ -375,6 +382,17 @@ if( !empty($_REQUEST["Accion"]) ){
             $obPrint->ImprimirCierreRestaurantePos($idCierre,"",1,"");
             print("OK;Se imprimió el cierre $idCierre");
         break; //Fin caso 13
+        
+        case 14: //Anular un pedido
+            $idPedido=$obCon->normalizar($_REQUEST["idPedido"]);
+            if($idPedido==''){
+                exit("E1;No se recibió un pedido");
+            }
+            $obCon->BorraReg("restaurante_pedidos_items", "idPedido", $idPedido);
+            $obCon->ActualizaRegistro("restaurante_pedidos", "Estado", "7", "ID", $idPedido);
+            
+            print("OK;Pedido Anulado");
+        break;//Fin caso 14
         
     }
     

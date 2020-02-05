@@ -110,6 +110,10 @@ $css->PageInit($myTitulo);
                 $css->Coption();
             $css->Cselect();
             
+            $css->CrearDiv("DivMensajes", "", "left", 1, 1);
+            
+            $css->CerrarDiv();
+            
             $css->CrearDiv("", "box-tools pull-right", "left", 1, 1);                
                     print('<div class="input-group">');               
                         $css->input("text", "TxtBusquedas", "form-control", "TxtBusquedas", "", "", "Buscar", "", "", "onchange=page=1;muestraRegistros()");
