@@ -48,9 +48,9 @@ WHERE (SELECT IFNULL((SELECT Cantidad FROM inventarios_conteo_selectivo WHERE pr
 
 DROP VIEW IF EXISTS `vista_diferencia_inventarios`;
 CREATE VIEW vista_diferencia_inventarios AS
-SELECT idProductosVenta,`Referencia`,`Nombre`,`Existencias` as ExistenciaAnterior,
-(SELECT IFNULL((SELECT Existencias FROM inventarios_temporal WHERE productosventa.Referencia = inventarios_temporal.Referencia),0)) as ExistenciaActual,
-(SELECT ExistenciaActual) - (Existencias) as Diferencia,PrecioVenta,CostoUnitario,
+SELECT idProductosVenta,`Referencia`,`Nombre`,`Existencias` as ExistenciaActual ,
+(SELECT IFNULL((SELECT Existencias FROM inventarios_temporal WHERE productosventa.Referencia = inventarios_temporal.Referencia),0)) as ExistenciaAnterior,
+(SELECT ExistenciaActual) - (SELECT ExistenciaAnterior) as Diferencia,PrecioVenta,CostoUnitario,
 (SELECT Diferencia)*CostoUnitario AS TotalCostosDiferencia,Departamento,Sub1,Sub2,Sub3,Sub4,Sub5
   FROM `productosventa` 
 WHERE (SELECT IFNULL((SELECT Existencias FROM inventarios_temporal WHERE productosventa.Referencia = inventarios_temporal.Referencia),0))-Existencias<>0;

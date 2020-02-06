@@ -90,7 +90,15 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla($DatosPedido["idProducto"], 1);
                     $css->ColTabla($Descripcion, 1);
                     $css->ColTabla($DatosPedido["Cantidad"], 1);
-                    $css->ColTabla("<strong>".number_format($DatosPedido["Total"])."</strong>", 1,"R");
+                    print("<td>");
+                        print('<div class="input-group input-group-md">');
+                        $css->input("number", "TxtTotal_".$idItem, "form-control", "TxtTotal", "", $DatosPedido["Total"], "Cantidad", "off", "", "");
+                        print('<span class="input-group-btn">
+                          <button type="button" class="btn btn-success btn-flat" onclick=EditarPrecioVenta(`'.$idItem.'`,`'."TxtTotal_".$idItem.'`)><i class="fa fa-edit"></i></button>
+                        </span>');
+                        print("</div>");
+                    print("</td>");
+                    //$css->ColTabla("<strong>".number_format($DatosPedido["Total"])."</strong>", 1,"R");
                     print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>"); 
                         $css->li("", "fa  fa-remove", "", "onclick=EliminarItem(`$idItem`) style=font-size:16px;cursor:pointer;text-align:center;color:red");
                         $css->Cli();

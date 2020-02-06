@@ -388,11 +388,30 @@ if( !empty($_REQUEST["Accion"]) ){
             if($idPedido==''){
                 exit("E1;No se recibió un pedido");
             }
+            $DatosPedido=$obCon->DevuelveValores("restaurante_pedidos", "ID", $idPedido);
+            $obCon->ActualizaRegistro("restaurante_mesas", "Estado", "0", "ID", $DatosPedido["idMesa"]);
             $obCon->BorraReg("restaurante_pedidos_items", "idPedido", $idPedido);
             $obCon->ActualizaRegistro("restaurante_pedidos", "Estado", "7", "ID", $idPedido);
             
             print("OK;Pedido Anulado");
         break;//Fin caso 14
+        
+        case 15: //Anular un pedido
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $Total=$obCon->normalizar($_REQUEST["Total"]);
+            
+            if($idItem==''){
+                exit("E1;No se recibió el item");
+            }
+            if(!is_numeric($Total) OR $Total<=0){
+                exit("E1;El valor debe ser numerico;TxtTotal_".$idItem);
+            }
+            $DatosItem=$obCon->DevuelveValores("restaurante_pedidos_items", "ID", $idItem);
+            
+            $sql="UPDATE restaurante_pedidos_items SET Subtotal='$Total',Total='$Total' WHERE ID='$idItem'";
+            $obCon->Query($sql);
+            print("OK;Total editado");
+        break;//Fin caso 15
         
     }
     

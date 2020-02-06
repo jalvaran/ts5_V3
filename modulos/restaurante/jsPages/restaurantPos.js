@@ -1002,4 +1002,42 @@ function EnviaAnularPedido(idPedido){
     
 }
 
+function EditarPrecioVenta(idItem,idCajaTexto){
+    var idDivMensajes='DivMensajes';
+    var Total=document.getElementById(idCajaTexto).value;   
+    var form_data = new FormData();
+        form_data.append('Accion', '15'); 
+        form_data.append('idItem', idItem);
+        form_data.append('Total', Total);
+        $.ajax({
+        url: './procesadores/restaurantPos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                
+                alertify.success(respuestas[1]);                
+                DibujePedidoActivo();
+                
+            }else{
+                document.getElementById(idDivMensajes).innerHTML=data;
+                
+            }
+                       
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
+
 DibujeListaPedidos();
