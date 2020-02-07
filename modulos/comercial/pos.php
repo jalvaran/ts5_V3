@@ -134,17 +134,17 @@ $css->PageInit($myTitulo);
             print("<br><br><br>");           
             
             
-            $css->CrearDiv("", "col-md-3", "left", 1, 1);
+            $css->CrearDiv("", "col-md-2", "left", 1, 1);
                $css->input("text", "TxtBuscarSeparado", "form-control", "TxtBuscarSeparado", "TxtBuscarSeparado", "", "Buscar Separado", "off", "", "onkeyup=BuscarSeparados()");
             $css->CerrarDiv();
             
-            $css->CrearDiv("", "col-md-3", "left", 1, 1);
+            $css->CrearDiv("", "col-md-2", "left", 1, 1);
                $css->input("text", "TxtBuscarCredito", "form-control", "TxtBuscarCredito", "TxtBuscarCredito", "", "Buscar Crédito", "off", "", "onkeyup=BuscarCreditos()");
             $css->CerrarDiv();
                 
             
             
-            $css->CrearDiv("", "col-md-3", "left", 1, 1);
+            $css->CrearDiv("", "col-md-2", "left", 1, 1);
             
             print('<div class="input-group input-group-md">
                 <input type="password" id="TxtAutorizaciones" class="form-control" placeholder="Autorizaciones">
@@ -162,13 +162,16 @@ $css->PageInit($myTitulo);
                
               </div>');
             
-                
+            
             $css->CerrarDiv();
             
-            $css->CrearDiv("", "col-md-3", "left", 1, 1);
+            $css->CrearDiv("", "col-md-2", "left", 1, 1);
                $css->input("password", "CodigoTarjetaEntrada", "form-control", "CodigoTarjetaEntrada", "CodigoTarjeta", "", "Tarjeta Código", "off", "", "onchange=CodigoTarjeta()");
             $css->CerrarDiv();
             
+            $css->CrearDiv("", "col-md-2", "left", 1, 1);
+               $css->input("text", "TxtBuscarAcuerdo", "form-control", "TxtBuscarAcuerdo", "TxtBuscarAcuerdo", "", "Buscar Acuerdo", "off", "", "onkeyup=BuscarAcuerdo()");
+            $css->CerrarDiv();
             
             $css->CrearDiv("DivBusquedasPOS", "col-md-12", "left", 1, 1);
               
@@ -267,6 +270,7 @@ $css->PageInit($myTitulo);
 $css->PageFin();
 print('<script src="../../componentes/shortcuts.js"></script>');  //script propio de la pagina
 print('<script src="jsPages/pos.js"></script>');  //script propio de la pagina
+print('<script src="jsPages/AcuerdoPago.js"></script>');  //script propio de la pagina
 print('<script src="../../componentes/webcam/webcam.js"></script>');  //script para usar la web cam
 
 $css->Cbody();

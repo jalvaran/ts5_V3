@@ -880,12 +880,12 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit();
             }
             
-            
+            $ValorAnteriorCuota="";
             
             $sql="SELECT * FROM acuerdo_pago WHERE Tercero='$NIT' AND Estado=1";
             $DatosAcuerdoAnterior=$obCon->FetchAssoc($obCon->Query($sql));
             if($DatosAcuerdoAnterior["ID"]>0){
-                
+                $ValorAnteriorCuota=$DatosAcuerdoAnterior["ValorCuotaGeneral"];
             }
             
                 
@@ -976,7 +976,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         print("</td>"); 
                         print("<td>");
                             
-                            $css->input("text", "ValorCuotaAcuerdo", "form-control", "ValorCuotaAcuerdo", "ValorCuotaAcuerdo", "", "Valor de la Cuota", "off", "", "");
+                            $css->input("text", "ValorCuotaAcuerdo", "form-control", "ValorCuotaAcuerdo", "ValorCuotaAcuerdo", $ValorAnteriorCuota, "Valor de la Cuota", "off", "", "");
                         print("</td>"); 
                         
                         print("<td>");

@@ -310,7 +310,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break; //Fin caso 2
     
-        case 3:
+        case 3: //dibuja el historial de una cuenta por pagar
             $idItem=$obCon->normalizar($_REQUEST["idItem"]);
             
             $DatosMovimiento=$obCon->DevuelveValores("librodiario", "idLibroDiario", $idItem);
@@ -350,6 +350,152 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CerrarTabla();
             
         break;//Fin caso 3    
+        
+        case 4: //Dibuja todas las cuentas por pagar  
+            $Tercero="";
+            if(isset($_REQUEST['Page'])){
+                $NumPage=$obCon->normalizar($_REQUEST['Page']);
+            }else{
+                $NumPage=1;
+            }
+            
+            $Condicional=" WHERE Total<>0 ";
+            
+            if(isset($_REQUEST['Busqueda'])){
+                $Busqueda=$obCon->normalizar($_REQUEST['Busqueda']);
+                if($Busqueda<>''){
+                    $Condicional.=" AND (NumeroDocumentoExterno like '%$Busqueda%')";
+                }
+                
+            }
+            
+            $statement=" `vista_cuentasxpagardetallado_v2` $Condicional ";
+            if(isset($_REQUEST['st'])){
+
+                $statement= urldecode($_REQUEST['st']);
+                //print($statement);
+            }
+            
+            $limit = 10;
+            $startpoint = ($NumPage * $limit) - $limit;
+            $VectorST = explode("LIMIT", $statement);
+            $statement = $VectorST[0]; 
+            $query = "SELECT COUNT(*) as `num`,SUM(Total) AS Total FROM {$statement}";
+            $row = $obCon->FetchArray($obCon->Query($query));
+            $ResultadosTotales = $row['num'];
+            $Total=$row['Total'];
+            $st_reporte=$statement;
+            $Limit=" LIMIT $startpoint,$limit";
+            
+            $query="SELECT * ";
+            
+            $Consulta=$obCon->Query("$query FROM $statement $Limit");
+            
+            $css->CrearTabla();
+            
+            
+                $css->FilaTabla(16);
+                    print("<td style='text-align:center'>");
+                        print("<strong>Registros:</strong> <h4 style=color:green>". number_format($ResultadosTotales)."</h4>");
+                    print("</td>");
+                    
+                    print("<td  colspan=3  style='text-align:center'>");
+                        $css->CrearTitulo("<strong>Todas las cuentas</strong>", "verde");
+                         
+                    print("</td>");
+                    print("<td style='text-align:center'>");
+                        print("<strong>Total:</strong> <h4 style=color:red>". number_format($Total)."</h4>");
+                    print("</td>");
+                    print("<td colspan='2' style='text-align:center'>");
+                        $link="../../general/procesadores/GeneradorCSV.process.php?Opcion=2&Tabla=vista_cuentasxpagardetallado_v2";
+                        print("<a href='$link' target='_blank'><button class='btn btn-info' value='Exportar'>Exportar</button></a>");
+                        
+                    print("</td>");
+                $css->CierraFilaTabla();
+                
+                $st= urlencode($st_reporte);
+                    if($ResultadosTotales>$limit){
+
+                        $css->FilaTabla(14);
+                            print("<td colspan='1' style=text-align:center>");
+                            if($NumPage>1){
+                                $NumPage1=$NumPage-1;
+                                
+                                $FuncionJS="CambiePaginaReferencia2(`$NumPage1`,`$Tercero`);";
+                                print("<strong>Atrás</strong><br>");
+                                $css->CrearBotonEvento("BtnMas", "Página $NumPage1", 1, "onclick", $FuncionJS, "rojo", "");
+
+                            }
+                            print("</td>");
+                            $TotalPaginas= ceil($ResultadosTotales/$limit);
+                            print("<td colspan=4 style=text-align:center>");
+                            print("<strong>Página: </strong>");
+
+                            
+                            $FuncionJS="onchange=CambiePaginaReferencia2(``,`$Tercero`);";
+                            $css->select("CmbPageCuentasXPagarReferencia", "form-control", "CmbPageCuentasXPagarReferencia", "", "", $FuncionJS, "");
+                            
+                                for($p=1;$p<=$TotalPaginas;$p++){
+                                    if($p==$NumPage){
+                                        $sel=1;
+                                    }else{
+                                        $sel=0;
+                                    }
+                                    
+                                    $css->option("", "", "", $p, "", "",$sel);
+                                        print($p);
+                                    $css->Coption();
+                                    
+                                }
+
+                            $css->Cselect();
+                            print("</td>");
+                            
+                            print("<td colspan='1' style=text-align:center>");
+                            
+                            if($ResultadosTotales>($startpoint+$limit)){
+                                $NumPage1=$NumPage+1;
+                                print("<strong>Siguiente</strong><br>");
+                                $FuncionJS="CambiePaginaReferencia2(`$NumPage1`,`$Tercero`);";
+                                $css->CrearBotonEvento("BtnMas", "Página $NumPage1", 1, "onclick", $FuncionJS, "verde", "");
+                                //$css->CrearBotonEvento("BtnMas", "Página $NumPage1", 1, "onclick", $FuncionJS, "verde", "");
+                            }
+                            print("</td>");
+                           $css->CierraFilaTabla(); 
+                        }
+                      
+                
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Fecha</strong>", 1);
+                    $css->ColTabla("<strong>Plazo Pago</strong>", 1);
+                    $css->ColTabla("<strong>Referencia</strong>", 1);
+                    $css->ColTabla("<strong>Cuenta</strong>", 1);
+                    $css->ColTabla("<strong>Nombre Cuenta</strong>", 1);                    
+                    $css->ColTabla("<strong>Total</strong>", 1);
+                    $css->ColTabla("<strong>Acciones</strong>", 1);
+                $css->CierraFilaTabla();
+                
+                
+                while($DatosCuentasXPagar=$obCon->FetchAssoc($Consulta)){
+                    $css->FilaTabla(14);
+                        $idItem=$DatosCuentasXPagar["ID"];
+                        $css->ColTabla($DatosCuentasXPagar["Fecha"], 1);
+                        $css->ColTabla($DatosCuentasXPagar["PlazoPago"], 1);
+                        print("<td style='text-align:center'>");
+                            print('<a href="#" onclick="VerMovimientosCuentaXPagar('.$idItem.');">'.$DatosCuentasXPagar["NumeroDocumentoExterno"].' <i class="fa fa-eye"></i></a>');
+                        print("</td>");
+                        //$css->ColTabla($DatosCuentasXPagar["NumeroDocumentoExterno"], 1);
+                        $css->ColTabla($DatosCuentasXPagar["CuentaPUC"], 1);
+                        $css->ColTabla($DatosCuentasXPagar["NombreCuenta"], 1);                        
+                        $css->ColTabla(number_format($DatosCuentasXPagar["Total"]), 1);
+                        print("<td style='text-align:center'>");
+                            print('<a href="#" onclick="AgregueMovimientoDesdeCuentaXPagar(`'.$idItem.'`,`'.$DatosCuentasXPagar["NumeroDocumentoExterno"].'`,`'.$DatosCuentasXPagar["Total"].'`,`'.$DatosCuentasXPagar["CuentaPUC"].'`,`'.$DatosCuentasXPagar["NombreCuenta"].'`,`'.$DatosCuentasXPagar["Tercero_Identificacion"].'`);"><i class="fa fa-plus"></i></a>');
+                        print("</td>");
+                    $css->CierraFilaTabla();
+                }
+            $css->CerrarTabla();
+            
+        break; //Fin caso 4
         
     }
     

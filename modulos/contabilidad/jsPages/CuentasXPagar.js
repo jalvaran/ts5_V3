@@ -261,5 +261,45 @@ function VerMovimientosCuentaXPagar(idItem){
       })  
 }
 
+function DibujeCuentasXPagarCompleta(Page=1,Busqueda=''){
+    
+    document.getElementById("DivDocumentosTercero").innerHTML='<div id="GifProcess">Procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 4);
+        form_data.append('Page', Page);
+        form_data.append('Busqueda', Busqueda);
+        
+        $.ajax({
+        url: './Consultas/CuentasXPagar.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivDocumentosTercero').innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+
+function CambiePaginaReferencia2(Page='',Tercero){
+    if(Page==''){
+       var Page=document.getElementById("CmbPageCuentasXPagarReferencia").value;
+    }
+    
+    var Busqueda=document.getElementById("TxtBusquedasReferencia").value;
+        
+    DibujeCuentasXPagarCompleta(Page,Busqueda,Tercero);
+}
+
 //document.getElementById("BtnMuestraMenuLateral").click();
 DibujeCuentasXPagar();

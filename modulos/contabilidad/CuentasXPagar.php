@@ -46,13 +46,15 @@ $css->PageInit($myTitulo);
                     $css->CrearDiv("", "col-md-6", "left", 1, 1);
                         $link="../../general/procesadores/GeneradorCSV.process.php?Opcion=2&Tabla=vista_cuentasxpagar_v2";
                         print("<a href='$link' target='_blank'><button class='btn btn-success' value='Exportar'>Exportar</button></a>");
+                        
                     $css->CerrarDiv();
                     print('<div class="input-group">');
                     $css->input("text", "TxtBusquedasTercero", "form-control", "TxtBusquedasTercero", "", "", "Buscar Tercero", "", "", "onchange=BuscarTercero()");
 
 
-                     print('<span class="input-group-addon"><i class="fa fa-fw fa-search"></i></span>
-                          </div>');
+                     print('<span class="input-group-addon"><i class="fa fa-fw fa-search"></i></span>');
+                     $css->CrearBotonEvento("BtnVerTodo", "Ver Todo", 1, "onclick", "DibujeCuentasXPagarCompleta()", "azul");
+                     print('</div>');
                     $css->CrearDiv("DivOpcionesCuentaGeneral", "", "left", 1, 1);
 
                     $css->CerrarDiv();

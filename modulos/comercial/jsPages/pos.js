@@ -2925,3 +2925,4 @@ function VisualizarTotalesAcuerdo(idAcuerdo=''){
       
       
 }
+

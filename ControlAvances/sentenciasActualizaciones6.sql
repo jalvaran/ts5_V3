@@ -291,3 +291,6 @@ ALTER TABLE `clientes` ADD `Plazo` INT(5) UNSIGNED  NOT NULL AFTER `Cupo`;
 
 ALTER TABLE `restaurante_cierres` ADD `EfectivoEnCaja` DOUBLE NOT NULL AFTER `Observaciones`;
 ALTER TABLE `restaurante_cierres` ADD `Diferencia` DOUBLE NOT NULL AFTER `EfectivoEnCaja`;
+
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(30,	'Dias de plazo para pagar una cuota en el modulo acuerdo de pagos',	'5',	'2019-12-22 10:34:26',	'0000-00-00 00:00:00');
