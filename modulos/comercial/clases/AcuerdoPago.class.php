@@ -157,6 +157,17 @@ class AcuerdoPago extends ProcesoVenta{
             }
             if($cicloPagos==3){ //Si el ciclo es Mensual
                 $DatosProyeccion["FechaCuotas"][$i]=$this->SumeMesesAFecha($FechaInicial, ($i-1));
+                $DiaMes=date("m-d", strtotime($DatosProyeccion["FechaCuotas"][$i-1]));
+                if($DiaMes=="01-30"){
+                    $FechaTemporal= $this->SumeDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i-1], 5);
+                    $CantidadDias= $this->obtenerCantidadDiasMes($FechaTemporal);
+                    if($CantidadDias==28){
+                        $DatosProyeccion["FechaCuotas"][$i]= $this->ResteDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i], 2);
+                    }
+                    if($CantidadDias==29){
+                        $DatosProyeccion["FechaCuotas"][$i]= $this->ResteDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i], 1);
+                    }
+                }
             }
             $DatosProyeccion["ValorCuota"][$i]=$ValorCuotaAcuerdo;
             if($i==$NumeroCuotasCalculadas){
