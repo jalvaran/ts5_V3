@@ -80,7 +80,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla($DatosAcuerdo["Observaciones"], 1);
                         $css->ColTabla(number_format($DatosAcuerdo["SaldoInicial"]), 1);
                         $css->ColTabla(number_format($DatosAcuerdo["TotalAbonos"]), 1);
-                        $css->ColTabla(number_format($DatosAcuerdo["SaldoFinal"]), 1);
+                        $css->ColTabla("<h3>".number_format($DatosAcuerdo["SaldoFinal"])."</h3>", 1);
                         $css->ColTabla($DatosAcuerdo["NombreUsuario"], 1);
 
                     $css->CierraFilaTabla();
@@ -189,14 +189,15 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla("<strong>Fecha</strong>", 1, "C");
                         $css->ColTabla("<strong>Valor</strong>", 1, "C");
                         $css->ColTabla("<strong>Pagos</strong>", 1, "C");
-                        
+                        $css->ColTabla("<strong>Fecha Pago</strong>", 1, "C");
                         $css->ColTabla("<strong>Estado</strong>", 1, "C");
                     $css->CierraFilaTabla();
                     
                     
                     $sql="SELECT t1.*,
                             (SELECT t2.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t2 WHERE t2.ID=t1.TipoCuota) AS NombreTipoCuota,
-                            (SELECT t3.NombreEstado FROM acuerdo_pago_proyeccion_estados t3 WHERE t3.ID=t1.Estado) AS NombreEstado
+                            (SELECT t3.NombreEstado FROM acuerdo_pago_proyeccion_estados t3 WHERE t3.ID=t1.Estado) AS NombreEstado,
+                            (SELECT t4.FechaPago FROM acuerdo_pago_cuotas_pagadas t4 WHERE t4.ID=t1.idPago LIMIT 1) AS FechaPago
                             FROM acuerdo_pago_proyeccion_pagos t1 WHERE idAcuerdoPago='$idAcuerdo' AND (Estado=1 OR Estado=3 ) ORDER BY NumeroCuota DESC";
                     $Consulta=$obAcuerdo->Query($sql);
                     
@@ -208,7 +209,7 @@ if( !empty($_REQUEST["Accion"]) ){
                             $css->ColTabla($DatosCuotas["Fecha"], 1);
                             $css->ColTabla(number_format($DatosCuotas["ValorCuota"]), 1);
                             $css->ColTabla(number_format($DatosCuotas["ValorPagado"]), 1);
-                            
+                            $css->ColTabla($DatosCuotas["FechaPago"], 1);
                             $css->ColTabla($DatosCuotas["NombreEstado"], 1);
                         $css->CierraFilaTabla();
                     }

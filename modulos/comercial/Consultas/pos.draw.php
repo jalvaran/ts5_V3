@@ -871,7 +871,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->FilaTabla(16);                    
                         $css->ColTabla(number_format($SaldoActualCliente), 1);
                         $css->ColTabla(number_format($Cupo), 1); 
-                        $css->ColTabla(number_format($NuevoSaldo), 1);
+                        $css->ColTabla("<h2>".number_format($NuevoSaldo)."</h2>", 1);
                     $css->CierraFilaTabla();
                     
             if($NuevoSaldo>$Cupo){
@@ -934,16 +934,15 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CierraFilaTabla();
                     
                     $css->FilaTabla(16);
-                        $css->ColTabla("<strong>Cuotas</strong>", 1);
+                        
                         $css->ColTabla("<strong>Ciclo</strong>", 1);
+                        $css->ColTabla("<strong>Cuotas</strong>", 1);
                         $css->ColTabla("", 1);
                     $css->CierraFilaTabla();
 
                     $css->FilaTabla(16);
                         
-                        print("<td>");
-                            $css->input("number", "NumeroCuotas", "form-control", "NumeroCuotas", "NumeroCuotas", "", "Numero de Cuotas", "off", "", "onchange=CalculeValorCuotaAcuerdo('$idAcuerdo')");
-                        print("</td>");
+                        
                         print("<td>");
                             $css->select("cicloPagos", "form-control", "cicloPagos", "", "", "onchange=CalculeCuotasAcuerdo()", "");
                                 $css->option("", "", "", "", "", "");
@@ -957,6 +956,9 @@ if( !empty($_REQUEST["Accion"]) ){
                                 $css->Coption();
                                 }
                             $css->Cselect();
+                        print("</td>");
+                        print("<td>");
+                            $css->input("number", "NumeroCuotas", "form-control", "NumeroCuotas", "NumeroCuotas", "", "Numero de Cuotas", "off", "", "onchange=CalculeValorCuotaAcuerdo('$idAcuerdo')");
                         print("</td>");
                         print("<td>");
                            // $css->CrearBotonEvento("btnAgregar", "+", 1, "onclick", "AgregarNumeroDeCuotas('$idAcuerdo')", "verde");
@@ -1222,7 +1224,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $ValorAProyectar=$obAcuerdo->ValorAProyectarTemporalAcuerdo($idAcuerdo, $TotalPreventa, $idCliente);
             print("Valor a Proyectar: <h2><strong>". number_format($ValorAProyectar)."</strong></h2>");
             $TotalCuotasProyectadas=$obAcuerdo->TotalCuotasTemporalAcuerdoPago($idAcuerdo);
-            print("Total Cuotas: <h2><strong>". number_format($TotalCuotasProyectadas)."</strong></h2>");
+            //print("Total Cuotas: <h2><strong>". number_format($TotalCuotasProyectadas)."</strong></h2>");
             $Diferencia=$ValorAProyectar-$TotalCuotasProyectadas;
             print("Diferencia: <h2><strong>". number_format($Diferencia)."</strong></h2>");
         break;//Fin caso 17    

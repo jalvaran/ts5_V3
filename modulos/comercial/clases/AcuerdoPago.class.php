@@ -116,22 +116,44 @@ class AcuerdoPago extends ProcesoVenta{
         $DatosProyeccion["ValorCuota"][1]=$ValorCuotaAcuerdo;
         $DatosProyeccion["NombreDia"][1]=$this->obtenerNombreDiaFecha($FechaInicial);
         
-        $this->CuotaAcuerdoPagosTemporal($FechaInicial, 1, 2, $idAcuerdoPago, $ValorCuotaAcuerdo, $idUser);
+        //$this->CuotaAcuerdoPagosTemporal($FechaInicial, 1, 2, $idAcuerdoPago, $ValorCuotaAcuerdo, $idUser);
         for($i=2;$i<=$NumeroCuotasCalculadas;$i++){
             if($cicloPagos==1){ //Si el ciclo es Semanal
                 $DatosProyeccion["FechaCuotas"][$i]=$this->SumeSemanasAFecha($FechaInicial, $i-1);
             }
             if($cicloPagos==2){ //Si el ciclo es Quincenal
-                if($i>2){
-                    if($i%2==0){ //Saber si es par
-                        $DatosProyeccion["FechaCuotas"][$i]=$this->SumeMesesAFecha($DatosProyeccion["FechaCuotas"][$i-2], 1);
-                    }else{
-                        $DatosProyeccion["FechaCuotas"][$i]=$this->SumeMesesAFecha($DatosProyeccion["FechaCuotas"][$i-2], 1);
+                $DatosProyeccion["FechaCuotas"][$i]=$this->SumeDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i-1], 15);
+                $DiaActual=date("d", strtotime($DatosProyeccion["FechaCuotas"][$i-1]));
+                $CantidadDias= $this->obtenerCantidadDiasMes($DatosProyeccion["FechaCuotas"][$i-1]);
+                $MesActual=date("m", strtotime($DatosProyeccion["FechaCuotas"][$i]));
+                $DiaMesActual=date("d", strtotime($DatosProyeccion["FechaCuotas"][$i]));
+                    if($DiaActual>15 and $CantidadDias==31){                        
+                        $DatosProyeccion["FechaCuotas"][$i]= $this->SumeDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i], 1);
+                        
                     }
-                }else{
-                    $DatosProyeccion["FechaCuotas"][$i]=$this->SumeDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i-1], 15);
-                }
-                
+                    if($DiaActual<=15 and $CantidadDias==28){
+                        
+                       $DatosProyeccion["FechaCuotas"][$i]= $this->ResteDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i], 2);
+                      
+                       
+                    }
+                    if($DiaActual<=15 and $CantidadDias==29){
+                        $DatosProyeccion["FechaCuotas"][$i]= $this->ResteDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i], 1);
+                    }
+                   
+                if($MesActual=='03' AND $DiaMesActual>15 and $DiaMesActual<29){
+                    $CantidadDias= $this->obtenerCantidadDiasMes($DatosProyeccion["FechaCuotas"][$i-2]);
+                    if($CantidadDias==28){
+                        $DatosProyeccion["FechaCuotas"][$i-2]= $this->SumeDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i-2], 2);
+                     
+                    }
+                    if($CantidadDias==29){
+                        $DatosProyeccion["FechaCuotas"][$i-2]= $this->SumeDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i-2], 1);
+                     
+                    }
+                     
+                }                        
+                   
             }
             if($cicloPagos==3){ //Si el ciclo es Mensual
                 $DatosProyeccion["FechaCuotas"][$i]=$this->SumeMesesAFecha($FechaInicial, ($i-1));
@@ -143,12 +165,19 @@ class AcuerdoPago extends ProcesoVenta{
             $DatosProyeccion["FechaFinal"]=$DatosProyeccion["FechaCuotas"][$i];
             $DatosProyeccion["NombreDia"][$i]=$this->obtenerNombreDiaFecha($DatosProyeccion["FechaCuotas"][$i]);
             
-            $this->CuotaAcuerdoPagosTemporal($DatosProyeccion["FechaCuotas"][$i], $i, 2, $idAcuerdoPago, $DatosProyeccion["ValorCuota"][$i], $idUser);
             
         }
-        
-        
+          
+        foreach ($DatosProyeccion["FechaCuotas"] as $key => $value) {
+            $this->CuotaAcuerdoPagosTemporal($value, $key, 2, $idAcuerdoPago, $DatosProyeccion["ValorCuota"][$key], $idUser);
+            
+        }  
         return($DatosProyeccion);
+     }
+     
+     public function obtenerCantidadDiasMes($Fecha) {
+         $numeroDias=date("t", strtotime($Fecha));
+         return($numeroDias);
      }
      
      public function obtenerNombreDiaFecha($Fecha) {
@@ -166,6 +195,13 @@ class AcuerdoPago extends ProcesoVenta{
         return($nuevafecha);
      }
      
+     public function ResteDiasAFechaAcuerdo($Fecha,$NumeroDias) {         
+        $nuevafecha = date('Y-m-d', strtotime($Fecha) + 86400);        
+        $nuevafecha = date('Y-m-d', strtotime("$Fecha - $NumeroDias day"));
+        
+        return($nuevafecha);
+     }
+       
      public function SumeSemanasAFecha($Fecha,$NumeroSemanas) {         
         $nuevafecha = date('Y-m-d', strtotime($Fecha) + 86400);        
         $nuevafecha = date('Y-m-d', strtotime("$Fecha + $NumeroSemanas week"));
