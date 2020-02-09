@@ -57,7 +57,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         print("<td style='text-align:center'>");
                             
                             print('<span class="input-group-btn">
-                                <button type="button" class="btn btn-warning btn-flat" onclick=FormularioAbonarAcuerdoPago(`'.$idAcuerdo.'`)> <i class="fa fa-plus"> </i> </button>
+                                <button type="button" class="btn btn-warning btn-flat" onclick=TotalAbonoAcuerdo=0;FormularioAbonarAcuerdoPago(`'.$idAcuerdo.'`)> <i class="fa fa-plus"> </i> </button>
                               </span> ');
                         print("</td>");  
                         print("<td style='text-align:center'>");    
@@ -144,12 +144,13 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     
                     $css->FilaTabla(16);
-                        $css->ColTabla("<strong>TipoCuota</strong>", 1, "C");
+                        //$css->ColTabla("<strong>TipoCuota</strong>", 1, "C");
                         $css->ColTabla("<strong>Numero de Cuota</strong>", 1, "C");
                         $css->ColTabla("<strong>Fecha</strong>", 1, "C");
                         $css->ColTabla("<strong>Valor</strong>", 1, "C");
                         $css->ColTabla("<strong>Pagos</strong>", 1, "C");
                         $css->ColTabla("<strong>Saldo</strong>", 1, "C");
+                        $css->ColTabla("<strong>Pago Individual</strong>", 1, "C");
                         $css->ColTabla("<strong>Estado</strong>", 1, "C");
                     $css->CierraFilaTabla();
                     
@@ -161,14 +162,20 @@ if( !empty($_REQUEST["Accion"]) ){
                     $Consulta=$obAcuerdo->Query($sql);
                     
                     while($DatosCuotas=$obAcuerdo->FetchAssoc($Consulta)){
+                        $idCuota=$DatosCuotas["ID"];
                         $TotalCuotasPendientes=$TotalCuotasPendientes+$DatosCuotas["ValorCuota"]-$DatosCuotas["ValorPagado"];
                         $css->FilaTabla(16);
-                            $css->ColTabla($DatosCuotas["NombreTipoCuota"], 1);
+                            //$css->ColTabla($DatosCuotas["NombreTipoCuota"], 1);
                             $css->ColTabla($DatosCuotas["NumeroCuota"], 1);
                             $css->ColTabla($DatosCuotas["Fecha"], 1);
                             $css->ColTabla(number_format($DatosCuotas["ValorCuota"]), 1);
                             $css->ColTabla(number_format($DatosCuotas["ValorPagado"]), 1);
                             $css->ColTabla(number_format($DatosCuotas["ValorCuota"]-$DatosCuotas["ValorPagado"]), 1);
+                            print("<td style=text-align:center>");
+                                print('<span class="input-group-btn">
+                                    <button type="button" class="btn btn-primary btn-flat" onclick=AbonarCuotaAcuerdoIndividual(`'.$idAcuerdo.'`,`'.$idCuota.'`)> <i class="fa fa-plus"> </i> </button>
+                                  </span> ');
+                            print("</td>");
                             $css->ColTabla($DatosCuotas["NombreEstado"], 1);
                         $css->CierraFilaTabla();
                     }

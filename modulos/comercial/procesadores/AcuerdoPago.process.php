@@ -84,7 +84,62 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Pago Ingresado");
         break; //fin caso 2
         
-             
+        case 3://Obtiene los valores de una cuota
+            $idCuota=$obCon->normalizar($_REQUEST["idCuota"]);
+            $DatosCuota=$obCon->DevuelveValores("acuerdo_pago_proyeccion_pagos", "ID", $idCuota);
+            if($DatosCuota["ID"]==''){
+                exit("E1;No existe la cuota Solicitada");
+               
+            }
+            $Saldo=$DatosCuota["ValorCuota"]-$DatosCuota["ValorPagado"];
+            $Mensaje="OK";
+            $Mensaje.=";".$DatosCuota["NumeroCuota"];
+            $Mensaje.=";".$DatosCuota["Fecha"];
+            $Mensaje.=";".$DatosCuota["ValorCuota"];
+            $Mensaje.=";".$DatosCuota["ValorPagado"];
+            $Mensaje.=";".$Saldo;
+            print($Mensaje);
+        break;//Fin caso 3    
+        
+        case 4://Realiza el abono a una cuota individual
+            $idCuota=$obCon->normalizar($_REQUEST["idCuota"]);
+            $ValorAbono=$obCon->normalizar($_REQUEST["ValorAbono"]);
+            $MetodoPago=$obCon->normalizar($_REQUEST["MetodoPago"]);
+            $TotalAbono=$obCon->normalizar($_REQUEST["TotalAbono"]);
+            if(!is_numeric($ValorAbono) or $ValorAbono<=0){
+                exit("E1;El valor del abono debe ser un numero mayor a cero");
+            }
+            if(!is_numeric($TotalAbono) or $TotalAbono<=0){
+                exit("E1;El Total del abono debe ser un numero mayor a Cero");
+            }
+            if($ValorAbono > $TotalAbono){
+                exit("E1;El Valor del Abono no puede ser mayor al Total del Abono");
+            }
+            if($MetodoPago==''){
+                exit("E1;No se recibió el metodo de pago");
+            }
+            $DatosCuota=$obCon->DevuelveValores("acuerdo_pago_proyeccion_pagos", "ID", $idCuota);
+            $idAcuerdo=$DatosCuota["idAcuerdoPago"];
+            $obCon->AbonarCuotaAcuerdo($idCuota, $ValorAbono, $MetodoPago, $idUser);
+            
+            if(isset($_REQUEST["idEmpresa"])){
+                $idEmpresa=$_REQUEST["idEmpresa"];
+            }else{
+                $idEmpresa=1;
+            }
+            if(isset($_REQUEST["idSucursal"])){
+                $idSucursal=$_REQUEST["idSucursal"];
+            }else{
+                $idSucursal=1;
+            }
+            if(isset($_REQUEST["idCentroCostos"])){
+                $idCentroCostos=$_REQUEST["idCentroCostos"];
+            }else{
+                $idCentroCostos=1;
+            }
+            
+            print("OK;Abono Registrado");
+        break;//FIn caso 4    
         
     }
     
