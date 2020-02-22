@@ -67,7 +67,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         print("</td>");  
                         print("<td style='text-align:center'>");        
                             print('<span class="input-group-btn">
-                                <button type="button" class="btn btn-success btn-flat" onclick=DibujarAcuerdoPagoExistente(`'.$idAcuerdo.'`)> <i class="fa fa-eye"> </i> </button>
+                                <button type="button" class="btn btn-success btn-flat" onclick=DibujarAcuerdoPagoExistente(`'.$idAcuerdo.'`,`DivBusquedasPOS`)> <i class="fa fa-eye"> </i> </button>
                               </span>');
                                 
                         print("</td>");
@@ -240,7 +240,199 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CerrarTabla();
             $css->CerrarDiv();
         break;//Fin caso 3    
-         
+        
+        case 4://Dibuja un acuerdo de pago por completo
+            
+            $idAcuerdo=$obAcuerdo->normalizar($_REQUEST["idAcuerdo"]);
+            $sql="SELECT t1.*, 
+                (SELECT CONCAT(RazonSocial) FROM clientes t2 WHERE t2.Num_Identificacion=t1.Tercero LIMIT 1) AS NombreCliente, 
+                (SELECT t3.NombreCiclo FROM acuerdo_pago_ciclos_pagos t3 WHERE t3.ID=t1.CicloPagos) AS NombreCicloPago,
+                (SELECT t4.NombreEstado FROM acuerdo_pago_estados t4 WHERE t4.ID=t1.Estado) AS NombreEstado
+                
+                FROM acuerdo_pago t1 WHERE idAcuerdoPago='$idAcuerdo'";
+        
+            $DatosAcuerdo= $obAcuerdo->FetchAssoc($obAcuerdo->Query($sql));
+            print("<br><br>");
+            $css->CrearTitulo("Acuerdo de pago con: ".$DatosAcuerdo["NombreCliente"]." ".$DatosAcuerdo["Tercero"], "rojo");
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Datos Generales</strong>", 6,'C');
+                   
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Fecha</strong>", 1);
+                    $css->ColTabla("<strong>Ciclo de pagos</strong>", 1);
+                    $css->ColTabla("<strong>Cuota General</strong>", 1);
+                    $css->ColTabla("<strong>Saldo Inicial</strong>", 1);
+                    $css->ColTabla("<strong>Total Abonos</strong>", 1);
+                    $css->ColTabla("<strong>Saldo Actual</strong>", 1);
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla($DatosAcuerdo["Fecha"], 1);
+                    $css->ColTabla($DatosAcuerdo["NombreCicloPago"], 1);
+                    $css->ColTabla(number_format($DatosAcuerdo["ValorCuotaGeneral"]), 1);
+                    $css->ColTabla(number_format($DatosAcuerdo["SaldoInicial"]), 1);
+                    $css->ColTabla(number_format($DatosAcuerdo["TotalAbonos"]), 1);
+                    $css->ColTabla(number_format($DatosAcuerdo["SaldoFinal"]), 1);
+                $css->CierraFilaTabla();
+            $TotalCuotasPendientes =0;    
+            $TotalPagos =0;    
+            $css->CerrarTabla();
+            
+            $css->CrearDiv("", "col-md-12", "left", 1, 1);
+                $css->CrearTitulo("<strong>CUOTAS PENDIENTES</strong>", "naranja");
+                $css->CrearTabla();
+                    
+                    
+                    $css->FilaTabla(16);
+                        //$css->ColTabla("<strong>TipoCuota</strong>", 1, "C");
+                        $css->ColTabla("<strong>Numero de Cuota</strong>", 1, "C");
+                        $css->ColTabla("<strong>Fecha</strong>", 1, "C");
+                        $css->ColTabla("<strong>Valor</strong>", 1, "C");
+                        $css->ColTabla("<strong>Pagos</strong>", 1, "C");
+                        $css->ColTabla("<strong>Saldo</strong>", 1, "C");
+                        //$css->ColTabla("<strong>Pago Individual</strong>", 1, "C");
+                        $css->ColTabla("<strong>Estado</strong>", 1, "C");
+                    $css->CierraFilaTabla();
+                    
+                    
+                    $sql="SELECT t1.*,
+                            (SELECT t2.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t2 WHERE t2.ID=t1.TipoCuota) AS NombreTipoCuota,
+                            (SELECT t3.NombreEstado FROM acuerdo_pago_proyeccion_estados t3 WHERE t3.ID=t1.Estado) AS NombreEstado
+                            FROM acuerdo_pago_proyeccion_pagos t1 WHERE idAcuerdoPago='$idAcuerdo' AND (Estado=0 OR Estado=2 OR Estado=4 ) ORDER BY Fecha ASC";
+                    $Consulta=$obAcuerdo->Query($sql);
+                    
+                    while($DatosCuotas=$obAcuerdo->FetchAssoc($Consulta)){
+                        $idCuota=$DatosCuotas["ID"];
+                        $TotalCuotasPendientes=$TotalCuotasPendientes+$DatosCuotas["ValorCuota"]-$DatosCuotas["ValorPagado"];
+                        $css->FilaTabla(16);
+                            //$css->ColTabla($DatosCuotas["NombreTipoCuota"], 1);
+                            $css->ColTabla($DatosCuotas["NumeroCuota"], 1);
+                            $css->ColTabla($DatosCuotas["Fecha"], 1);
+                            $css->ColTabla(number_format($DatosCuotas["ValorCuota"]), 1);
+                            $css->ColTabla(number_format($DatosCuotas["ValorPagado"]), 1);
+                            $css->ColTabla(number_format($DatosCuotas["ValorCuota"]-$DatosCuotas["ValorPagado"]), 1);
+                            
+                            $css->ColTabla($DatosCuotas["NombreEstado"], 1);
+                        $css->CierraFilaTabla();
+                    }
+                    
+                    
+                $css->CerrarTabla();
+            $css->CerrarDiv();
+            
+            
+            $css->CrearDiv("", "col-md-12", "left", 1, 1);
+                $css->CrearTitulo("<strong>CUOTAS PAGADAS EN SU TOTALIDAD</strong>", "verde");
+                $css->CrearTabla();
+                    
+                    
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>TipoCuota</strong>", 1, "C");
+                        $css->ColTabla("<strong>Numero de Cuota</strong>", 1, "C");
+                        $css->ColTabla("<strong>Fecha</strong>", 1, "C");
+                        $css->ColTabla("<strong>Valor</strong>", 1, "C");
+                        $css->ColTabla("<strong>Pagos</strong>", 1, "C");
+                        $css->ColTabla("<strong>Fecha Pago</strong>", 1, "C");
+                        $css->ColTabla("<strong>Estado</strong>", 1, "C");
+                    $css->CierraFilaTabla();
+                    
+                    
+                    $sql="SELECT t1.*,
+                            (SELECT t2.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t2 WHERE t2.ID=t1.TipoCuota) AS NombreTipoCuota,
+                            (SELECT t3.NombreEstado FROM acuerdo_pago_proyeccion_estados t3 WHERE t3.ID=t1.Estado) AS NombreEstado,
+                            (SELECT t4.FechaPago FROM acuerdo_pago_cuotas_pagadas t4 WHERE t4.ID=t1.idPago LIMIT 1) AS FechaPago
+                            FROM acuerdo_pago_proyeccion_pagos t1 WHERE idAcuerdoPago='$idAcuerdo' AND (Estado=1 OR Estado=3 ) ORDER BY NumeroCuota DESC";
+                    $Consulta=$obAcuerdo->Query($sql);
+                    
+                    while($DatosCuotas=$obAcuerdo->FetchAssoc($Consulta)){
+                        $TotalPagos=$TotalPagos+$DatosCuotas["ValorPagado"];
+                        $css->FilaTabla(16);
+                            $css->ColTabla($DatosCuotas["NombreTipoCuota"], 1);
+                            $css->ColTabla($DatosCuotas["NumeroCuota"], 1);
+                            $css->ColTabla($DatosCuotas["Fecha"], 1);
+                            $css->ColTabla(number_format($DatosCuotas["ValorCuota"]), 1);
+                            $css->ColTabla(number_format($DatosCuotas["ValorPagado"]), 1);
+                            $css->ColTabla($DatosCuotas["FechaPago"], 1);
+                            $css->ColTabla($DatosCuotas["NombreEstado"], 1);
+                        $css->CierraFilaTabla();
+                    }
+                    
+                    
+                $css->CerrarTabla();
+                $css->CrearTabla(); 
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>TOTALES</strong>",2,'C');
+                    $css->CierraFilaTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>TOTAL CUOTAS PENDIENTES</strong>", 1,'C');
+                        $css->ColTabla("<strong>TOTAL CUOTAS PAGADAS</strong>", 1,'C');
+                        
+                    $css->CierraFilaTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla(number_format($TotalCuotasPendientes), 1,'C');
+                        $css->ColTabla(number_format($TotalPagos), 1,'C');
+                        
+                    $css->CierraFilaTabla();
+                $css->CerrarTabla();
+            $css->CerrarDiv();
+            
+            
+            $css->CrearDiv("", "col-md-12", "left", 1, 1);
+                $css->CrearTitulo("<strong>HISTORIAL DE PAGOS</strong>", "verde");
+                $css->CrearTabla();
+                    
+                    
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Fecha de Pago</strong>", 1, "C");
+                        $css->ColTabla("<strong>Tipo de Cuota</strong>", 1, "C");
+                        $css->ColTabla("<strong>Valor del pago</strong>", 1, "C");
+                        $css->ColTabla("<strong>Metodo de pago</strong>", 1, "C");
+                        $css->ColTabla("<strong>Usuario que recibió</strong>", 1, "C");
+                        
+                    $css->CierraFilaTabla();
+                    
+                    
+                    $sql="SELECT t1.*,
+                            (SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t2 WHERE t2.idUsuarios=t1.idUser) AS NombreUsuario,
+                            (SELECT (Metodo) FROM metodos_pago t3 WHERE t3.ID=t1.MetodoPago) AS NombreMetodo,
+                            (SELECT (NombreTipoCuota) FROM acuerdo_pago_tipo_cuota t4 WHERE t4.ID=t1.TipoCuota) AS NombreTipoCuota
+                            FROM acuerdo_pago_cuotas_pagadas t1 WHERE idAcuerdoPago='$idAcuerdo' ORDER BY Created DESC";
+                    $Consulta=$obAcuerdo->Query($sql);
+                    $TotalPagos=0;
+                    while($DatosCuotas=$obAcuerdo->FetchAssoc($Consulta)){
+                        $TotalPagos=$TotalPagos+$DatosCuotas["ValorPago"];
+                        $css->FilaTabla(16);
+                            $css->ColTabla($DatosCuotas["Created"], 1);
+                            $css->ColTabla($DatosCuotas["NombreTipoCuota"], 1);
+                            
+                            $css->ColTabla(number_format($DatosCuotas["ValorPago"]), 1);
+                            
+                            $css->ColTabla($DatosCuotas["NombreMetodo"], 1);
+                            $css->ColTabla($DatosCuotas["NombreUsuario"], 1);
+                        $css->CierraFilaTabla();
+                    }
+                    
+                    
+                $css->CerrarTabla();
+                $css->CrearTabla(); 
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>TOTALES</strong>",2,'C');
+                    $css->CierraFilaTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>TOTAL CUOTAS PENDIENTES</strong>", 1,'C');
+                        $css->ColTabla("<strong>TOTAL CUOTAS PAGADAS</strong>", 1,'C');
+                        
+                    $css->CierraFilaTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla(number_format($TotalCuotasPendientes), 1,'C');
+                        $css->ColTabla(number_format($TotalPagos), 1,'C');
+                        
+                    $css->CierraFilaTabla();
+                $css->CerrarTabla();
+            $css->CerrarDiv();
+            
+        break;//Fin caso 4    
         
     }
     

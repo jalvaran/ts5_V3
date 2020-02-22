@@ -138,6 +138,33 @@ if( !empty($_REQUEST["Accion"]) ){
                 $idCentroCostos=1;
             }
             
+            $sql="UPDATE acuerdo_pago SET TotalAbonos=(TotalAbonos+$ValorAbono),SaldoFinal=(SaldoInicial-TotalAbonos) WHERE idAcuerdoPago='$idAcuerdo'";
+            $obCon->Query($sql);
+            
+            $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
+            if($DatosAcuerdo["SaldoFinal"]<=0){
+                
+            }
+            if($MetodoPago==1){
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 10); //Efectivo
+                $CuentaDestino=$Parametros["CuentaPUC"];
+            
+            }elseif($MetodoPago==2 or $MetodoPago==3){
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 17); //Bancos
+                $CuentaDestino=$Parametros["CuentaPUC"];
+            }else{
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 30); //Otras formas de pago
+                $CuentaDestino=$Parametros["CuentaPUC"];
+            }
+            
+            
+            $Tercero=$DatosAcuerdo["Tercero"];
+            $Fecha=date("Y-m-d");
+            $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6); //Contrapartida del comprobante de ingreso aqui se aloja la cuenta de clientes
+            $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAbono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdo", "CERRADO");
+            $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
+            $obPrint->PrintAcuerdoPago($idAcuerdo, 1, 0);
+            
             print("OK;Abono Registrado");
         break;//FIn caso 4    
         

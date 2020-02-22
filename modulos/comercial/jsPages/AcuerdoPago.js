@@ -265,3 +265,27 @@ function RegistrePagoCuotaIndividual(idAcuerdo,idCuota,value){
           }
       });
 }
+
+function DibujarAcuerdoPagoExistente(idAcuerdo,idDiv='DivHistorialAcuerdoPago'){
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 4);
+        form_data.append('idAcuerdo', idAcuerdo);
+        $.ajax({
+        url: './Consultas/AcuerdoPago.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}

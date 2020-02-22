@@ -96,6 +96,12 @@ class Factura_Electronica extends ProcesoVenta{
         $DatosEmpresaPro=$this->DevuelveValores("empresapro", "idEmpresaPro", $idEmpresaPro);
         $EmpresaTipoCompania=$DatosEmpresaPro["TipoPersona"];
         $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
+        $CodigoDane=$DatosCliente["Cod_Dpto"].$DatosCliente["Cod_Mcipio"];
+        $DatosMunicipos= $this->DevuelveValores("catalogo_municipios", "CodigoDANE", $CodigoDane);
+        $municipio_id=$DatosMunicipos["ID"];
+        if($municipio_id==''){
+            $municipio_id=1006;
+        }
         $NumeroFactura=$DatosFactura["NumeroFactura"];
         $Parametros=$this->DevuelveValores("configuracion_general", "ID", 27); //Contiene el metodo de envio del documento a la DIAN
         $MetodoEnvio=$Parametros["Valor"]; //1 sincrono 2 asincrono
@@ -169,6 +175,7 @@ class Factura_Electronica extends ProcesoVenta{
                 "phone": "'.$AdqContactoTelefono.'",
                 "address": "'.$AdqDireccion.'",
                 "email": "'.$AdqContactoMail.'",
+                "municipality_id": "'.$municipio_id.'",
                 "merchant_registration": "NA"
             },
             "payment_form": {

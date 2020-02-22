@@ -6,7 +6,7 @@ if (!isset($_SESSION['username'])){
   
 }
 $idUser=$_SESSION['idUser'];
-
+$TipoUser=$_SESSION['tipouser'];
 include_once("../clases/restaurantPos.class.php");
 include_once("../../../constructores/paginas_constructor.php");
 
@@ -155,9 +155,11 @@ if( !empty($_REQUEST["Accion"]) ){
                           </span>');
                     print("</td>"); 
                     print("<td style='text-align:center'>");
-                        print('<span class="input-group-btn">
-                            <button type="button" id="BtnImprimePedido" class="btn btn-danger btn-flat" onclick=AbrirOpcionesFacturacion(`'.$idPedido.'`) title="Facturar" style="font-size:30px;"><i class="fa fa-money"></i></button>
-                          </span>');
+                        if($TipoUser=="administrador"){
+                            print('<span class="input-group-btn">
+                                <button type="button" id="BtnImprimePedido" class="btn btn-danger btn-flat" onclick=AbrirOpcionesFacturacion(`'.$idPedido.'`) title="Facturar" style="font-size:30px;"><i class="fa fa-money"></i></button>
+                              </span>');
+                        }
                     print("</td>");
                 $css->CierraFilaTabla();
             $css->CerrarTabla();
@@ -286,7 +288,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     (SELECT t5.NombreEstado FROM restaurante_estados_pedidos t5 WHERE t1.Estado=t5.ID) as NombreEstado,
                     (SELECT CONCAT(Nombre, ' ', Apellido) FROM usuarios t3 WHERE t1.idUsuario=t3.idUsuarios) as NombreUsuario,
                     (SELECT SUM(Total) FROM restaurante_pedidos_items t4 WHERE t4.idPedido=t1.ID) as TotalPedido
-                    FROM restaurante_pedidos t1 WHERE Tipo='$TipoPedido' AND (Estado<>2 AND Estado<>7 ) ORDER BY Estado,ID ASC; ";
+                    FROM restaurante_pedidos t1 WHERE Tipo='$TipoPedido' AND (Estado<>2 AND Estado<>7 ) ORDER BY idMesa,ID ASC; ";
             $Consulta=$obCon->Query($sql);
             while($DatosPedido=$obCon->FetchAssoc($Consulta)){
                 $idPedido=$DatosPedido["ID"];
@@ -398,12 +400,16 @@ if( !empty($_REQUEST["Accion"]) ){
                         <div class="col-sm-3">
                           <div class="description-block">
                             ');
-                    print('<span class="input-group-btn">
-                            <button type="button" id="BtnAnular" class="btn btn-danger btn-flat" onclick=AnularPedido(`'.$idPedido.'`) title="Anular Pedido" style="font-size:30px;"><i class="fa fa-remove"></i></button>
-                          </span>');
+                    if($TipoUser=="administrador"){
+                        print('<span class="input-group-btn">
+                                <button type="button" id="BtnAnular" class="btn btn-danger btn-flat" onclick=AnularPedido(`'.$idPedido.'`) title="Anular Pedido" style="font-size:30px;"><i class="fa fa-remove"></i></button>
+                                </span>
+                                <span class="description-text" style="font-size:15px;"><strong>ANULAR</strong></span>  
+                            ');
+                    }
                     print('  
                         
-                            <span class="description-text" style="font-size:15px;"><strong>ANULAR</strong></span>
+                            
                           </div> 
                           <!-- /.description-block -->
                         </div>

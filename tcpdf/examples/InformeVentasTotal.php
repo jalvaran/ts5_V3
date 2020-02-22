@@ -344,8 +344,10 @@ $pdf->writeHTML($tbl, false, false, false, false, '');
 $pdf->Output($nombre_file.'.pdf', 'I');
 $DatosImpresora=$obVenta->DevuelveValores("config_puertos", "ID", 1);
     if($DatosImpresora["Habilitado"]=="SI"){
-        $obPrintPos->ImprimeComprobanteInformeDiario($DatosImpresora["Puerto"], $FechaIni, $FechaFinal);
         
+        //$obPrintPos->ImprimeComprobanteInformeDiario($DatosImpresora["Puerto"], $FechaIni, $FechaFinal);
+        $obPrintPos->ImprimeComprobanteInformeDiarioRestaurante($DatosImpresora["Puerto"], $FechaIni, $FechaFinal);
+        //print("sale");
     }
     
 //============================================================+

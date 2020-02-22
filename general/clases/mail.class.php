@@ -76,9 +76,9 @@ class TS_Mail extends ProcesoVenta{
     
     public function EnviarMailXPHPMailer($para,$de,$nombreRemitente, $asunto, $mensajeHTML, $Adjuntos='') {
         
-        require '../../librerias/phpmailer/src/Exception.php';
-        require '../../librerias/phpmailer/src/PHPMailer.php';
-        require '../../librerias/phpmailer/src/SMTP.php';
+        require '../../../librerias/phpmailer/src/Exception.php';
+        require '../../../librerias/phpmailer/src/PHPMailer.php';
+        require '../../../librerias/phpmailer/src/SMTP.php';
 
         /*
         Primero, obtenemos el listado de e-mails
@@ -101,17 +101,22 @@ class TS_Mail extends ProcesoVenta{
         
 
         // Typical mail data
-        $mail->AddAddress($email, $name);
+        $Destinatarios= explode(",", $email);
+        foreach ($Destinatarios as $value) {
+            $mail->AddAddress($value, $name);
+        }
+        
         $mail->SetFrom($email_from, $name_from);
         $mail->IsHTML(true);
         $mail->Subject = $asunto;
         $mail->Body = $mensajeHTML;
-        
-        foreach ($Adjuntos as $value) {
-            $Vector=explode('/',$value);
-            $Total=count($Vector);
-            $NombreArchivo=$Vector[$Total-1];
-            $mail->AddAttachment($value,$NombreArchivo);
+        if($Adjuntos<>''){
+            foreach ($Adjuntos as $value) {
+                $Vector=explode('/',$value);
+                $Total=count($Vector);
+                $NombreArchivo=$Vector[$Total-1];
+                $mail->AddAttachment($value,$NombreArchivo);
+            }
         }
         
         

@@ -48,7 +48,7 @@ $tbl = <<<EOD
     <th><h3>Departamento</h3></th>
 	<th><h3>Nombre</h3></th>
         <th><h3>Impuesto</h3></th>
-	<th><h3>Total Items</h3></th>
+	
     <th><h3>SubTotal</h3></th>
         
 	<th><h3>IVA</h3></th>
@@ -160,7 +160,7 @@ while($DatosVentas=$obVenta->FetchArray($Datos)){
   <td>$idDepartamentos</td>
   <td>$NombreDep</td>
   <td>$TipoIva</td>
-  <td>$Items</td>
+  
   <td>$SubtotalUser</td>
   
   <td>$IVA</td>
@@ -189,7 +189,7 @@ $tbl = <<<EOD
   <td align="RIGHT"><h3>SUMATORIA</h3></td>
   <td><h3>NA</h3></td>
   <td><h3>NA</h3></td>
-  <td><h3>$TotalItems</h3></td>
+  
   <td><h3>$Subtotal</h3></td>
         
   <td><h3>$TotalIVA</h3></td>

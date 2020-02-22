@@ -294,3 +294,24 @@ ALTER TABLE `restaurante_cierres` ADD `Diferencia` DOUBLE NOT NULL AFTER `Efecti
 
 INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
 (30,	'Dias de plazo para pagar una cuota en el modulo acuerdo de pagos',	'5',	'2019-12-22 10:34:26',	'0000-00-00 00:00:00');
+
+
+ALTER TABLE `usuarios` ADD `Cargo` INT(5) UNSIGNED ZEROFILL NOT NULL AFTER `TipoUser`;
+ALTER TABLE `usuarios` ADD `Proceso` INT(5) UNSIGNED ZEROFILL NOT NULL AFTER `Cargo`;
+
+INSERT INTO `menu_carpetas` (`ID`, `Ruta`, `Updated`, `Sync`) VALUES
+(15,	'../modulos/tickets/',	'2019-06-22 10:09:52',	'2019-04-07 09:14:07');
+
+INSERT INTO `menu` (`ID`, `Nombre`, `idCarpeta`, `Pagina`, `Target`, `Estado`, `Image`, `CSS_Clase`, `Orden`, `Updated`, `Sync`) VALUES
+(33,	'Tickets',	1,	'MnuTickets.php',	'_BLANK',	1,	'tickets.png',	'fa fa-share',	16,	'2019-01-13 09:12:42',	'2019-01-13 09:12:42');
+
+INSERT INTO `menu_pestanas` (`ID`, `Nombre`, `idMenu`, `Orden`, `Estado`, `Updated`, `Sync`) VALUES
+(51,	'Tickets',	33,	1,	CONV('1', 2, 10) + 0,	'2019-01-13 09:12:43',	'2019-01-13 09:12:43');
+
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+(195,	'Tickets',	51,	15,	33,	'',	0,	'',	'tickets.php',	'_BLANK',	1,	'tickets.png',	1,	'2020-02-21 11:51:51',	'2019-01-12 09:12:44'),
+(194,	'Informes',	51,	15,	33,	'',	0,	'',	'adminTickets.php',	'_BLANK',	1,	'admin.png',	1,	'2020-02-21 11:51:51',	'2019-01-12 09:12:44');
+
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(31,	'Determina si se envía correo de notificacion al realizar un ticket',	'1',	'2019-12-23 16:47:38',	'0000-00-00 00:00:00');
+

@@ -886,6 +886,14 @@ if( !empty($_REQUEST["Accion"]) ){
             $DatosAcuerdoAnterior=$obCon->FetchAssoc($obCon->Query($sql));
             if($DatosAcuerdoAnterior["ID"]>0){
                 $ValorAnteriorCuota=$DatosAcuerdoAnterior["ValorCuotaGeneral"];
+                $css->FilaTabla(16);
+                print("<td style='text-align:center' colspan=3>");        
+                    print('<strong>Ver Acuerdo de Pago Anterior</strong><span class="input-group-btn"> 
+                        <button type="button" class="btn btn-success btn-flat" onclick=DibujarAcuerdoPagoExistente(`'.$DatosAcuerdoAnterior["idAcuerdoPago"].'`,`DivProyeccionPagosAcuerdo`)> <i class="fa fa-eye"> </i> </button>
+                      </span>');
+
+                print("</td>");
+                $css->CierraFilaTabla();
             }
             
                 
