@@ -343,6 +343,10 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             
             $obFactura->InsertarFacturaLibroDiarioV2($idFactura,$CmbCuentaIngresoFactura,$idUser);
+            $ParametrosConfiguracion=$obCon->DevuelveValores("configuracion_general", "ID", 35);//Determina si una factura negativa debe devolver dinero al cliente
+            if($ParametrosConfiguracion["Valor"]==1 AND $Total<0){
+                $obFactura->ContabilizaGananciaOcasionalPOS($idFactura,$Total,$CmbCuentaIngresoFactura,$idUser);
+            }
             $obFactura->DescargueFacturaInventariosV2($idFactura, "");
             if($CmbFormaPago<>'Contado'){
                 $obFactura->IngreseCartera($idFactura, $Fecha, $idCliente, $CmbFormaPago, $SaldoFactura, "");
@@ -983,7 +987,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
             
             $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
-            $TipoCuota=$obCon->normalizar($_REQUEST["TipoCuota"]);
+            $TipoCuota=0;
             $NumeroCuota=0;
             $ValorPago=$obCon->normalizar($_REQUEST["ValorPago"]);
             $MetodoPago=$obCon->normalizar($_REQUEST["MetodoPago"]);            
@@ -991,9 +995,7 @@ if( !empty($_REQUEST["Accion"]) ){
             if($idAcuerdoPago==''){
                 exit("E1;No se recibió el id del acuerdo de pago");
             }
-            if($TipoCuota==''){
-                exit("E1;No se recibió el tipo de cuota");
-            }
+            
             if(!is_numeric($ValorPago) or $ValorPago<0){
                 exit("E1;La cuota inicial del acuerdo debe ser un numero mayor a cero;CuotaInicialAcuerdo");
             }

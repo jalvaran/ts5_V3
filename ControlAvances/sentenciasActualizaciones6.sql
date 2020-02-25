@@ -315,3 +315,64 @@ INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`,
 INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
 (31,	'Determina si se envía correo de notificacion al realizar un ticket',	'1',	'2019-12-23 16:47:38',	'0000-00-00 00:00:00');
 
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(32,	'Determina si es obligatorio pedir la foto en un acuerdo de pago',	'1',	'2019-12-23 16:47:38',	'0000-00-00 00:00:00');
+
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(33,	'Determina si se verifica que un cliente tenga datos adicionales para guardar un acuerdo de pago',	'1',	'2019-12-23 16:47:38',	'0000-00-00 00:00:00');
+
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(34,	'Determina si debe verificarse que el cliente tenga un recomendado para guardar un acuerdo de pago',	'1',	'2019-12-23 16:47:38',	'0000-00-00 00:00:00');
+
+
+CREATE TABLE `clientes_datos_adicionales` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idCliente` bigint(20) NOT NULL,
+  `SobreNombre` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
+  `LugarTrabajo` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `Cargo` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
+  `DireccionTrabajo` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `TelefonoTrabajo` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `Facebook` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `Instagram` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idCliente` (`idCliente`),
+  KEY `SobreNombre` (`SobreNombre`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `clientes_recomendados` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idCliente` bigint(20) NOT NULL,
+  `NombreRecomendado` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `DireccionRecomendado` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `TelefonoRecomendado` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `DireccionTrabajoRecomendado` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `TelefonoTrabajoRecomendado` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idCliente` (`idCliente`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `CuerpoFormato`, `NotasPiePagina`, `Updated`, `Sync`) VALUES
+(36,	'INFORME DE CIERRE DE RESTAURANTE',	'001',	'F-GC-036',	'2020-02-22',	'',	'',	'2019-04-06 14:18:54',	'2019-04-06 14:18:54');
+
+
+INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `CuerpoFormato`, `NotasPiePagina`, `Updated`, `Sync`) VALUES
+(37,	'ACUERDO DE PAGO',	'001',	'F-GC-037',	'2020-02-22',	'',	'',	'2019-04-06 14:18:54',	'2019-04-06 14:18:54');
+
+INSERT INTO `parametros_contables` (`ID`, `Descripcion`, `CuentaPUC`, `NombreCuenta`, `Updated`, `Sync`) VALUES
+(36,	'Cuenta para registrar los saldos de facturas negativas de un cliente, se contabiliza como un anticipo',	28050503,	'ANTICIPOS REALIZADOS POR CLIENTES EN FACTURAS A FAVOR',	'2019-02-26 15:55:46',	'2019-02-26 15:55:46'),
+(35,	'Anticipos realizados por clientes para los encargos',	28050502,	'ANTICIPOS REALIZADOS POR CLIENTES EN ENCARGOS',	'2020-02-25 05:56:46',	'2019-02-26 15:55:46');
+
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(35,	'Determina si una factura negativa debe llevarse a una ganancia ocasional y no devolver el dinero al cliente en el POS',	'0',	'2019-12-23 16:47:38',	'0000-00-00 00:00:00');
+
+INSERT INTO `parametros_contables` (`ID`, `Descripcion`, `CuentaPUC`, `NombreCuenta`, `Updated`, `Sync`) VALUES
+(37,	'Cuenta para Contabilizar un ingreso no operacional',	47057001,	'INGRESOS NO OPERACIONALES POR DEVOLUCIONES EN POS',	'2019-01-13 09:12:55',	'2019-01-13 09:12:55');
+

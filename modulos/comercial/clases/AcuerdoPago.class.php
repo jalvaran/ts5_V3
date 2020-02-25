@@ -238,9 +238,25 @@ class AcuerdoPago extends ProcesoVenta{
         fclose ($png);
         return($NombreArchivo);
     }
+    
+    public function GuardarFotoSubida($NombreArchivo,$DirectorioTemporal,$idAcuerdo) {
+        //print($Base64);
+        $info = new SplFileInfo($NombreArchivo);
+        $Extension=$info->getExtension();
+       
+        if($Extension<>'png' and $Extension<>'jpg' and $Extension<>'jpeg' and $Extension<>'bmp'){
+            exit("E1;El archivo no es valido, debe ser una imagen");
+        }
+        $DatosRuta=$this->DevuelveValores("configuracion_general", "ID", 29); //Contiene la ruta donde se crea la foto para el acuerdo de pago
+        $Ruta=$DatosRuta["Valor"];
+        $NombreArchivo= $Ruta.$idAcuerdo.".png";
+        move_uploaded_file($DirectorioTemporal,$NombreArchivo);
+        return($NombreArchivo);
+    }
      
     public function ValidarDatosCreacionAcuerdoPagoPOS($VariablesAcuerdo) {
-        
+        $idCliente= $this->normalizar($VariablesAcuerdo["idCliente"]);
+        $idPreventa= $this->normalizar($VariablesAcuerdo["idPreventa"]);
         if($VariablesAcuerdo["idAcuerdoPago"]==''){
             exit("E4;No se recibió un id para el acuerdo de pago");            
         }
@@ -263,7 +279,7 @@ class AcuerdoPago extends ProcesoVenta{
         if($VariablesAcuerdo["cicloPagos"]==''){
             exit("E4;Debe seleccionar el ciclo de pagos;cicloPagos");            
         }
-        $sql="SELECT ID FROM acuerdo_pago_cuotas_pagadas_temp WHERE idAcuerdoPago='$idAcuerdo' AND TipoCuota=1 LIMIT 1";
+        $sql="SELECT ID FROM acuerdo_pago_cuotas_pagadas_temp WHERE idAcuerdoPago='$idAcuerdo' AND TipoCuota=0 LIMIT 1";
         $DatosAcuerdo= $this->FetchAssoc($this->Query($sql));
         if($DatosAcuerdo["ID"]==""){
             exit("E4;Debe agregar una cuota inicial");
@@ -273,21 +289,43 @@ class AcuerdoPago extends ProcesoVenta{
         if($DatosAcuerdo["ID"]==""){
             exit("E4;No se ha realizado la proyeccion de pagos");
         }
-        $DatosRuta=$this->DevuelveValores("configuracion_general", "ID", 29); //Contiene la ruta donde se crea la foto para el acuerdo de pago
-        $Ruta=$DatosRuta["Valor"];
-        $NombreArchivo= $Ruta.$idAcuerdo.".png";
-        if(!file_exists($NombreArchivo)){
-            exit("E4;No se ha tomado la foto para evidencia del acuerdo de pago");
+        $Parametro=$this->DevuelveValores("configuracion_general", "ID", 32); //parametro para saber si es obligatorio pedir la foto
+        $ValidarFoto=$Parametro["Valor"];
+        if($ValidarFoto==1){
+            $DatosRuta=$this->DevuelveValores("configuracion_general", "ID", 29); //Contiene la ruta donde se crea la foto para el acuerdo de pago
+            $Ruta=$DatosRuta["Valor"];
+            $NombreArchivo= $Ruta.$idAcuerdo.".png";
+            if(!file_exists($NombreArchivo)){
+                exit("E4;No se ha tomado la foto para evidencia del acuerdo de pago");
+            }
+        }
+        $Parametro=$this->DevuelveValores("configuracion_general", "ID", 33); //parametro para saber si se validan los datos adicionales del cliente
+        $ValidarDatosAdicionales=$Parametro["Valor"];
+        if($ValidarDatosAdicionales==1){
+            $sql="SELECT ID FROM clientes_datos_adicionales WHERE idCliente='$idCliente' LIMIT 1";
+            $Validacion= $this->FetchAssoc($this->Query($sql));
+            if($Validacion["ID"]==''){
+                exit("E4;Debe Agregar los datos adicionales del cliente");
+            }
+        }
+        $Parametro=$this->DevuelveValores("configuracion_general", "ID", 34); //parametro para saber si se validan los recomendados del cliente
+        $ValidarDatosAdicionales=$Parametro["Valor"];
+        if($ValidarDatosAdicionales==1){
+            $sql="SELECT ID FROM clientes_recomendados WHERE idCliente='$idCliente' LIMIT 1";
+            $Validacion= $this->FetchAssoc($this->Query($sql));
+            if($Validacion["ID"]==''){
+                exit("E4;Debe al menos un recomendado del cliente");
+            }
         }
         
-        $idCliente= $this->normalizar($VariablesAcuerdo["idCliente"]);
-        $idPreventa= $this->normalizar($VariablesAcuerdo["idPreventa"]);
         $sql="SELECT SUM(TotalVenta) AS Total FROM preventa WHERE VestasActivas_idVestasActivas='$idPreventa' ";
         $Totales=$this->FetchAssoc($this->Query($sql));
         $TotalPreventa=$Totales["Total"];
         $ValorAProyectar=$this->ValorAProyectarTemporalAcuerdo($idAcuerdo, $TotalPreventa, $idCliente);
         $TotalCuotasAcuerdo=$this->TotalCuotasTemporalAcuerdoPago($idAcuerdo);
-        if(round($ValorAProyectar)<>round($TotalCuotasAcuerdo)){
+        $DiferenciaEnValores=$ValorAProyectar-$TotalCuotasAcuerdo;
+        
+        if(ABS($DiferenciaEnValores)>1){
             exit("E4;La sumatoria de las cuotas no es igual al Valor a Proyectar");
         }
     }
@@ -348,7 +386,7 @@ class AcuerdoPago extends ProcesoVenta{
     }
     
     public function TotalCuotaInicialTemporalAcuerdoPago($idAcuerdo) {
-        $sql="SELECT SUM(ValorPago) AS Total FROM acuerdo_pago_cuotas_pagadas_temp WHERE idAcuerdoPago='$idAcuerdo' AND TipoCuota=1";
+        $sql="SELECT SUM(ValorPago) AS Total FROM acuerdo_pago_cuotas_pagadas_temp WHERE idAcuerdoPago='$idAcuerdo' AND TipoCuota=0";
         $DatosCuotas= $this->FetchAssoc($this->Query($sql));
         return($DatosCuotas["Total"]);
         
@@ -494,6 +532,45 @@ class AcuerdoPago extends ProcesoVenta{
             }
             
         
+    }
+    
+    
+    public function AgregaDatosAdicionalesCliente($idCliente,$SobreNombre,$LugarTrabajo,$Cargo,$DireccionTrabajo,$TelefonoTrabajo,$Facebook,$Instagram) {
+        $DatosAdicionales= $this->DevuelveValores("clientes_datos_adicionales", "idCliente", $idCliente);
+        $Datos["idCliente"]=$idCliente;
+        $Datos["SobreNombre"]=$SobreNombre;
+        $Datos["LugarTrabajo"]=$LugarTrabajo;
+        $Datos["Cargo"]=$Cargo;
+        $Datos["DireccionTrabajo"]=$DireccionTrabajo;
+        $Datos["TelefonoTrabajo"]=$TelefonoTrabajo;
+        $Datos["Facebook"]=$Facebook;
+        $Datos["Instagram"]=$Instagram;
+        $Datos["Created"]=date("Y-m-d H:i:s");
+        
+        if($DatosAdicionales["ID"]==''){
+            $sql= $this->getSQLInsert("clientes_datos_adicionales", $Datos);
+            
+        }else{
+            $idDatosAdicionales=$DatosAdicionales["ID"];
+            $sql= $this->getSQLUpdate("clientes_datos_adicionales", $Datos);
+            $sql=$sql." WHERE ID='$idDatosAdicionales' ";
+        }
+        
+        $this->Query($sql);
+    }
+    
+    public function AgregaRecomendadoCliente($idCliente, $NombreRecomendado, $DireccionRecomendado, $TelefonoRecomendado, $DireccionTrabajoRecomendado, $TelefonoTrabajoRecomendado) {
+        
+        $Datos["idCliente"]=$idCliente;
+        $Datos["NombreRecomendado"]=$NombreRecomendado;
+        $Datos["DireccionRecomendado"]=$DireccionRecomendado;
+        $Datos["TelefonoRecomendado"]=$TelefonoRecomendado;
+        $Datos["DireccionTrabajoRecomendado"]=$DireccionTrabajoRecomendado;
+        $Datos["TelefonoTrabajoRecomendado"]=$TelefonoTrabajoRecomendado;        
+        $Datos["Created"]=date("Y-m-d H:i:s");
+        
+        $sql= $this->getSQLInsert("clientes_recomendados", $Datos);            
+        $this->Query($sql);
     }
     
     /**

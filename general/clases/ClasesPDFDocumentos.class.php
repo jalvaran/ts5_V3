@@ -1161,7 +1161,7 @@ EOD;
         <td  height="50" align="center" style="border-bottom: 1px solid #ddd;background-color: white;"><br/><br/><br/><br/><br/>Firma Autorizada</td> 
         <td  height="50" align="center" style="border-bottom: 1px solid #ddd;background-color: white;"><br/><br/><br/><br/><br/>Firma Recibido</td> 
         
-        <td align="rigth" style="border-bottom: 1px solid #ddd;background-color: white;"><strong>TOTAL: $ '.number_format($TotalFactura+$OtrosImpuestos,2).'</strong></td>
+        <td align="rigth" style="border-bottom: 1px solid #ddd;background-color: white;"><strong>TOTAL: $ '.number_format($TotalFactura+$OtrosImpuestos).'</strong></td>
     </tr>
      
 </table>';
@@ -2916,6 +2916,399 @@ $tbl.= "</table>";
                 $html.="</td>";
             $html.="</tr>";  
             
+        $html.="</table>";
+        return($html);
+    }
+    
+    public function AcuerdoPagoPDF($idAcuerdo) {
+        $idFormato=37;
+        
+        $DatosFormatos= $this->obCon->DevuelveValores("formatos_calidad", "ID", $idFormato);
+        $sql="SELECT t1.*,
+                (SELECT t2.NombreCiclo FROM acuerdo_pago_ciclos_pagos t2 WHERE t2.ID=t1.CicloPagos LIMIT 1 ) as NombreCicloPago
+                FROM acuerdo_pago t1 WHERE idAcuerdoPago='$idAcuerdo' LIMIT 1";
+        $DatosAcuerdo= $this->obCon->FetchArray($this->obCon->Query($sql));
+        $DatosUsuario= $this->obCon->DevuelveValores("usuarios", "idUsuarios", $DatosAcuerdo["idUser"]);
+        $DatosCliente= $this->obCon->DevuelveValores("clientes", "Num_Identificacion", $DatosAcuerdo["Tercero"]);
+        $Documento="$DatosFormatos[Nombre] $DatosAcuerdo[ID]";
+        
+        $this->PDF_Ini($DatosFormatos['Nombre'],7, "");
+           
+        $this->PDF_Encabezado($DatosAcuerdo["Fecha"],1, $idFormato, "",$Documento);
+        
+        $html=$this->EncabezadoAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente);        
+        $this->PDF->writeHTML("<br><br>".$html, true, false, false, false, ''); 
+        
+        $html=$this->CuotasPendientesAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente);        
+        $this->PDF->writeHTML("<br><br>".$html, true, false, false, false, ''); 
+       
+        $html=$this->CuotasPagadasAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente);        
+        $this->PDF->writeHTML("<br><br>".$html, true, false, false, false, ''); 
+        
+        $html=$this->AbonosRealizadosAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente);        
+        $this->PDF->writeHTML("<br><br>".$html, true, false, false, false, ''); 
+        
+        $this->PDF_Output("Acuerdo_Pago_$idAcuerdo");
+    }
+    
+    public function EncabezadoAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente) {
+        $html="";
+        $html.='<table cellspacing="3" cellpadding="2" border="1">';
+            $html.="<tr>";
+                $html.='<td colspan="6" style="text-align:center;">';
+                    $html.="<strong>DATOS GENERALES DEL ACUERDO DE PAGO</strong>";
+                $html.="</td>";
+            $html.="</tr>";
+            $html.="<tr>";
+                $html.='<td colspan="1" style="width:50px;">';
+                    $html.="<strong>TERCERO:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" style="width:200px;">';
+                    $html.= utf8_encode($DatosCliente["RazonSocial"])."<br>".$DatosCliente["Num_Identificacion"];
+                $html.="</td>";  
+                $html.='<td colspan="1" style="width:60px;">';
+                    $html.="<strong>DIRECCION:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" style="width:112px;">';
+                    $html.= utf8_encode($DatosCliente["Direccion"]);
+                $html.="</td>";
+                $html.='<td colspan="1" style="width:60px;">';
+                    $html.="<strong>TELEFONO:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" style="width:151px;">';
+                    $html.= utf8_encode($DatosCliente["Telefono"]);
+                $html.="</td>";
+            $html.="</tr>";
+            
+            $html.="<tr>";
+                $html.='<td colspan="1" style="width:50px;">';
+                    $html.="<strong>FECHA:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" style="width:200px;">';
+                    $html.= utf8_encode($DatosAcuerdo["Created"]);
+                $html.="</td>";  
+                $html.='<td colspan="1" style="width:60px;">';
+                    $html.="<strong>CICLO PAGO:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" style="width:112px;">';
+                    $html.= utf8_encode($DatosAcuerdo["NombreCicloPago"]);
+                $html.="</td>";
+                $html.='<td colspan="1" style="width:60px;">';
+                    $html.="<strong>SALDO ANTERIOR:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" style="width:151px;">';
+                    $html.= number_format($DatosAcuerdo["SaldoAnterior"]);
+                $html.="</td>";
+            $html.="</tr>";
+            
+            $html.="<tr>";
+                $html.='<td colspan="1" style="width:50px;">';
+                    $html.="<strong>SALDO INICIAL:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" style="width:200px;">';
+                    $html.= number_format($DatosAcuerdo["SaldoInicial"]);
+                $html.="</td>";  
+                $html.='<td colspan="1" style="width:60px;">';
+                    $html.="<strong>TOTAL ABONOS:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" style="width:112px;">';
+                    $html.= number_format($DatosAcuerdo["TotalAbonos"]);
+                $html.="</td>";
+                $html.='<td colspan="1" style="width:60px;">';
+                    $html.="<strong>SALDO FINAL:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" style="width:151px;">';
+                    $html.= number_format($DatosAcuerdo["SaldoFinal"]);
+                $html.="</td>";
+            $html.="</tr>";
+            $html.="<tr>";
+                $html.='<td colspan="6" style="text-align:center;">';
+                    $html.="<strong>OBSERVACIONES</strong>";
+                $html.="</td>";
+            $html.="</tr>";
+            $html.="<tr>";
+                $html.='<td colspan="6" style="text-align:left;">';
+                    $html.= utf8_encode($DatosAcuerdo["Observaciones"]);
+                $html.="</td>";
+            $html.="</tr>";
+            
+            $DatosRuta=$this->obCon->DevuelveValores("configuracion_general", "ID", 29); //Contiene la ruta donde se crea la foto para el acuerdo de pago
+            $Ruta=$DatosRuta["Valor"];
+            $NombreArchivo= $Ruta.$idAcuerdo.".png";
+            $NombreArchivo= str_replace("../", "", $NombreArchivo);
+            $NombreArchivo="../../".$NombreArchivo;
+            if(is_file($NombreArchivo)){
+                $html.="<tr>";
+                    $html.='<td colspan="6" style="text-align:center;">';
+                        $html.="<strong>FOTO</strong>";
+                    $html.="</td>";
+                $html.="</tr>";
+                $html.="<tr>";
+                    $html.='<td colspan="6" style="text-align:center;">';
+                        $html.= '<img src="'.$NombreArchivo.'" style="width:150px;height:110px;">';
+                    $html.="</td>";
+                $html.="</tr>";
+            }
+        $html.="</table>";
+        return($html);
+    }
+    
+    public function CuotasPendientesAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente) {
+        $html="";
+        $html.='<table cellspacing="3" cellpadding="2" border="1">';
+            $html.="<tr>";
+                $html.='<td colspan="6" style="text-align:center;">';
+                    $html.="<strong>CUOTAS PENDIENTES</strong>";
+                $html.="</td>";
+            $html.="</tr>";
+            $html.="<tr>";
+                $html.='<td colspan="1">';
+                    $html.="<strong>CUOTA:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>FECHA:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>VALOR:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>ABONOS:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>SALDO:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>ESTADO:</strong>";
+                $html.="</td>";
+                
+            $html.="</tr>";
+            
+                
+            $sql="SELECT t1.*,
+                    (SELECT t2.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t2 WHERE t2.ID=t1.TipoCuota) AS NombreTipoCuota,
+                    (SELECT t3.NombreEstado FROM acuerdo_pago_proyeccion_estados t3 WHERE t3.ID=t1.Estado) AS NombreEstado
+                    FROM acuerdo_pago_proyeccion_pagos t1 WHERE idAcuerdoPago='$idAcuerdo' AND (Estado=0 OR Estado=2 OR Estado=4 ) ORDER BY Fecha ASC";
+            $Consulta=$this->obCon->Query($sql);
+            $TotalValorCuotas=0;
+            $TotalPagos=0;
+            $TotalSaldo=0;
+            while($DatosCuotas=$this->obCon->FetchAssoc($Consulta)){
+                $TotalValorCuotas=$TotalValorCuotas+$DatosCuotas["ValorCuota"];
+                $TotalPagos=$TotalPagos+$DatosCuotas["ValorPagado"];
+                $SaldoCuota=$DatosCuotas["ValorCuota"]-$DatosCuotas["ValorPagado"];
+                $TotalSaldo=$TotalSaldo+$SaldoCuota;
+                $html.="<tr>";
+                    $html.='<td colspan="1" >';
+                        $html.=$DatosCuotas["NumeroCuota"];
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=$DatosCuotas["Fecha"];
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=number_format($DatosCuotas["ValorCuota"]);
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=number_format($DatosCuotas["ValorPagado"]);
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=number_format($SaldoCuota);
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=$DatosCuotas["NombreEstado"];
+                    $html.="</td>";
+
+                $html.="</tr>";
+            }
+            $html.="<tr>";
+                $html.='<td colspan="2" style="text-align:right">';
+                    $html.="<strong>TOTALES:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.=number_format($TotalValorCuotas);
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.=number_format($TotalPagos);
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.=number_format($TotalSaldo);
+                $html.="</td>";
+            
+                $html.='<td colspan="1" >';
+                    $html.="";
+                $html.="</td>"; 
+            $html.="</tr>";
+        $html.="</table>";
+        return($html);
+    }
+    
+     public function CuotasPagadasAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente) {
+        $html="";
+        $html.='<table cellspacing="3" cellpadding="2" border="1">';
+            $html.="<tr>";
+                $html.='<td colspan="6" style="text-align:center;">';
+                    $html.="<strong>CUOTAS PAGADAS</strong>";
+                $html.="</td>";
+            $html.="</tr>";
+            $html.="<tr>";
+                $html.='<td colspan="1">';
+                    $html.="<strong>CUOTA:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>FECHA:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>VALOR:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>ABONOS:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>SALDO:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>ESTADO:</strong>";
+                $html.="</td>";
+                
+            $html.="</tr>";
+            
+                
+            $sql="SELECT t1.*,
+                            (SELECT t2.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t2 WHERE t2.ID=t1.TipoCuota) AS NombreTipoCuota,
+                            (SELECT t3.NombreEstado FROM acuerdo_pago_proyeccion_estados t3 WHERE t3.ID=t1.Estado) AS NombreEstado,
+                            (SELECT t4.FechaPago FROM acuerdo_pago_cuotas_pagadas t4 WHERE t4.ID=t1.idPago LIMIT 1) AS FechaPago
+                            FROM acuerdo_pago_proyeccion_pagos t1 WHERE idAcuerdoPago='$idAcuerdo' AND (Estado=1 OR Estado=3 ) ORDER BY NumeroCuota DESC";
+            $Consulta=$this->obCon->Query($sql);
+            $TotalValorCuotas=0;
+            $TotalPagos=0;
+            $TotalSaldo=0;
+            while($DatosCuotas=$this->obCon->FetchAssoc($Consulta)){
+                $TotalValorCuotas=$TotalValorCuotas+$DatosCuotas["ValorCuota"];
+                $TotalPagos=$TotalPagos+$DatosCuotas["ValorPagado"];
+                $SaldoCuota=$DatosCuotas["ValorCuota"]-$DatosCuotas["ValorPagado"];
+                $TotalSaldo=$TotalSaldo+$SaldoCuota;
+                $html.="<tr>";
+                    $html.='<td colspan="1" >';
+                        $html.=$DatosCuotas["NumeroCuota"];
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=$DatosCuotas["Fecha"];
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=number_format($DatosCuotas["ValorCuota"]);
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=number_format($DatosCuotas["ValorPagado"]);
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=number_format($SaldoCuota);
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=$DatosCuotas["NombreEstado"];
+                    $html.="</td>";
+
+                $html.="</tr>";
+            }
+            $html.="<tr>";
+                $html.='<td colspan="2" style="text-align:right">';
+                    $html.="<strong>TOTALES:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.=number_format($TotalValorCuotas);
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.=number_format($TotalPagos);
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.=number_format($TotalSaldo);
+                $html.="</td>";
+            
+                $html.='<td colspan="1" >';
+                    $html.="";
+                $html.="</td>"; 
+            $html.="</tr>";
+        $html.="</table>";
+        return($html);
+    }
+    
+    public function AbonosRealizadosAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente) {
+        $html="";
+        $html.='<table cellspacing="3" cellpadding="2" border="1">';
+            $html.="<tr>";
+                $html.='<td colspan="6" style="text-align:center;">';
+                    $html.="<strong>ABONOS REALIZADOS</strong>";
+                $html.="</td>";
+            $html.="</tr>";
+            $html.="<tr>";
+                $html.='<td colspan="1">';
+                    $html.="<strong>CUOTA:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>FECHA:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>TIPO CUOTA:</strong>";
+                $html.="</td>";
+                
+                $html.='<td colspan="1" >';
+                    $html.="<strong>VALOR:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>METODO:</strong>";
+                $html.="</td>";
+                $html.='<td colspan="1" >';
+                    $html.="<strong>USUARIO QUE RECIBE:</strong>";
+                $html.="</td>";
+                
+            $html.="</tr>";
+            
+                
+            $sql="SELECT t1.*,
+                    (SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t3 WHERE t3.idUsuarios=t1.idUser) AS NombreUsuario,
+                    (SELECT t2.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t2 WHERE t2.ID=t1.TipoCuota) AS NombreTipoCuota,                           
+                    (SELECT t4.Metodo FROM metodos_pago t4 WHERE t4.ID=t1.MetodoPago LIMIT 1) AS NombreMetodoPago
+                    FROM acuerdo_pago_cuotas_pagadas t1 WHERE idAcuerdoPago='$idAcuerdo' ORDER BY FechaPago ASC";
+            $Consulta=$this->obCon->Query($sql);
+            
+            $TotalPagos=0;
+            
+            while($DatosCuotas=$this->obCon->FetchAssoc($Consulta)){
+                $TotalPagos=$TotalPagos+$DatosCuotas["ValorPago"];
+                $html.="<tr>";
+                    $html.='<td colspan="1" >';
+                        $html.=$DatosCuotas["NumeroCuota"];
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=$DatosCuotas["Created"];
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=$DatosCuotas["NombreTipoCuota"];
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=number_format($DatosCuotas["ValorPago"]);
+                    $html.="</td>";
+                    
+                    $html.='<td colspan="1" >';
+                        $html.=$DatosCuotas["NombreMetodoPago"];
+                    $html.="</td>";
+                    $html.='<td colspan="1" >';
+                        $html.=$DatosCuotas["NombreUsuario"];
+                    $html.="</td>";
+
+                $html.="</tr>";
+            }
+            $html.="<tr>";
+                $html.='<td colspan="3" style="text-align:right">';
+                    $html.="<strong>TOTALES:</strong>";
+                $html.="</td>";
+                
+                $html.='<td colspan="1" >';
+                    $html.=number_format($TotalPagos);
+                $html.="</td>";
+                
+                $html.='<td colspan="2" >';
+                    $html.="";
+                $html.="</td>"; 
+            $html.="</tr>";
         $html.="</table>";
         return($html);
     }

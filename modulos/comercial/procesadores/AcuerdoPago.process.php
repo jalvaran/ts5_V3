@@ -168,6 +168,95 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Abono Registrado");
         break;//FIn caso 4    
         
+        case 5://Guarda una foto subida como soporte para el acuerdo de pago
+            $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
+            
+            if($idAcuerdo==""){
+                exit("E1;No se recibió el id del acuerdo de pago");
+            }
+            if(!empty($_FILES['upFoto']['name'])){
+                $obCon->GuardarFotoSubida($_FILES['upFoto']['name'],$_FILES['upFoto']['tmp_name'], $idAcuerdo);
+                                
+            }else{
+                exit("E1;No se recibió la foto");
+            }
+            
+            exit("OK;Foto subida");
+            
+        break;//Fin caso 5   
+        
+        case 6://Agregar los datos adicionales de un cliente
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
+            $SobreNombre=$obCon->normalizar($_REQUEST["SobreNombre"]);
+            $LugarTrabajo=$obCon->normalizar($_REQUEST["LugarTrabajo"]);
+            $Cargo=$obCon->normalizar($_REQUEST["Cargo"]);
+            $DireccionTrabajo=$obCon->normalizar($_REQUEST["DireccionTrabajo"]);
+            $TelefonoTrabajo=$obCon->normalizar($_REQUEST["TelefonoTrabajo"]);
+            $TxtFacebook=$obCon->normalizar($_REQUEST["TxtFacebook"]);
+            $TxtInstagram=$obCon->normalizar($_REQUEST["TxtInstagram"]);
+            
+            if($idCliente==''){
+                exit("E1;No se recibió el id del cliente");
+            }
+            if($SobreNombre==''){
+                exit("E1;Debe digitar el Sobre Nombre del Cliente;SobreNombre");
+            }
+            if($LugarTrabajo==''){
+                exit("E1;Debe digitar el Lugar Trabajo del Cliente;LugarTrabajo");
+            }
+            if($Cargo==''){
+                exit("E1;Debe digitar el Cargo del Cliente;Cargo");
+            }
+            if($DireccionTrabajo==''){
+                exit("E1;Debe digitar la Direccion de Trabajo del Cliente;DireccionTrabajo");
+            }
+            if($TelefonoTrabajo==''){
+                exit("E1;Debe digitar el Telefono de Trabajo del Cliente;TelefonoTrabajo");
+            }
+            if($TxtFacebook==''){
+                exit("E1;Debe digitar el Facebook del Cliente;TxtFacebook");
+            }
+            if($TxtInstagram==''){
+                exit("E1;Debe digitar el Instagram del Cliente;TxtInstagram");
+            }
+            
+            $obCon->AgregaDatosAdicionalesCliente($idCliente, $SobreNombre, $LugarTrabajo, $Cargo, $DireccionTrabajo, $TelefonoTrabajo, $TxtFacebook, $TxtInstagram);
+            print("OK;Datos adicionales del cliente agregados");
+            
+        break;//Fin caso 6  
+        
+        case 7://Agregar un recomendado de un cliente
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
+            $NombreRecomendado=$obCon->normalizar($_REQUEST["NombreRecomendado"]);
+            $DireccionRecomendado=$obCon->normalizar($_REQUEST["DireccionRecomendado"]);
+            $TelefonoRecomendado=$obCon->normalizar($_REQUEST["TelefonoRecomendado"]);
+            $DireccionTrabajoRecomendado=$obCon->normalizar($_REQUEST["DireccionTrabajoRecomendado"]);
+            $TelefonoTrabajoRecomendado=$obCon->normalizar($_REQUEST["TelefonoTrabajoRecomendado"]);
+            
+            if($idCliente==''){
+                exit("E1;No se recibió el id del cliente");
+            }
+            if($NombreRecomendado==''){
+                exit("E1;Debe digitar el Nombre del Recomendado;NombreRecomendado");
+            }
+            if($DireccionRecomendado==''){
+                exit("E1;Debe digitar la Direccion de Recomendado;DireccionRecomendado");
+            }
+            if($TelefonoRecomendado==''){
+                exit("E1;Debe digitar el Telefono del Recomendado;TelefonoRecomendado");
+            }
+            if($DireccionTrabajoRecomendado==''){
+                exit("E1;Debe digitar la Direccion del Trabajo del Recomendado;DireccionTrabajoRecomendado");
+            }
+            if($TelefonoTrabajoRecomendado==''){
+                exit("E1;Debe digitar el Telefono del Trabajo del Recomendado;TelefonoTrabajoRecomendado");
+            }
+                        
+            $obCon->AgregaRecomendadoCliente($idCliente, $NombreRecomendado, $DireccionRecomendado, $TelefonoRecomendado, $DireccionTrabajoRecomendado, $TelefonoTrabajoRecomendado);
+            print("OK;Recomendado agregado");
+            
+        break;//Fin caso 7
+        
     }
     
     

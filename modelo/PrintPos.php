@@ -1325,12 +1325,20 @@ class PrintPos extends ProcesoVenta{
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"OTROS IMPUESTOS      ".str_pad("$".number_format($TotalOtrosImpuestos),20," ",STR_PAD_LEFT));
+    $Parametros= $this->DevuelveValores("configuracion_general", "ID", 35);//Se Valida si las facturas negativas se devulven al cliente o no
+    $TotalFacturasNegativas=0;   
+    if($Parametros["Valor"]=="1"){
+        $TotalFacturasNegativas=$this->Sume("facturas", "Total", "WHERE idCierre='$idCierre' AND Total<0");
+        $TotalFacturasNegativas=ABS($TotalFacturasNegativas);
+    }
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"TOTAL ENTREGA        ".str_pad("$".number_format($DatosCierre["TotalEntrega"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$AbonosAcuerdoOtrosMetodos),20," ",STR_PAD_LEFT));
+    fwrite($handle,"TOTAL ENTREGA        ".str_pad("$".number_format($DatosCierre["TotalEntrega"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$AbonosAcuerdoOtrosMetodos+$TotalFacturasNegativas),20," ",STR_PAD_LEFT));
+    
+    
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"SALDO EN CAJA        ".str_pad("$".number_format($DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo),20," ",STR_PAD_LEFT));
+    fwrite($handle,"SALDO EN CAJA        ".str_pad("$".number_format($DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$TotalFacturasNegativas),20," ",STR_PAD_LEFT));
     
     $this->SeparadorHorizontal($handle, "_", 37);
 

@@ -451,14 +451,14 @@ class Facturacion extends ProcesoVenta{
                 $CuentaPUC=$CuentaDestino;
                 $DatosCuenta= $this->DevuelveValores("subcuentas", "PUC", $CuentaDestino);
                 $NombreCuenta=$DatosCuenta["Nombre"];
-                if($Total>0){
-                    $Debito=$DiferenciaFormasPago;
+                if($Total>=0){
+                    $Debito=ABS($DiferenciaFormasPago);
                     $Credito=0;
                     $Neto=$DiferenciaFormasPago;
                 }else{
                     $Debito=0;
-                    $Credito=$DiferenciaFormasPago;
-                    $Neto=$DiferenciaFormasPago*(-1);
+                    $Credito=ABS($DiferenciaFormasPago);
+                    $Neto=ABS($DiferenciaFormasPago)*(-1);
                 }
                 $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
             }
@@ -507,10 +507,15 @@ class Facturacion extends ProcesoVenta{
             $Parametros=$this->DevuelveValores("parametros_contables", "ID", 6); //Cuenta para clientes
             $CuentaPUC=$Parametros["CuentaPUC"];
             $NombreCuenta=$Parametros["NombreCuenta"];
-
-            $Debito=$Total;
-            $Credito=0;
-            $Neto=$Total;
+            if($Total>=0){
+                $Debito=ABS($Total);
+                $Credito=0;
+                $Neto=$Total;
+            }else{
+                $Debito=(0);
+                $Credito=ABS($Total);
+                $Neto=ABS($Total)*(-1);
+            }
             $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
 
 
@@ -546,14 +551,22 @@ class Facturacion extends ProcesoVenta{
             
 
             ///////////////////////Registramos ingresos
-
-            $CuentaPUC=$DatosItems["CuentaPUC"]; 
-            $DatosCuenta=$this->DevuelveValores("subcuentas","PUC",$CuentaPUC);
-            $NombreCuenta=$DatosCuenta["Nombre"];
-            $Debito=0;
-            $Credito=$Subtotal;
-            $Neto=$Subtotal*(-1);
-            
+            if($Subtotal>=0){///Si es una venta  
+                $CuentaPUC=$DatosItems["CuentaPUC"]; 
+                $DatosCuenta=$this->DevuelveValores("subcuentas","PUC",$CuentaPUC);
+                $NombreCuenta=$DatosCuenta["Nombre"];
+                $Debito=0;
+                $Credito=$Subtotal;
+                $Neto=$Subtotal*(-1);
+            }else{//Si el subtotal es negativo se debe ingresar a una devolucion en ventas
+                $ParametrosDevolucion= $this->DevuelveValores("parametros_contables", "ID", 9);//Cuenta para las devoluciones en venta
+                $CuentaPUC= $ParametrosDevolucion["CuentaPUC"];//Cuenta para las devoluciones en venta
+                $DatosCuenta=$this->DevuelveValores("subcuentas","PUC",$CuentaPUC);
+                $NombreCuenta=$DatosCuenta["Nombre"];
+                $Debito=ABS($Subtotal);
+                $Credito=0;
+                $Neto=ABS($Subtotal);
+            }
             $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
          
             ///////////////////////Registramos IVA Generado si aplica
@@ -582,7 +595,7 @@ class Facturacion extends ProcesoVenta{
 
                 $NombreCuenta=$Parametros["NombreCuenta"];
 
-                $Debito=$TotalCostosM;
+                $Debito=ABS($TotalCostosM);
                 $Credito=0;
                 $Neto=$TotalCostosM;
 
@@ -596,7 +609,7 @@ class Facturacion extends ProcesoVenta{
                 $NombreCuenta=$Parametros["NombreCuenta"];
 
                 $Debito=0;
-                $Credito=$TotalCostosM;
+                $Credito=ABS($TotalCostosM);
                 $Neto=$TotalCostosM*(-1);
 
                 $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
@@ -1020,6 +1033,20 @@ class Facturacion extends ProcesoVenta{
          $this->Query($sql);         
      }
      
+      public function ContabilizaGananciaOcasionalPOS($idFactura,$Valor,$CuentaDestino,$idUser) {
+        $Valor=ABS($Valor);
+        $DatosFactura=$this->DevuelveValores("facturas", "idFacturas", $idFactura);
+        $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
+        if($DatosFactura["FormaPago"]=='Contado'){
+            $ParametrosContables=$this->DevuelveValores("parametros_contables", "ID", 36);//Cuenta para un posible retorno del dinero al cliente
+        }else{
+            $ParametrosContables=$this->DevuelveValores("parametros_contables", "ID", 6);//Cuenta para un posible retorno del dinero al cliente
+        }
+        $this->IngreseMovimientoLibroDiario($DatosFactura["Fecha"], "FACTURA", $idFactura, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDestino, "", "Devoluciones POS", "DB", $Valor, "Devolucion en venta sin retorno al cliente", $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
+        $this->IngreseMovimientoLibroDiario($DatosFactura["Fecha"], "FACTURA", $idFactura, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $ParametrosContables["CuentaPUC"], $ParametrosContables["NombreCuenta"], "Devoluciones POS", "CR", $Valor, "Devolucion en venta sin retorno al cliente", $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
+        
+        
+    }
     /**
      * Fin Clase
      */

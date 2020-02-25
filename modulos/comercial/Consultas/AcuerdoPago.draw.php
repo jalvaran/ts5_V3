@@ -36,6 +36,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>Abonar</strong>", 1);
                     $css->ColTabla("<strong>Imprimir</strong>", 1);
                     $css->ColTabla("<strong>Ver</strong>", 1);
+                    $css->ColTabla("<strong>PDF</strong>", 1);
                     $css->ColTabla("<strong>Tercero</strong>", 1);
                     $css->ColTabla("<strong>Fecha</strong>", 1);
                     $css->ColTabla("<strong>Fecha Inicial</strong>", 1);
@@ -68,6 +69,12 @@ if( !empty($_REQUEST["Accion"]) ){
                         print("<td style='text-align:center'>");        
                             print('<span class="input-group-btn">
                                 <button type="button" class="btn btn-success btn-flat" onclick=DibujarAcuerdoPagoExistente(`'.$idAcuerdo.'`,`DivBusquedasPOS`)> <i class="fa fa-eye"> </i> </button>
+                              </span>');
+                                
+                        print("</td>");
+                        print("<td style='text-align:center'>");        
+                            print('<span class="input-group-btn">
+                                <a class="btn btn-danger btn-flat" href="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=37&idAcuerdo='.$idAcuerdo.'" target="_blank"> <i class="fa fa-file-pdf-o"> </i> </a>
                               </span>');
                                 
                         print("</td>");
@@ -433,6 +440,200 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CerrarDiv();
             
         break;//Fin caso 4    
+        
+        case 5://Dibuja el formulario para agregar los datos adicionales de un cliente
+            $idCliente=$obAcuerdo->normalizar($_REQUEST["idCliente"]);
+            
+            if($idCliente==""){
+                $css->CrearTitulo("<strong>NO SE RECIBIÓ EL ID DEL CLIENTE</strong>", "rojo");
+                exit();
+            }
+            $DatosCliente=$obAcuerdo->DevuelveValores("clientes", "idClientes", $idCliente);
+            $DatosAdicionalesCliente=$obAcuerdo->DevuelveValores("clientes_datos_adicionales", "idCliente", $idCliente);
+            $css->CrearDiv("DivFormularioDatosAdicionalesCliente", "", "center", 1, 1);
+                $css->CrearTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>DATOS ADICIONALES DE: </strong>". utf8_encode($DatosCliente["RazonSocial"])." ".$DatosCliente["Num_Identificacion"], 2);
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Sobre Nombre</strong>", 2);
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        print("<td colspan=2>");
+                            $css->input("text", "SobreNombre", "form-control", "SobreNombre", "Sobre nombre", $DatosAdicionalesCliente["SobreNombre"], "Sobre Nombre", "off", "", "");
+                        print("</td>");
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        
+                        $css->ColTabla("<strong>Lugar de Trabajo</strong>", 1);
+                        $css->ColTabla("<strong>Cargo</strong>", 1);
+                        
+                        
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        
+                        print("<td>");
+                            $css->input("text", "LugarTrabajo", "form-control", "LugarTrabajo", "Sobre nombre", $DatosAdicionalesCliente["LugarTrabajo"], "Lugar Trabajo", "off", "", "");
+                        print("</td>");
+                        print("<td>");
+                            $css->input("text", "Cargo", "form-control", "Cargo", "Sobre nombre", $DatosAdicionalesCliente["Cargo"], "Cargo", "off", "", "");
+                        print("</td>");
+                        
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Direccion del Trabajo</strong>", 1);
+                        $css->ColTabla("<strong>Telefono Trabajo</strong>", 1);
+                        
+                        
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        print("<td>");
+                            $css->input("text", "DireccionTrabajo", "form-control", "DireccionTrabajo", "Direccion Trabajo", $DatosAdicionalesCliente["DireccionTrabajo"], "Direccion Trabajo", "off", "", "");
+                        print("</td>");
+                        print("<td>");
+                            $css->input("text", "TelefonoTrabajo", "form-control", "TelefonoTrabajo", "Telefono Trabajo", $DatosAdicionalesCliente["TelefonoTrabajo"], "Telefono Trabajo", "off", "", "");
+                        print("</td>");
+                        
+                    $css->CierraFilaTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Facebook</strong>", 1);
+                        $css->ColTabla("<strong>Instagram</strong>", 1);
+                        
+                        
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        print("<td>");
+                            $css->input("text", "TxtFacebook", "form-control", "TxtFacebook", "Facebooko", $DatosAdicionalesCliente["Facebook"], "Facebook", "off", "", "");
+                        print("</td>");
+                        print("<td>");
+                            $css->input("text", "TxtInstagram", "form-control", "TxtInstagram", "Instagram", $DatosAdicionalesCliente["Instagram"], "Instagram", "off", "", "");
+                        print("</td>");
+                        
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        print("<td colspan=2>");
+                            $css->CrearBotonEvento("BtnGuardarDatosAdicionalesCliente", "Guardar", 1, "onclick", "GuardarDatosAdicionalesCliente(`$idCliente`)", "azul");
+                        print("</td>");
+                                                
+                    $css->CierraFilaTabla();
+                $css->CerrarTabla();
+            $css->CerrarDiv();
+            
+            
+        break;//Fin caso 5    
+        
+        case 6://Dibuja el formulario para agregar los recomendados de un cliente
+            $idCliente=$obAcuerdo->normalizar($_REQUEST["idCliente"]);
+            
+            if($idCliente==""){
+                $css->CrearTitulo("<strong>NO SE RECIBIÓ EL ID DEL CLIENTE</strong>", "rojo");
+                exit();
+            }
+            $DatosCliente=$obAcuerdo->DevuelveValores("clientes", "idClientes", $idCliente);
+            
+            $css->CrearDiv("DivFormularioRecomendadosCliente", "", "center", 1, 1);
+                $css->CrearTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>AGREGAR RECOMENDADO DE: </strong>". utf8_encode($DatosCliente["RazonSocial"])." ".$DatosCliente["Num_Identificacion"], 2);
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Nombre del Recomendado</strong>", 2);
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        print("<td colspan=2>");
+                            $css->input("text", "NombreRecomendado", "form-control", "NombreRecomendado", "Nombre Recomendado", "", "Nombre Recomendado", "off", "", "");
+                        print("</td>");
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        
+                        $css->ColTabla("<strong>Direccion</strong>", 1);
+                        $css->ColTabla("<strong>Telefono</strong>", 1);
+                        
+                        
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        
+                        print("<td>");
+                            $css->input("text", "DireccionRecomendado", "form-control", "DireccionRecomendado", "Direccion Recomendado", "", "Direccion Recomendado", "off", "", "");
+                        print("</td>");
+                        print("<td>");
+                            $css->input("text", "TelefonoRecomendado", "form-control", "TelefonoRecomendado", "Telefono Recomendado", "", "Telefono Recomendado", "off", "", "");
+                        print("</td>");
+                        
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Direccion del Trabajo</strong>", 1);
+                        $css->ColTabla("<strong>Telefono Trabajo</strong>", 1);
+                        
+                        
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        print("<td>");
+                            $css->input("text", "DireccionTrabajoRecomendado", "form-control", "DireccionTrabajoRecomendado", "Direccion Trabajo", "", "Direccion Trabajo", "off", "", "");
+                        print("</td>");
+                        print("<td>");
+                            $css->input("text", "TelefonoTrabajoRecomendado", "form-control", "TelefonoTrabajoRecomendado", "Telefono Trabajo", "", "Telefono Trabajo", "off", "", "");
+                        print("</td>");
+                        
+                    $css->CierraFilaTabla();
+                    
+                    $css->FilaTabla(16);
+                        print("<td colspan=2>");
+                            $css->CrearBotonEvento("BtnGuardarRecomendadosCliente", "Guardar", 1, "onclick", "GuardarRecomendadosCliente(`$idCliente`)", "naranja");
+                        print("</td>");
+                                                
+                    $css->CierraFilaTabla();
+                $css->CerrarTabla();
+            $css->CerrarDiv();
+            
+            $css->CrearDiv("DivRecomendadosExistentes", "", "center", 1, 1);
+                
+            $css->CerrarDiv();
+            
+        break;//Fin caso 6
+        
+        case 7://Dibuja los recomendados de un cliente
+            $idCliente=$obAcuerdo->normalizar($_REQUEST["idCliente"]);
+            $css->CrearTitulo("<strong>RECOMENDADOS DE ESTE CLIENTE:</strong>", "naranja");
+            
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>NOMBRE</strong>", 1,"C");
+                    $css->ColTabla("<strong>DIRECCIÓN</strong>", 1,"C");
+                    $css->ColTabla("<strong>TELEFONO</strong>", 1,"C");
+                    $css->ColTabla("<strong>DIRECCION DE TRABAJO</strong>", 1,"C");
+                    $css->ColTabla("<strong>TELEFONO DEL TRABAJO</strong>", 1,"C");
+                    
+                $css->CierraFilaTabla();
+                
+                $sql="SELECT * FROM clientes_recomendados WHERE idCliente='$idCliente' ORDER BY ID DESC";
+                $Consulta=$obAcuerdo->Query($sql);
+                while($DatosRecomendado=$obAcuerdo->FetchAssoc($Consulta)){
+                    $css->FilaTabla(16);
+                        $css->ColTabla($DatosRecomendado["NombreRecomendado"], 1);
+                        $css->ColTabla($DatosRecomendado["DireccionRecomendado"], 1);
+                        $css->ColTabla($DatosRecomendado["TelefonoRecomendado"], 1);
+                        $css->ColTabla($DatosRecomendado["DireccionTrabajoRecomendado"], 1);
+                        $css->ColTabla($DatosRecomendado["TelefonoTrabajoRecomendado"], 1);
+
+                    $css->CierraFilaTabla();
+                }
+            $css->CerrarTabla();
+        break;//Fin caso 7    
         
     }
     

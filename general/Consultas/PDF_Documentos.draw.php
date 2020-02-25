@@ -98,6 +98,10 @@ if(isset($_REQUEST["idDocumento"])){
             $idCierre=$obCon->normalizar($_REQUEST["ID"]);
             $obDoc->InformeCierreRestaurante($idCierre,"");            
             break;//Fin caso 35
+        case 37: //PDF de un acuerdo de pago
+            $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdo"]);
+            $obDoc->AcuerdoPagoPDF($idAcuerdo,"");            
+            break;//Fin caso 35
     }
 }else{
     print("No se recibió parametro de documento");

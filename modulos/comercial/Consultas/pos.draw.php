@@ -884,19 +884,39 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $sql="SELECT * FROM acuerdo_pago WHERE Tercero='$NIT' AND Estado=1";
             $DatosAcuerdoAnterior=$obCon->FetchAssoc($obCon->Query($sql));
+            $disabledBtnAnteriorAcuerdo="disabled";
             if($DatosAcuerdoAnterior["ID"]>0){
-                $ValorAnteriorCuota=$DatosAcuerdoAnterior["ValorCuotaGeneral"];
-                $css->FilaTabla(16);
-                print("<td style='text-align:center' colspan=3>");        
-                    print('<strong>Ver Acuerdo de Pago Anterior</strong><span class="input-group-btn"> 
-                        <button type="button" class="btn btn-success btn-flat" onclick=DibujarAcuerdoPagoExistente(`'.$DatosAcuerdoAnterior["idAcuerdoPago"].'`,`DivProyeccionPagosAcuerdo`)> <i class="fa fa-eye"> </i> </button>
+                $disabledBtnAnteriorAcuerdo="";
+            }
+            $ValorAnteriorCuota=$DatosAcuerdoAnterior["ValorCuotaGeneral"];
+            $css->FilaTabla(16);
+                $css->ColTabla("<strong>Acuerdo Anterior</strong>", "1", "C");
+                $css->ColTabla("<strong>Datos Adicionales</strong>", "1", "C");
+                $css->ColTabla("<strong>Recomendados</strong>", "1", "C");
+            
+            $css->CierraFilaTabla();
+            
+            $css->FilaTabla(16);
+                print("<td style='text-align:center'>");        
+                    print('<span class="input-group-btn"> 
+                        <button type="button" class="btn btn-success btn-flat" '.$disabledBtnAnteriorAcuerdo.' onclick=DibujarAcuerdoPagoExistente(`'.$DatosAcuerdoAnterior["idAcuerdoPago"].'`,`DivProyeccionPagosAcuerdo`)> <i class="fa fa-eye"> </i> </button>
                       </span>');
 
                 print("</td>");
-                $css->CierraFilaTabla();
-            }
-            
-                
+                print("<td style='text-align:center' >");        
+                    print('<span class="input-group-btn"> 
+                        <button type="button" class="btn btn-primary btn-flat" onclick=DibujarFormularioDatosAdicionalesCliente(`'.$idCliente.'`,`DivProyeccionPagosAcuerdo`)> <i class="fa fa-user-plus"> </i> </button>
+                      </span>');
+
+                print("</td>");
+                print("<td style='text-align:center' >");        
+                    print('<span class="input-group-btn"> 
+                        <button type="button" class="btn btn-warning btn-flat" onclick=DibujarFormularioRecomendadosCliente(`'.$idCliente.'`,`DivProyeccionPagosAcuerdo`)> <i class="fa fa-users"> </i> </button>
+                      </span>');
+
+                print("</td>");
+            $css->CierraFilaTabla();
+                    $css->FilaTabla(16);   
                         $css->ColTabla("<strong>Cuota Inicial</strong>", 1);
                         $css->ColTabla("<strong>Metodo</strong>", 1); 
                         $css->ColTabla("<strong>Agregar</strong>", 1);
@@ -1015,17 +1035,25 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CierraFilaTabla();
                 $css->CerrarTabla();
                 $css->CrearTitulo("Tomar Fotografía", "naranja");
-                $css->CrearBotonEvento("btnTomarFoto", "Tomar Foto", 1, "onclick", "TomarFoto()", "azul");
-                print('                
-                <div>
-                    <select name="listaDeDispositivos" id="listaDeDispositivos"></select>
-                    
-                    <p id="estado"></p>
-                </div>
-                <br>
-                <video muted="muted" id="video" style="width:400px"></video>
-                <canvas id="canvas" style="display: none;"></canvas>');
-                
+                $css->CrearDiv("", "col-md-6", "center", 1, 1);
+                    $css->input("file", "upFoto", "form-control", "upFoto", "", "Subir Foto", "Subir Foto", "off", "", "");
+                $css->CerrarDiv();
+                $css->CrearDiv("", "col-md-6", "center", 1, 1);
+                    $css->CrearBotonEvento("btnSubirFoto", "Subir Foto", 1, "onclick", "SubirFoto()", "verde");
+                $css->CerrarDiv();
+                print("<br><br><br>");
+                $css->CrearDiv("", "col-md-12", "center", 1, 1);
+                    $css->CrearBotonEvento("btnTomarFoto", "Tomar Foto", 1, "onclick", "TomarFoto()", "azul");
+                    print('                
+                    <div>
+                        <select name="listaDeDispositivos" class="form-control" id="listaDeDispositivos"></select>
+
+                        <p id="estado"></p>
+                    </div>
+                    <br>
+                    <video muted="muted" id="video" style="width:400px"></video>
+                    <canvas id="canvas" style="display: none;"></canvas>');
+                $css->CerrarDiv();
             $css->CerrarDiv();
             
             
@@ -1055,7 +1083,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CierraFilaTabla();
                 
                 $sql="SELECT t1.ID,t1.ValorPago,(SELECT t2.Metodo FROM metodos_pago t2 WHERE t2.ID=t1.MetodoPago LIMIT 1) AS NombreMetodoPago
-                       FROM acuerdo_pago_cuotas_pagadas_temp t1 WHERE t1.idAcuerdoPago='$idAcuerdo' AND TipoCuota=1";
+                       FROM acuerdo_pago_cuotas_pagadas_temp t1 WHERE t1.idAcuerdoPago='$idAcuerdo' AND TipoCuota=0";
                 $Consulta=$obCon->Query($sql);
                 $TotalCuotaInicial=0;
                 while($DatosCuota=$obCon->FetchAssoc($Consulta)){
