@@ -2,6 +2,25 @@
 
 document.getElementById("BtnMuestraMenuLateral").click();
 
+
+$('#idCliente').select2({
+		  
+    placeholder: 'Todos los clientes',
+    ajax: {
+      url: 'buscadores/terceros.search.php',
+      dataType: 'json',
+      delay: 250,
+      processResults: function (data) {
+
+        return {                     
+          results: data
+        };
+      },
+     cache: true
+    }
+  });
+          
+          
 /**
  * Busca un acuerdo de pago
  * @returns {undefined}

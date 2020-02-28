@@ -6,104 +6,21 @@ if (!isset($_SESSION['username'])){
   
 }
 $idUser=$_SESSION['idUser'];
-
-include_once("../clases/Facturacion.class.php");
 include_once("../clases/AcuerdoPago.class.php");
+include_once("../clases/informesAcuerdosPago.class.php");
 include_once("../../../constructores/paginas_constructor.php");
 
 if( !empty($_REQUEST["Accion"]) ){
     $css =  new PageConstruct("", "", 1, "", 1, 0);
-    $obCon = new Facturacion($idUser);
-    $obAcuerdo = new AcuerdoPago($idUser);
+    
+    $obCon = new informesAcuerdoPago($idUser);
     switch ($_REQUEST["Accion"]) {
                 
-        case 1://Dibuja un acuerdo de pago existente
-            $key=$obCon->normalizar($_REQUEST["TxtBuscarAcuerdo"]);
+        case 1://Dibuja el formulario para obtener el informe de cuentas por pagar
             
-            $sql="SELECT t1.*,
-                    (SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t3 WHERE t3.idUsuarios=t1.idUser) as NombreUsuario,
-                    (SELECT RazonSocial FROM clientes t4 WHERE t4.Num_Identificacion=t1.Tercero LIMIT 1) as NombreTercero
-                    FROM acuerdo_pago t1 
-                    WHERE t1.Tercero = 
-                    (SELECT t2.Num_Identificacion FROM clientes t2 WHERE t2.RazonSocial LIKE '%$key%' or Num_Identificacion='$key' LIMIT 1) AND Estado=1";
-            $Consulta=$obAcuerdo->Query($sql);
-            print("<br><br>");
-            $css->CrearTabla();
-                
-                $css->FilaTabla(16);
-                    
-                    $css->ColTabla("<strong>ID</strong>", 1);
-                    $css->ColTabla("<strong>Abonar</strong>", 1);
-                    $css->ColTabla("<strong>Imprimir</strong>", 1);
-                    $css->ColTabla("<strong>Ver</strong>", 1);
-                    $css->ColTabla("<strong>PDF</strong>", 1);
-                    $css->ColTabla("<strong>Tercero</strong>", 1);
-                    $css->ColTabla("<strong>Fecha</strong>", 1);
-                    $css->ColTabla("<strong>Fecha Inicial</strong>", 1);
-                    $css->ColTabla("<strong>Valor Cuota General</strong>", 1);
-                    //$css->ColTabla("<strong>CicloPagos</strong>", 1);
-                    $css->ColTabla("<strong>Saldo Anterior</strong>", 1);
-                    $css->ColTabla("<strong>Observaciones</strong>", 1);
-                    $css->ColTabla("<strong>Saldo Inicial</strong>", 1);
-                    $css->ColTabla("<strong>Total Abonos</strong>", 1);
-                    $css->ColTabla("<strong>Saldo Final</strong>", 1);
-                    $css->ColTabla("<strong>Estado</strong>", 1);
-                    $css->ColTabla("<strong>Usuario</strong>", 1);
-                    
-                $css->CierraFilaTabla();
-            
-                while($DatosAcuerdo=$obAcuerdo->FetchAssoc($Consulta)){
-                    $idAcuerdo=$DatosAcuerdo["idAcuerdoPago"];
-                    $EstadoAcuerdo=$obAcuerdo->ObtengaEstadoGeneralAcuerdo($idAcuerdo);
-                    $EstadoGeneral="AL DIA";
-                    if($EstadoAcuerdo==4){
-                        $EstadoGeneral="EN MORA";
-                    }
-                    $css->FilaTabla(16);
-                        $css->ColTabla($DatosAcuerdo["ID"], 1);
-                        print("<td style='text-align:center'>");
-                            
-                            print('<span class="input-group-btn">
-                                <button type="button" class="btn btn-warning btn-flat" onclick=TotalAbonoAcuerdo=0;FormularioAbonarAcuerdoPago(`'.$idAcuerdo.'`)> <i class="fa fa-plus"> </i> </button>
-                              </span> ');
-                        print("</td>");  
-                        print("<td style='text-align:center'>");    
-                            print('<span class="input-group-btn">
-                                <button type="button" class="btn btn-primary btn-flat" onclick=ImprimirAcuerdoPago(`'.$idAcuerdo.'`)> <i class="fa fa-print"> </i> </button>
-                              </span>');
-                        print("</td>");  
-                        print("<td style='text-align:center'>");        
-                            print('<span class="input-group-btn">
-                                <button type="button" class="btn btn-success btn-flat" onclick=DibujarAcuerdoPagoExistente(`'.$idAcuerdo.'`,`DivBusquedasPOS`)> <i class="fa fa-eye"> </i> </button>
-                              </span>');
-                                
-                        print("</td>");
-                        print("<td style='text-align:center'>");        
-                            print('<span class="input-group-btn">
-                                <a class="btn btn-danger btn-flat" href="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=37&idAcuerdo='.$idAcuerdo.'&EstadoGeneral='.$EstadoAcuerdo.'" target="_blank"> <i class="fa fa-file-pdf-o"> </i> </a>
-                              </span>');
-                                
-                        print("</td>");
-                        $css->ColTabla($DatosAcuerdo["Tercero"]." ".$DatosAcuerdo["NombreTercero"], 1);
-                        $css->ColTabla($DatosAcuerdo["Fecha"], 1);
-                        $css->ColTabla($DatosAcuerdo["FechaInicialParaPagos"], 1);
-                        $css->ColTabla(number_format($DatosAcuerdo["ValorCuotaGeneral"]), 1);
-                        //$css->ColTabla($DatosAcuerdo["CicloPagos"], 1);
-                        $css->ColTabla(number_format($DatosAcuerdo["SaldoAnterior"]), 1);
-                        $css->ColTabla($DatosAcuerdo["Observaciones"], 1);
-                        $css->ColTabla(number_format($DatosAcuerdo["SaldoInicial"]), 1);
-                        $css->ColTabla(number_format($DatosAcuerdo["TotalAbonos"]), 1);
-                        $css->ColTabla("<h3>".number_format($DatosAcuerdo["SaldoFinal"])."</h3>", 1);
-                        $css->ColTabla($EstadoGeneral, 1);
-                        $css->ColTabla($DatosAcuerdo["NombreUsuario"], 1);
-
-                    $css->CierraFilaTabla();
-                }
-                
-            $css->CerrarTabla();
         break;// fin caso 1
         
-        case 2:// Dibuja el formulario para realizar un abono
+        case 2:// Dibuja para obtener
             $idAcuerdo=$obAcuerdo->normalizar($_REQUEST["idAcuerdo"]);
             
             $DatosAcuerdo=$obAcuerdo->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);

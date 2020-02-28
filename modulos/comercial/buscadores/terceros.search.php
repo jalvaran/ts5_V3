@@ -14,12 +14,12 @@ $key=$obRest->normalizar($_REQUEST['q']);
 
 $sql = "SELECT * FROM clientes 
 		WHERE RazonSocial LIKE '%$key%' or Num_Identificacion LIKE '%$key%' OR  Telefono LIKE '%$key%'
-		LIMIT 50"; 
+		LIMIT 100"; 
 $result = $obRest->Query($sql);
 $json = [];
 
 while($row = $obRest->FetchAssoc($result)){
-    $Texto=$row['RazonSocial']." ".$row['Num_Identificacion']." ".$row['Telefono'];
+    $Texto= utf8_encode($row['RazonSocial']." ".$row['Num_Identificacion']." ".$row['Telefono']);
      $json[] = ['id'=>$row['Num_Identificacion'], 'text'=>$Texto];
 }
 echo json_encode($json);

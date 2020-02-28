@@ -31,7 +31,6 @@ $css->PageInit($myTitulo);
     $css->section("", "content", "", "");
         $css->CrearDiv("", "row", "left", 1, 1);
          $css->CrearDiv("", "col-md-2", "left", 1, 1);
-            $css->CrearBotonEvento("BtnActualizar", "Menú", 1, "onclick", "VerMenu()", "verde");
             
             $css->CrearDiv("", "box box-solid", "left", 1, 1);
              $css->CrearDiv("", "box-header with-border", "left", 1, 1);
@@ -68,19 +67,60 @@ $css->PageInit($myTitulo);
               </div>
               <!-- /.box -->
             </div>');
+            
             $css->CrearDiv("", "col-md-10", "left", 1, 1);
-                      
-            $css->CrearDiv("DivMensajes", "col-md-12", "left", 1, 1);
+             
+                $css->CrearDiv("DivMensajes", "col-md-12", "left", 1, 1);
+
+                $css->CerrarDiv();
+                $css->CrearDiv("DivClientes", "col-md-4", "left", 1, 1);
+                    $css->select("idCliente", "form-control", "idCliente", "", "", "", "");
+                        $css->option("", "", "", "", "", "");
+                            print("Selecciona un Cliente");
+                        $css->Coption();
+                    $css->Cselect();
+                $css->CerrarDiv();
                 
-            $css->CerrarDiv();
-                 
-            $css->CrearDiv("", "col-md-12", "left", 1, 1);
-                            
-                $css->CrearDiv("", "box box-primary", "left", 1, 1);
-                    $css->CrearDiv("DivDrawTables", "box-header with-border", "left", 1, 1);
+                $css->CrearDiv("DivClientes", "col-md-2", "left", 1, 1);
+                    $css->select("cmbCicloPagos", "form-control", "cmbCicloPagos", "", "", "", "");
                         
-                    $css->CerrarDiv();
-                $css->CerrarDiv();    
+                        $css->option("", "", "", "", "", "");
+                            print("Todos los ciclos");
+                        $css->Coption();
+                        
+                        $sql="SELECT * FROM acuerdo_pago_ciclos_pagos";
+                        $Consulta=$obCon->Query($sql);
+                        while($DatosCiclo=$obCon->FetchAssoc($Consulta)){
+                            $css->option("", "", "", $DatosCiclo["ID"], "", "");
+                                print($DatosCiclo["NombreCiclo"]);
+                            $css->Coption();
+                        }
+                    $css->Cselect();
+                $css->CerrarDiv();
+                
+                $css->CrearDiv("", "col-md-2", "right", 1, 1); 
+
+                    $css->input("date", "FechaInicialRangos", "form-control", "FechaInicialRangos", "Fecha", "", "Fecha Inicial", "off", "", "onchange=CambiePagina()","style='line-height: 15px;'");
+
+                $css->CerrarDiv();
+                $css->CrearDiv("", "col-md-2", "right", 1, 1); 
+                    $css->input("date", "FechaFinalRangos", "form-control", "FechaFinalRangos", "Fecha", "", "Fecha Final", "off", "", "onchange=CambiePagina()","style='line-height: 15px;'");
+
+                $css->CerrarDiv();
+
+                $css->CrearDiv("", "col-md-2", "right", 1, 1); 
+                    $css->CrearBotonEvento("btnGenerarListado", "Generar", 1, "onclick", "GenerarListado()", "verde");
+                $css->CerrarDiv();
+
+
+                $css->CrearDiv("", "col-md-12", "left", 1, 1);
+                            
+                    $css->CrearDiv("", "box box-primary", "left", 1, 1);
+                        $css->CrearDiv("DivDrawTables", "box-header with-border", "left", 1, 1);
+
+                        $css->CerrarDiv();
+                    $css->CerrarDiv();    
+                $css->CerrarDiv();
             $css->CerrarDiv();
        
         print('</div>
