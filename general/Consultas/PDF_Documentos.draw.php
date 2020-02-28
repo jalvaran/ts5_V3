@@ -100,7 +100,8 @@ if(isset($_REQUEST["idDocumento"])){
             break;//Fin caso 35
         case 37: //PDF de un acuerdo de pago
             $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdo"]);
-            $obDoc->AcuerdoPagoPDF($idAcuerdo,"");            
+            $EstadoGeneral=$obCon->normalizar($_REQUEST["EstadoGeneral"]);
+            $obDoc->AcuerdoPagoPDF($idAcuerdo,$EstadoGeneral,"");            
             break;//Fin caso 35
     }
 }else{

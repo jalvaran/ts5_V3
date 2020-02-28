@@ -573,6 +573,26 @@ class AcuerdoPago extends ProcesoVenta{
         $this->Query($sql);
     }
     
+    public function InteresesAcuerdoPagos($idAcuerdoPago,$ValorPago,$MetodoPago,$idUser) {
+         
+         $Datos["idAcuerdoPago"]=$idAcuerdoPago;
+         $Datos["FechaPago"]=date("Y-m-d");
+         $Datos["ValorRecargoInteres"]=$ValorPago;
+         $Datos["MetodoPago"]=$MetodoPago;
+         $Datos["idUser"]=$idUser;
+         $Datos["Created"]=date("Y-m-d H:i:s");
+         $sql=$this->getSQLInsert("acuerdo_recargos_intereses", $Datos);
+         $this->Query($sql);   
+         $ID=$this->ObtenerMAX("acuerdo_recargos_intereses", "ID", "idAcuerdoPago", $idAcuerdoPago);
+         return($ID);
+     }
+     
+     public function ObtengaEstadoGeneralAcuerdo($idAcuerdo) {
+         $this->ActualiceEstadosProyeccionPagos($idAcuerdo);
+         $MaxEstado=$this->ObtenerMAX("acuerdo_pago_proyeccion_pagos", "Estado", "idAcuerdoPago", $idAcuerdo);
+         return($MaxEstado);
+     }
+    
     /**
      * Fin Clase
      */

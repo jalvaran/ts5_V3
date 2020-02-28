@@ -2920,7 +2920,7 @@ $tbl.= "</table>";
         return($html);
     }
     
-    public function AcuerdoPagoPDF($idAcuerdo) {
+    public function AcuerdoPagoPDF($idAcuerdo,$EstadoAcuerdo) {
         $idFormato=37;
         
         $DatosFormatos= $this->obCon->DevuelveValores("formatos_calidad", "ID", $idFormato);
@@ -2936,7 +2936,7 @@ $tbl.= "</table>";
            
         $this->PDF_Encabezado($DatosAcuerdo["Fecha"],1, $idFormato, "",$Documento);
         
-        $html=$this->EncabezadoAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente);        
+        $html=$this->EncabezadoAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente,$EstadoAcuerdo);        
         $this->PDF->writeHTML("<br><br>".$html, true, false, false, false, ''); 
         
         $html=$this->CuotasPendientesAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente);        
@@ -2951,7 +2951,7 @@ $tbl.= "</table>";
         $this->PDF_Output("Acuerdo_Pago_$idAcuerdo");
     }
     
-    public function EncabezadoAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente) {
+    public function EncabezadoAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente,$EstadoAcuerdo) {
         $html="";
         $html.='<table cellspacing="3" cellpadding="2" border="1">';
             $html.="<tr>";
@@ -3028,7 +3028,13 @@ $tbl.= "</table>";
             $html.="</tr>";
             $html.="<tr>";
                 $html.='<td colspan="6" style="text-align:left;">';
-                    $html.= utf8_encode($DatosAcuerdo["Observaciones"]);
+                    $Observaciones=$DatosAcuerdo["Observaciones"];
+                    if($EstadoAcuerdo==4){
+                        $Observaciones="Acuerdo en MORA; ".$Observaciones;
+                    }else{
+                        $Observaciones="Acuerdo AL DIA; ".$Observaciones;
+                    }
+                    $html.= utf8_encode($Observaciones);
                 $html.="</td>";
             $html.="</tr>";
             

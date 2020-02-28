@@ -776,7 +776,8 @@ class Facturacion extends ProcesoVenta{
         $this->update("comprobantes_ingreso", "idCierre", $idCierre, "WHERE idCierre='' AND Usuarios_idUsuarios='$idUser'"); 
         $this->update("comercial_plataformas_pago_ingresos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'"); 
         $this->update("pos_registro_descuentos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUsuario='$idUser'");  
-        $this->update("acuerdo_pago_cuotas_pagadas", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'");  
+        $this->update("acuerdo_pago_cuotas_pagadas", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'"); 
+        $this->update("acuerdo_recargos_intereses", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'");  
         return ($idCierre);
         
     }

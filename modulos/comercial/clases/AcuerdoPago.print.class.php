@@ -82,7 +82,7 @@ class AcuerdoPagoPrint extends PrintPos{
             fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
             $sql="SELECT t1.*,(SELECT t2.Metodo FROM metodos_pago t2 WHERE t2.ID=t1.MetodoPago) AS NombreFormaPago,
                     (SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t3 WHERE t3.idUsuarios=t1.idUser) AS NombreUsuario
-                     FROM acuerdo_pago_cuotas_pagadas t1 WHERE t1.idAcuerdoPago='$idAcuerdo' AND t1.TipoCuota=1 ORDER BY t1.Created ASC";
+                     FROM acuerdo_pago_cuotas_pagadas t1 WHERE t1.idAcuerdoPago='$idAcuerdo' AND t1.TipoCuota=0 ORDER BY t1.Created ASC";
             $Consulta= $this->Query($sql);
             while($DatosPagos= $this->FetchAssoc($Consulta)){
                 fwrite($handle,"FECHA: ".$DatosPagos["Created"]);
@@ -97,7 +97,7 @@ class AcuerdoPagoPrint extends PrintPos{
             fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
             $sql="SELECT t1.*,(SELECT t2.Metodo FROM metodos_pago t2 WHERE t2.ID=t1.MetodoPago) AS NombreFormaPago,
                     (SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t3 WHERE t3.idUsuarios=t1.idUser) AS NombreUsuario
-                     FROM acuerdo_pago_cuotas_pagadas t1 WHERE t1.idAcuerdoPago='$idAcuerdo' AND t1.TipoCuota=2 ORDER BY t1.Created ASC";
+                     FROM acuerdo_pago_cuotas_pagadas t1 WHERE t1.idAcuerdoPago='$idAcuerdo' AND t1.TipoCuota>0 ORDER BY t1.Created ASC";
             $Consulta= $this->Query($sql);
             while($DatosPagos= $this->FetchAssoc($Consulta)){
                 fwrite($handle,"FECHA: ".$DatosPagos["Created"]);

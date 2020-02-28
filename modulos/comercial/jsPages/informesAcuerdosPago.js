@@ -1,17 +1,19 @@
-var TotalAbonoAcuerdo=0;
+
+
+document.getElementById("BtnMuestraMenuLateral").click();
 
 /**
  * Busca un acuerdo de pago
  * @returns {undefined}
  */
-function BuscarAcuerdo(){
-    var TxtBuscarAcuerdo=(document.getElementById('TxtBuscarAcuerdo').value);    
+function DibujeFormularioSegunTipoInforme(){
+    var cmbTipoInforme=(document.getElementById('cmbTipoInforme').value);    
     var form_data = new FormData();
         
-        form_data.append('Accion', 1);
-        form_data.append('TxtBuscarAcuerdo', TxtBuscarAcuerdo);
+        form_data.append('Accion', cmbTipoInforme);
+        
         $.ajax({
-        url: './Consultas/AcuerdoPago.draw.php',
+        url: './Consultas/informesAcuerdosPago.draw.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -559,3 +561,6 @@ function DibujeRecomendadosCliente(idCliente='',idDiv="DivRecomendadosExistentes
       
       
 }
+
+
+DibujeFormularioSegunTipoInforme();

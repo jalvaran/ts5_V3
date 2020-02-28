@@ -1297,6 +1297,24 @@ class PrintPos extends ProcesoVenta{
         
     }
     
+    $sql="SELECT SUM(ValorRecargoInteres) as Total FROM acuerdo_recargos_intereses WHERE idCierre='$idCierre' AND MetodoPago=1";
+    $DatosPagosAcuerdo= $this->FetchAssoc($this->Query($sql));
+    $InteresesAcuerdoEfectivo=$DatosPagosAcuerdo["Total"];
+    
+    $sql="SELECT SUM(ValorRecargoInteres) as Total FROM acuerdo_recargos_intereses WHERE idCierre='$idCierre' AND MetodoPago<>1";
+    $DatosPagosAcuerdo= $this->FetchAssoc($this->Query($sql));
+    $InteresesAcuerdoOtrosMetodos=$DatosPagosAcuerdo["Total"];
+    
+    if($InteresesAcuerdoEfectivo>0 or $InteresesAcuerdoOtrosMetodos>0){
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"INTERESES ACUERDOS EFECTIVO:  ".str_pad("$".number_format($InteresesAcuerdoEfectivo),20," ",STR_PAD_LEFT));
+        
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"INTERESES ACUERDOS NO EFECTIVO:  ".str_pad("$".number_format($InteresesAcuerdoOtrosMetodos),17," ",STR_PAD_LEFT));
+    
+        
+    }
+    
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"INTERESES SISTECREDITO  ".str_pad("$".number_format($TotalInteresesSisteCredito),17," ",STR_PAD_LEFT));
     if($TotalAnticiposRecibidos>0){
@@ -1333,12 +1351,12 @@ class PrintPos extends ProcesoVenta{
     }
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"TOTAL ENTREGA        ".str_pad("$".number_format($DatosCierre["TotalEntrega"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$AbonosAcuerdoOtrosMetodos+$TotalFacturasNegativas),20," ",STR_PAD_LEFT));
+    fwrite($handle,"TOTAL ENTREGA        ".str_pad("$".number_format($DatosCierre["TotalEntrega"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$AbonosAcuerdoOtrosMetodos+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos),20," ",STR_PAD_LEFT));
     
     
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"SALDO EN CAJA        ".str_pad("$".number_format($DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$TotalFacturasNegativas),20," ",STR_PAD_LEFT));
+    fwrite($handle,"SALDO EN CAJA        ".str_pad("$".number_format($DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos),20," ",STR_PAD_LEFT));
     
     $this->SeparadorHorizontal($handle, "_", 37);
 

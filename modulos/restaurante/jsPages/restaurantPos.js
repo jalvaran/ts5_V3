@@ -890,6 +890,8 @@ function FormularioCerrarTurno(){
 
 
 function CerrarTurno(){
+    var idBoton="BntModalPOS";
+    document.getElementById(idBoton).disabled=true;
     
     var idDivMensajes='DivFrmPOS';
     var EfectivoEnCaja=document.getElementById("EfectivoEnCaja").value; 
@@ -914,18 +916,22 @@ function CerrarTurno(){
             if(respuestas[0]=="OK"){
                 
                 alertify.success(respuestas[1]);                
-                
+                document.getElementById(idBoton).disabled=false;
+    
                 CierraModal('ModalAccionesPOS');
             }else if(respuestas[0]=="E1"){
                 alertify.error(respuestas[1],0);
                 MarqueErrorElemento(respuestas[2]);
+                document.getElementById(idBoton).disabled=false;
             }else{
                 document.getElementById(idDivMensajes).innerHTML=data;
+                document.getElementById(idBoton).disabled=false;
                 
             }
                        
         },
         error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;
             alert(xhr.status);
             alert(thrownError);
           }

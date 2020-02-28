@@ -32,6 +32,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdo"]);
             $MetodoPago=$obCon->normalizar($_REQUEST["CmbMetodoPagoAbonoAcuerdo"]);
             $ValorAbono=$obCon->normalizar($_REQUEST["TxtValorAbonoAcuerdoExistente"]);
+            $RecargosIntereses=$obCon->normalizar($_REQUEST["TxtRecargosIntereses"]);
             
             if($idAcuerdo==''){
                 exit("E1;No se recibió el id del acuerdo");
@@ -39,8 +40,14 @@ if( !empty($_REQUEST["Accion"]) ){
             if($MetodoPago==''){
                 exit("E1;No se recibió un metodo de pago");
             }
-            if(!is_numeric($ValorAbono) or $ValorAbono<=0){
+            if(!is_numeric($ValorAbono) or $ValorAbono<0){
                 exit("E1;El valor del abono debe ser un numero mayor a cero");
+            }
+            if(!is_numeric($RecargosIntereses) or $RecargosIntereses<0){
+                exit("E1;El valor de los recargos o intereses debe ser un numero positivo");
+            }
+            if($RecargosIntereses==0 and $ValorAbono==0){
+                exit("E1;El valor de los abonos y de los intereses es cero");
             }
             if(isset($_REQUEST["idEmpresa"])){
                 $idEmpresa=$_REQUEST["idEmpresa"];
@@ -57,11 +64,9 @@ if( !empty($_REQUEST["Accion"]) ){
             }else{
                 $idCentroCostos=1;
             }
-            $obCon->AbonarAcuerdoPago($idAcuerdo,$MetodoPago,$ValorAbono,$idUser);
-            $sql="UPDATE acuerdo_pago SET TotalAbonos=(TotalAbonos+$ValorAbono),SaldoFinal=(SaldoInicial-TotalAbonos) WHERE idAcuerdoPago='$idAcuerdo'";
-            $obCon->Query($sql);
             
             $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
+            
             if($MetodoPago==1){
                 $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 10); //Efectivo
                 $CuentaDestino=$Parametros["CuentaPUC"];
@@ -69,6 +74,27 @@ if( !empty($_REQUEST["Accion"]) ){
             }elseif($MetodoPago==2 or $MetodoPago==3){
                 $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 17); //Bancos
                 $CuentaDestino=$Parametros["CuentaPUC"];
+            }elseif($MetodoPago==10){
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 36); //Saldo a Favor de un cliente
+                $CuentaDestino=$Parametros["CuentaPUC"];
+                
+                $CuentaPUCSaldoFavor=$Parametros["CuentaPUC"];
+                $sql="SELECT SUM(Debito-Credito) as Saldo  FROM librodiario WHERE Tercero_Identificacion='$Tercero' AND CuentaPUC='$CuentaPUCSaldoFavor'";
+                $Totales=$obCon->FetchAssoc($obCon->Query($sql));
+                $SaldoAFavor=$Totales["Saldo"]*(-1);
+                if($SaldoAFavor<$ValorAbono){
+                    exit("E1;El Saldo a Favor del cliente es menor al Valor del Abono");
+                }
+            }elseif($MetodoPago==11){
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 35); //Anticipos de un cliente
+                $CuentaDestino=$Parametros["CuentaPUC"];    
+                $CuentaPUCSaldoFavor=$Parametros["CuentaPUC"];
+                $sql="SELECT SUM(Debito-Credito) as Saldo  FROM librodiario WHERE Tercero_Identificacion='$Tercero' AND CuentaPUC='$CuentaPUCSaldoFavor'";
+                $Totales=$obCon->FetchAssoc($obCon->Query($sql));
+                $TotalAnticipos=$Totales["Saldo"]*(-1);
+                if($TotalAnticipos<$ValorAbono){
+                    exit("E1;Los Anticipos del cliente Son menores al Valor del Abono");
+                }   
             }else{
                 $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 30); //Otras formas de pago
                 $CuentaDestino=$Parametros["CuentaPUC"];
@@ -77,9 +103,25 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $Tercero=$DatosAcuerdo["Tercero"];
             $Fecha=date("Y-m-d");
-            $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6); //Contrapartida del comprobante de ingreso aqui se aloja la cuenta de clientes
-            $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAbono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdo", "CERRADO");
-            $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
+            if($ValorAbono>0){
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6); //Contrapartida del comprobante de ingreso aqui se aloja la cuenta de clientes
+                $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAbono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdo", "CERRADO");
+                $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
+
+                $obCon->AbonarAcuerdoPago($idAcuerdo,$MetodoPago,$ValorAbono,$idUser);
+
+                $sql="UPDATE acuerdo_pago SET TotalAbonos=(TotalAbonos+$ValorAbono),SaldoFinal=(SaldoInicial-TotalAbonos) WHERE idAcuerdoPago='$idAcuerdo'";
+                $obCon->Query($sql);
+            }
+            
+            if($RecargosIntereses>0){
+                $idInteres=$obCon->InteresesAcuerdoPagos($idAcuerdo, $RecargosIntereses, $MetodoPago, $idUser);
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 38); //ingresos no operacionales por recargos o intereses
+                $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $RecargosIntereses, "RecargoInteresAcuerdoPago", "Ingreso por Interes o Recargo de Pago $idAcuerdo", "CERRADO");
+                $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
+
+            }
+            
             $obPrint->PrintAcuerdoPago($idAcuerdo, 1, 0);
             print("OK;Pago Ingresado");
         break; //fin caso 2
@@ -106,21 +148,30 @@ if( !empty($_REQUEST["Accion"]) ){
             $ValorAbono=$obCon->normalizar($_REQUEST["ValorAbono"]);
             $MetodoPago=$obCon->normalizar($_REQUEST["MetodoPago"]);
             $TotalAbono=$obCon->normalizar($_REQUEST["TotalAbono"]);
-            if(!is_numeric($ValorAbono) or $ValorAbono<=0){
+            $RecargosIntereses=$obCon->normalizar($_REQUEST["TxtRecargosIntereses"]);
+            if(!is_numeric($ValorAbono) or $ValorAbono<0){
                 exit("E1;El valor del abono debe ser un numero mayor a cero");
             }
             if(!is_numeric($TotalAbono) or $TotalAbono<=0){
                 exit("E1;El Total del abono debe ser un numero mayor a Cero");
             }
+            if(!is_numeric($RecargosIntereses) or $RecargosIntereses<0){
+                exit("E1;El valor del recargo o interes debe ser un numero positivo");
+            }
+            if($RecargosIntereses==0 AND $ValorAbono==0){
+                exit("E1;Los intereses y Abonos están en cero");
+            }
+            
             if($ValorAbono > $TotalAbono){
                 exit("E1;El Valor del Abono no puede ser mayor al Total del Abono");
             }
+            
             if($MetodoPago==''){
                 exit("E1;No se recibió el metodo de pago");
             }
             $DatosCuota=$obCon->DevuelveValores("acuerdo_pago_proyeccion_pagos", "ID", $idCuota);
             $idAcuerdo=$DatosCuota["idAcuerdoPago"];
-            $obCon->AbonarCuotaAcuerdo($idCuota, $ValorAbono, $MetodoPago, $idUser);
+            
             
             if(isset($_REQUEST["idEmpresa"])){
                 $idEmpresa=$_REQUEST["idEmpresa"];
@@ -138,8 +189,6 @@ if( !empty($_REQUEST["Accion"]) ){
                 $idCentroCostos=1;
             }
             
-            $sql="UPDATE acuerdo_pago SET TotalAbonos=(TotalAbonos+$ValorAbono),SaldoFinal=(SaldoInicial-TotalAbonos) WHERE idAcuerdoPago='$idAcuerdo'";
-            $obCon->Query($sql);
             
             $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
             if($DatosAcuerdo["SaldoFinal"]<=0){
@@ -152,18 +201,51 @@ if( !empty($_REQUEST["Accion"]) ){
             }elseif($MetodoPago==2 or $MetodoPago==3){
                 $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 17); //Bancos
                 $CuentaDestino=$Parametros["CuentaPUC"];
+                
+            }elseif($MetodoPago==10){
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 36); //Saldo a Favor de un cliente
+                $CuentaDestino=$Parametros["CuentaPUC"];
+                
+                $CuentaPUCSaldoFavor=$Parametros["CuentaPUC"];
+                $sql="SELECT SUM(Debito-Credito) as Saldo  FROM librodiario WHERE Tercero_Identificacion='$Tercero' AND CuentaPUC='$CuentaPUCSaldoFavor'";
+                $Totales=$obCon->FetchAssoc($obCon->Query($sql));
+                $SaldoAFavor=$Totales["Saldo"]*(-1);
+                if($SaldoAFavor<$ValorAbono){
+                    exit("E1;El Saldo a Favor del cliente es menor al Valor del Abono");
+                }
+            }elseif($MetodoPago==11){
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 35); //Anticipos de un cliente
+                $CuentaDestino=$Parametros["CuentaPUC"];    
+                $CuentaPUCSaldoFavor=$Parametros["CuentaPUC"];
+                $sql="SELECT SUM(Debito-Credito) as Saldo  FROM librodiario WHERE Tercero_Identificacion='$Tercero' AND CuentaPUC='$CuentaPUCSaldoFavor'";
+                $Totales=$obCon->FetchAssoc($obCon->Query($sql));
+                $TotalAnticipos=$Totales["Saldo"]*(-1);
+                if($TotalAnticipos<$ValorAbono){
+                    exit("E1;Los Anticipos del cliente Son menores al Valor del Abono");
+                }
             }else{
                 $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 30); //Otras formas de pago
                 $CuentaDestino=$Parametros["CuentaPUC"];
             }
-            
-            
             $Tercero=$DatosAcuerdo["Tercero"];
             $Fecha=date("Y-m-d");
-            $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6); //Contrapartida del comprobante de ingreso aqui se aloja la cuenta de clientes
-            $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAbono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdo", "CERRADO");
-            $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
-            $obPrint->PrintAcuerdoPago($idAcuerdo, 1, 0);
+            if($ValorAbono>0){
+                $obCon->AbonarCuotaAcuerdo($idCuota, $ValorAbono, $MetodoPago, $idUser);
+                $sql="UPDATE acuerdo_pago SET TotalAbonos=(TotalAbonos+$ValorAbono),SaldoFinal=(SaldoInicial-TotalAbonos) WHERE idAcuerdoPago='$idAcuerdo'";
+                $obCon->Query($sql);
+
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6); //Contrapartida del comprobante de ingreso aqui se aloja la cuenta de clientes
+                $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAbono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdo", "CERRADO");
+                $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
+                $obPrint->PrintAcuerdoPago($idAcuerdo, 1, 0);
+            }
+            if($RecargosIntereses>0){
+                $idInteres=$obCon->InteresesAcuerdoPagos($idAcuerdo, $RecargosIntereses, $MetodoPago, $idUser);
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 38); //ingresos no operacionales por recargos o intereses
+                $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $RecargosIntereses, "RecargoInteresAcuerdoPago", "Ingreso por Interes o Recargo de Pago $idAcuerdo", "CERRADO");
+                $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
+
+            }
             
             print("OK;Abono Registrado");
         break;//FIn caso 4    

@@ -376,3 +376,96 @@ INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `S
 INSERT INTO `parametros_contables` (`ID`, `Descripcion`, `CuentaPUC`, `NombreCuenta`, `Updated`, `Sync`) VALUES
 (37,	'Cuenta para Contabilizar un ingreso no operacional',	47057001,	'INGRESOS NO OPERACIONALES POR DEVOLUCIONES EN POS',	'2019-01-13 09:12:55',	'2019-01-13 09:12:55');
 
+INSERT INTO `parametros_contables` (`ID`, `Descripcion`, `CuentaPUC`, `NombreCuenta`, `Updated`, `Sync`) VALUES
+(38,	'Cuenta para Contabilizar un ingreso no operacional por recargos o intereses',	47057002,	'INGRESOS NO OPERACIONALES POR RECARGOS O INTERESES',	'2019-01-13 09:12:55',	'2019-01-13 09:12:55');
+
+INSERT INTO `subcuentas` (`PUC`, `Nombre`, `Valor`, `SolicitaBase`, `Updated`, `Sync`) VALUES
+(47057001,	'INGRESOS NO OPERACIONALES POR DEVOLUCIONES EN POS',	'0',	0,	'2019-04-24 15:48:18',	'2019-04-24 15:48:18');
+
+
+INSERT INTO `subcuentas` (`PUC`, `Nombre`, `Valor`, `SolicitaBase`, `Updated`, `Sync`) VALUES
+(47057002,	'INGRESOS NO OPERACIONALES POR RECARGOS O INTERESES',	'0',	0,	'2019-04-24 15:48:18',	'2019-04-24 15:48:18');
+
+
+INSERT INTO `subcuentas` (`PUC`, `Nombre`, `Valor`, `SolicitaBase`, `Updated`, `Sync`) VALUES
+(28050503,	'SALDO A FAVOR DE CLIENTES POR DEVOLUCIONES',	'0',	0,	'2019-04-24 15:48:18',	'2019-04-24 15:48:18');
+
+INSERT INTO `subcuentas` (`PUC`, `Nombre`, `Valor`, `SolicitaBase`, `Updated`, `Sync`) VALUES
+(28050501,	'ANTICIPOS REALIZADOS POR CLIENTES EN SEPARADOS',	'0',	0,	'2019-04-24 15:48:18',	'2019-04-24 15:48:18');
+
+
+INSERT INTO `subcuentas` (`PUC`, `Nombre`, `Valor`, `SolicitaBase`, `Updated`, `Sync`) VALUES
+(28050502,	'ANTICIPOS REALIZADOS POR CLIENTES EN ENCARGOS',	'0',	0,	'2019-04-24 15:48:18',	'2019-04-24 15:48:18');
+
+
+CREATE TABLE `restaurante_estados_pedidos` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NombreEstado` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `restaurante_estados_pedidos` (`ID`, `NombreEstado`, `Updated`, `Sync`) VALUES
+(1,	'ABIERTO',	'2020-02-22 19:56:37',	'0000-00-00 00:00:00'),
+(2,	'CERRADO',	'2020-02-22 19:56:37',	'0000-00-00 00:00:00'),
+(3,	'RE ABIERTO',	'2020-02-22 19:56:37',	'0000-00-00 00:00:00'),
+(4,	'PREPARADO',	'2020-02-22 19:56:37',	'0000-00-00 00:00:00'),
+(5,	'ENVIADO',	'2020-02-22 19:56:37',	'0000-00-00 00:00:00'),
+(6,	'ENTREGADO',	'2020-02-22 19:56:37',	'0000-00-00 00:00:00'),
+(7,	'ANULADO',	'2020-02-22 19:56:37',	'0000-00-00 00:00:00');
+
+CREATE TABLE `restaurante_tipos_pedido` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `restaurante_tipos_pedido` (`ID`, `Nombre`, `Updated`, `Sync`) VALUES
+(1,	'MESAS',	'2020-02-22 19:56:37',	'0000-00-00 00:00:00'),
+(2,	'DOMICILIO',	'2020-02-22 19:56:37',	'0000-00-00 00:00:00'),
+(3,	'LLEVAR',	'2020-02-22 19:56:37',	'0000-00-00 00:00:00'),
+(4,	'BARRA',	'2020-02-22 19:56:37',	'0000-00-00 00:00:00');
+
+CREATE TABLE `factura_compra_notas_devolucion` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `Tercero` bigint(20) NOT NULL,
+  `Concepto` text COLLATE utf8_spanish_ci NOT NULL,
+  `idCentroCostos` int(11) NOT NULL,
+  `idSucursal` int(11) NOT NULL,
+  `idUser` bigint(20) NOT NULL,
+  `Estado` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `restaurante_registro_propinas` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `Hora` time NOT NULL,
+  `idFactura` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `idColaborador` int(11) NOT NULL,
+  `Efectivo` double NOT NULL,
+  `Tarjetas` double NOT NULL,
+  `idCierre` bigint(20) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+INSERT INTO `menu_pestanas` (`ID`, `Nombre`, `idMenu`, `Orden`, `Estado`, `Updated`, `Sync`) VALUES
+(52,	'Acuerdos de pago',	2,	4,	CONV('1', 2, 10) + 0,	'2019-01-13 09:12:43',	'2019-01-13 09:12:43');
+
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+(197,	'Listados de Cartera',	52,	8,	0,	'acuerdos_pago',	1,	'onclick=\"SeleccioneTablaDB(`acuerdos_pago`)\";',	'informesAcuerdosPago.php',	'_SELF',	1,	'informes5.png',	1,	'2019-01-13 09:12:44',	'2018-01-13 09:12:44'),
+(196,	'Panel de Administracion',	52,	8,	0,	'acuerdos_pago',	1,	'onclick=\"SeleccioneTablaDB(`acuerdos_pago`)\";',	'adminAcuerdosPago.php',	'_SELF',	1,	'acuerdo.png',	1,	'2019-01-13 09:12:44',	'2018-01-13 09:12:44');
+
+
+
+
