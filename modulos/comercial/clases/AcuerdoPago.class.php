@@ -260,8 +260,8 @@ class AcuerdoPago extends ProcesoVenta{
         if($VariablesAcuerdo["idAcuerdoPago"]==''){
             exit("E4;No se recibió un id para el acuerdo de pago");            
         }
-        if($VariablesAcuerdo["SaldoActualAcuerdoPago"]==''){
-            exit("E4;No se recibió un el saldo actual del cliente");            
+        if(!isset($VariablesAcuerdo["SaldoActualAcuerdoPago"])){
+            exit("E4;No se recibió el saldo actual del cliente");            
         }
         if($VariablesAcuerdo["NuevoSaldoAcuerdoPago"]==''){
             exit("E4;No se recibió un el nuevo saldo del cliente");            

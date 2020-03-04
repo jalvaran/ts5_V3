@@ -466,6 +466,7 @@ INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`,
 (197,	'Listados de Cartera',	52,	8,	0,	'acuerdos_pago',	1,	'onclick=\"SeleccioneTablaDB(`acuerdos_pago`)\";',	'informesAcuerdosPago.php',	'_SELF',	1,	'informes5.png',	1,	'2019-01-13 09:12:44',	'2018-01-13 09:12:44'),
 (196,	'Panel de Administracion',	52,	8,	0,	'acuerdos_pago',	1,	'onclick=\"SeleccioneTablaDB(`acuerdos_pago`)\";',	'adminAcuerdosPago.php',	'_SELF',	1,	'acuerdo.png',	1,	'2019-01-13 09:12:44',	'2018-01-13 09:12:44');
 
-
+INSERT INTO `configuracion_tablas_acciones_adicionales` (`ID`, `TablaDB`, `JavaScript`, `ClaseIcono`, `Titulo`, `Ruta`, `Target`, `Updated`, `Sync`) VALUES
+('',	'vista_documentos_contables',	'onclick=AbrirDocumento',	'fa fa-fw fa-history',	'Abrir',	'#',	'_SELF',	'2020-03-01 10:33:56',	'2019-04-07 08:23:24');
 
 

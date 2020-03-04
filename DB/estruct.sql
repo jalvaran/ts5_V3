@@ -127,7 +127,7 @@ CREATE TABLE `acueducto_lecturas` (
 
 CREATE TABLE `acuerdo_pago` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'identificador unico de un acuerdo de pago',
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Fecha` date NOT NULL COMMENT 'Fecha del acuerdo',
   `FechaInicialParaPagos` date NOT NULL COMMENT 'Fecha donde se inicia a pagar el credito',
   `Tercero` bigint(20) NOT NULL COMMENT 'NIT del tercero con el cual se realiza el acuerdo de pago',
@@ -142,6 +142,8 @@ CREATE TABLE `acuerdo_pago` (
   `Estado` int(11) NOT NULL COMMENT 'Estado en el que se encuentra el documento, relacionado con la tabla acuerdo_pago_estados',
   `idUser` int(11) NOT NULL COMMENT 'usuario que lo crea',
   `Created` datetime NOT NULL COMMENT 'Fecha de creacion del registro',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`),
   KEY `Tercero` (`Tercero`),
   KEY `CicloPagos` (`CicloPagos`),
@@ -155,6 +157,8 @@ CREATE TABLE `acuerdo_pago_ciclos_pagos` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `NombreCiclo` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `NumeroDias` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
@@ -170,12 +174,22 @@ CREATE TABLE `acuerdo_pago_cuotas_pagadas` (
   `idUser` int(11) NOT NULL COMMENT 'usuario que recibe la cuota',
   `idCierre` bigint(20) NOT NULL COMMENT 'id del cierre donde se suma el abono del cliente, relaciona con la tabla cajas_aperturas_cierres',
   `Created` datetime NOT NULL COMMENT 'Fecha en que se crea el registro',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`),
   KEY `idCierre` (`idCierre`),
   KEY `idUser` (`idUser`),
   KEY `NumeroCuota` (`NumeroCuota`),
   KEY `TipoCuota` (`TipoCuota`),
   KEY `MetodoPago` (`MetodoPago`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_cuotas_pagadas_estados` (
+  `ID` int(11) NOT NULL,
+  `NombreEstado` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
@@ -187,9 +201,12 @@ CREATE TABLE `acuerdo_pago_cuotas_pagadas_temp` (
   `FechaPago` date NOT NULL COMMENT 'Fecha del pago',
   `ValorPago` double NOT NULL COMMENT 'Valor que paga el cliente',
   `MetodoPago` int(11) NOT NULL COMMENT 'Relacion con la tabla metodos_pago, efectivo, tarjetas, cheques, bonos etc',
+  `Estado` int(11) NOT NULL,
   `idUser` int(11) NOT NULL COMMENT 'usuario que recibe la cuota',
   `idCierre` bigint(20) NOT NULL COMMENT 'id del cierre donde se suma el abono del cliente, relaciona con la tabla cajas_aperturas_cierres',
   `Created` datetime NOT NULL COMMENT 'Fecha en que se crea el registro',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`),
   KEY `idCierre` (`idCierre`),
   KEY `idUser` (`idUser`),
@@ -204,6 +221,55 @@ CREATE TABLE `acuerdo_pago_estados` (
   `NombreEstado` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'Nombre del estado',
   `Observaciones` tinytext COLLATE utf8_spanish_ci NOT NULL COMMENT 'Observaciones del estado, aplicacion, cuando aplica',
   `Created` datetime NOT NULL COMMENT 'Fecha de creacion del registro',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_hoja_trabajo_informes` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `ConsecutivoAcuerdo` bigint(20) NOT NULL DEFAULT '0',
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'id del acuerdo de pago',
+  `TipoCuota` int(11) NOT NULL COMMENT 'Tipo de cuota, 1 cuota programable, 2 Cuota Normal',
+  `NumeroCuota` int(11) NOT NULL COMMENT 'Numero de Cuota',
+  `Fecha` date NOT NULL COMMENT 'Fecha proyectada para pago',
+  `ValorCuota` double NOT NULL COMMENT 'Valor de la cuota',
+  `ValorPagado` double NOT NULL,
+  `idPago` bigint(20) NOT NULL,
+  `EstadoProyeccion` int(11) NOT NULL COMMENT '0 sin pagar, 1 pago parcial, 2 pago completo',
+  `NombreEstadoProyeccion` varchar(20) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `NombreTipoCuota` varchar(15) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `Tercero` bigint(20) NOT NULL COMMENT 'NIT del tercero con el cual se realiza el acuerdo de pago',
+  `RazonSocial` varchar(100) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `idClienteAcuerdo` bigint(11) DEFAULT NULL,
+  `DireccionCliente` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `TelefonoCliente` varchar(100) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `SobreNombreCliente` varchar(90) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `ValorCuotaGeneral` double NOT NULL COMMENT 'Valor de la cuota que se elige al crear un acuerdo de pago',
+  `CicloPagos` int(11) NOT NULL COMMENT 'Ciclo de pagos, proviene de la tabla acuerdo_pago_ciclos_pagos, normalmente sera semanal, quincenal o mensual',
+  `NombreCicloPago` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `SaldoAnterior` double(17,0) NOT NULL,
+  `SaldoInicial` double(17,0) NOT NULL,
+  `TotalAbonos` double NOT NULL COMMENT 'Registra el total de abonos realizados al documento',
+  `SaldoFinal` double(17,0) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `ConsecutivoAcuerdo` (`ConsecutivoAcuerdo`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`),
+  KEY `TipoCuota` (`TipoCuota`),
+  KEY `NumeroCuota` (`NumeroCuota`),
+  KEY `EstadoProyeccion` (`EstadoProyeccion`),
+  KEY `Tercero` (`Tercero`),
+  KEY `CicloPagos` (`CicloPagos`),
+  KEY `TelefonoCliente` (`TelefonoCliente`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_proyeccion_estados` (
+  `ID` int(11) NOT NULL,
+  `NombreEstado` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
@@ -215,12 +281,17 @@ CREATE TABLE `acuerdo_pago_proyeccion_pagos` (
   `NumeroCuota` int(11) NOT NULL COMMENT 'Numero de Cuota',
   `Fecha` date NOT NULL COMMENT 'Fecha proyectada para pago',
   `ValorCuota` double NOT NULL COMMENT 'Valor de la cuota',
+  `ValorPagado` double NOT NULL,
+  `idPago` bigint(20) NOT NULL,
   `Estado` int(11) NOT NULL COMMENT '0 sin pagar, 1 pago parcial, 2 pago completo',
   `idUser` int(11) NOT NULL COMMENT 'usuario creador',
   `Created` datetime NOT NULL COMMENT 'Fecha y hora del registro',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`),
   KEY `idAcuerdoPago` (`idAcuerdoPago`),
-  KEY `Estado` (`Estado`)
+  KEY `Estado` (`Estado`),
+  KEY `idPago` (`idPago`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
@@ -234,9 +305,38 @@ CREATE TABLE `acuerdo_pago_proyeccion_pagos_temp` (
   `Estado` int(11) NOT NULL COMMENT '0 sin pagar, 1 pago parcial, 2 pago completo',
   `idUser` int(11) NOT NULL,
   `Created` datetime NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`),
   KEY `idAcuerdoPago` (`idAcuerdoPago`),
   KEY `Estado` (`Estado`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_tipo_cuota` (
+  `ID` int(11) NOT NULL,
+  `NombreTipoCuota` varchar(15) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_recargos_intereses` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'id unico del acuerdo de pago',
+  `FechaPago` date NOT NULL COMMENT 'Fecha del pago',
+  `ValorRecargoInteres` double NOT NULL COMMENT 'Valor que paga el cliente',
+  `MetodoPago` int(11) NOT NULL COMMENT 'Relacion con la tabla metodos_pago, efectivo, tarjetas, cheques, bonos etc',
+  `idUser` int(11) NOT NULL COMMENT 'usuario que recibe la cuota',
+  `idCierre` bigint(20) NOT NULL COMMENT 'id del cierre donde se suma el abono del cliente, relaciona con la tabla cajas_aperturas_cierres',
+  `Created` datetime NOT NULL COMMENT 'Fecha en que se crea el registro',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idCierre` (`idCierre`),
+  KEY `idUser` (`idUser`),
+  KEY `MetodoPago` (`MetodoPago`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
@@ -449,12 +549,48 @@ CREATE TABLE `clientes` (
   `CIUU` int(11) NOT NULL,
   `TipoOrganizacion` int(11) NOT NULL COMMENT '1 juridico, 2 natural',
   `Cupo` double NOT NULL,
+  `Plazo` int(5) unsigned NOT NULL,
   `CodigoTarjeta` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
   `Soporte` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`idClientes`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `clientes_datos_adicionales` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idCliente` bigint(20) NOT NULL,
+  `SobreNombre` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
+  `LugarTrabajo` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `Cargo` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
+  `DireccionTrabajo` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `TelefonoTrabajo` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `Facebook` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `Instagram` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idCliente` (`idCliente`),
+  KEY `SobreNombre` (`SobreNombre`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `clientes_recomendados` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idCliente` bigint(20) NOT NULL,
+  `NombreRecomendado` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `DireccionRecomendado` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `TelefonoRecomendado` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `DireccionTrabajoRecomendado` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `TelefonoTrabajoRecomendado` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idCliente` (`idCliente`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
 CREATE TABLE `cod_departamentos` (
@@ -1522,6 +1658,24 @@ CREATE TABLE `empresapro_resoluciones_facturacion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
+CREATE TABLE `empresa_cargos` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NombreCargo` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `empresa_nombres_procesos` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NombreProceso` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
 CREATE TABLE `empresa_pro_sucursales` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -1605,6 +1759,26 @@ CREATE TABLE `facturas` (
   KEY `TipoFactura` (`TipoFactura`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+DELIMITER ;;
+
+CREATE TRIGGER `InsertFacturaOri` AFTER INSERT ON `facturas` FOR EACH ROW
+BEGIN
+
+INSERT INTO ori_facturas SELECT * FROM facturas WHERE idFacturas=New.idFacturas;
+
+
+END;;
+
+CREATE TRIGGER `Actualiza_OriFacturas` AFTER UPDATE ON `facturas` FOR EACH ROW
+BEGIN
+
+REPLACE INTO ori_facturas SELECT * FROM facturas WHERE idFacturas=New.idFacturas;
+
+
+END;;
+
+DELIMITER ;
 
 CREATE TABLE `facturas_abonos` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -1819,6 +1993,17 @@ CREATE TABLE `facturas_items` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
+DELIMITER ;;
+
+CREATE TRIGGER `InsertFacturasItems` AFTER INSERT ON `facturas_items` FOR EACH ROW
+BEGIN
+
+INSERT INTO ori_facturas_items SELECT * FROM facturas_items WHERE ID=New.ID;
+
+END;;
+
+DELIMITER ;
+
 CREATE TABLE `facturas_kardex` (
   `idFacturas` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `CuentaDestino` bigint(20) NOT NULL,
@@ -1880,6 +2065,46 @@ CREATE TABLE `facturas_reten_aplicadas` (
   PRIMARY KEY (`idFacturasRetAplicadas`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
+
+DELIMITER ;;
+
+CREATE TRIGGER `ActualizaSaldoFact` AFTER INSERT ON `facturas_reten_aplicadas` FOR EACH ROW
+BEGIN
+
+SELECT SaldoFact into @SaldoAnt FROM facturas WHERE idFacturas=NEW.Facturas_idFacturas;
+
+SET @Saldo=@SaldoAnt-NEW.Monto;
+
+UPDATE facturas SET SaldoFact=@Saldo WHERE idFacturas=NEW.Facturas_idFacturas;
+
+
+END;;
+
+CREATE TRIGGER `ActualizaSaldoFactUpdate` AFTER UPDATE ON `facturas_reten_aplicadas` FOR EACH ROW
+BEGIN
+
+SELECT SaldoFact into @SaldoAnt FROM facturas WHERE idFacturas=NEW.Facturas_idFacturas;
+
+SET @Saldo=@SaldoAnt+(OLD.Monto-NEW.Monto);
+
+UPDATE facturas SET SaldoFact=@Saldo WHERE idFacturas=NEW.Facturas_idFacturas;
+
+
+END;;
+
+CREATE TRIGGER `ActualizaSaldoFactDel` BEFORE DELETE ON `facturas_reten_aplicadas` FOR EACH ROW
+BEGIN
+
+SELECT SaldoFact into @SaldoAnt FROM facturas WHERE idFacturas=OLD.Facturas_idFacturas;
+
+SET @Saldo=@SaldoAnt+OLD.Monto;
+
+UPDATE facturas SET SaldoFact=@Saldo WHERE idFacturas=OLD.Facturas_idFacturas;
+
+
+END;;
+
+DELIMITER ;
 
 CREATE TABLE `facturas_tipo_pago` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -2498,6 +2723,8 @@ CREATE TABLE `metodos_pago` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Metodo` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
   `Estado` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
@@ -3267,6 +3494,31 @@ CREATE TABLE `productosventa` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
+DELIMITER ;;
+
+CREATE TRIGGER `insKardex` AFTER INSERT ON `productosventa` FOR EACH ROW
+BEGIN
+
+SET @fecha=CURDATE();
+    INSERT INTO kardexmercancias (`Fecha`, `Movimiento`, `Detalle`, `Cantidad`,`ValorUnitario`, `ValorTotal`, `ProductosVenta_idProductosVenta`) VALUES (@fecha,'ENTRADA','INICIO',NEW.Existencias,NEW.CostoUnitario,NEW.CostoTotal,NEW.idProductosVenta);
+    
+    INSERT INTO kardexmercancias (`Fecha`, `Movimiento`, `Detalle`, `Cantidad`,`ValorUnitario`, `ValorTotal`, `ProductosVenta_idProductosVenta`) VALUES (@fecha,'SALDOS','INICIO',NEW.Existencias,NEW.CostoUnitario,NEW.CostoTotal,NEW.idProductosVenta);
+
+SET @Dep=LPAD(NEW.Departamento,2,'0');
+
+SET @Sub1=LPAD(NEW.Sub1,2,'0');
+
+SET @id=LPAD(NEW.idProductosVenta,7,'0');
+    
+    
+SET @Codigo=CONCAT(@Dep,@Sub1,@id);
+
+INSERT INTO prod_codbarras (`CodigoBarras`,`ProductosVenta_idProductosVenta`) VALUES (@Codigo,NEW.idProductosVenta);
+
+END;;
+
+DELIMITER ;
+
 CREATE TABLE `productosventa_bodega_1` (
   `idProductosVenta` bigint(20) NOT NULL AUTO_INCREMENT,
   `CodigoBarras` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3588,6 +3840,19 @@ CREATE TABLE `prod_sinc` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
+DELIMITER ;;
+
+CREATE TRIGGER `Productos_Sinc` AFTER INSERT ON `prod_sinc` FOR EACH ROW
+BEGIN
+
+UPDATE productosventa SET PrecioVenta=NEW.PrecioVenta WHERE Referencia=NEW.Referencia AND Departamento=NEW.Departamento;
+
+UPDATE productosventa SET PrecioMayorista=NEW.PrecioMayorista WHERE Referencia=NEW.Referencia AND Departamento=NEW.Departamento;
+
+END;;
+
+DELIMITER ;
+
 CREATE TABLE `prod_sub1` (
   `idSub1` int(11) NOT NULL AUTO_INCREMENT,
   `NombreSub1` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
@@ -3675,6 +3940,7 @@ CREATE TABLE `proveedores` (
   `CIUU` int(11) NOT NULL,
   `TipoOrganizacion` int(11) NOT NULL COMMENT '1 juridico, 2 natural',
   `Cupo` double NOT NULL,
+  `Plazo` int(11) NOT NULL COMMENT 'plazo para pago de facturas',
   `CodigoTarjeta` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
   `Soporte` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -3834,6 +4100,42 @@ CREATE TABLE `relacioncompras` (
   PRIMARY KEY (`idRelacionCompras`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
+
+DELIMITER ;;
+
+CREATE TRIGGER `KardexCompras` AFTER INSERT ON `relacioncompras` FOR EACH ROW
+BEGIN
+
+
+SELECT Existencias into @Cantidad FROM productosventa WHERE idProductosVenta=NEW.ProductosVenta_idProductosVenta;
+
+
+SET @Saldo=@Cantidad+NEW.Cantidad;
+
+SET @PrecioPromedio=NEW.TotalAntesIVA;
+          
+SET @TotalSaldo=NEW.ValorUnitarioAntesIVA*@Saldo;
+
+    
+ INSERT INTO kardexmercancias (`Fecha`, `Movimiento`, `Detalle`,`idDocumento`, `Cantidad`,`ValorUnitario`, `ValorTotal`, `ProductosVenta_idProductosVenta`) VALUES (NEW.Fecha,'ENTRADA',NEW.Documento,NEW.NumDocumento,NEW.Cantidad,NEW.ValorUnitarioAntesIVA,NEW.TotalAntesIVA,NEW.ProductosVenta_idProductosVenta);
+    
+
+INSERT INTO kardexmercancias (`Fecha`, `Movimiento`, `Detalle`,`idDocumento`, `Cantidad`,`ValorUnitario`, `ValorTotal`, `ProductosVenta_idProductosVenta`) VALUES (NEW.Fecha,'SALDOS',NEW.Documento,NEW.NumDocumento,@Saldo,NEW.ValorUnitarioAntesIVA,@TotalSaldo,NEW.ProductosVenta_idProductosVenta);
+
+SELECT Existencias into @Saldoext FROM productosventa WHERE idProductosVenta = NEW.ProductosVenta_idProductosVenta;
+
+SET @Saldoext=@Saldoext+NEW.Cantidad;
+
+UPDATE productosventa SET `Existencias`= @Saldoext WHERE idProductosVenta = NEW.ProductosVenta_idProductosVenta;
+
+UPDATE productosventa SET `CostoUnitario`= NEW.ValorUnitarioAntesIVA WHERE idProductosVenta = NEW.ProductosVenta_idProductosVenta;
+
+UPDATE productosventa SET `CostoTotal`= @TotalSaldo WHERE idProductosVenta = NEW.ProductosVenta_idProductosVenta;
+
+
+END;;
+
+DELIMITER ;
 
 CREATE TABLE `remisiones` (
   `ID` int(16) NOT NULL AUTO_INCREMENT,
@@ -4006,6 +4308,8 @@ CREATE TABLE `restaurante_cierres` (
   `Fecha` date NOT NULL,
   `Hora` time NOT NULL,
   `Observaciones` text COLLATE utf8_spanish2_ci NOT NULL,
+  `EfectivoEnCaja` double NOT NULL,
+  `Diferencia` double NOT NULL,
   `idUsuario` bigint(20) NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -4015,20 +4319,26 @@ CREATE TABLE `restaurante_cierres` (
 
 CREATE TABLE `restaurante_estados_mesas` (
   `ID` int(11) NOT NULL,
-  `NombreEstado` varchar(25) COLLATE utf8_spanish_ci NOT NULL
+  `NombreEstado` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
 CREATE TABLE `restaurante_estados_pedidos` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `NombreEstado` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
 CREATE TABLE `restaurante_estados_pedidos_items` (
   `ID` int(11) NOT NULL,
-  `NombreEstado` varchar(25) COLLATE utf8_spanish_ci NOT NULL
+  `NombreEstado` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
@@ -4050,7 +4360,7 @@ CREATE TABLE `restaurante_pedidos` (
   `Hora` time NOT NULL,
   `idUsuario` bigint(20) NOT NULL,
   `idMesa` int(11) NOT NULL,
-  `Estado` varchar(4) COLLATE utf8_spanish_ci NOT NULL COMMENT '''AB'' Abierto,''FAPE'' pedido facturado, ''FADO'' domicilio facturado, ''DEPE'' pedido descartado, ''DEDO'' domicilios descartados',
+  `Estado` int(11) NOT NULL COMMENT '''AB'' Abierto,''FAPE'' pedido facturado, ''FADO'' domicilio facturado, ''DEPE'' pedido descartado, ''DEDO'' domicilios descartados',
   `Tipo` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
   `idCliente` bigint(20) NOT NULL,
   `NombreCliente` varchar(60) COLLATE utf8_spanish_ci NOT NULL,
@@ -4061,7 +4371,12 @@ CREATE TABLE `restaurante_pedidos` (
   `FechaCreacion` datetime NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`ID`),
+  KEY `idUsuario` (`idUsuario`),
+  KEY `idMesa` (`idMesa`),
+  KEY `Estado` (`Estado`),
+  KEY `Tipo` (`Tipo`),
+  KEY `idCierre` (`idCierre`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
@@ -4072,7 +4387,7 @@ CREATE TABLE `restaurante_pedidos_items` (
   `idPedido` bigint(20) NOT NULL,
   `idProducto` bigint(20) NOT NULL,
   `NombreProducto` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
-  `Cantidad` int(11) NOT NULL,
+  `Cantidad` double NOT NULL,
   `ValorUnitario` double NOT NULL,
   `Subtotal` double NOT NULL,
   `IVA` double NOT NULL,
@@ -4146,6 +4461,7 @@ CREATE TABLE `restaurante_resumen_cierre` (
   `TotalPropinas1` double NOT NULL,
   `TotalPropinas2` double NOT NULL,
   `TotalPropinas3` double NOT NULL,
+  `TotalPropinas4` double NOT NULL,
   `TotalCasa` double NOT NULL,
   `idUser` int(11) NOT NULL,
   `idCierre` bigint(20) NOT NULL,
@@ -4162,6 +4478,8 @@ CREATE TABLE `restaurante_resumen_cierre` (
 CREATE TABLE `restaurante_tipos_pedido` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
@@ -4481,6 +4799,110 @@ CREATE TABLE `terceros_cuentas_cobro` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci COMMENT='Tabla para realizar cuentas de cobro por parte de terceros';
 
 
+CREATE TABLE `tickets` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idProyecto` int(11) NOT NULL,
+  `TipoTicket` int(11) NOT NULL,
+  `idModuloProyecto` int(11) NOT NULL,
+  `Prioridad` int(11) NOT NULL,
+  `FechaApertura` datetime NOT NULL,
+  `Asunto` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `Estado` int(11) NOT NULL,
+  `idUsuarioSolicitante` int(11) NOT NULL,
+  `idUsuarioAsignado` int(11) NOT NULL,
+  `FechaActualizacion` datetime NOT NULL,
+  `idUsuarioActualiza` int(11) NOT NULL,
+  `FechaCierre` datetime NOT NULL,
+  `idUsuarioCierra` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `TipoTicket` (`TipoTicket`),
+  KEY `idProyecto` (`idProyecto`),
+  KEY `idModuloProyecto` (`idModuloProyecto`),
+  KEY `Estado` (`Estado`),
+  KEY `Asunto` (`Asunto`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `tickets_adjuntos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Ruta` varchar(300) COLLATE utf8_spanish_ci NOT NULL,
+  `NombreArchivo` varchar(300) COLLATE utf8_spanish_ci NOT NULL,
+  `Extension` varchar(15) COLLATE utf8_spanish_ci NOT NULL,
+  `Tamano` varchar(15) COLLATE utf8_spanish_ci NOT NULL,
+  `idMensaje` bigint(20) NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Created` datetime NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idMensaje` (`idMensaje`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `tickets_estados` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Estado` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `tickets_mensajes` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idTicket` bigint(20) NOT NULL,
+  `Mensaje` text COLLATE utf8_spanish_ci NOT NULL,
+  `Estado` int(11) NOT NULL,
+  `Created` datetime NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idTicket` (`idTicket`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `tickets_modulos_proyectos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idProyecto` int(11) NOT NULL,
+  `NombreModulo` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
+  `Estado` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `tickets_prioridad` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Prioridad` varchar(15) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `tickets_proyectos` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Proyecto` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Estado` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `tickets_tipo` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `TipoTicket` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
 CREATE TABLE `tiposretenciones` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
@@ -4776,6 +5198,8 @@ CREATE TABLE `usuarios` (
   `Login` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
   `Password` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
   `TipoUser` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `Cargo` int(5) unsigned zerofill NOT NULL,
+  `Proceso` int(5) unsigned zerofill NOT NULL,
   `Email` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
   `Role` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Habilitado` varchar(2) COLLATE utf8_spanish_ci NOT NULL DEFAULT 'SI',
@@ -4842,6 +5266,42 @@ CREATE TABLE `ventas` (
   PRIMARY KEY (`idVentas`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
+
+DELIMITER ;;
+
+CREATE TRIGGER `UpdateProductos` AFTER INSERT ON `ventas` FOR EACH ROW
+BEGIN
+
+
+SELECT Existencias into @Cantidad FROM productosventa WHERE idProductosVenta=NEW.Productos_idProductos;
+
+SET @PrecioPromedio=NEW.ValorCostoUnitario;
+
+SET @Saldo=@Cantidad-NEW.Cantidad;
+
+SET @TotalSaldo=@Saldo*@PrecioPromedio;
+SET @TotalMov=NEW.Cantidad*@PrecioPromedio;
+    
+ INSERT INTO kardexmercancias (`Fecha`, `Movimiento`, `Detalle`,`idDocumento`, `Cantidad`,`ValorUnitario`, `ValorTotal`, `ProductosVenta_idProductosVenta`) VALUES (NEW.Fecha,'SALIDA','VENTA',NEW.NumVenta,NEW.Cantidad,@PrecioPromedio,@TotalMov,NEW.Productos_idProductos);
+    
+
+INSERT INTO kardexmercancias (`Fecha`, `Movimiento`, `Detalle`,`idDocumento`, `Cantidad`,`ValorUnitario`, `ValorTotal`, `ProductosVenta_idProductosVenta`) VALUES (NEW.Fecha,'SALDOS','VENTA',NEW.NumVenta,@Saldo,@PrecioPromedio,@TotalSaldo,NEW.Productos_idProductos);
+
+UPDATE productosventa SET `Existencias`= @Saldo WHERE idProductosVenta = NEW.Productos_idProductos;
+
+UPDATE productosventa SET `CostoTotal`= @TotalSaldo WHERE idProductosVenta = NEW.Productos_idProductos;
+
+SET @SubTotal=NEW.TotalVenta-NEW.Impuestos;
+
+IF (NEW.Especial = "NO" ) THEN
+
+INSERT INTO cotizaciones (`NumCotizacion`, `Fecha`, `Descripcion`,`Referencia`, `ValorUnitario`,`Cantidad`, `Subtotal`, `IVA`, `Total`, `ValorDescuento`,`Clientes_idClientes`, `SubtotalCosto`,`Usuarios_idUsuarios`, `TipoItem`, `PrecioCosto`) VALUES (NEW.Cotizaciones_idCotizaciones,NEW.Fecha,NEW.Producto,NEW.Referencia,NEW.ValorVentaUnitario,NEW.Cantidad,@SubTotal,NEW.Impuestos, NEW.TotalVenta,NEW.Descuentos,NEW.Clientes_idClientes,NEW.TotalCosto,NEW.Usuarios_idUsuarios,'PR',@PrecioPromedio);
+
+END IF;
+
+END;;
+
+DELIMITER ;
 
 CREATE TABLE `ventas_devoluciones` (
   `idDevoluciones` int(16) NOT NULL AUTO_INCREMENT,
@@ -4960,7 +5420,7 @@ CREATE TABLE `vista_cuentasxcobrar` (`CuentaPUC` varchar(45), `NombreCuenta` var
 CREATE TABLE `vista_cuentasxcobrardetallado` (`ID` bigint(20), `CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `Fecha` date, `NumeroDocumentoExterno` varchar(45), `Debitos` double, `Creditos` double, `Total` double);
 
 
-CREATE TABLE `vista_cuentasxpagardetallado_v2` (`ID` bigint(20), `CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `Fecha` date, `NumeroDocumentoExterno` varchar(45), `Debitos` double, `Creditos` double, `Total` double);
+CREATE TABLE `vista_cuentasxpagardetallado_v2` (`ID` bigint(20), `CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `Fecha` date, `NumeroDocumentoExterno` varchar(45), `Debitos` double, `Creditos` double, `Total` double, `PlazoPago` date);
 
 
 CREATE TABLE `vista_cuentasxpagar_v2` (`CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `Debitos` double, `Creditos` double, `Total` double);
@@ -4975,7 +5435,7 @@ CREATE TABLE `vista_cuentasxtercerosdocumentos_v2` (`ID` bigint(20), `CuentaPUC`
 CREATE TABLE `vista_cuentasxterceros_v2` (`CuentaPUC` varchar(45), `NombreCuenta` varchar(200), `Tercero_Identificacion` varchar(45), `Tercero_Razon_Social` varchar(100), `Debitos` double, `Creditos` double, `Total` double);
 
 
-CREATE TABLE `vista_diferencia_inventarios` (`idProductosVenta` bigint(20), `Referencia` varchar(200), `Nombre` varchar(70), `ExistenciaAnterior` double, `ExistenciaActual` double, `Diferencia` double, `PrecioVenta` double, `CostoUnitario` double, `TotalCostosDiferencia` double, `Departamento` varchar(45), `Sub1` varchar(45), `Sub2` varchar(45), `Sub3` varchar(45), `Sub4` varchar(45), `Sub5` varchar(45));
+CREATE TABLE `vista_diferencia_inventarios` (`idProductosVenta` bigint(20), `Referencia` varchar(200), `Nombre` varchar(70), `ExistenciaActual` double, `ExistenciaAnterior` double, `Diferencia` double, `PrecioVenta` double, `CostoUnitario` double, `TotalCostosDiferencia` double, `Departamento` varchar(45), `Sub1` varchar(45), `Sub2` varchar(45), `Sub3` varchar(45), `Sub4` varchar(45), `Sub5` varchar(45));
 
 
 CREATE TABLE `vista_diferencia_inventarios_selectivos` (`idProductosVenta` bigint(20), `Referencia` varchar(200), `Nombre` varchar(70), `ExistenciaAnterior` double, `ExistenciaActual` double, `Diferencia` double, `PrecioVenta` double, `CostoUnitario` double, `TotalCostosDiferencia` double, `Departamento` varchar(45), `Sub1` varchar(45), `Sub2` varchar(45), `Sub3` varchar(45), `Sub4` varchar(45), `Sub5` varchar(45));
@@ -5032,10 +5492,16 @@ CREATE TABLE `vista_notas_devolucion` (`ID` bigint(20), `Fecha` date, `Tercero` 
 CREATE TABLE `vista_ori_facturas` (`Fecha` date, `idFactura` varchar(45), `Referencia` varchar(200), `Nombre` varchar(500), `Departamento` int(11), `SubGrupo1` int(11), `SubGrupo2` int(11), `SubGrupo3` int(11), `SubGrupo4` int(11), `SubGrupo5` int(11), `ValorUnitarioItem` int(11), `Cantidad` varchar(45), `Dias` varchar(45), `SubtotalItem` varchar(45), `IVAItem` varchar(45), `ValorOtrosImpuestos` double, `TotalItem` double, `PorcentajeIVA` varchar(10), `idOtrosImpuestos` int(11), `idPorcentajeIVA` int(11), `PrecioCostoUnitario` varchar(45), `SubtotalCosto` varchar(45), `TipoItem` varchar(10), `CuentaPUC` int(11), `GeneradoDesde` varchar(100), `NumeroIdentificador` varchar(45), `idUsuarios` int(11), `idCierre` bigint(20), `idResolucion` int(11), `TipoFactura` varchar(10), `Prefijo` varchar(45), `NumeroFactura` int(16), `Hora` varchar(20), `FormaPago` varchar(20), `CentroCosto` int(11), `idSucursal` int(11), `EmpresaPro_idEmpresaPro` int(11), `Clientes_idClientes` int(11), `ObservacionesFact` text);
 
 
-CREATE TABLE `vista_pedidos_restaurante` (`ID` bigint(20), `Fecha` date, `Hora` time, `Estado` varchar(4), `idMesa` int(11), `idCliente` bigint(20), `NombreCliente` varchar(60), `DireccionEnvio` varchar(100), `TelefonoConfirmacion` varchar(100), `Observaciones` text, `idCierre` bigint(20), `Subtotal` double, `IVA` double, `Total` double, `TotalCostos` double, `idUsuario` bigint(20));
+CREATE TABLE `vista_pedidos_restaurante` (`ID` bigint(20), `Fecha` date, `Hora` time, `Estado` int(11), `idMesa` int(11), `idCliente` bigint(20), `NombreCliente` varchar(60), `DireccionEnvio` varchar(100), `TelefonoConfirmacion` varchar(100), `Observaciones` text, `idCierre` bigint(20), `Subtotal` double, `IVA` double, `Total` double, `TotalCostos` double, `idUsuario` bigint(20));
+
+
+CREATE TABLE `vista_pedidos_restaurante_pos` (`ID` bigint(20), `Fecha` date, `Hora` time, `idUsuario` bigint(20), `idMesa` int(11), `Estado` int(11), `Tipo` varchar(20), `idCliente` bigint(20), `NombreCliente` varchar(60), `DireccionEnvio` varchar(100), `TelefonoConfirmacion` varchar(100), `Observaciones` text, `idCierre` bigint(20), `FechaCreacion` datetime, `Updated` timestamp, `Sync` datetime, `Total` double, `NombreEstado` varchar(25), `NombreTipoPedido` varchar(45), `NombreUsuario` varchar(91));
 
 
 CREATE TABLE `vista_preventa` (`VestasActivas_idVestasActivas` int(11), `TablaItems` varchar(14), `Referencia` varchar(200), `Nombre` varchar(70), `Departamento` varchar(45), `SubGrupo1` varchar(45), `SubGrupo2` varchar(45), `SubGrupo3` varchar(45), `SubGrupo4` varchar(45), `SubGrupo5` varchar(45), `ValorUnitarioItem` double, `Cantidad` double, `Dias` varchar(1), `SubtotalItem` double, `IVAItem` double, `ValorOtrosImpuestos` double, `TotalItem` double, `PorcentajeIVA` varchar(24), `PrecioCostoUnitario` double, `SubtotalCosto` double, `TipoItem` varchar(2), `CuentaPUC` varchar(45), `Updated` timestamp, `Sync` datetime);
+
+
+CREATE TABLE `vista_proyeccion_acuerdos_pago` (`idProyeccion` bigint(20), `ConsecutivoAcuerdo` bigint(20), `idAcuerdoPago` varchar(45), `TipoCuota` int(11), `NumeroCuota` int(11), `Fecha` date, `ValorCuota` double, `ValorPagado` double, `idPago` bigint(20), `EstadoProyeccion` int(11), `NombreEstadoProyeccion` varchar(20), `Tercero` bigint(20), `RazonSocial` varchar(100), `idClienteAcuerdo` bigint(11), `SobreNombreCliente` varchar(90), `ValorCuotaGeneral` double, `CicloPagos` int(11), `SaldoAnterior` double(17,0), `SaldoInicial` double(17,0), `TotalAbonos` double, `SaldoFinal` double(17,0));
 
 
 CREATE TABLE `vista_prueba` (
@@ -5057,6 +5523,9 @@ CREATE TABLE `vista_prueba` (
 
 
 CREATE TABLE `vista_resumen_facturacion` (`ID` bigint(20) unsigned, `FechaInicial` date, `FechaFinal` date, `Referencia` varchar(200), `idProducto` bigint(20), `Nombre` text, `Departamento` int(11), `SubGrupo1` int(11), `SubGrupo2` int(11), `SubGrupo3` int(11), `SubGrupo4` int(11), `SubGrupo5` int(11), `Cantidad` double, `TotalVenta` double(19,2), `Costo` double(19,2));
+
+
+CREATE TABLE `vista_resumen_restaurante_turno_actual` (`idProductosVenta` bigint(20), `Nombre` varchar(70), `ItemsCompras` double, `ItemsVentas` double, `TrasladosRecibidos` decimal(32,0), `TrasladosEnviados` decimal(32,0), `TotalBajas` double, `TotalAltas` double, `CantidadRecibida` double, `SaldoFinal` double, `TotalVentas` double, `TotalComisiones1` double, `TotalComisiones2` double, `TotalComisiones3` double, `TotalComisiones4` double, `TotalCasa` double);
 
 
 CREATE TABLE `vista_resumen_ventas_departamentos` (`FechaFactura` date, `Departamento` int(11), `SubGrupo1` int(11), `SubGrupo2` int(11), `SubGrupo3` int(11), `SubGrupo4` int(11), `SubGrupo5` int(11), `Total` double);
@@ -5092,6 +5561,9 @@ CREATE TABLE `vista_saldo_inicial_grupopuc` (`ID` varchar(2), `SaldoInicial` dou
 CREATE TABLE `vista_sistemas` (`ID` bigint(20), `idSistema` bigint(20), `Nombre_Sistema` mediumtext, `Observaciones` mediumtext, `TablaOrigen` varchar(90), `CodigoInterno` bigint(20), `Nombre` text, `Cantidad` double, `PrecioUnitario` double, `PrecioVenta` double(17,0), `CostoUnitario` double(17,0), `Costo_Total_Item` double(17,0), `IVA` varchar(10), `Departamento` varchar(45), `Sub1` varchar(45), `Sub2` varchar(45), `Sub3` varchar(45), `Sub4` varchar(45), `Sub5` varchar(45), `Updated` timestamp, `Sync` datetime);
 
 
+CREATE TABLE `vista_tickets` (`ID` bigint(20), `idProyecto` int(11), `TipoTicket` int(11), `idModuloProyecto` int(11), `Prioridad` int(11), `FechaApertura` datetime, `Asunto` varchar(200), `Estado` int(11), `idUsuarioSolicitante` int(11), `idUsuarioAsignado` int(11), `FechaActualizacion` datetime, `idUsuarioActualiza` int(11), `FechaCierre` datetime, `idUsuarioCierra` int(11), `NombreSolicitante` varchar(45), `ApellidoSolicitante` varchar(45), `NombreAsignado` varchar(45), `ApellidoAsignado` varchar(45), `NombreEstado` varchar(45), `NombrePrioridad` varchar(15), `NombreProyecto` varchar(45), `NombreModulo` varchar(100), `NombreTipoTicket` varchar(20));
+
+
 CREATE TABLE `vista_titulos_abonos` (`ID` bigint(20), `Fecha` date, `Hora` time, `Monto` double, `idVenta` bigint(20), `Promocion` int(11), `Mayor` int(11), `Concepto` text, `idColaborador` bigint(20), `NombreColaborador` varchar(90), `Estado` varchar(45), `idComprobanteIngreso` bigint(20), `Mayor2` int(11), `Adicional` int(11), `Valor` bigint(20), `TotalAbonos` bigint(20), `Saldo` bigint(20), `idCliente` bigint(20), `NombreCliente` varchar(90));
 
 
@@ -5114,7 +5586,7 @@ DROP TABLE IF EXISTS `vista_balancextercero1`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_balancextercero1` AS select `librodiario`.`Tercero_Identificacion` AS `Tercero_Identificacion`,`librodiario`.`Tercero_Razon_Social` AS `Tercero_Razon_Social`,`librodiario`.`CuentaPUC` AS `CuentaPUC`,sum(`librodiario`.`Debito`) AS `Debitos`,sum(`librodiario`.`Credito`) AS `Creditos`,(sum(`librodiario`.`Debito`) - sum(`librodiario`.`Credito`)) AS `Neto` from `librodiario` group by `librodiario`.`Tercero_Identificacion` order by substr(`librodiario`.`CuentaPUC`,1,8);
 
 DROP TABLE IF EXISTS `vista_balancextercero2`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_balancextercero2` AS select substr(`librodiario`.`CuentaPUC`,1,8) AS `ID`,`librodiario`.`Fecha` AS `Fecha`,`librodiario`.`Tercero_Identificacion` AS `Identificacion`,`librodiario`.`Tercero_Razon_Social` AS `Razon_Social`,`librodiario`.`CuentaPUC` AS `CuentaPUC`,`librodiario`.`NombreCuenta` AS `NombreCuenta`,`librodiario`.`Tipo_Documento_Intero` AS `TipoDocumento`,`librodiario`.`Num_Documento_Interno` AS `NumDocumento`,`librodiario`.`Num_Documento_Externo` AS `DocumentoExterno`,(select `vista_saldo_inicial_cuentapuc`.`SaldoInicial` from `vista_saldo_inicial_cuentapuc` where ((`librodiario`.`CuentaPUC` = `vista_saldo_inicial_cuentapuc`.`ID`) and (`librodiario`.`Tercero_Identificacion` = `vista_saldo_inicial_cuentapuc`.`Tercero_Identificacion`)) limit 1) AS `SaldoInicialSubCuenta`,substr(`librodiario`.`CuentaPUC`,1,1) AS `Clase`,(select `clasecuenta`.`Clase` from `clasecuenta` where (`clasecuenta`.`PUC` = substr(`librodiario`.`CuentaPUC`,1,1))) AS `NombreClase`,(select `vista_saldos_iniciales_clase`.`SaldoInicialClase` from `vista_saldos_iniciales_clase` where (`vista_saldos_iniciales_clase`.`Clase` = substr(`librodiario`.`CuentaPUC`,1,1)) limit 1) AS `SaldoInicialClase`,(select `vista_movimientos_clase`.`DebitosClase` from `vista_movimientos_clase` where (`vista_movimientos_clase`.`Clase` = substr(`librodiario`.`CuentaPUC`,1,1)) limit 1) AS `DebitosClase`,(select `vista_movimientos_clase`.`CreditosClase` from `vista_movimientos_clase` where (`vista_movimientos_clase`.`Clase` = substr(`librodiario`.`CuentaPUC`,1,1)) limit 1) AS `CreditosClase`,substr(`librodiario`.`CuentaPUC`,1,2) AS `Grupo`,(select `gupocuentas`.`Nombre` from `gupocuentas` where (`gupocuentas`.`PUC` = substr(`librodiario`.`CuentaPUC`,1,2))) AS `NombreGrupo`,(select `vista_saldos_iniciales_grupo`.`SaldoInicialGrupo` from `vista_saldos_iniciales_grupo` where (`vista_saldos_iniciales_grupo`.`Grupo` = substr(`librodiario`.`CuentaPUC`,1,2)) limit 1) AS `SaldoInicialGrupo`,(select `vista_movimientos_grupo`.`DebitosGrupo` from `vista_movimientos_grupo` where (`vista_movimientos_grupo`.`Grupo` = substr(`librodiario`.`CuentaPUC`,1,2)) limit 1) AS `DebitosGrupo`,(select `vista_movimientos_grupo`.`CreditosGrupo` from `vista_movimientos_grupo` where (`vista_movimientos_grupo`.`Grupo` = substr(`librodiario`.`CuentaPUC`,1,2)) limit 1) AS `CreditosGrupo`,substr(`librodiario`.`CuentaPUC`,1,4) AS `CuentaPadre`,(select `cuentas`.`Nombre` from `cuentas` where (`cuentas`.`idPUC` = substr(`librodiario`.`CuentaPUC`,1,4))) AS `NombreCuentaPadre`,(select `vista_saldos_iniciales_cuenta_padre`.`SaldoInicialCuentaPadre` from `vista_saldos_iniciales_cuenta_padre` where (`vista_saldos_iniciales_cuenta_padre`.`CuentaPadre` = substr(`librodiario`.`CuentaPUC`,1,4)) limit 1) AS `SaldoInicialCuentaPadre`,(select `vista_movimientos_cuenta_padre`.`DebitosCuentaPadre` from `vista_movimientos_cuenta_padre` where (`vista_movimientos_cuenta_padre`.`CuentaPadre` = substr(`librodiario`.`CuentaPUC`,1,4)) limit 1) AS `DebitosCuentaPadre`,(select `vista_movimientos_cuenta_padre`.`CreditosCuentaPadre` from `vista_movimientos_cuenta_padre` where (`vista_movimientos_cuenta_padre`.`CuentaPadre` = substr(`librodiario`.`CuentaPUC`,1,4)) limit 1) AS `CreditosCuentaPadre`,`librodiario`.`Debito` AS `Debito`,`librodiario`.`Credito` AS `Credito`,`librodiario`.`idEmpresa` AS `idEmpresa`,`librodiario`.`idCentroCosto` AS `idCentroCosto` from `librodiario` where ((`librodiario`.`Fecha` >= '2019-02-01') and (`librodiario`.`Fecha` <= '2019-09-12') and (`librodiario`.`CuentaPUC` like '1105%')) order by `librodiario`.`idLibroDiario`,substr(`librodiario`.`CuentaPUC`,1,8),`librodiario`.`CuentaPUC`,`librodiario`.`Fecha`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_balancextercero2` AS select substr(`librodiario`.`CuentaPUC`,1,8) AS `ID`,`librodiario`.`Fecha` AS `Fecha`,`librodiario`.`Tercero_Identificacion` AS `Identificacion`,`librodiario`.`Tercero_Razon_Social` AS `Razon_Social`,`librodiario`.`CuentaPUC` AS `CuentaPUC`,`librodiario`.`NombreCuenta` AS `NombreCuenta`,`librodiario`.`Tipo_Documento_Intero` AS `TipoDocumento`,`librodiario`.`Num_Documento_Interno` AS `NumDocumento`,`librodiario`.`Num_Documento_Externo` AS `DocumentoExterno`,(select `vista_saldo_inicial_cuentapuc`.`SaldoInicial` from `vista_saldo_inicial_cuentapuc` where ((`librodiario`.`CuentaPUC` = `vista_saldo_inicial_cuentapuc`.`ID`) and (`librodiario`.`Tercero_Identificacion` = `vista_saldo_inicial_cuentapuc`.`Tercero_Identificacion`)) limit 1) AS `SaldoInicialSubCuenta`,substr(`librodiario`.`CuentaPUC`,1,1) AS `Clase`,(select `clasecuenta`.`Clase` from `clasecuenta` where (`clasecuenta`.`PUC` = substr(`librodiario`.`CuentaPUC`,1,1))) AS `NombreClase`,(select `vista_saldos_iniciales_clase`.`SaldoInicialClase` from `vista_saldos_iniciales_clase` where (`vista_saldos_iniciales_clase`.`Clase` = substr(`librodiario`.`CuentaPUC`,1,1)) limit 1) AS `SaldoInicialClase`,(select `vista_movimientos_clase`.`DebitosClase` from `vista_movimientos_clase` where (`vista_movimientos_clase`.`Clase` = substr(`librodiario`.`CuentaPUC`,1,1)) limit 1) AS `DebitosClase`,(select `vista_movimientos_clase`.`CreditosClase` from `vista_movimientos_clase` where (`vista_movimientos_clase`.`Clase` = substr(`librodiario`.`CuentaPUC`,1,1)) limit 1) AS `CreditosClase`,substr(`librodiario`.`CuentaPUC`,1,2) AS `Grupo`,(select `gupocuentas`.`Nombre` from `gupocuentas` where (`gupocuentas`.`PUC` = substr(`librodiario`.`CuentaPUC`,1,2))) AS `NombreGrupo`,(select `vista_saldos_iniciales_grupo`.`SaldoInicialGrupo` from `vista_saldos_iniciales_grupo` where (`vista_saldos_iniciales_grupo`.`Grupo` = substr(`librodiario`.`CuentaPUC`,1,2)) limit 1) AS `SaldoInicialGrupo`,(select `vista_movimientos_grupo`.`DebitosGrupo` from `vista_movimientos_grupo` where (`vista_movimientos_grupo`.`Grupo` = substr(`librodiario`.`CuentaPUC`,1,2)) limit 1) AS `DebitosGrupo`,(select `vista_movimientos_grupo`.`CreditosGrupo` from `vista_movimientos_grupo` where (`vista_movimientos_grupo`.`Grupo` = substr(`librodiario`.`CuentaPUC`,1,2)) limit 1) AS `CreditosGrupo`,substr(`librodiario`.`CuentaPUC`,1,4) AS `CuentaPadre`,(select `cuentas`.`Nombre` from `cuentas` where (`cuentas`.`idPUC` = substr(`librodiario`.`CuentaPUC`,1,4))) AS `NombreCuentaPadre`,(select `vista_saldos_iniciales_cuenta_padre`.`SaldoInicialCuentaPadre` from `vista_saldos_iniciales_cuenta_padre` where (`vista_saldos_iniciales_cuenta_padre`.`CuentaPadre` = substr(`librodiario`.`CuentaPUC`,1,4)) limit 1) AS `SaldoInicialCuentaPadre`,(select `vista_movimientos_cuenta_padre`.`DebitosCuentaPadre` from `vista_movimientos_cuenta_padre` where (`vista_movimientos_cuenta_padre`.`CuentaPadre` = substr(`librodiario`.`CuentaPUC`,1,4)) limit 1) AS `DebitosCuentaPadre`,(select `vista_movimientos_cuenta_padre`.`CreditosCuentaPadre` from `vista_movimientos_cuenta_padre` where (`vista_movimientos_cuenta_padre`.`CuentaPadre` = substr(`librodiario`.`CuentaPUC`,1,4)) limit 1) AS `CreditosCuentaPadre`,`librodiario`.`Debito` AS `Debito`,`librodiario`.`Credito` AS `Credito`,`librodiario`.`idEmpresa` AS `idEmpresa`,`librodiario`.`idCentroCosto` AS `idCentroCosto` from `librodiario` where ((`librodiario`.`Fecha` >= '2020-02-28') and (`librodiario`.`Fecha` <= '2020-02-28')) order by substr(`librodiario`.`CuentaPUC`,1,8),`librodiario`.`Tercero_Identificacion`,`librodiario`.`CuentaPUC`,`librodiario`.`Fecha`;
 
 DROP TABLE IF EXISTS `vista_cierres_restaurante`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_cierres_restaurante` AS select `restaurante_cierres`.`ID` AS `ID`,`restaurante_cierres`.`Fecha` AS `Fecha`,`restaurante_cierres`.`Hora` AS `Hora`,`restaurante_cierres`.`idUsuario` AS `idUsuario`,(select sum(`restaurante_pedidos_items`.`Total`) AS `Total` from `restaurante_pedidos_items` where ((`restaurante_pedidos_items`.`idCierre` = `restaurante_cierres`.`ID`) and (`restaurante_pedidos_items`.`Estado` = 'FAPE'))) AS `PedidosFacturados`,(select sum(`restaurante_pedidos_items`.`Total`) AS `Total` from `restaurante_pedidos_items` where ((`restaurante_pedidos_items`.`idCierre` = `restaurante_cierres`.`ID`) and (`restaurante_pedidos_items`.`Estado` = 'DEPE'))) AS `PedidosDescartados`,(select sum(`restaurante_pedidos_items`.`Total`) AS `Total` from `restaurante_pedidos_items` where ((`restaurante_pedidos_items`.`idCierre` = `restaurante_cierres`.`ID`) and (`restaurante_pedidos_items`.`Estado` = 'FADO'))) AS `DomiciliosFacturados`,(select sum(`restaurante_pedidos_items`.`Total`) AS `Total` from `restaurante_pedidos_items` where ((`restaurante_pedidos_items`.`idCierre` = `restaurante_cierres`.`ID`) and (`restaurante_pedidos_items`.`Estado` = 'DEDO'))) AS `DomiciliosDescartados`,(select sum(`restaurante_pedidos_items`.`Total`) AS `Total` from `restaurante_pedidos_items` where ((`restaurante_pedidos_items`.`idCierre` = `restaurante_cierres`.`ID`) and (`restaurante_pedidos_items`.`Estado` = 'FALL'))) AS `ParaLlevarFacturado`,(select sum(`restaurante_pedidos_items`.`Total`) AS `Total` from `restaurante_pedidos_items` where ((`restaurante_pedidos_items`.`idCierre` = `restaurante_cierres`.`ID`) and (`restaurante_pedidos_items`.`Estado` = 'DELL'))) AS `ParaLlevarDescartado`,(select sum(`restaurante_registro_propinas`.`Efectivo`) AS `Total` from `restaurante_registro_propinas` where (`restaurante_registro_propinas`.`idCierre` = `restaurante_cierres`.`ID`)) AS `PropinasEfectivo`,(select sum(`restaurante_registro_propinas`.`Tarjetas`) AS `Total` from `restaurante_registro_propinas` where (`restaurante_registro_propinas`.`idCierre` = `restaurante_cierres`.`ID`)) AS `PropinasTarjetas` from `restaurante_cierres`;
@@ -5135,7 +5607,7 @@ DROP TABLE IF EXISTS `vista_cuentasxcobrardetallado`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_cuentasxcobrardetallado` AS select `t1`.`ID` AS `ID`,`t1`.`CuentaPUC` AS `CuentaPUC`,`t1`.`NombreCuenta` AS `NombreCuenta`,`t1`.`Tercero_Identificacion` AS `Tercero_Identificacion`,`t1`.`Tercero_Razon_Social` AS `Tercero_Razon_Social`,`t1`.`Fecha` AS `Fecha`,`t1`.`NumeroDocumentoExterno` AS `NumeroDocumentoExterno`,`t1`.`Debitos` AS `Debitos`,`t1`.`Creditos` AS `Creditos`,`t1`.`Total` AS `Total` from `vista_cuentasxtercerosdocumentos_v2` `t1` where ((`t1`.`Total` <> 0) and exists(select 1 from `contabilidad_parametros_cuentasxcobrar` `t2` where (`t1`.`CuentaPUC` like `t2`.`CuentaPUC`))) order by `t1`.`Fecha`;
 
 DROP TABLE IF EXISTS `vista_cuentasxpagardetallado_v2`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_cuentasxpagardetallado_v2` AS select `t1`.`ID` AS `ID`,`t1`.`CuentaPUC` AS `CuentaPUC`,`t1`.`NombreCuenta` AS `NombreCuenta`,`t1`.`Tercero_Identificacion` AS `Tercero_Identificacion`,`t1`.`Tercero_Razon_Social` AS `Tercero_Razon_Social`,`t1`.`Fecha` AS `Fecha`,`t1`.`NumeroDocumentoExterno` AS `NumeroDocumentoExterno`,`t1`.`Debitos` AS `Debitos`,`t1`.`Creditos` AS `Creditos`,`t1`.`Total` AS `Total` from `vista_cuentasxtercerosdocumentos_v2` `t1` where ((`t1`.`Total` <> 0) and exists(select 1 from `contabilidad_parametros_cuentasxpagar` `t2` where (`t1`.`CuentaPUC` like `t2`.`CuentaPUC`))) order by `t1`.`Fecha`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_cuentasxpagardetallado_v2` AS select `t1`.`ID` AS `ID`,`t1`.`CuentaPUC` AS `CuentaPUC`,`t1`.`NombreCuenta` AS `NombreCuenta`,`t1`.`Tercero_Identificacion` AS `Tercero_Identificacion`,`t1`.`Tercero_Razon_Social` AS `Tercero_Razon_Social`,`t1`.`Fecha` AS `Fecha`,`t1`.`NumeroDocumentoExterno` AS `NumeroDocumentoExterno`,`t1`.`Debitos` AS `Debitos`,`t1`.`Creditos` AS `Creditos`,`t1`.`Total` AS `Total`,(`t1`.`Fecha` + interval (select `t2`.`Plazo` from `proveedores` `t2` where (`t2`.`Num_Identificacion` = `t1`.`Tercero_Identificacion`) limit 1) day) AS `PlazoPago` from `vista_cuentasxtercerosdocumentos_v2` `t1` where (((`t1`.`Total` < -(1)) or (`t1`.`Total` > 1)) and exists(select 1 from `contabilidad_parametros_cuentasxpagar` `t2` where (`t1`.`CuentaPUC` like `t2`.`CuentaPUC`))) order by (`t1`.`Fecha` + interval (select `t2`.`Plazo` from `proveedores` `t2` where (`t2`.`Num_Identificacion` = `t1`.`Tercero_Identificacion`) limit 1) day);
 
 DROP TABLE IF EXISTS `vista_cuentasxpagar_v2`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_cuentasxpagar_v2` AS select `t1`.`CuentaPUC` AS `CuentaPUC`,`t1`.`NombreCuenta` AS `NombreCuenta`,`t1`.`Tercero_Identificacion` AS `Tercero_Identificacion`,`t1`.`Tercero_Razon_Social` AS `Tercero_Razon_Social`,`t1`.`Debitos` AS `Debitos`,`t1`.`Creditos` AS `Creditos`,`t1`.`Total` AS `Total` from `vista_cuentasxterceros_v2` `t1` where ((`t1`.`Total` <> 0) and exists(select 1 from `contabilidad_parametros_cuentasxpagar` `t2` where (`t1`.`CuentaPUC` like `t2`.`CuentaPUC`))) order by `t1`.`Total`;
@@ -5150,7 +5622,7 @@ DROP TABLE IF EXISTS `vista_cuentasxterceros_v2`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_cuentasxterceros_v2` AS select `librodiario`.`CuentaPUC` AS `CuentaPUC`,`librodiario`.`NombreCuenta` AS `NombreCuenta`,`librodiario`.`Tercero_Identificacion` AS `Tercero_Identificacion`,`librodiario`.`Tercero_Razon_Social` AS `Tercero_Razon_Social`,sum(`librodiario`.`Debito`) AS `Debitos`,sum(`librodiario`.`Credito`) AS `Creditos`,sum((`librodiario`.`Debito` - `librodiario`.`Credito`)) AS `Total` from `librodiario` group by `librodiario`.`Tercero_Identificacion`,`librodiario`.`CuentaPUC`;
 
 DROP TABLE IF EXISTS `vista_diferencia_inventarios`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_diferencia_inventarios` AS select `productosventa`.`idProductosVenta` AS `idProductosVenta`,`productosventa`.`Referencia` AS `Referencia`,`productosventa`.`Nombre` AS `Nombre`,`productosventa`.`Existencias` AS `ExistenciaAnterior`,(select ifnull((select `inventarios_temporal`.`Existencias` from `inventarios_temporal` where (`productosventa`.`Referencia` = `inventarios_temporal`.`Referencia`)),0)) AS `ExistenciaActual`,((select `ExistenciaActual`) - `productosventa`.`Existencias`) AS `Diferencia`,`productosventa`.`PrecioVenta` AS `PrecioVenta`,`productosventa`.`CostoUnitario` AS `CostoUnitario`,((select `Diferencia`) * `productosventa`.`CostoUnitario`) AS `TotalCostosDiferencia`,`productosventa`.`Departamento` AS `Departamento`,`productosventa`.`Sub1` AS `Sub1`,`productosventa`.`Sub2` AS `Sub2`,`productosventa`.`Sub3` AS `Sub3`,`productosventa`.`Sub4` AS `Sub4`,`productosventa`.`Sub5` AS `Sub5` from `productosventa` where (((select ifnull((select `inventarios_temporal`.`Existencias` from `inventarios_temporal` where (`productosventa`.`Referencia` = `inventarios_temporal`.`Referencia`)),0)) - `productosventa`.`Existencias`) <> 0);
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_diferencia_inventarios` AS select `productosventa`.`idProductosVenta` AS `idProductosVenta`,`productosventa`.`Referencia` AS `Referencia`,`productosventa`.`Nombre` AS `Nombre`,`productosventa`.`Existencias` AS `ExistenciaActual`,(select ifnull((select `inventarios_temporal`.`Existencias` from `inventarios_temporal` where (`productosventa`.`Referencia` = `inventarios_temporal`.`Referencia`)),0)) AS `ExistenciaAnterior`,((select `ExistenciaActual`) - (select `ExistenciaAnterior`)) AS `Diferencia`,`productosventa`.`PrecioVenta` AS `PrecioVenta`,`productosventa`.`CostoUnitario` AS `CostoUnitario`,((select `Diferencia`) * `productosventa`.`CostoUnitario`) AS `TotalCostosDiferencia`,`productosventa`.`Departamento` AS `Departamento`,`productosventa`.`Sub1` AS `Sub1`,`productosventa`.`Sub2` AS `Sub2`,`productosventa`.`Sub3` AS `Sub3`,`productosventa`.`Sub4` AS `Sub4`,`productosventa`.`Sub5` AS `Sub5` from `productosventa` where (((select ifnull((select `inventarios_temporal`.`Existencias` from `inventarios_temporal` where (`productosventa`.`Referencia` = `inventarios_temporal`.`Referencia`)),0)) - `productosventa`.`Existencias`) <> 0);
 
 DROP TABLE IF EXISTS `vista_diferencia_inventarios_selectivos`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_diferencia_inventarios_selectivos` AS select `productosventa`.`idProductosVenta` AS `idProductosVenta`,`productosventa`.`Referencia` AS `Referencia`,`productosventa`.`Nombre` AS `Nombre`,`productosventa`.`Existencias` AS `ExistenciaAnterior`,(select ifnull((select `inventarios_conteo_selectivo`.`Cantidad` from `inventarios_conteo_selectivo` where (`productosventa`.`idProductosVenta` = `inventarios_conteo_selectivo`.`Referencia`)),0)) AS `ExistenciaActual`,((select `ExistenciaActual`) - `productosventa`.`Existencias`) AS `Diferencia`,`productosventa`.`PrecioVenta` AS `PrecioVenta`,`productosventa`.`CostoUnitario` AS `CostoUnitario`,((select `Diferencia`) * `productosventa`.`CostoUnitario`) AS `TotalCostosDiferencia`,`productosventa`.`Departamento` AS `Departamento`,`productosventa`.`Sub1` AS `Sub1`,`productosventa`.`Sub2` AS `Sub2`,`productosventa`.`Sub3` AS `Sub3`,`productosventa`.`Sub4` AS `Sub4`,`productosventa`.`Sub5` AS `Sub5` from `productosventa` where ((select ifnull((select `inventarios_conteo_selectivo`.`Cantidad` from `inventarios_conteo_selectivo` where (`productosventa`.`idProductosVenta` = `inventarios_conteo_selectivo`.`Referencia`)),0)) > 0);
@@ -5162,7 +5634,7 @@ DROP TABLE IF EXISTS `vista_documentos_equivalentes`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_documentos_equivalentes` AS select `de`.`ID` AS `ID`,`de`.`Fecha` AS `Fecha`,`de`.`Tercero` AS `Tercero`,`de`.`Estado` AS `Estado`,(select sum(`dei`.`Total`) from `documento_equivalente_items` `dei` where (`dei`.`idDocumento` = `de`.`ID`)) AS `Total` from `documento_equivalente` `de`;
 
 DROP TABLE IF EXISTS `vista_estado_resultados_anio`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_estado_resultados_anio` AS select `librodiario`.`idLibroDiario` AS `idLibroDiario`,`librodiario`.`Fecha` AS `Fecha`,`librodiario`.`Tipo_Documento_Intero` AS `Tipo_Documento_Intero`,`librodiario`.`Num_Documento_Interno` AS `Num_Documento_Interno`,`librodiario`.`Num_Documento_Externo` AS `Num_Documento_Externo`,`librodiario`.`Tercero_Tipo_Documento` AS `Tercero_Tipo_Documento`,`librodiario`.`Tercero_Identificacion` AS `Tercero_Identificacion`,`librodiario`.`Tercero_DV` AS `Tercero_DV`,`librodiario`.`Tercero_Primer_Apellido` AS `Tercero_Primer_Apellido`,`librodiario`.`Tercero_Segundo_Apellido` AS `Tercero_Segundo_Apellido`,`librodiario`.`Tercero_Primer_Nombre` AS `Tercero_Primer_Nombre`,`librodiario`.`Tercero_Otros_Nombres` AS `Tercero_Otros_Nombres`,`librodiario`.`Tercero_Razon_Social` AS `Tercero_Razon_Social`,`librodiario`.`Tercero_Direccion` AS `Tercero_Direccion`,`librodiario`.`Tercero_Cod_Dpto` AS `Tercero_Cod_Dpto`,`librodiario`.`Tercero_Cod_Mcipio` AS `Tercero_Cod_Mcipio`,`librodiario`.`Tercero_Pais_Domicilio` AS `Tercero_Pais_Domicilio`,`librodiario`.`Concepto` AS `Concepto`,`librodiario`.`CuentaPUC` AS `CuentaPUC`,`librodiario`.`NombreCuenta` AS `NombreCuenta`,`librodiario`.`Detalle` AS `Detalle`,`librodiario`.`Debito` AS `Debito`,`librodiario`.`Credito` AS `Credito`,`librodiario`.`Neto` AS `Neto`,`librodiario`.`Mayor` AS `Mayor`,`librodiario`.`Esp` AS `Esp`,`librodiario`.`idCentroCosto` AS `idCentroCosto`,`librodiario`.`idEmpresa` AS `idEmpresa`,`librodiario`.`idSucursal` AS `idSucursal`,`librodiario`.`Estado` AS `Estado`,`librodiario`.`idUsuario` AS `idUsuario`,`librodiario`.`idCierre` AS `idCierre`,`librodiario`.`Updated` AS `Updated`,`librodiario`.`Sync` AS `Sync` from `librodiario` where ((`librodiario`.`Fecha` >= '2019-01-01') and (`librodiario`.`Fecha` <= '2019-12-31'));
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_estado_resultados_anio` AS select `librodiario`.`idLibroDiario` AS `idLibroDiario`,`librodiario`.`Fecha` AS `Fecha`,`librodiario`.`Tipo_Documento_Intero` AS `Tipo_Documento_Intero`,`librodiario`.`Num_Documento_Interno` AS `Num_Documento_Interno`,`librodiario`.`Num_Documento_Externo` AS `Num_Documento_Externo`,`librodiario`.`Tercero_Tipo_Documento` AS `Tercero_Tipo_Documento`,`librodiario`.`Tercero_Identificacion` AS `Tercero_Identificacion`,`librodiario`.`Tercero_DV` AS `Tercero_DV`,`librodiario`.`Tercero_Primer_Apellido` AS `Tercero_Primer_Apellido`,`librodiario`.`Tercero_Segundo_Apellido` AS `Tercero_Segundo_Apellido`,`librodiario`.`Tercero_Primer_Nombre` AS `Tercero_Primer_Nombre`,`librodiario`.`Tercero_Otros_Nombres` AS `Tercero_Otros_Nombres`,`librodiario`.`Tercero_Razon_Social` AS `Tercero_Razon_Social`,`librodiario`.`Tercero_Direccion` AS `Tercero_Direccion`,`librodiario`.`Tercero_Cod_Dpto` AS `Tercero_Cod_Dpto`,`librodiario`.`Tercero_Cod_Mcipio` AS `Tercero_Cod_Mcipio`,`librodiario`.`Tercero_Pais_Domicilio` AS `Tercero_Pais_Domicilio`,`librodiario`.`Concepto` AS `Concepto`,`librodiario`.`CuentaPUC` AS `CuentaPUC`,`librodiario`.`NombreCuenta` AS `NombreCuenta`,`librodiario`.`Detalle` AS `Detalle`,`librodiario`.`Debito` AS `Debito`,`librodiario`.`Credito` AS `Credito`,`librodiario`.`Neto` AS `Neto`,`librodiario`.`Mayor` AS `Mayor`,`librodiario`.`Esp` AS `Esp`,`librodiario`.`idCentroCosto` AS `idCentroCosto`,`librodiario`.`idEmpresa` AS `idEmpresa`,`librodiario`.`idSucursal` AS `idSucursal`,`librodiario`.`Estado` AS `Estado`,`librodiario`.`idUsuario` AS `idUsuario`,`librodiario`.`idCierre` AS `idCierre`,`librodiario`.`Updated` AS `Updated`,`librodiario`.`Sync` AS `Sync` from `librodiario` where ((`librodiario`.`Fecha` >= '2020-01-01') and (`librodiario`.`Fecha` <= '2020-12-31'));
 
 DROP TABLE IF EXISTS `vista_exogena`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_exogena` AS select `librodiario`.`Tipo_Documento_Intero` AS `Tipo_Documento_Intero`,(select if((`librodiario`.`Tipo_Documento_Intero` = 'FACTURA'),(select `facturas`.`NumeroFactura` from `facturas` where (`facturas`.`idFacturas` = `librodiario`.`Num_Documento_Interno`)),`librodiario`.`Num_Documento_Interno`)) AS `NumDocumento`,`librodiario`.`Num_Documento_Externo` AS `Num_Documento_Externo`,`librodiario`.`Tercero_Tipo_Documento` AS `Tercero_Tipo_Documento`,`librodiario`.`Tercero_Identificacion` AS `Tercero_Identificacion`,`librodiario`.`Tercero_DV` AS `Tercero_DV`,`librodiario`.`Tercero_Primer_Apellido` AS `Tercero_Primer_Apellido`,`librodiario`.`Tercero_Segundo_Apellido` AS `Tercero_Segundo_Apellido`,`librodiario`.`Tercero_Primer_Nombre` AS `Tercero_Primer_Nombre`,`librodiario`.`Tercero_Otros_Nombres` AS `Tercero_Otros_Nombres`,`librodiario`.`Tercero_Razon_Social` AS `Tercero_Razon_Social`,`librodiario`.`Tercero_Direccion` AS `Tercero_Direccion`,`librodiario`.`Tercero_Cod_Mcipio` AS `Tercero_Cod_Mcipio`,`librodiario`.`Tercero_Pais_Domicilio` AS `Tercero_Pais_Domicilio`,`librodiario`.`Concepto` AS `Concepto`,`librodiario`.`CuentaPUC` AS `CuentaPUC`,`librodiario`.`NombreCuenta` AS `NombreCuenta`,`librodiario`.`Detalle` AS `Detalle`,round(sum(`librodiario`.`Debito`),0) AS `Debitos`,round(sum(`librodiario`.`Credito`),0) AS `Creditos` from `librodiario` where ((`librodiario`.`Fecha` >= '2017-01-01') and (`librodiario`.`Fecha` <= '2017-12-31')) group by `librodiario`.`CuentaPUC`,`librodiario`.`Tercero_Identificacion`;
@@ -5189,13 +5661,13 @@ DROP TABLE IF EXISTS `vista_listado_facturas_electronicas`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_listado_facturas_electronicas` AS select `t1`.`ID` AS `ID`,`t1`.`idFactura` AS `idFactura`,`t1`.`RespuestaCompletaServidor` AS `RespuestaCompletaServidor`,`t1`.`UUID` AS `UUID`,`t1`.`RutaPDF` AS `RutaPDF`,`t1`.`RutaXML` AS `RutaXML`,`t1`.`Estado` AS `Estado`,`t1`.`PDFCreado` AS `PDFCreado`,`t1`.`ZIPCreado` AS `ZIPCreado`,`t1`.`EnviadoPorMail` AS `EnviadoPorMail`,`t1`.`FechaReporte` AS `FechaReporte`,`t1`.`Created` AS `Created`,`t1`.`Updated` AS `Updated`,`t1`.`Sync` AS `Sync`,(select `t2`.`Fecha` from `facturas` `t2` where (`t1`.`idFactura` = `t2`.`idFacturas`)) AS `FechaFactura`,(select `t2`.`Prefijo` from `facturas` `t2` where (`t1`.`idFactura` = `t2`.`idFacturas`)) AS `PrefijoFactura`,(select `t2`.`NumeroFactura` from `facturas` `t2` where (`t1`.`idFactura` = `t2`.`idFacturas`)) AS `NumeroFactura`,(select `t2`.`Total` from `facturas` `t2` where (`t1`.`idFactura` = `t2`.`idFacturas`)) AS `Total`,(select `t2`.`Clientes_idClientes` from `facturas` `t2` where (`t1`.`idFactura` = `t2`.`idFacturas`)) AS `idCliente`,(select `t2`.`RazonSocial` from `clientes` `t2` where (`t2`.`idClientes` = (select `idCliente`))) AS `RazonSocialCliente`,(select `t2`.`Num_Identificacion` from `clientes` `t2` where (`t2`.`idClientes` = (select `idCliente`))) AS `NIT_Cliente`,(select `t2`.`NombreEstado` from `facturas_electronicas_log_estados` `t2` where (`t1`.`Estado` = `t2`.`ID`)) AS `NombreEstado` from `facturas_electronicas_log` `t1`;
 
 DROP TABLE IF EXISTS `vista_movimientos_clase`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_movimientos_clase` AS select substr(`librodiario`.`CuentaPUC`,1,1) AS `Clase`,sum(`librodiario`.`Debito`) AS `DebitosClase`,sum(`librodiario`.`Credito`) AS `CreditosClase` from `librodiario` where ((`librodiario`.`Fecha` >= '2019-02-01') and (`librodiario`.`Fecha` <= '2019-09-12')) group by substr(`librodiario`.`CuentaPUC`,1,1);
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_movimientos_clase` AS select substr(`librodiario`.`CuentaPUC`,1,1) AS `Clase`,sum(`librodiario`.`Debito`) AS `DebitosClase`,sum(`librodiario`.`Credito`) AS `CreditosClase` from `librodiario` where ((`librodiario`.`Fecha` >= '2020-02-28') and (`librodiario`.`Fecha` <= '2020-02-28')) group by substr(`librodiario`.`CuentaPUC`,1,1);
 
 DROP TABLE IF EXISTS `vista_movimientos_cuenta_padre`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_movimientos_cuenta_padre` AS select substr(`librodiario`.`CuentaPUC`,1,4) AS `CuentaPadre`,sum(`librodiario`.`Debito`) AS `DebitosCuentaPadre`,sum(`librodiario`.`Credito`) AS `CreditosCuentaPadre` from `librodiario` where ((`librodiario`.`Fecha` >= '2019-02-01') and (`librodiario`.`Fecha` <= '2019-09-12')) group by substr(`librodiario`.`CuentaPUC`,1,4);
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_movimientos_cuenta_padre` AS select substr(`librodiario`.`CuentaPUC`,1,4) AS `CuentaPadre`,sum(`librodiario`.`Debito`) AS `DebitosCuentaPadre`,sum(`librodiario`.`Credito`) AS `CreditosCuentaPadre` from `librodiario` where ((`librodiario`.`Fecha` >= '2020-02-28') and (`librodiario`.`Fecha` <= '2020-02-28')) group by substr(`librodiario`.`CuentaPUC`,1,4);
 
 DROP TABLE IF EXISTS `vista_movimientos_grupo`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_movimientos_grupo` AS select substr(`librodiario`.`CuentaPUC`,1,2) AS `Grupo`,sum(`librodiario`.`Debito`) AS `DebitosGrupo`,sum(`librodiario`.`Credito`) AS `CreditosGrupo` from `librodiario` where ((`librodiario`.`Fecha` >= '2019-02-01') and (`librodiario`.`Fecha` <= '2019-09-12')) group by substr(`librodiario`.`CuentaPUC`,1,2);
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_movimientos_grupo` AS select substr(`librodiario`.`CuentaPUC`,1,2) AS `Grupo`,sum(`librodiario`.`Debito`) AS `DebitosGrupo`,sum(`librodiario`.`Credito`) AS `CreditosGrupo` from `librodiario` where ((`librodiario`.`Fecha` >= '2020-02-28') and (`librodiario`.`Fecha` <= '2020-02-28')) group by substr(`librodiario`.`CuentaPUC`,1,2);
 
 DROP TABLE IF EXISTS `vista_nomina_servicios_turnos`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_nomina_servicios_turnos` AS select `nomina_servicios_turnos`.`ID` AS `ID`,`nomina_servicios_turnos`.`Fecha` AS `Fecha`,`nomina_servicios_turnos`.`Tercero` AS `Tercero`,`nomina_servicios_turnos`.`Sucursal` AS `Sucursal`,`nomina_servicios_turnos`.`Valor` AS `Valor`,`nomina_servicios_turnos`.`idUser` AS `idUser`,`nomina_servicios_turnos`.`Pagado` AS `Pagado`,`nomina_servicios_turnos`.`Estado` AS `Estado`,`nomina_servicios_turnos`.`idDocumentoEquivalente` AS `idDocumentoEquivalente`,`nomina_servicios_turnos`.`Updated` AS `Updated`,`nomina_servicios_turnos`.`Sync` AS `Sync`,(select `empresa_pro_sucursales`.`Nombre` from `empresa_pro_sucursales` where (`empresa_pro_sucursales`.`ID` = `nomina_servicios_turnos`.`Sucursal`) limit 1) AS `NombreSucursal`,(select `proveedores`.`RazonSocial` from `proveedores` where (`proveedores`.`Num_Identificacion` = `nomina_servicios_turnos`.`Tercero`) limit 1) AS `NombreTercero` from `nomina_servicios_turnos` where (`nomina_servicios_turnos`.`Estado` <> 'ANULADO');
@@ -5209,11 +5681,20 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 DROP TABLE IF EXISTS `vista_pedidos_restaurante`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_pedidos_restaurante` AS select `restaurante_pedidos`.`ID` AS `ID`,`restaurante_pedidos`.`Fecha` AS `Fecha`,`restaurante_pedidos`.`Hora` AS `Hora`,`restaurante_pedidos`.`Estado` AS `Estado`,`restaurante_pedidos`.`idMesa` AS `idMesa`,`restaurante_pedidos`.`idCliente` AS `idCliente`,`restaurante_pedidos`.`NombreCliente` AS `NombreCliente`,`restaurante_pedidos`.`DireccionEnvio` AS `DireccionEnvio`,`restaurante_pedidos`.`TelefonoConfirmacion` AS `TelefonoConfirmacion`,`restaurante_pedidos`.`Observaciones` AS `Observaciones`,`restaurante_pedidos`.`idCierre` AS `idCierre`,(select sum(`restaurante_pedidos_items`.`Subtotal`) AS `Subtotal` from `restaurante_pedidos_items` where (`restaurante_pedidos_items`.`idPedido` = `restaurante_pedidos`.`ID`)) AS `Subtotal`,(select sum(`restaurante_pedidos_items`.`IVA`) AS `IVA` from `restaurante_pedidos_items` where (`restaurante_pedidos_items`.`idPedido` = `restaurante_pedidos`.`ID`)) AS `IVA`,(select sum(`restaurante_pedidos_items`.`Total`) AS `Total` from `restaurante_pedidos_items` where (`restaurante_pedidos_items`.`idPedido` = `restaurante_pedidos`.`ID`)) AS `Total`,(select sum(`restaurante_pedidos_items`.`TotalCostos`) from `restaurante_pedidos_items` where (`restaurante_pedidos_items`.`idPedido` = `restaurante_pedidos`.`ID`)) AS `TotalCostos`,`restaurante_pedidos`.`idUsuario` AS `idUsuario` from `restaurante_pedidos`;
 
+DROP TABLE IF EXISTS `vista_pedidos_restaurante_pos`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_pedidos_restaurante_pos` AS select `t1`.`ID` AS `ID`,`t1`.`Fecha` AS `Fecha`,`t1`.`Hora` AS `Hora`,`t1`.`idUsuario` AS `idUsuario`,`t1`.`idMesa` AS `idMesa`,`t1`.`Estado` AS `Estado`,`t1`.`Tipo` AS `Tipo`,`t1`.`idCliente` AS `idCliente`,`t1`.`NombreCliente` AS `NombreCliente`,`t1`.`DireccionEnvio` AS `DireccionEnvio`,`t1`.`TelefonoConfirmacion` AS `TelefonoConfirmacion`,`t1`.`Observaciones` AS `Observaciones`,`t1`.`idCierre` AS `idCierre`,`t1`.`FechaCreacion` AS `FechaCreacion`,`t1`.`Updated` AS `Updated`,`t1`.`Sync` AS `Sync`,(select sum(`t2`.`Total`) from `restaurante_pedidos_items` `t2` where (`t2`.`idPedido` = `t1`.`ID`)) AS `Total`,(select `t3`.`NombreEstado` from `restaurante_estados_pedidos` `t3` where (`t3`.`ID` = `t1`.`Estado`)) AS `NombreEstado`,(select `t4`.`Nombre` from `restaurante_tipos_pedido` `t4` where (`t4`.`ID` = `t1`.`Tipo`)) AS `NombreTipoPedido`,(select concat(`t5`.`Nombre`,' ',`t5`.`Apellido`) from `usuarios` `t5` where (`t5`.`idUsuarios` = `t1`.`idUsuario`)) AS `NombreUsuario` from `restaurante_pedidos` `t1`;
+
 DROP TABLE IF EXISTS `vista_preventa`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_preventa` AS select `p`.`VestasActivas_idVestasActivas` AS `VestasActivas_idVestasActivas`,'productosventa' AS `TablaItems`,`pv`.`Referencia` AS `Referencia`,`pv`.`Nombre` AS `Nombre`,`pv`.`Departamento` AS `Departamento`,`pv`.`Sub1` AS `SubGrupo1`,`pv`.`Sub2` AS `SubGrupo2`,`pv`.`Sub3` AS `SubGrupo3`,`pv`.`Sub4` AS `SubGrupo4`,`pv`.`Sub5` AS `SubGrupo5`,`p`.`ValorAcordado` AS `ValorUnitarioItem`,`p`.`Cantidad` AS `Cantidad`,'1' AS `Dias`,(`p`.`ValorAcordado` * `p`.`Cantidad`) AS `SubtotalItem`,((`p`.`ValorAcordado` * `p`.`Cantidad`) * `pv`.`IVA`) AS `IVAItem`,((select `productos_impuestos_adicionales`.`ValorImpuesto` from `productos_impuestos_adicionales` where (`productos_impuestos_adicionales`.`idProducto` = `p`.`ProductosVenta_idProductosVenta`)) * `p`.`Cantidad`) AS `ValorOtrosImpuestos`,((`p`.`ValorAcordado` * `p`.`Cantidad`) + ((`p`.`ValorAcordado` * `p`.`Cantidad`) * `pv`.`IVA`)) AS `TotalItem`,concat((`pv`.`IVA` * 100),'%') AS `PorcentajeIVA`,`pv`.`CostoUnitario` AS `PrecioCostoUnitario`,(`pv`.`CostoUnitario` * `p`.`Cantidad`) AS `SubtotalCosto`,(select `prod_departamentos`.`TipoItem` from `prod_departamentos` where (`prod_departamentos`.`idDepartamentos` = `pv`.`Departamento`)) AS `TipoItem`,`pv`.`CuentaPUC` AS `CuentaPUC`,`p`.`Updated` AS `Updated`,`p`.`Sync` AS `Sync` from (`preventa` `p` join `productosventa` `pv` on((`p`.`ProductosVenta_idProductosVenta` = `pv`.`idProductosVenta`))) where (`p`.`TablaItem` = 'productosventa');
 
+DROP TABLE IF EXISTS `vista_proyeccion_acuerdos_pago`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_proyeccion_acuerdos_pago` AS select `t1`.`ID` AS `idProyeccion`,`t2`.`ID` AS `ConsecutivoAcuerdo`,`t1`.`idAcuerdoPago` AS `idAcuerdoPago`,`t1`.`TipoCuota` AS `TipoCuota`,`t1`.`NumeroCuota` AS `NumeroCuota`,`t1`.`Fecha` AS `Fecha`,`t1`.`ValorCuota` AS `ValorCuota`,`t1`.`ValorPagado` AS `ValorPagado`,`t1`.`idPago` AS `idPago`,`t1`.`Estado` AS `EstadoProyeccion`,(select `t3`.`NombreEstado` from `acuerdo_pago_proyeccion_estados` `t3` where (`t3`.`ID` = `t1`.`Estado`) limit 1) AS `NombreEstadoProyeccion`,`t2`.`Tercero` AS `Tercero`,(select `t4`.`RazonSocial` from `clientes` `t4` where (`t4`.`Num_Identificacion` = `t2`.`Tercero`) limit 1) AS `RazonSocial`,(select `t4`.`idClientes` from `clientes` `t4` where (`t4`.`Num_Identificacion` = `t2`.`Tercero`) limit 1) AS `idClienteAcuerdo`,(select `t5`.`SobreNombre` from `clientes_datos_adicionales` `t5` where (`t5`.`idCliente` = (select `idClienteAcuerdo`)) limit 1) AS `SobreNombreCliente`,`t2`.`ValorCuotaGeneral` AS `ValorCuotaGeneral`,`t2`.`CicloPagos` AS `CicloPagos`,round(`t2`.`SaldoAnterior`,0) AS `SaldoAnterior`,round(`t2`.`SaldoInicial`,0) AS `SaldoInicial`,`t2`.`TotalAbonos` AS `TotalAbonos`,round(`t2`.`SaldoFinal`,0) AS `SaldoFinal` from (`acuerdo_pago_proyeccion_pagos` `t1` join `acuerdo_pago` `t2` on((`t1`.`idAcuerdoPago` = `t2`.`idAcuerdoPago`))) where ((`t2`.`Estado` = 1) and (`t1`.`Estado` <> 1) and (`t1`.`Estado` <> 2)) order by `t2`.`Tercero`,`t1`.`Fecha`;
+
 DROP TABLE IF EXISTS `vista_resumen_facturacion`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_resumen_facturacion` AS select `facturas_items`.`ID` AS `ID`,`facturas_items`.`FechaFactura` AS `FechaInicial`,`facturas_items`.`FechaFactura` AS `FechaFinal`,`facturas_items`.`Referencia` AS `Referencia`,(select `productosventa`.`idProductosVenta` from `productosventa` where (`productosventa`.`Referencia` = `facturas_items`.`Referencia`)) AS `idProducto`,`facturas_items`.`Nombre` AS `Nombre`,`facturas_items`.`Departamento` AS `Departamento`,`facturas_items`.`SubGrupo1` AS `SubGrupo1`,`facturas_items`.`SubGrupo2` AS `SubGrupo2`,`facturas_items`.`SubGrupo3` AS `SubGrupo3`,`facturas_items`.`SubGrupo4` AS `SubGrupo4`,`facturas_items`.`SubGrupo5` AS `SubGrupo5`,sum(`facturas_items`.`Cantidad`) AS `Cantidad`,round(sum(`facturas_items`.`TotalItem`),2) AS `TotalVenta`,round(sum(`facturas_items`.`SubtotalCosto`),2) AS `Costo` from `facturas_items` group by `facturas_items`.`FechaFactura`,`facturas_items`.`Referencia`;
+
+DROP TABLE IF EXISTS `vista_resumen_restaurante_turno_actual`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_resumen_restaurante_turno_actual` AS select `t1`.`idProductosVenta` AS `idProductosVenta`,`t1`.`Nombre` AS `Nombre`,(select ifnull((select sum(`fci`.`Cantidad`) from `factura_compra_items` `fci` where ((`t1`.`idProductosVenta` = `fci`.`idProducto`) and (`fci`.`idCierre` = '0'))),0)) AS `ItemsCompras`,(select ifnull((select sum(`fi`.`Cantidad`) from `facturas_items` `fi` where ((`t1`.`Referencia` = `fi`.`Referencia`) and (`fi`.`idCierre` = '0'))),0)) AS `ItemsVentas`,(select ifnull((select sum(`ti`.`Cantidad`) from `traslados_items` `ti` where ((convert(`ti`.`Referencia` using utf8) = convert(`t1`.`Referencia` using utf8)) and (`ti`.`Destino` = '$SedeActual') and (`ti`.`idCierre` = '0'))),0)) AS `TrasladosRecibidos`,(select ifnull((select sum(`ti`.`Cantidad`) from `traslados_items` `ti` where ((convert(`ti`.`Referencia` using utf8) = convert(`t1`.`Referencia` using utf8)) and (`ti`.`Destino` <> '$SedeActual') and (`ti`.`idCierre` = '0') and (`ti`.`Estado` = 'PREPARADO'))),0)) AS `TrasladosEnviados`,(select ifnull((select sum(`icm`.`Cantidad`) from `inventario_comprobante_movimientos_items` `icm` where ((`t1`.`idProductosVenta` = `icm`.`idProducto`) and (`icm`.`TablaOrigen` = 'productosventa') and (`icm`.`TipoMovimiento` = 'BAJA') and (`icm`.`idCierre` = '0'))),0)) AS `TotalBajas`,(select ifnull((select sum(`icm`.`Cantidad`) from `inventario_comprobante_movimientos_items` `icm` where ((`t1`.`idProductosVenta` = `icm`.`idProducto`) and (`icm`.`TablaOrigen` = 'productosventa') and (`icm`.`TipoMovimiento` = 'ALTA') and (`icm`.`idCierre` = '0'))),0)) AS `TotalAltas`,((((((`t1`.`Existencias` - (select `ItemsCompras`)) + (select `TrasladosEnviados`)) - (select `TrasladosRecibidos`)) + (select `TotalBajas`)) - (select `TotalAltas`)) + (select `ItemsVentas`)) AS `CantidadRecibida`,`t1`.`Existencias` AS `SaldoFinal`,(select ifnull((select sum(`fi`.`TotalItem`) from `facturas_items` `fi` where ((`t1`.`Referencia` = `fi`.`Referencia`) and (`fi`.`idCierre` = '0'))),0)) AS `TotalVentas`,(`t1`.`ValorComision1` * (select `ItemsVentas`)) AS `TotalComisiones1`,(`t1`.`ValorComision2` * (select `ItemsVentas`)) AS `TotalComisiones2`,(`t1`.`ValorComision3` * (select `ItemsVentas`)) AS `TotalComisiones3`,(`t1`.`ValorComision4` * (select `ItemsVentas`)) AS `TotalComisiones4`,(((((select `TotalVentas`) - (select `TotalComisiones1`)) - (select `TotalComisiones2`)) - (select `TotalComisiones3`)) - (select `TotalComisiones4`)) AS `TotalCasa` from `productosventa` `t1`;
 
 DROP TABLE IF EXISTS `vista_resumen_ventas_departamentos`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_resumen_ventas_departamentos` AS select `facturas_items`.`FechaFactura` AS `FechaFactura`,`facturas_items`.`Departamento` AS `Departamento`,`facturas_items`.`SubGrupo1` AS `SubGrupo1`,`facturas_items`.`SubGrupo2` AS `SubGrupo2`,`facturas_items`.`SubGrupo3` AS `SubGrupo3`,`facturas_items`.`SubGrupo4` AS `SubGrupo4`,`facturas_items`.`SubGrupo5` AS `SubGrupo5`,sum(`facturas_items`.`TotalItem`) AS `Total` from `facturas_items` group by `facturas_items`.`FechaFactura`,`facturas_items`.`Departamento`,`facturas_items`.`SubGrupo1`,`facturas_items`.`SubGrupo2`,`facturas_items`.`SubGrupo3`,`facturas_items`.`SubGrupo4`,`facturas_items`.`SubGrupo5`;
@@ -5225,13 +5706,13 @@ DROP TABLE IF EXISTS `vista_retenciones_tercero`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_retenciones_tercero` AS select `vista_retenciones`.`idCompra` AS `idCompra`,`vista_retenciones`.`Fecha` AS `Fecha`,`vista_retenciones`.`Tercero` AS `Tercero`,`vista_retenciones`.`RazonSocial` AS `RazonSocial`,`vista_retenciones`.`DV` AS `DV`,`vista_retenciones`.`Direccion` AS `Direccion`,`vista_retenciones`.`Ciudad` AS `Ciudad`,`vista_retenciones`.`CuentaPUC` AS `CuentaPUC`,`vista_retenciones`.`Cuenta` AS `Cuenta`,`vista_retenciones`.`ValorRetencion` AS `ValorRetencion`,`vista_retenciones`.`PorcentajeRetenido` AS `PorcentajeRetenido`,`vista_retenciones`.`BaseRetencion` AS `BaseRetencion` from `vista_retenciones` where ((`vista_retenciones`.`Fecha` >= '2019-01-20') and (`vista_retenciones`.`Fecha` <= '2019-01-20') and (`vista_retenciones`.`Tercero` = '94481747'));
 
 DROP TABLE IF EXISTS `vista_saldos_iniciales_clase`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_saldos_iniciales_clase` AS select substr(`librodiario`.`CuentaPUC`,1,1) AS `Clase`,sum((`librodiario`.`Debito` - `librodiario`.`Credito`)) AS `SaldoInicialClase` from `librodiario` where (`librodiario`.`Fecha` < '2019-02-01') group by substr(`librodiario`.`CuentaPUC`,1,1);
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_saldos_iniciales_clase` AS select substr(`librodiario`.`CuentaPUC`,1,1) AS `Clase`,sum((`librodiario`.`Debito` - `librodiario`.`Credito`)) AS `SaldoInicialClase` from `librodiario` where (`librodiario`.`Fecha` < '2020-02-28') group by substr(`librodiario`.`CuentaPUC`,1,1);
 
 DROP TABLE IF EXISTS `vista_saldos_iniciales_cuenta_padre`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_saldos_iniciales_cuenta_padre` AS select substr(`librodiario`.`CuentaPUC`,1,4) AS `CuentaPadre`,sum((`librodiario`.`Debito` - `librodiario`.`Credito`)) AS `SaldoInicialCuentaPadre` from `librodiario` where (`librodiario`.`Fecha` < '2019-02-01') group by substr(`librodiario`.`CuentaPUC`,1,4);
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_saldos_iniciales_cuenta_padre` AS select substr(`librodiario`.`CuentaPUC`,1,4) AS `CuentaPadre`,sum((`librodiario`.`Debito` - `librodiario`.`Credito`)) AS `SaldoInicialCuentaPadre` from `librodiario` where (`librodiario`.`Fecha` < '2020-02-28') group by substr(`librodiario`.`CuentaPUC`,1,4);
 
 DROP TABLE IF EXISTS `vista_saldos_iniciales_grupo`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_saldos_iniciales_grupo` AS select substr(`librodiario`.`CuentaPUC`,1,2) AS `Grupo`,sum((`librodiario`.`Debito` - `librodiario`.`Credito`)) AS `SaldoInicialGrupo` from `librodiario` where (`librodiario`.`Fecha` < '2019-02-01') group by substr(`librodiario`.`CuentaPUC`,1,2);
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_saldos_iniciales_grupo` AS select substr(`librodiario`.`CuentaPUC`,1,2) AS `Grupo`,sum((`librodiario`.`Debito` - `librodiario`.`Credito`)) AS `SaldoInicialGrupo` from `librodiario` where (`librodiario`.`Fecha` < '2020-02-28') group by substr(`librodiario`.`CuentaPUC`,1,2);
 
 DROP TABLE IF EXISTS `vista_saldo_inicial_clase_cuenta`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_saldo_inicial_clase_cuenta` AS select distinct substr(`librodiario`.`CuentaPUC`,1,1) AS `ID`,(select sum((`librodiario`.`Debito` - `librodiario`.`Credito`)) from `librodiario` where ((`librodiario`.`Fecha` < '2018-01-01') and (substr(`librodiario`.`CuentaPUC`,1,1) = (select `ID`)))) AS `SaldoInicial` from `librodiario` where ((`librodiario`.`Fecha` >= '2018-01-01') and (`librodiario`.`Fecha` <= '2019-04-25')) order by substr(`librodiario`.`CuentaPUC`,1,1);
@@ -5240,13 +5721,16 @@ DROP TABLE IF EXISTS `vista_saldo_inicial_cuenta`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_saldo_inicial_cuenta` AS select substr(`librodiario`.`CuentaPUC`,1,4) AS `ID`,sum((`librodiario`.`Debito` - `librodiario`.`Credito`)) AS `SaldoInicial` from `librodiario` where ((`librodiario`.`Fecha` >= '2018-01-01') and (`librodiario`.`Fecha` <= '2019-04-25')) group by substr(`librodiario`.`CuentaPUC`,1,4);
 
 DROP TABLE IF EXISTS `vista_saldo_inicial_cuentapuc`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_saldo_inicial_cuentapuc` AS select `librodiario`.`CuentaPUC` AS `ID`,`librodiario`.`Tercero_Identificacion` AS `Tercero_Identificacion`,sum((`librodiario`.`Debito` - `librodiario`.`Credito`)) AS `SaldoInicial` from `librodiario` where ((`librodiario`.`Fecha` >= '2019-02-01') and (`librodiario`.`Fecha` <= '2019-09-12')) group by `librodiario`.`CuentaPUC`,`librodiario`.`Tercero_Identificacion`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_saldo_inicial_cuentapuc` AS select `librodiario`.`CuentaPUC` AS `ID`,`librodiario`.`Tercero_Identificacion` AS `Tercero_Identificacion`,sum((`librodiario`.`Debito` - `librodiario`.`Credito`)) AS `SaldoInicial` from `librodiario` where ((`librodiario`.`Fecha` >= '2020-02-28') and (`librodiario`.`Fecha` <= '2020-02-28')) group by `librodiario`.`CuentaPUC`,`librodiario`.`Tercero_Identificacion`;
 
 DROP TABLE IF EXISTS `vista_saldo_inicial_grupopuc`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_saldo_inicial_grupopuc` AS select substr(`librodiario`.`CuentaPUC`,1,2) AS `ID`,sum((`librodiario`.`Debito` - `librodiario`.`Credito`)) AS `SaldoInicial` from `librodiario` where ((`librodiario`.`Fecha` >= '2018-01-01') and (`librodiario`.`Fecha` <= '2019-04-25')) group by substr(`librodiario`.`CuentaPUC`,1,2);
 
 DROP TABLE IF EXISTS `vista_sistemas`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_sistemas` AS select `si`.`ID` AS `ID`,`st`.`ID` AS `idSistema`,`st`.`Nombre` AS `Nombre_Sistema`,`st`.`Observaciones` AS `Observaciones`,`si`.`TablaOrigen` AS `TablaOrigen`,`s`.`idProductosVenta` AS `CodigoInterno`,`s`.`Nombre` AS `Nombre`,`si`.`Cantidad` AS `Cantidad`,`si`.`ValorUnitario` AS `PrecioUnitario`,round((`si`.`ValorUnitario` * `si`.`Cantidad`),0) AS `PrecioVenta`,round(`s`.`CostoUnitario`,0) AS `CostoUnitario`,round((`si`.`Cantidad` * `s`.`CostoUnitario`),0) AS `Costo_Total_Item`,`s`.`IVA` AS `IVA`,`s`.`Departamento` AS `Departamento`,`s`.`Sub1` AS `Sub1`,`s`.`Sub2` AS `Sub2`,`s`.`Sub3` AS `Sub3`,`s`.`Sub4` AS `Sub4`,`s`.`Sub5` AS `Sub5`,`st`.`Updated` AS `Updated`,`st`.`Sync` AS `Sync` from ((`sistemas_relaciones` `si` join `servicios` `s` on((`s`.`Referencia` = `si`.`Referencia`))) join `sistemas` `st` on((`st`.`ID` = `si`.`idSistema`))) union select `si`.`ID` AS `ID`,`st`.`ID` AS `idSistema`,`st`.`Nombre` AS `Nombre_Sistema`,`st`.`Observaciones` AS `Observaciones`,`si`.`TablaOrigen` AS `TablaOrigen`,`s`.`idProductosVenta` AS `CodigoInterno`,`s`.`Nombre` AS `Nombre`,`si`.`Cantidad` AS `Cantidad`,`si`.`ValorUnitario` AS `PrecioUnitario`,round((`si`.`ValorUnitario` * `si`.`Cantidad`),0) AS `PrecioVenta`,round(`s`.`CostoUnitario`,0) AS `CostoUnitario`,round((`si`.`Cantidad` * `s`.`CostoUnitario`),0) AS `Costo_Total_Item`,`s`.`IVA` AS `IVA`,`s`.`Departamento` AS `Departamento`,`s`.`Sub1` AS `Sub1`,`s`.`Sub2` AS `Sub2`,`s`.`Sub3` AS `Sub3`,`s`.`Sub4` AS `Sub4`,`s`.`Sub5` AS `Sub5`,`st`.`Updated` AS `Updated`,`st`.`Sync` AS `Sync` from ((`sistemas_relaciones` `si` join `productosventa` `s` on((`s`.`Referencia` = `si`.`Referencia`))) join `sistemas` `st` on((`st`.`ID` = `si`.`idSistema`)));
+
+DROP TABLE IF EXISTS `vista_tickets`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_tickets` AS select `t1`.`ID` AS `ID`,`t1`.`idProyecto` AS `idProyecto`,`t1`.`TipoTicket` AS `TipoTicket`,`t1`.`idModuloProyecto` AS `idModuloProyecto`,`t1`.`Prioridad` AS `Prioridad`,`t1`.`FechaApertura` AS `FechaApertura`,`t1`.`Asunto` AS `Asunto`,`t1`.`Estado` AS `Estado`,`t1`.`idUsuarioSolicitante` AS `idUsuarioSolicitante`,`t1`.`idUsuarioAsignado` AS `idUsuarioAsignado`,`t1`.`FechaActualizacion` AS `FechaActualizacion`,`t1`.`idUsuarioActualiza` AS `idUsuarioActualiza`,`t1`.`FechaCierre` AS `FechaCierre`,`t1`.`idUsuarioCierra` AS `idUsuarioCierra`,(select `usuarios`.`Nombre` from `usuarios` where (`usuarios`.`idUsuarios` = `t1`.`idUsuarioSolicitante`)) AS `NombreSolicitante`,(select `usuarios`.`Apellido` from `usuarios` where (`usuarios`.`idUsuarios` = `t1`.`idUsuarioSolicitante`)) AS `ApellidoSolicitante`,(select `usuarios`.`Nombre` from `usuarios` where (`usuarios`.`idUsuarios` = `t1`.`idUsuarioAsignado`)) AS `NombreAsignado`,(select `usuarios`.`Apellido` from `usuarios` where (`usuarios`.`idUsuarios` = `t1`.`idUsuarioAsignado`)) AS `ApellidoAsignado`,(select `t2`.`Estado` from `tickets_estados` `t2` where (`t2`.`ID` = `t1`.`Estado`)) AS `NombreEstado`,(select `t2`.`Prioridad` from `tickets_prioridad` `t2` where (`t2`.`ID` = `t1`.`Prioridad`)) AS `NombrePrioridad`,(select `t2`.`Proyecto` from `tickets_proyectos` `t2` where (`t2`.`ID` = `t1`.`idProyecto`)) AS `NombreProyecto`,(select `t2`.`NombreModulo` from `tickets_modulos_proyectos` `t2` where (`t2`.`ID` = `t1`.`idModuloProyecto`)) AS `NombreModulo`,(select `t2`.`TipoTicket` from `tickets_tipo` `t2` where (`t2`.`ID` = `t1`.`TipoTicket`)) AS `NombreTipoTicket` from `tickets` `t1`;
 
 DROP TABLE IF EXISTS `vista_titulos_abonos`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_titulos_abonos` AS select `td`.`ID` AS `ID`,`td`.`Fecha` AS `Fecha`,`td`.`Hora` AS `Hora`,`td`.`Monto` AS `Monto`,`td`.`idVenta` AS `idVenta`,`tv`.`Promocion` AS `Promocion`,`tv`.`Mayor1` AS `Mayor`,`td`.`Observaciones` AS `Concepto`,`td`.`idColaborador` AS `idColaborador`,`td`.`NombreColaborador` AS `NombreColaborador`,`td`.`Estado` AS `Estado`,`td`.`idComprobanteIngreso` AS `idComprobanteIngreso`,`tv`.`Mayor2` AS `Mayor2`,`tv`.`Adicional` AS `Adicional`,`tv`.`Valor` AS `Valor`,`tv`.`TotalAbonos` AS `TotalAbonos`,`tv`.`Saldo` AS `Saldo`,`tv`.`idCliente` AS `idCliente`,`tv`.`NombreCliente` AS `NombreCliente` from (`titulos_abonos` `td` join `titulos_ventas` `tv` on((`td`.`idVenta` = `tv`.`ID`)));
@@ -5260,4 +5744,4 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 DROP TABLE IF EXISTS `vista_totales_facturacion`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_totales_facturacion` AS select `facturas_items`.`FechaFactura` AS `FechaFactura`,sum(`facturas_items`.`Cantidad`) AS `Items`,round(sum(`facturas_items`.`SubtotalItem`),0) AS `Subtotal`,round(sum(`facturas_items`.`IVAItem`),0) AS `IVA`,round(sum(`facturas_items`.`ValorOtrosImpuestos`),0) AS `OtrosImpuestos`,round(sum(`facturas_items`.`TotalItem`),0) AS `Total` from `facturas_items` group by `facturas_items`.`FechaFactura`;
 
--- 2020-01-14 14:50:22
+-- 2020-03-04 14:33:45

@@ -783,7 +783,7 @@ function VerifiqueSolicitaBase(){
         data: form_data,
         type: 'post',
         success: function(data){
-            console.log(data)
+            
             if(data=='1'){
                 MuestraXID('DivBases');
                 document.getElementById("Valor").disabled=true;
@@ -862,6 +862,47 @@ function initModule(){
       
       $('#CuentaPUC').bind('change', function() {
         VerifiqueSolicitaBase();
+      });
+}
+
+
+function AbrirDocumento(idDocumento){
+    var form_data = new FormData();
+        form_data.append('Accion', 14);
+        form_data.append('idDocumento', idDocumento);
+        
+        $.ajax({
+        url: './procesadores/DocumentosContables.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=='OK'){
+                var idDocumento=respuestas[2];
+                var TextoComboDocumento=respuestas[3];
+                alertify.success(respuestas[1]);
+                var x = document.getElementById("idDocumento");
+                var option = document.createElement("option");
+                option.text = TextoComboDocumento;
+                option.value = idDocumento;
+                x.add(option); 
+                $("#idDocumento option:last").attr('selected','selected');
+                DibujeDocumento();
+            }else if(respuestas[0]=='E1'){
+                alertify.error(respuestas[1]);
+            }else{
+                alertify.alert(data);
+            }   
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
       });
 }
 

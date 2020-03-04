@@ -183,6 +183,19 @@ class DocumentosContables extends ProcesoVenta{
             $DatosCuenta=$this->DevuelveValores("subcuentas","PUC",$CuentaPUC);
             return($DatosCuenta["SolicitaBase"]);
         }
+        
+        public function AbrirDocumentoContable($idDocumento) {
+            $sql="SELECT t1.Consecutivo, 
+                    (SELECT t2.Nombre FROM documentos_contables t2 WHERE t1.idDocumento=t2.ID LIMIT 1) AS NombreDocumento 
+                    FROM documentos_contables_control t1 WHERE t1.ID='$idDocumento';";
+            $DatosDocumento= $this->FetchAssoc($this->Query($sql));
+            $Documento=$DatosDocumento["NombreDocumento"];
+            $Consecutivo=$DatosDocumento["Consecutivo"];
+            $sql="DELETE FROM librodiario WHERE Tipo_Documento_Intero='$Documento' AND Num_Documento_Interno='$Consecutivo'";
+            $this->Query($sql);
+            $this->ActualizaRegistro("documentos_contables_control", "Estado", "ABIERTO", "ID", $idDocumento);
+        }
+        
     /**
      * Fin Clase
      */

@@ -319,6 +319,19 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Movimiento Agregado");
         break; //Fin caso 13
         
+        case 14:// abre un documento contable
+            $idDocumento=$obCon->normalizar($_REQUEST["idDocumento"]);
+            $sql="SELECT t1.Consecutivo, t1.Estado,
+                    (SELECT t2.Nombre FROM documentos_contables t2 WHERE t1.idDocumento=t2.ID LIMIT 1) AS NombreDocumento 
+                    FROM documentos_contables_control t1 WHERE t1.ID='$idDocumento';";
+            $DatosDocumento= $obCon->FetchAssoc($obCon->Query($sql));
+            if($DatosDocumento["Estado"]=='ABIERTO'){
+                exit("E1;El documento ya está abierto");
+            }
+            $obCon->AbrirDocumentoContable($idDocumento);
+            print("OK;$DatosDocumento[NombreDocumento] $DatosDocumento[Consecutivo] Abierto;$idDocumento;$DatosDocumento[NombreDocumento] $DatosDocumento[Consecutivo]");
+        break;    
+        
         
     }
     

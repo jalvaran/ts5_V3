@@ -121,7 +121,10 @@ if( !empty($_REQUEST["Accion"]) ){
                 $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
 
             }
-            
+            $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
+            if($DatosAcuerdo["SaldoFinal"]<=0){
+                $obCon->ActualizaRegistro("acuerdo_pago", "Estado", 2, "idAcuerdoPago", $idAcuerdo);
+            }
             $obPrint->PrintAcuerdoPago($idAcuerdo, 1, 0);
             print("OK;Pago Ingresado");
         break; //fin caso 2
@@ -246,7 +249,10 @@ if( !empty($_REQUEST["Accion"]) ){
                 $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
 
             }
-            
+            $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
+            if($DatosAcuerdo["SaldoFinal"]<=0){
+                $obCon->ActualizaRegistro("acuerdo_pago", "Estado", 2, "idAcuerdoPago", $idAcuerdo);
+            }
             print("OK;Abono Registrado");
         break;//FIn caso 4    
         

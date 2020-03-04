@@ -446,7 +446,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $Observaciones=$obCon->normalizar($_REQUEST["TxtObservacionesAcuerdoPago"]);
                 $SaldoAnterior=$obCon->normalizar($_REQUEST["SaldoActualAcuerdoPago"]);
                 $SaldoFinal=$obCon->normalizar($_REQUEST["NuevoSaldoAcuerdoPago"]);
-                $sql="SELECT SUM(ValorPago) as TotalCuotaInicial FROM acuerdo_pago_cuotas_pagadas_temp WHERE idAcuerdoPago='$idAcuerdoPago' AND TipoCuota=1";
+                $sql="SELECT SUM(ValorPago) as TotalCuotaInicial FROM acuerdo_pago_cuotas_pagadas_temp WHERE idAcuerdoPago='$idAcuerdoPago' AND TipoCuota=0";
                 $TotalesCuotaInicial=$obAcuerdo->FetchAssoc($obAcuerdo->Query($sql));
                 $CuotaInicial=$TotalesCuotaInicial["TotalCuotaInicial"];
                 $SaldoInicial=$SaldoFinal;

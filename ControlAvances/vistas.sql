@@ -369,3 +369,18 @@ SELECT t1.*,
 
 FROM restaurante_pedidos t1;
 
+DROP VIEW IF EXISTS `vista_proyeccion_acuerdos_pago`;
+CREATE VIEW vista_proyeccion_acuerdos_pago AS
+SELECT t1.ID as idProyeccion,t2.ID as ConsecutivoAcuerdo,t1.idAcuerdoPago,t1.TipoCuota,t1.NumeroCuota,t1.Fecha,t1.ValorCuota,t1.ValorPagado,t1.idPago,
+t1.Estado as EstadoProyeccion,
+(SELECT t3.NombreEstado FROM acuerdo_pago_proyeccion_estados t3 WHERE t3.ID=t1.Estado LIMIT 1) AS NombreEstadoProyeccion,
+t2.Tercero,
+(SELECT t4.RazonSocial FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero LIMIT 1) AS RazonSocial,
+(SELECT t4.idClientes FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero LIMIT 1) AS idClienteAcuerdo,
+(SELECT t5.SobreNombre FROM clientes_datos_adicionales t5 WHERE t5.idCliente=(SELECT idClienteAcuerdo) LIMIT 1) AS SobreNombreCliente,
+t2.ValorCuotaGeneral,t2.CicloPagos,round(t2.SaldoAnterior) as SaldoAnterior,round(t2.SaldoInicial)  as SaldoInicial,t2.TotalAbonos,round(t2.SaldoFinal) as SaldoFinal
+FROM acuerdo_pago_proyeccion_pagos t1 
+INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
+WHERE t2.Estado=1 AND t1.Estado<>1 AND t1.Estado<>2 ORDER BY Tercero,Fecha;
+
+

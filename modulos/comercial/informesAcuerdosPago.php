@@ -74,7 +74,7 @@ $css->PageInit($myTitulo);
 
                 $css->CerrarDiv();
                 $css->CrearDiv("DivClientes", "col-md-4", "left", 1, 1);
-                    $css->select("idCliente", "form-control", "idCliente", "", "", "", "");
+                    $css->select("idCliente", "form-control", "idCliente", "", "", "", "onchange=DibujeHojaDeTrabajoInforme();");
                         $css->option("", "", "", "", "", "");
                             print("Selecciona un Cliente");
                         $css->Coption();
@@ -82,7 +82,7 @@ $css->PageInit($myTitulo);
                 $css->CerrarDiv();
                 
                 $css->CrearDiv("DivClientes", "col-md-2", "left", 1, 1);
-                    $css->select("cmbCicloPagos", "form-control", "cmbCicloPagos", "", "", "", "");
+                    $css->select("cmbCicloPagos", "form-control", "cmbCicloPagos", "", "", "", "onchange=DibujeHojaDeTrabajoInforme();");
                         
                         $css->option("", "", "", "", "", "");
                             print("Todos los ciclos");
@@ -100,16 +100,16 @@ $css->PageInit($myTitulo);
                 
                 $css->CrearDiv("", "col-md-2", "right", 1, 1); 
 
-                    $css->input("date", "FechaInicialRangos", "form-control", "FechaInicialRangos", "Fecha", "", "Fecha Inicial", "off", "", "onchange=CambiePagina()","style='line-height: 15px;'");
+                    $css->input("date", "FechaInicialRangos", "form-control", "FechaInicialRangos", "Fecha", "", "Fecha Inicial", "off", "", "onchange=DibujeHojaDeTrabajoInforme();","style='line-height: 15px;'");
 
                 $css->CerrarDiv();
                 $css->CrearDiv("", "col-md-2", "right", 1, 1); 
-                    $css->input("date", "FechaFinalRangos", "form-control", "FechaFinalRangos", "Fecha", "", "Fecha Final", "off", "", "onchange=CambiePagina()","style='line-height: 15px;'");
+                    $css->input("date", "FechaFinalRangos", "form-control", "FechaFinalRangos", "Fecha", "", "Fecha Final", "off", "", "onchange=DibujeHojaDeTrabajoInforme();","style='line-height: 15px;'");
 
                 $css->CerrarDiv();
 
                 $css->CrearDiv("", "col-md-2", "right", 1, 1); 
-                    $css->CrearBotonEvento("btnGenerarListado", "Generar", 1, "onclick", "GenerarListado()", "verde");
+                    $css->CrearBotonEvento("btnGenerarListado", "Generar", 1, "onclick", "DibujeHojaDeTrabajoInforme();", "verde");
                 $css->CerrarDiv();
 
 
