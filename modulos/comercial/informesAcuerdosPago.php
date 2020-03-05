@@ -58,6 +58,10 @@ $css->PageInit($myTitulo);
                             $css->option("", "", "", "3", "", "");
                                     print("Historial de abonos de un cliente");
                             $css->Coption();
+                            
+                            $css->option("", "", "", "4", "", "");
+                                    print("Gestion de Cobranza");
+                            $css->Coption();
                       $css->Cselect();
             
                     $css->Cdiv();
@@ -74,7 +78,7 @@ $css->PageInit($myTitulo);
 
                 $css->CerrarDiv();
                 $css->CrearDiv("DivClientes", "col-md-4", "left", 1, 1);
-                    $css->select("idCliente", "form-control", "idCliente", "", "", "", "onchange=DibujeHojaDeTrabajoInforme();");
+                    $css->select("idCliente", "form-control", "idCliente", "", "", "", "onchange=DibujeListadoSegunTipo();");
                         $css->option("", "", "", "", "", "");
                             print("Selecciona un Cliente");
                         $css->Coption();
@@ -82,7 +86,7 @@ $css->PageInit($myTitulo);
                 $css->CerrarDiv();
                 
                 $css->CrearDiv("DivClientes", "col-md-2", "left", 1, 1);
-                    $css->select("cmbCicloPagos", "form-control", "cmbCicloPagos", "", "", "", "onchange=DibujeHojaDeTrabajoInforme();");
+                    $css->select("cmbCicloPagos", "form-control", "cmbCicloPagos", "", "", "", "onchange=DibujeListadoSegunTipo();");
                         
                         $css->option("", "", "", "", "", "");
                             print("Todos los ciclos");
@@ -100,16 +104,16 @@ $css->PageInit($myTitulo);
                 
                 $css->CrearDiv("", "col-md-2", "right", 1, 1); 
 
-                    $css->input("date", "FechaInicialRangos", "form-control", "FechaInicialRangos", "Fecha", "", "Fecha Inicial", "off", "", "onchange=DibujeHojaDeTrabajoInforme();","style='line-height: 15px;'");
+                    $css->input("date", "FechaInicialRangos", "form-control", "FechaInicialRangos", "Fecha", "", "Fecha Inicial", "off", "", "onchange=DibujeListadoSegunTipo();","style='line-height: 15px;'");
 
                 $css->CerrarDiv();
                 $css->CrearDiv("", "col-md-2", "right", 1, 1); 
-                    $css->input("date", "FechaFinalRangos", "form-control", "FechaFinalRangos", "Fecha", "", "Fecha Final", "off", "", "onchange=DibujeHojaDeTrabajoInforme();","style='line-height: 15px;'");
+                    $css->input("date", "FechaFinalRangos", "form-control", "FechaFinalRangos", "Fecha", "", "Fecha Final", "off", "", "onchange=DibujeListadoSegunTipo();","style='line-height: 15px;'");
 
                 $css->CerrarDiv();
 
                 $css->CrearDiv("", "col-md-2", "right", 1, 1); 
-                    $css->CrearBotonEvento("btnGenerarListado", "Generar", 1, "onclick", "DibujeHojaDeTrabajoInforme();", "verde");
+                    $css->CrearBotonEvento("btnGenerarListado", "Generar", 1, "onclick", "DibujeListadoSegunTipo();", "verde");
                 $css->CerrarDiv();
 
 

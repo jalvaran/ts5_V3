@@ -384,3 +384,31 @@ INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago
 WHERE t2.Estado=1 AND t1.Estado<>1 AND t1.Estado<>2 ORDER BY Tercero,Fecha;
 
 
+DROP VIEW IF EXISTS `vista_productos_facturas_acuerdo`;
+CREATE VIEW vista_productos_facturas_acuerdo AS
+SELECT t1.ID,t1.idFactura,
+    (SELECT t3.Num_Identificacion FROM clientes t3 WHERE t3.idClientes=t2.Clientes_idClientes LIMIT 1) AS Tercero, 
+    t2.Fecha,t2.Hora,t2.Prefijo,t2.NumeroFactura,t1.Referencia,t1.Nombre,round(t1.ValorUnitarioItem) as ValorUnitarioItem,
+    t1.Cantidad,round(t1.SubtotalItem) as SubtotalItem,round(t1.IVAItem) as IVAItem,round(t1.TotalItem) as TotalItem
+    
+   
+FROM facturas_items t1 
+INNER JOIN facturas t2 ON t1.idFactura=t2.idFacturas 
+WHERE t2.FormaPago='Acuerdo' ORDER BY t2.Clientes_idClientes,t2.Fecha DESC;
+
+
+DROP VIEW IF EXISTS `vista_abonos_acuerdo_pago`;
+CREATE VIEW vista_abonos_acuerdo_pago AS
+SELECT t1.ID,t2.Tercero,t1.NumeroCuota,t1.TipoCuota,
+    (SELECT t3.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t3 WHERE t3.ID=t1.TipoCuota LIMIT 1 ) AS NombreTipoCuota,
+    t1.idAcuerdoPago,t2.ID as ConsecutivoAcuerdo,t1.FechaPago AS Fecha,t1.ValorPago,t1.MetodoPago,
+    (SELECT t5.Metodo FROM metodos_pago t5 WHERE t5.ID=t1.MetodoPago) as NombreMetodoPago,
+    t1.idUser,
+    (SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t4 WHERE t4.idUsuarios=t1.idUser ) as NombreUsuario,
+    t1.Created
+    
+FROM acuerdo_pago_cuotas_pagadas t1 
+INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
+ ORDER BY t2.Tercero,t1.Created DESC;
+
+

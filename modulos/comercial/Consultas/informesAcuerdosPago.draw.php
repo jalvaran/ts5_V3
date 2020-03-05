@@ -19,7 +19,7 @@ if( !empty($_REQUEST["Accion"]) ){
         case 1://dibuja la vista de las cuenta x cobrar
             
             
-            $Limit=20;
+            $Limit=15;
             $Page=$obCon->normalizar($_REQUEST["Page"]);
             $NumPage=$obCon->normalizar($_REQUEST["Page"]);
             if($Page==''){
@@ -162,6 +162,307 @@ if( !empty($_REQUEST["Accion"]) ){
         break;//fin caso 1
         
         
+        case 2://dibuja la vista de los productos adquiridos por un cliente por un acuerdo de pago
+            
+            
+            $Limit=15;
+            $Page=$obCon->normalizar($_REQUEST["Page"]);
+            $NumPage=$obCon->normalizar($_REQUEST["Page"]);
+            if($Page==''){
+                $Page=1;
+                $NumPage=1;
+            }
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
+            $FechaInicialRangos=$obCon->normalizar($_REQUEST["FechaInicialRangos"]);
+            $FechaFinalRangos=$obCon->normalizar($_REQUEST["FechaFinalRangos"]);
+            
+            $Condicion=" WHERE ID>0 ";
+            
+            if($idCliente<>''){
+                $Condicion.=" AND (Tercero = '$idCliente')";
+            }
+            if($FechaInicialRangos<>''){
+                $Condicion.=" AND (Fecha >= '$FechaInicialRangos')";
+            }
+            if($FechaFinalRangos<>''){
+                $Condicion.=" AND (Fecha <= '$FechaFinalRangos')";
+            }
+                                    
+            $PuntoInicio = ($Page * $Limit) - $Limit;
+            
+            $sql = "SELECT COUNT(ID) as Items,SUM(TotalItem) as Total
+                   FROM vista_productos_facturas_acuerdo t1 $Condicion;";
+            
+            $Consulta=$obCon->Query($sql);
+            $totales = $obCon->FetchAssoc($Consulta);
+            $ResultadosTotales = $totales['Items'];
+            $Total=$totales["Total"];
+            
+            $sql="SELECT *
+                  FROM vista_productos_facturas_acuerdo t1 $Condicion LIMIT $PuntoInicio,$Limit;";
+            $Consulta=$obCon->Query($sql);
+            
+            
+            $css->CrearTitulo("Listado de productos adquiridos en acuerdos de pago", "verde");
+            
+            $css->CrearTabla();
+                
+            
+            $css->FilaTabla(16);
+                    print("<td style='text-align:center'>");
+                        print("<strong>Registros:</strong> <h4 style=color:green>". number_format($ResultadosTotales)."</h4>");
+                    print("</td>");
+                    
+                    print("<td style='text-align:center'>");
+                        print("<strong>Total:</strong><br>");
+                        print("".number_format($Total));
+                    print("</td>");
+                    
+                    print("<td style='text-align:center'>");
+                        $Ruta="../../general/procesadores/GeneradorCSV.process.php?Opcion=2&Tabla=vista_productos_facturas_acuerdo&c=". base64_encode($Condicion);
+                        print('<a href="'.$Ruta.'" target="_blank"><button type="button" id="BtnExportarExcelCuentas" class="btn btn-success btn-flat"><i class="fa fa-file-excel-o"></i></button></a>');
+                    print("</td>");
+                   
+                
+                    if($ResultadosTotales>$Limit){
+
+                        //$css->FilaTabla(14);
+                            
+                            $TotalPaginas= ceil($ResultadosTotales/$Limit);
+                            print("<td  style=text-align:center>");
+                            //print("<strong>Página: </strong>");
+                            
+                            print('<div class="input-group" style=width:150px>');
+                            if($NumPage>1){
+                                $NumPage1=$NumPage-1;
+                            print('<span class="input-group-addon" onclick=CambiePagina(`'.$NumPage1.'`,`2`) style=cursor:pointer><i class="fa fa-chevron-left"></i></span>');
+                            }
+                            $FuncionJS="onchange=CambiePagina(``,`2`);";
+                            $css->select("CmbPage", "form-control", "CmbPage", "", "", $FuncionJS, "");
+                            
+                                for($p=1;$p<=$TotalPaginas;$p++){
+                                    if($p==$NumPage){
+                                        $sel=1;
+                                    }else{
+                                        $sel=0;
+                                    }
+                                    
+                                    $css->option("", "", "", $p, "", "",$sel);
+                                        print($p);
+                                    $css->Coption();
+                                    
+                                }
+
+                            $css->Cselect();
+                            if($ResultadosTotales>($PuntoInicio+$Limit)){
+                                $NumPage1=$NumPage+1;
+                            print('<span class="input-group-addon" onclick=CambiePagina(`'.$NumPage1.'`,`2`) style=cursor:pointer><i class="fa fa-chevron-right" ></i></span>');
+                            }
+                            print("</div>");
+                            print("</td>");
+                            
+                            
+                          
+                        }
+            
+            $css->FilaTabla(16);
+                
+                $css->ColTabla("<strong>ID</strong>", 1, "C");
+                $css->ColTabla("<strong>Tercero</strong>", 1, "C");
+                $css->ColTabla("<strong>Fecha</strong>", 1, "C");
+                $css->ColTabla("<strong>Hora</strong>", 1, "C"); 
+                $css->ColTabla("<strong>Prefijo</strong>", 1, "C"); 
+                $css->ColTabla("<strong>NumeroFactura</strong>", 1, "C");
+                $css->ColTabla("<strong>Referencia</strong>", 1, "C");                
+                $css->ColTabla("<strong>Nombre</strong>", 1, "C"); 
+                $css->ColTabla("<strong>TotalItem</strong>", 1, "C");
+                               
+            $css->CierraFilaTabla();
+
+            
+                while($RegistrosTabla=$obCon->FetchAssoc($Consulta)){
+                    
+                    $idItem=$RegistrosTabla["ID"];
+                    $css->FilaTabla(16);
+                        
+                        $css->ColTabla($RegistrosTabla["ID"], 1, "L");
+                        $css->ColTabla($RegistrosTabla["Tercero"], 1, "L");
+                        
+                        $css->ColTabla($RegistrosTabla["Fecha"], 1, "L");
+                        $css->ColTabla(($RegistrosTabla["Hora"]), 1, "L");         
+                        $css->ColTabla($RegistrosTabla["Prefijo"], 1, "L");
+                        $css->ColTabla($RegistrosTabla["NumeroFactura"], 1, "L");
+                        $css->ColTabla($RegistrosTabla["Referencia"], 1, "L");
+                        $css->ColTabla($RegistrosTabla["Nombre"], 1, "L");
+                        $css->ColTabla(number_format($RegistrosTabla["TotalItem"]), 1, "L");
+                                                
+                    $css->CierraFilaTabla();
+                    
+                }
+            
+            $css->CerrarTabla();
+            
+        break;//fin caso 2
+        
+        case 3://dibuja la vista de los abonos realizados por un cliente
+            
+            
+            $Limit=15;
+            $Page=$obCon->normalizar($_REQUEST["Page"]);
+            $NumPage=$obCon->normalizar($_REQUEST["Page"]);
+            if($Page==''){
+                $Page=1;
+                $NumPage=1;
+            }
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
+            $FechaInicialRangos=$obCon->normalizar($_REQUEST["FechaInicialRangos"]);
+            $FechaFinalRangos=$obCon->normalizar($_REQUEST["FechaFinalRangos"]);
+            
+            $Condicion=" WHERE ID>0 ";
+            
+            if($idCliente<>''){
+                $Condicion.=" AND (Tercero = '$idCliente')";
+            }
+            if($FechaInicialRangos<>''){
+                $Condicion.=" AND (Fecha >= '$FechaInicialRangos')";
+            }
+            if($FechaFinalRangos<>''){
+                $Condicion.=" AND (Fecha <= '$FechaFinalRangos')";
+            }
+                                    
+            $PuntoInicio = ($Page * $Limit) - $Limit;
+            
+            $sql = "SELECT COUNT(ID) as Items,SUM(ValorPago) as Total
+                   FROM vista_abonos_acuerdo_pago t1 $Condicion;";
+            
+            $Consulta=$obCon->Query($sql);
+            $totales = $obCon->FetchAssoc($Consulta);
+            $ResultadosTotales = $totales['Items'];
+            $Total=$totales["Total"];
+            
+            $sql="SELECT *
+                  FROM vista_abonos_acuerdo_pago t1 $Condicion LIMIT $PuntoInicio,$Limit;";
+            $Consulta=$obCon->Query($sql);
+            
+            
+            $css->CrearTitulo("Listado de abonos de acuerdos de pago", "verde");
+            
+            $css->CrearTabla();
+                
+            
+            $css->FilaTabla(16);
+                    print("<td style='text-align:center'>");
+                        print("<strong>Registros:</strong> <h4 style=color:green>". number_format($ResultadosTotales)."</h4>");
+                    print("</td>");
+                    
+                    print("<td style='text-align:center'>");
+                        print("<strong>Total:</strong><br>");
+                        print("".number_format($Total));
+                    print("</td>");
+                    
+                    print("<td style='text-align:center'>");
+                        $Ruta="../../general/procesadores/GeneradorCSV.process.php?Opcion=2&Tabla=vista_abonos_acuerdo_pago&c=". base64_encode($Condicion);
+                        print('<a href="'.$Ruta.'" target="_blank"><button type="button" id="BtnExportarExcelCuentas" class="btn btn-success btn-flat"><i class="fa fa-file-excel-o"></i></button></a>');
+                    print("</td>");
+                   
+                
+                    if($ResultadosTotales>$Limit){
+
+                        //$css->FilaTabla(14);
+                            
+                            $TotalPaginas= ceil($ResultadosTotales/$Limit);
+                            print("<td  style=text-align:center>");
+                            //print("<strong>Página: </strong>");
+                            
+                            print('<div class="input-group" style=width:150px>');
+                            if($NumPage>1){
+                                $NumPage1=$NumPage-1;
+                            print('<span class="input-group-addon" onclick=CambiePagina(`'.$NumPage1.'`,`3`) style=cursor:pointer><i class="fa fa-chevron-left"></i></span>');
+                            }
+                            $FuncionJS="onchange=CambiePagina(``,`3`);";
+                            $css->select("CmbPage", "form-control", "CmbPage", "", "", $FuncionJS, "");
+                            
+                                for($p=1;$p<=$TotalPaginas;$p++){
+                                    if($p==$NumPage){
+                                        $sel=1;
+                                    }else{
+                                        $sel=0;
+                                    }
+                                    
+                                    $css->option("", "", "", $p, "", "",$sel);
+                                        print($p);
+                                    $css->Coption();
+                                    
+                                }
+
+                            $css->Cselect();
+                            if($ResultadosTotales>($PuntoInicio+$Limit)){
+                                $NumPage1=$NumPage+1;
+                            print('<span class="input-group-addon" onclick=CambiePagina(`'.$NumPage1.'`,`3`) style=cursor:pointer><i class="fa fa-chevron-right" ></i></span>');
+                            }
+                            print("</div>");
+                            print("</td>");
+                            
+                            
+                          
+                        }
+            
+            $css->FilaTabla(16);
+                
+                $css->ColTabla("<strong>ID</strong>", 1, "C");
+                $css->ColTabla("<strong>Tercero</strong>", 1, "C");
+                $css->ColTabla("<strong>Fecha</strong>", 1, "C");
+                $css->ColTabla("<strong>Acuerdo</strong>", 1, "C"); 
+                $css->ColTabla("<strong>Cuota</strong>", 1, "C"); 
+                $css->ColTabla("<strong>Valor Pagado</strong>", 1, "C");
+                $css->ColTabla("<strong>Metodo</strong>", 1, "C");                
+                $css->ColTabla("<strong>Recibe</strong>", 1, "C"); 
+                              
+            $css->CierraFilaTabla();
+
+            
+                while($RegistrosTabla=$obCon->FetchAssoc($Consulta)){
+                    
+                    $idItem=$RegistrosTabla["ID"];
+                    $css->FilaTabla(16);
+                        
+                        $css->ColTabla($RegistrosTabla["ID"], 1, "L");
+                        $css->ColTabla($RegistrosTabla["Tercero"], 1, "L");
+                        
+                        $css->ColTabla($RegistrosTabla["Created"], 1, "L");
+                        $css->ColTabla(($RegistrosTabla["ConsecutivoAcuerdo"]), 1, "L");         
+                        $css->ColTabla($RegistrosTabla["NumeroCuota"], 1, "L");
+                        $css->ColTabla(number_format($RegistrosTabla["ValorPago"]), 1, "L");
+                        $css->ColTabla($RegistrosTabla["NombreMetodoPago"], 1, "L");
+                        $css->ColTabla($RegistrosTabla["NombreUsuario"], 1, "L");
+                                                
+                    $css->CierraFilaTabla();
+                    
+                }
+            
+            $css->CerrarTabla();
+            
+        break;//fin caso 3
+        
+        case 4:// Dibuja el informe de gestion de cartera
+            $FechaInicialRangos=$obCon->normalizar($_REQUEST["FechaInicialRangos"]);
+            $FechaFinalRangos=$obCon->normalizar($_REQUEST["FechaFinalRangos"]);
+            
+            if($FechaInicialRangos==''){
+                $css->CrearTitulo("Debe seleccionar una fecha inicial", "rojo");
+                exit();
+            }
+            if($FechaFinalRangos==''){
+                $css->CrearTitulo("Debe seleccionar una fecha final", "rojo");
+                exit();
+            }
+            
+            $sql="SELECT SUM(ValorCuota-ValorPagado) AS Total FROM acuerdo_pago_proyeccion_pagos 
+                    WHERE Fecha >= '$FechaInicialRangos' AND Fecha <= '$FechaFinalRangos';";
+            $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));
+            $TotalCartera=$DatoConsulta["Total"];
+            
+        break;//fin caso 4    
         
     }
     

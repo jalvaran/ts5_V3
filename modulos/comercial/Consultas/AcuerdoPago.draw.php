@@ -204,7 +204,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $idCuota=$DatosCuotas["ID"];
                         $TotalCuotasPendientes=$TotalCuotasPendientes+$DatosCuotas["ValorCuota"]-$DatosCuotas["ValorPagado"];
                         $css->FilaTabla(16);
-                            //$css->ColTabla($DatosCuotas["NombreTipoCuota"], 1);
+                            $css->ColTabla($DatosCuotas["ID"], 1);
                             $css->ColTabla($DatosCuotas["NumeroCuota"], 1);
                             $css->ColTabla($DatosCuotas["Fecha"], 1);
                             $css->ColTabla(number_format($DatosCuotas["ValorCuota"]), 1);
@@ -250,6 +250,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     while($DatosCuotas=$obAcuerdo->FetchAssoc($Consulta)){
                         $TotalPagos=$TotalPagos+$DatosCuotas["ValorPagado"];
                         $css->FilaTabla(16);
+                            
                             $css->ColTabla($DatosCuotas["NombreTipoCuota"], 1);
                             $css->ColTabla($DatosCuotas["NumeroCuota"], 1);
                             $css->ColTabla($DatosCuotas["Fecha"], 1);

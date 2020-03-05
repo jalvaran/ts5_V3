@@ -87,8 +87,12 @@ if(isset($_REQUEST["Opcion"])){
             if(file_exists($Link)){
                 unlink($Link);
             }
-                       
             $Condicion="";
+            if($_REQUEST["c"]){
+                $Condicion= base64_decode($_REQUEST["c"]);
+                $Condicion=$obCon->normalizar($Condicion);
+            }          
+            
             
             $Separador=";";
             $NumPage="";

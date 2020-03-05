@@ -115,7 +115,7 @@ class AcuerdoPago extends ProcesoVenta{
         $DatosProyeccion["FechaCuotas"][1]=$FechaInicial;
         $DatosProyeccion["ValorCuota"][1]=$ValorCuotaAcuerdo;
         $DatosProyeccion["NombreDia"][1]=$this->obtenerNombreDiaFecha($FechaInicial);
-        
+        $DatosProyeccion["FechaFinal"]=$FechaInicial;
         //$this->CuotaAcuerdoPagosTemporal($FechaInicial, 1, 2, $idAcuerdoPago, $ValorCuotaAcuerdo, $idUser);
         for($i=2;$i<=$NumeroCuotasCalculadas;$i++){
             if($cicloPagos==1){ //Si el ciclo es Semanal
@@ -425,17 +425,19 @@ class AcuerdoPago extends ProcesoVenta{
         }
         $DatosGenerales= $this->DevuelveValores("configuracion_general", "ID", 30);//Verifico cuantos dias de plazo tiene un cliente para pagar
         $DiasPlazo=$DatosGenerales["Valor"];
-        $sql="SELECT * FROM acuerdo_pago_proyeccion_pagos WHERE idAcuerdoPago='$idAcuerdo' AND Estado=0 or Estado=2 or Estado=4 ORDER BY Fecha ASC";
+        $sql="SELECT * FROM acuerdo_pago_proyeccion_pagos WHERE idAcuerdoPago='$idAcuerdo' AND (Estado=0 or Estado=2 or Estado=4) ORDER BY Fecha ASC";
         $Consulta= $this->Query($sql);
         $ContadorPago=$ValorAbono;
         
         while($DatosProyeccion= $this->FetchAssoc($Consulta)){
+            
             $idProyeccion=$DatosProyeccion["ID"];
             $SaldoAPagarCuota=$DatosProyeccion["ValorCuota"]-$DatosProyeccion["ValorPagado"];
             if($ContadorPago<=0){
                 break;
             }
             if($ContadorPago>=$SaldoAPagarCuota){//en el caso que se pague por completo la cuota
+                
                 $ValorPago=$SaldoAPagarCuota;
                 $ContadorPago=$ContadorPago-$SaldoAPagarCuota;
                 $idPago=$this->PagoAcuerdoPagos($DatosProyeccion["NumeroCuota"], $DatosProyeccion["TipoCuota"], $idAcuerdo, $ValorPago, $MetodoPago, $idUser);
@@ -447,17 +449,22 @@ class AcuerdoPago extends ProcesoVenta{
                 }
                 $sql="UPDATE acuerdo_pago_proyeccion_pagos SET Estado='$Estado',ValorPagado=ValorCuota,idPago='$idPago' WHERE ID='$idProyeccion'";
                 $this->Query($sql);
-                
+                //print($sql);
             }elseif($ContadorPago<$SaldoAPagarCuota) {
+                
                 $ValorPago=$ContadorPago;
+                
                 $ContadorPago=0;
+                $idPago=0;
                 $idPago=$this->PagoAcuerdoPagos($DatosProyeccion["NumeroCuota"], $DatosProyeccion["TipoCuota"], $idAcuerdo, $ValorPago, $MetodoPago, $idUser);
-                $FechaVencimiento=$this->SumeDiasAFechaAcuerdo($DatosProyeccion["Fecha"], $DiasPlazo);
-                $FechaActual=date("Y-m-d");
+                //$FechaVencimiento=$this->SumeDiasAFechaAcuerdo($DatosProyeccion["Fecha"], $DiasPlazo);
+                //$FechaActual=date("Y-m-d");
                 $Estado=2;
                 
                 $sql="UPDATE acuerdo_pago_proyeccion_pagos SET Estado='$Estado',ValorPagado=(ValorPagado+$ValorPago),idPago='$idPago' WHERE ID='$idProyeccion'";
+                
                 $this->Query($sql);
+                //exit("E1;$sql");
                 break;
             }
             
