@@ -45,9 +45,10 @@ class AcuerdoPago extends ProcesoVenta{
       * @param type $MetodoPago
       * @param type $idUser
       */
-     public function PagoAcuerdoPagos($NumeroCuota,$TipoCuota,$idAcuerdoPago,$ValorPago,$MetodoPago,$idUser) {
+     public function PagoAcuerdoPagos($idProyeccion,$NumeroCuota,$TipoCuota,$idAcuerdoPago,$ValorPago,$MetodoPago,$idUser) {
          $Datos["NumeroCuota"]=$NumeroCuota;
          $Datos["TipoCuota"]=$TipoCuota;
+         $Datos["idProyeccion"]=$idProyeccion;
          $Datos["idAcuerdoPago"]=$idAcuerdoPago;
          $Datos["FechaPago"]=date("Y-m-d");
          $Datos["ValorPago"]=$ValorPago;
@@ -142,16 +143,19 @@ class AcuerdoPago extends ProcesoVenta{
                     }
                    
                 if($MesActual=='03' AND $DiaMesActual>15 and $DiaMesActual<29){
-                    $CantidadDias= $this->obtenerCantidadDiasMes($DatosProyeccion["FechaCuotas"][$i-2]);
-                    if($CantidadDias==28){
-                        $DatosProyeccion["FechaCuotas"][$i-2]= $this->SumeDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i-2], 2);
+                    if(isset($DatosProyeccion["FechaCuotas"][$i-2])){
+                        $CantidadDias= $this->obtenerCantidadDiasMes($DatosProyeccion["FechaCuotas"][$i-2]);
+                   
+                        if($CantidadDias==28){
+                            $DatosProyeccion["FechaCuotas"][$i-2]= $this->SumeDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i-2], 2);
+
+                        }
+                        if($CantidadDias==29){
+                            $DatosProyeccion["FechaCuotas"][$i-2]= $this->SumeDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i-2], 1);
+
+                        }
                      
                     }
-                    if($CantidadDias==29){
-                        $DatosProyeccion["FechaCuotas"][$i-2]= $this->SumeDiasAFechaAcuerdo($DatosProyeccion["FechaCuotas"][$i-2], 1);
-                     
-                    }
-                     
                 }                        
                    
             }
@@ -440,7 +444,7 @@ class AcuerdoPago extends ProcesoVenta{
                 
                 $ValorPago=$SaldoAPagarCuota;
                 $ContadorPago=$ContadorPago-$SaldoAPagarCuota;
-                $idPago=$this->PagoAcuerdoPagos($DatosProyeccion["NumeroCuota"], $DatosProyeccion["TipoCuota"], $idAcuerdo, $ValorPago, $MetodoPago, $idUser);
+                $idPago=$this->PagoAcuerdoPagos($idProyeccion,$DatosProyeccion["NumeroCuota"], $DatosProyeccion["TipoCuota"], $idAcuerdo, $ValorPago, $MetodoPago, $idUser);
                 $FechaVencimiento=$this->SumeDiasAFechaAcuerdo($DatosProyeccion["Fecha"], $DiasPlazo);
                 $FechaActual=date("Y-m-d");
                 $Estado=1;
@@ -456,7 +460,7 @@ class AcuerdoPago extends ProcesoVenta{
                 
                 $ContadorPago=0;
                 $idPago=0;
-                $idPago=$this->PagoAcuerdoPagos($DatosProyeccion["NumeroCuota"], $DatosProyeccion["TipoCuota"], $idAcuerdo, $ValorPago, $MetodoPago, $idUser);
+                $idPago=$this->PagoAcuerdoPagos($idProyeccion,$DatosProyeccion["NumeroCuota"], $DatosProyeccion["TipoCuota"], $idAcuerdo, $ValorPago, $MetodoPago, $idUser);
                 //$FechaVencimiento=$this->SumeDiasAFechaAcuerdo($DatosProyeccion["Fecha"], $DiasPlazo);
                 //$FechaActual=date("Y-m-d");
                 $Estado=2;
@@ -515,7 +519,7 @@ class AcuerdoPago extends ProcesoVenta{
             if($ValorAbono==$SaldoAPagarCuota){//en el caso que se pague por completo la cuota
                 $ValorPago=$SaldoAPagarCuota;
                 
-                $idPago=$this->PagoAcuerdoPagos($DatosProyeccion["NumeroCuota"], $DatosProyeccion["TipoCuota"], $idAcuerdo, $ValorPago, $MetodoPago, $idUser);
+                $idPago=$this->PagoAcuerdoPagos($idProyeccion,$DatosProyeccion["NumeroCuota"], $DatosProyeccion["TipoCuota"], $idAcuerdo, $ValorPago, $MetodoPago, $idUser);
                 $FechaVencimiento=$this->SumeDiasAFechaAcuerdo($DatosProyeccion["Fecha"], $DiasPlazo);
                 $FechaActual=date("Y-m-d");
                 $Estado=1;
@@ -528,7 +532,7 @@ class AcuerdoPago extends ProcesoVenta{
             }elseif($ValorAbono<$SaldoAPagarCuota) {
                 $ValorPago=$ValorAbono;
                 
-                $idPago=$this->PagoAcuerdoPagos($DatosProyeccion["NumeroCuota"], $DatosProyeccion["TipoCuota"], $idAcuerdo, $ValorPago, $MetodoPago, $idUser);
+                $idPago=$this->PagoAcuerdoPagos($idProyeccion,$DatosProyeccion["NumeroCuota"], $DatosProyeccion["TipoCuota"], $idAcuerdo, $ValorPago, $MetodoPago, $idUser);
                 $FechaVencimiento=$this->SumeDiasAFechaAcuerdo($DatosProyeccion["Fecha"], $DiasPlazo);
                 $FechaActual=date("Y-m-d");
                 $Estado=2;

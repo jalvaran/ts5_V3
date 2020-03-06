@@ -306,5 +306,14 @@ function DibujeFormularioSegunTipoInforme(){
 }
 
 
+function ExportarTablaToExcel(idTabla){
+    excel = new ExcelGen({
+        "src_id": idTabla,
+        "show_header": true
+        
+    });
+    excel.generate();
+}
+
 ConstruyeHojaDeTrabajoInforme();
 

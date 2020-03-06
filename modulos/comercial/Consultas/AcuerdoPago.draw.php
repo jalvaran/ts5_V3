@@ -183,7 +183,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     
                     $css->FilaTabla(16);
-                        //$css->ColTabla("<strong>TipoCuota</strong>", 1, "C");
+                        $css->ColTabla("<strong>ID</strong>", 1, "C");
                         $css->ColTabla("<strong>Numero de Cuota</strong>", 1, "C");
                         $css->ColTabla("<strong>Fecha</strong>", 1, "C");
                         $css->ColTabla("<strong>Valor</strong>", 1, "C");

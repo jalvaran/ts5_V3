@@ -219,7 +219,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>Efectivo</strong>", 1);
                     $css->ColTabla("<strong>Tarjetas</strong>", 1);
                     $css->ColTabla("<strong>Cheques</strong>", 1);
-                    $css->ColTabla("<strong>Otros</strong>", 1);
+                    $css->ColTabla("<strong>Bonos</strong>", 1);
                     $css->ColTabla("<strong>Devolver</strong>", 1);
                     
                 $css->CierraFilaTabla();
