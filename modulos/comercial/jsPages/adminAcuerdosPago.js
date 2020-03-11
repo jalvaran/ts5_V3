@@ -163,6 +163,96 @@ function HistorialAbonos(Page=1){
 }  
 
 
+/**
+ * Historial proyeccion de pagos
+ * @returns {undefined}
+ */
+function ReconstruccionDeCuenta(Page=1){
+    
+    var idDiv="DivDrawTables";
+    
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess"><br><img   src="../../images/loading.gif" alt="Cargando" height="50" width="50"></div>';  
+    var idCliente=document.getElementById("idCliente").value;    
+    var FechaInicialRangos=document.getElementById("FechaInicialRangos").value;
+    var FechaFinalRangos=document.getElementById("FechaFinalRangos").value;    
+    var Busqueda=document.getElementById("Busqueda").value;
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 4);
+        form_data.append('Page', Page);
+        form_data.append('idCliente', idCliente);
+        
+        form_data.append('FechaInicialRangos', FechaInicialRangos);
+        form_data.append('FechaFinalRangos', FechaFinalRangos);
+        form_data.append('Busqueda', Busqueda);
+        
+        
+        $.ajax({
+        url: './Consultas/adminAcuerdosPago.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+/**
+ * Historial proyeccion de pagos
+ * @returns {undefined}
+ */
+function HistorialProductosAcuerdos(Page=1){
+    
+    var idDiv="DivDrawTables";
+    
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess"><br><img   src="../../images/loading.gif" alt="Cargando" height="50" width="50"></div>';  
+    var idCliente=document.getElementById("idCliente").value;
+    var FechaInicialRangos=document.getElementById("FechaInicialRangos").value;
+    var FechaFinalRangos=document.getElementById("FechaFinalRangos").value;
+    var cmbEstadosAcuerdos=document.getElementById("cmbEstadosAcuerdos").value;
+    var Busqueda=document.getElementById("Busqueda").value;
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 5);
+        form_data.append('Page', Page);
+        form_data.append('idCliente', idCliente);
+        
+        form_data.append('FechaInicialRangos', FechaInicialRangos);
+        form_data.append('FechaFinalRangos', FechaFinalRangos);
+        form_data.append('Busqueda', Busqueda);
+        form_data.append('cmbEstadosAcuerdos', cmbEstadosAcuerdos);
+        
+        
+        $.ajax({
+        url: './Consultas/adminAcuerdosPago.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
 function ConstruyeHojaDeTrabajoInforme(){
     var idDiv="DivDrawTables";
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">Construyendo la hoja de trabajo...<br><img   src="../../images/loading.gif" alt="Cargando" height="50" width="50"></div>';  
@@ -211,6 +301,12 @@ function CambiePagina(Page="",Funcion=1){
     if(Funcion==3){
         HistorialAbonos(Page);
     }
+    if(Funcion==4){
+        ReconstruccionDeCuenta(Page);
+    }
+    if(Funcion==5){
+        HistorialProductosAcuerdos(Page);
+    }
 }
 
 function DibujeListadoSegunTipo(cmbTipoInforme=""){
@@ -237,9 +333,20 @@ function DibujeListadoSegunTipo(cmbTipoInforme=""){
         OcultaObjeto("DivEstadosProyeccion");
         MuestraObjeto("DivTiposCuota");
     }
-    if(cmbTipoInforme=="4"){//gestion de cartera
-        DibujeGestionCartera();     
+    if(cmbTipoInforme=="4"){//Muestra todo el movimiento contable de un cliente
+        OcultaObjeto("DivEstadosAcuerdos");
+        OcultaObjeto("DivEstadosProyeccion");
+        OcultaObjeto("DivTiposCuota");
+        ReconstruccionDeCuenta();     
     }
+    
+    if(cmbTipoInforme=="5"){//Muestra el historial de productos llevados en un acuerdo de pago
+        MuestraObjeto("DivEstadosAcuerdos");
+        OcultaObjeto("DivEstadosProyeccion");
+        OcultaObjeto("DivTiposCuota");
+        HistorialProductosAcuerdos();     
+    }
+    
 }
 
 function LimpiarFiltros(){

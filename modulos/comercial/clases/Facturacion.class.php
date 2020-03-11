@@ -783,7 +783,7 @@ class Facturacion extends ProcesoVenta{
     }
     
     
-    public function pos_InsertarItemsPreventaAItemsFactura($Datos,$idUser){
+    public function pos_InsertarItemsPreventaAItemsFactura($Datos,$idUser,$GeneradoDesde="POS",$idDocGenera=""){
         
         $idPreventa=$Datos["idPreventa"];
         $NumFactura=$Datos["ID"];
@@ -825,7 +825,7 @@ class Facturacion extends ProcesoVenta{
                     $DatosProductoLineaSistema["Sub5"]=0;
                     $DatosProductoLineaSistema["CuentaPUC"]='';
                     
-                    $this->ItemFacturaVenta($NumFactura, $DatosCotizacionLineaSistema, $DatosProductoLineaSistema, 0, 0, 0, 0, 0, '', $DatosOtrosImpuestos, "");
+                    $this->ItemFacturaVenta($NumFactura, $DatosCotizacionLineaSistema, $DatosProductoLineaSistema, 0, 0, 0, 0, 0, '', $DatosOtrosImpuestos, "",$GeneradoDesde,$idDocGenera);
                     
                 }
                  
@@ -850,7 +850,7 @@ class Facturacion extends ProcesoVenta{
                     $DatosProductoLineaSistema["Sub5"]=0;
                     $DatosProductoLineaSistema["CuentaPUC"]='';
                     
-                    $this->ItemFacturaVenta($NumFactura, $DatosCotizacionLineaSistema, $DatosProductoLineaSistema, 0, 0, 0, 0, 0, '', $DatosOtrosImpuestos, "");
+                    $this->ItemFacturaVenta($NumFactura, $DatosCotizacionLineaSistema, $DatosProductoLineaSistema, 0, 0, 0, 0, 0, '', $DatosOtrosImpuestos, "",$GeneradoDesde,$idDocGenera);
                     
                 }
             }
@@ -889,7 +889,7 @@ class Facturacion extends ProcesoVenta{
             }else{
                 $PorcentajeIVA="Exc";
             }
-            $this->ItemFacturaVenta($NumFactura, $DatosCotizacion, $DatosProducto, $SubtotalItem, $IVAItem, $TotalItem, $PorcentajeIVA, $SubtotalCosto, $FechaFactura, $DatosOtrosImpuestos, "");
+            $this->ItemFacturaVenta($NumFactura, $DatosCotizacion, $DatosProducto, $SubtotalItem, $IVAItem, $TotalItem, $PorcentajeIVA, $SubtotalCosto, $FechaFactura, $DatosOtrosImpuestos, "",$GeneradoDesde,$idDocGenera);
                          
         }
         /*

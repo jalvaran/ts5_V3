@@ -475,3 +475,18 @@ FROM acuerdo_pago_cuotas_pagadas t1
 INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
 ORDER BY Tercero,t1.Created DESC;
 
+DROP VIEW IF EXISTS `vista_acuerdo_pago_productos`;
+CREATE VIEW vista_acuerdo_pago_productos AS
+SELECT t1.ID,t2.Fecha,t2.Clientes_idClientes,
+    (SELECT t3.Num_Identificacion FROM clientes t3 WHERE t3.idClientes=t2.Clientes_idClientes LIMIT 1) as Tercero,
+    (SELECT t3.RazonSocial FROM clientes t3 WHERE t3.idClientes=t2.Clientes_idClientes LIMIT 1) as RazonSocial,
+    
+    t1.Referencia,t1.Nombre,t1.Departamento,round(t1.ValorUnitarioItem) as ValorUnitarioItem,t1.Cantidad,round(t1.SubtotalItem) as SubtotalItem,
+    round(t1.IVAItem) as IVAItem,round(t1.TotalItem) as TotalItem,t1.PorcentajeIVA,t1.PrecioCostoUnitario,round(t1.SubtotalCosto) as SubtotalCosto,
+    t1.GeneradoDesde,t1.NumeroIdentificador as idAcuerdoPago,
+    (SELECT t4.ID FROM acuerdo_pago t4 WHERE t4.idAcuerdoPago=t1.NumeroIdentificador LIMIT 1) as ConsecutivoAcuerdo,
+    (SELECT t4.Estado FROM acuerdo_pago t4 WHERE t4.idAcuerdoPago=t1.NumeroIdentificador LIMIT 1) as EstadoAcuerdo
+FROM facturas_items t1 
+INNER JOIN facturas t2 ON t1.idFactura=t2.idFacturas WHERE t1.GeneradoDesde='Acuerdo'
+ORDER BY t2.Fecha,t1.ID DESC;
+

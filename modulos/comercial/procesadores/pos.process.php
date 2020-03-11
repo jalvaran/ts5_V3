@@ -329,7 +329,14 @@ if( !empty($_REQUEST["Accion"]) ){
             $Datos["CuentaDestino"]=$CmbCuentaIngresoFactura;
             $Datos["EmpresaPro"]=$idEmpresa;
             $Datos["CentroCostos"]=$idCentroCostos;
-            $obFactura->pos_InsertarItemsPreventaAItemsFactura($Datos,$idUser);
+            $GeneradoDesde="POS";
+            $idDocGenera=$idPreventa;
+            if($CmbFormaPago=="Acuerdo"){
+                $GeneradoDesde="Acuerdo";
+                $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
+                $idDocGenera=$idAcuerdoPago;
+            }
+            $obFactura->pos_InsertarItemsPreventaAItemsFactura($Datos,$idUser,$GeneradoDesde,$idDocGenera);
                 
             //$obFactura->CopiarItemsCotizacionAItemsFactura($idCotizacion, $idFactura, $Fecha,$idUser, "");
             if($CmbFormaPago=='Contado'){

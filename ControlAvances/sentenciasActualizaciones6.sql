@@ -470,3 +470,6 @@ INSERT INTO `configuracion_tablas_acciones_adicionales` (`ID`, `TablaDB`, `JavaS
 ('',	'vista_documentos_contables',	'onclick=AbrirDocumento',	'fa fa-fw fa-history',	'Abrir',	'#',	'_SELF',	'2020-03-01 10:33:56',	'2019-04-07 08:23:24');
 
 ALTER TABLE `facturas` ADD INDEX(`FormaPago`);
+ALTER TABLE `facturas` ADD INDEX(`Clientes_idClientes`);
+ALTER TABLE `facturas_items` ADD INDEX(`GeneradoDesde`);
+ALTER TABLE `facturas_items` ADD INDEX(`NumeroIdentificador`);

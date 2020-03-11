@@ -1944,7 +1944,7 @@ public function CalculePesoRemision($idCotizacion)
         
     } 
     //inserta item de factura
-    public function ItemFacturaVenta($NumFactura,$DatosCotizacion,$DatosProducto,$SubtotalItem,$IVAItem,$TotalItem,$PorcentajeIVA,$SubtotalCosto,$FechaFactura,$DatosOtrosImpuestos,$Vector) {
+    public function ItemFacturaVenta($NumFactura,$DatosCotizacion,$DatosProducto,$SubtotalItem,$IVAItem,$TotalItem,$PorcentajeIVA,$SubtotalCosto,$FechaFactura,$DatosOtrosImpuestos,$Vector,$GeneradoDesde='cotizacionesv5',$idDocGenera="") {
         //$ID=date("YmdHis").microtime(false);
             $tab="facturas_items";
             $NumRegistros=29;
@@ -1970,8 +1970,8 @@ public function CalculePesoRemision($idCotizacion)
             $Columnas[19]="SubtotalCosto";	$Valores[19]=$SubtotalCosto;
             $Columnas[20]="TipoItem";		$Valores[20]=$DatosCotizacion["TipoItem"];
             $Columnas[21]="CuentaPUC";		$Valores[21]=$DatosProducto['CuentaPUC'];
-            $Columnas[22]="GeneradoDesde";	$Valores[22]="cotizacionesv5";
-            $Columnas[23]="NumeroIdentificador";$Valores[23]="";
+            $Columnas[22]="GeneradoDesde";	$Valores[22]=$GeneradoDesde;
+            $Columnas[23]="NumeroIdentificador";$Valores[23]=$idDocGenera;
             $Columnas[24]="FechaFactura";       $Valores[24]=$FechaFactura;
             $Columnas[25]="idUsuarios";         $Valores[25]= $this->idUser;
             $Columnas[26]="idPorcentajeIVA";    $Valores[26]= "";
