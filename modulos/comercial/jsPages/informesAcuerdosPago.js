@@ -26,6 +26,7 @@ $('#idCliente').select2({
  * @returns {undefined}
  */
 function DibujeHojaDeTrabajoInforme(Page=1){
+    ConstruyeHojaDeTrabajoInforme();
     var idDiv="DivDrawTables";
     
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">Construyendo la hoja de trabajo...<br><img   src="../../images/loading.gif" alt="Cargando" height="50" width="50"></div>';  
@@ -81,7 +82,7 @@ function ConstruyeHojaDeTrabajoInforme(){
             if(respuestas[0]=="OK"){
                 document.getElementById(idDiv).innerHTML="";
                 alertify.success(respuestas[1]);
-                DibujeHojaDeTrabajoInforme();
+                
             }else if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
             }else{
@@ -314,6 +315,6 @@ function ExportarTablaToExcel(idTabla){
     });
     excel.generate();
 }
+DibujeHojaDeTrabajoInforme();
 
-ConstruyeHojaDeTrabajoInforme();
 

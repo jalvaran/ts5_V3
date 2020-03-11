@@ -412,3 +412,66 @@ INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago
  ORDER BY t2.Tercero,t1.Created DESC;
 
 
+DROP VIEW IF EXISTS `vista_acuerdo_pago`;
+CREATE VIEW vista_acuerdo_pago AS
+SELECT t1.ID,t1.idAcuerdoPago,t1.Fecha,t1.FechaInicialParaPagos,t1.Tercero,
+    (SELECT t4.RazonSocial FROM clientes t4 WHERE t4.Num_Identificacion=t1.Tercero LIMIT 1) as RazonSocial,
+    (SELECT t4.Telefono FROM clientes t4 WHERE t4.Num_Identificacion=t1.Tercero LIMIT 1) as Telefono,
+    (SELECT t4.Direccion FROM clientes t4 WHERE t4.Num_Identificacion=t1.Tercero LIMIT 1) as Direccion,
+    t1.ValorCuotaGeneral,t1.CicloPagos,
+    (SELECT t2.NombreCiclo FROM acuerdo_pago_ciclos_pagos t2 WHERE t2.ID=t1.CicloPagos LIMIT 1 ) AS NombreCicloPagos,
+    round(t1.SaldoAnterior) as SaldoAnterior,t1.Observaciones,round(t1.SaldoInicial) as SaldoInicial ,
+    round(t1.TotalAbonos) as TotalAbonos,round(t1.SaldoFinal) as SaldoFinal,t1.Estado,
+    
+    (SELECT t3.NombreEstado FROM acuerdo_pago_estados t3 WHERE t3.ID=t1.Estado) as NombreEstado,
+    t1.idUser,
+    (SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t4 WHERE t4.idUsuarios=t1.idUser ) as NombreUsuario,    
+    (SELECT MAX(t5.Estado) FROM acuerdo_pago_proyeccion_pagos t5 WHERE t5.idAcuerdoPago=t1.idAcuerdoPago) as EstadoMora,
+    (IF((SELECT EstadoMora)=4,'EN MORA','AL DIA' )) AS NombreEstadoMora,
+    t1.Created
+FROM acuerdo_pago t1 
+ ORDER BY t1.Created DESC;
+
+
+DROP VIEW IF EXISTS `vista_acuerdos_pago_proyeccion_historial`;
+CREATE VIEW vista_acuerdos_pago_proyeccion_historial AS
+SELECT t1.ID as ID,t2.ID as ConsecutivoAcuerdo,t1.idAcuerdoPago,t1.TipoCuota,
+(SELECT t6.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t6 WHERE t6.ID=t1.TipoCuota LIMIT 1) AS NombreTipoCuota,
+t1.NumeroCuota,t1.Fecha,t1.ValorCuota,t1.ValorPagado,((SELECT t1.ValorCuota)-(SELECT t1.ValorPagado)) as Saldo,t1.idPago,
+t1.Estado as EstadoProyeccion,
+(SELECT t3.NombreEstado FROM acuerdo_pago_proyeccion_estados t3 WHERE t3.ID=t1.Estado LIMIT 1) AS NombreEstadoProyeccion,
+t2.Tercero,
+(SELECT t4.RazonSocial FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero LIMIT 1) AS RazonSocial,
+(SELECT t4.idClientes FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero LIMIT 1) AS idClienteAcuerdo,
+(SELECT t5.SobreNombre FROM clientes_datos_adicionales t5 WHERE t5.idCliente=(SELECT idClienteAcuerdo) LIMIT 1) AS SobreNombreCliente,
+t2.CicloPagos,
+(SELECT t8.NombreCiclo FROM acuerdo_pago_ciclos_pagos t8 WHERE t8.ID=t2.CicloPagos LIMIT 1 ) AS NombreCicloPagos,
+t2.Estado as EstadoAcuerdo,
+(SELECT t7.NombreEstado FROM acuerdo_pago_estados t7 WHERE t7.ID=t2.Estado) as NombreEstadoAcuerdo
+FROM acuerdo_pago_proyeccion_pagos t1 
+INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
+ORDER BY Tercero,Fecha;
+
+
+DROP VIEW IF EXISTS `vista_acuerdo_pago_cuotas_pagadas`;
+CREATE VIEW vista_acuerdo_pago_cuotas_pagadas AS
+SELECT t1.ID as ID,t2.ID as ConsecutivoAcuerdo,t1.idAcuerdoPago,t1.TipoCuota,
+(SELECT t6.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t6 WHERE t6.ID=t1.TipoCuota LIMIT 1) AS NombreTipoCuota,
+t1.NumeroCuota,t1.FechaPago as Fecha,t1.idProyeccion,
+(SELECT IFNULL((SELECT ValorCuota FROM acuerdo_pago_proyeccion_pagos t10 WHERE t10.ID=t1.idProyeccion),0)) as ValorCuota,
+t1.ValorPago,((SELECT ValorCuota) - (t1.ValorPago)) as SaldoCuota,
+
+
+(SELECT t9.Metodo FROM metodos_pago t9 WHERE t9.ID=t1.MetodoPago) as NombreMetodoPago,
+t2.Tercero,
+(SELECT t4.RazonSocial FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero LIMIT 1) AS RazonSocial,
+(SELECT t4.idClientes FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero LIMIT 1) AS idClienteAcuerdo,
+(SELECT t5.SobreNombre FROM clientes_datos_adicionales t5 WHERE t5.idCliente=(SELECT idClienteAcuerdo) LIMIT 1) AS SobreNombreCliente,
+t2.CicloPagos,
+(SELECT t8.NombreCiclo FROM acuerdo_pago_ciclos_pagos t8 WHERE t8.ID=t2.CicloPagos LIMIT 1 ) AS NombreCicloPagos,
+t2.Estado as EstadoAcuerdo,
+(SELECT t7.NombreEstado FROM acuerdo_pago_estados t7 WHERE t7.ID=t2.Estado) as NombreEstadoAcuerdo
+FROM acuerdo_pago_cuotas_pagadas t1 
+INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
+ORDER BY Tercero,t1.Created DESC;
+
