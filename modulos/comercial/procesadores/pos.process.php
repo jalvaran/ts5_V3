@@ -1081,7 +1081,54 @@ if( !empty($_REQUEST["Accion"]) ){
             $obCon->ActualizaRegistro($Tabla, "ValorCuota", $Valor, "ID", $idItem, 1);
             print("OK;Cuota Actualizada");
         break;//Fin caso 29
-     
+        
+        case 30://Crear un anticipo por encargos
+            
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);            
+            $Observaciones=$obCon->normalizar($_REQUEST["TxtObservacionesEncargos"]);
+            $MetodoPagoAnticipo=$obCon->normalizar($_REQUEST["CmbMetodoPagoAnticipo"]);
+            $ValorAnticipoEncargo=$obCon->normalizar($_REQUEST["TxtValorAnticipoEncargo"]);
+            
+            if($idCliente<=1){
+                exit("E1;No se recibió un tercero válido");
+            }
+            
+            if($Observaciones==''){
+                exit("E1;El campo observaciones no puede estar vacío;TxtObservacionesEncargos");
+            }
+            
+            if($MetodoPagoAnticipo==''){
+                exit("E1;El campo observaciones no puede estar vacío;CmbMetodoPagoAnticipo");
+            }
+            
+            if(!is_numeric($ValorAnticipoEncargo) or $ValorAnticipoEncargo<=0){
+                exit("E1;El Valor debe ser un numero positivo mayor a Cero;TxtValorAnticipoEncargo");
+            }
+            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
+            $Fecha=date("Y-m-d");
+            $Tercero=$DatosCliente["Num_Identificacion"];
+            $idAnticipo=$obCon->NuevoAnticipoPorEncargo($Fecha, $Tercero, $Observaciones, $idUser);
+            $idAbono=$obCon->AbonoAnticipoPorEncargo($Fecha, $idAnticipo, $MetodoPagoAnticipo, $ValorAnticipoEncargo, $idUser);
+            $DatosCaja=$obCon->DevuelveValores("cajas", "idUsuario", $idUser);
+            $DatosMetodoPago=$obCon->DevuelveValores("metodos_pago", "ID", $MetodoPagoAnticipo);
+            $CentroCosto=$DatosCaja["CentroCostos"];
+            
+            if($MetodoPagoAnticipo==1){
+                $CuentaDestino=$DatosCaja["CuentaPUCEfectivo"];
+                
+            }else{
+                $CuentaDestino=$DatosMetodoPago["CuentaPUCIngresos"];
+            }
+            
+            
+            $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 35);  //Cuenta para los Anticipos de los clientes
+            $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAnticipoEncargo, "AnticiposPorEncargos", "Ingreso por Anticipo por encargo No. $idAnticipo", "CERRADO");
+            $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
+            
+            $obCon->update("anticipos_encargos_abonos", "idComprobanteIngreso", $idComprobante, "WHERE ID='$idAbono'");
+            
+            print("OK;Anticipo x encargo recibido");
+        break;//Fin caso 30    
         
     }
     

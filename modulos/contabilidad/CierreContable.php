@@ -1,7 +1,7 @@
 <?php
 /**
- * Pagina para administracion de los acuerdos de pago
- * 2020-03-06, Julian Alvaran Techno Soluciones SAS
+ * Pagina para realizar un cierre contable
+ * 2020-03-18, Julian Alvaran Techno Soluciones SAS
  * 
  * es recomendable No usar los siguientes ID para ningún objeto:
  * FrmModal, ModalAcciones,DivFormularios,BtnModalGuardar,DivOpcionesTablas,
@@ -10,8 +10,8 @@
  * 
  */
 
-$myPage="adminAcuerdosPago.php";  // identifica la pagina para poder controlar el acceso
-$myTitulo="Administrador de Acuerdos de Pago";  //Titulo en la pestaña del navegador
+$myPage="CierreContable.php";  // identifica la pagina para poder controlar el acceso
+$myTitulo="Cierre Contable";  //Titulo en la pestaña del navegador
 include_once("../../sesiones/php_control_usuarios.php"); //Controla los permisos de los usuarios
 include_once("../../constructores/paginas_constructor.php"); //Construye la pagina, estan las herramientas para construir los objetos de la pagina
 

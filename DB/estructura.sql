@@ -255,6 +255,8 @@ CREATE TABLE `acuerdo_pago_hoja_trabajo_informes` (
   `SaldoInicial` double(17,0) NOT NULL,
   `TotalAbonos` double NOT NULL COMMENT 'Registra el total de abonos realizados al documento',
   `SaldoFinal` double(17,0) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`),
   KEY `ConsecutivoAcuerdo` (`ConsecutivoAcuerdo`),
   KEY `idAcuerdoPago` (`idAcuerdoPago`),
@@ -264,6 +266,24 @@ CREATE TABLE `acuerdo_pago_hoja_trabajo_informes` (
   KEY `Tercero` (`Tercero`),
   KEY `CicloPagos` (`CicloPagos`),
   KEY `TelefonoCliente` (`TelefonoCliente`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_productos_devueltos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `idFacturasItems` bigint(20) NOT NULL,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Cantidad` double NOT NULL,
+  `ValorDevolucion` double NOT NULL,
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idFacturasItems` (`idFacturasItems`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
@@ -353,6 +373,52 @@ CREATE TABLE `alertas` (
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `anticipos_encargos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL COMMENT 'Fecha del anticipo',
+  `Tercero` bigint(20) NOT NULL COMMENT 'Tercero que da el anticipo',
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL COMMENT 'Observaciones del anticipo',
+  `idUser` int(11) NOT NULL COMMENT 'Usuario que recibe',
+  `Estado` int(11) NOT NULL,
+  `Created` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP COMMENT 'Fecha de Creacion',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `Tercero` (`Tercero`),
+  KEY `idUser` (`idUser`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `anticipos_encargos_abonos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `idAnticipo` bigint(20) NOT NULL,
+  `Metodo` int(11) NOT NULL,
+  `Valor` double NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `idCierre` bigint(20) NOT NULL,
+  `idComprobanteIngreso` bigint(20) NOT NULL,
+  `Created` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idAnticipo` (`idAnticipo`),
+  KEY `Metodo` (`Metodo`),
+  KEY `idUser` (`idUser`),
+  KEY `idCierre` (`idCierre`),
+  KEY `idComprobanteIngreso` (`idComprobanteIngreso`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `anticipos_encargos_estados` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NombreEstado` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
 CREATE TABLE `autorizaciones_generales` (
@@ -1759,7 +1825,8 @@ CREATE TABLE `facturas` (
   PRIMARY KEY (`idFacturas`),
   KEY `ReporteFacturaElectronica` (`ReporteFacturaElectronica`),
   KEY `TipoFactura` (`TipoFactura`),
-  KEY `FormaPago` (`FormaPago`)
+  KEY `FormaPago` (`FormaPago`),
+  KEY `Clientes_idClientes` (`Clientes_idClientes`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -1992,7 +2059,9 @@ CREATE TABLE `facturas_items` (
   KEY `idFactura` (`idFactura`),
   KEY `idCierre` (`idCierre`),
   KEY `FechaFactura` (`FechaFactura`),
-  KEY `Referencia` (`Referencia`)
+  KEY `Referencia` (`Referencia`),
+  KEY `GeneradoDesde` (`GeneradoDesde`),
+  KEY `NumeroIdentificador` (`NumeroIdentificador`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
@@ -2726,6 +2795,11 @@ CREATE TABLE `metodos_pago` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Metodo` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
   `Estado` int(11) NOT NULL,
+  `SoloAdmin` int(11) NOT NULL,
+  `CuentaPUCIngresos` bigint(20) NOT NULL,
+  `NombreCuentaPUCIngresos` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `CuentaPUCEgresos` bigint(20) NOT NULL,
+  `NombreCuentaPUCEgresos` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`ID`)
@@ -5408,6 +5482,9 @@ CREATE TABLE `vista_acuerdo_pago` (`ID` bigint(20), `idAcuerdoPago` varchar(45),
 CREATE TABLE `vista_acuerdo_pago_cuotas_pagadas` (`ID` bigint(20), `ConsecutivoAcuerdo` bigint(20), `idAcuerdoPago` varchar(45), `TipoCuota` int(11), `NombreTipoCuota` varchar(15), `NumeroCuota` int(11), `Fecha` date, `idProyeccion` bigint(20), `ValorCuota` double, `ValorPago` double, `SaldoCuota` double, `NombreMetodoPago` varchar(25), `Tercero` bigint(20), `RazonSocial` varchar(100), `idClienteAcuerdo` bigint(11), `SobreNombreCliente` varchar(90), `CicloPagos` int(11), `NombreCicloPagos` varchar(45), `EstadoAcuerdo` int(11), `NombreEstadoAcuerdo` varchar(45));
 
 
+CREATE TABLE `vista_acuerdo_pago_productos` (`ID` bigint(20) unsigned, `Fecha` date, `Clientes_idClientes` int(11), `Tercero` varchar(45), `RazonSocial` varchar(100), `Referencia` varchar(200), `Nombre` text, `Departamento` int(11), `ValorUnitarioItem` double(17,0), `Cantidad` double, `SubtotalItem` double(17,0), `IVAItem` double(17,0), `TotalItem` double(17,0), `PorcentajeIVA` varchar(10), `PrecioCostoUnitario` double, `SubtotalCosto` double(17,0), `GeneradoDesde` varchar(100), `idAcuerdoPago` varchar(45), `ConsecutivoAcuerdo` bigint(20), `EstadoAcuerdo` bigint(11));
+
+
 CREATE TABLE `vista_af` ();
 
 
@@ -5591,6 +5668,9 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_acuerdo_pago` AS sel
 DROP TABLE IF EXISTS `vista_acuerdo_pago_cuotas_pagadas`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_acuerdo_pago_cuotas_pagadas` AS select `t1`.`ID` AS `ID`,`t2`.`ID` AS `ConsecutivoAcuerdo`,`t1`.`idAcuerdoPago` AS `idAcuerdoPago`,`t1`.`TipoCuota` AS `TipoCuota`,(select `t6`.`NombreTipoCuota` from `acuerdo_pago_tipo_cuota` `t6` where (`t6`.`ID` = `t1`.`TipoCuota`) limit 1) AS `NombreTipoCuota`,`t1`.`NumeroCuota` AS `NumeroCuota`,`t1`.`FechaPago` AS `Fecha`,`t1`.`idProyeccion` AS `idProyeccion`,(select ifnull((select `t10`.`ValorCuota` from `acuerdo_pago_proyeccion_pagos` `t10` where (`t10`.`ID` = `t1`.`idProyeccion`)),0)) AS `ValorCuota`,`t1`.`ValorPago` AS `ValorPago`,((select `ValorCuota`) - `t1`.`ValorPago`) AS `SaldoCuota`,(select `t9`.`Metodo` from `metodos_pago` `t9` where (`t9`.`ID` = `t1`.`MetodoPago`)) AS `NombreMetodoPago`,`t2`.`Tercero` AS `Tercero`,(select `t4`.`RazonSocial` from `clientes` `t4` where (`t4`.`Num_Identificacion` = `t2`.`Tercero`) limit 1) AS `RazonSocial`,(select `t4`.`idClientes` from `clientes` `t4` where (`t4`.`Num_Identificacion` = `t2`.`Tercero`) limit 1) AS `idClienteAcuerdo`,(select `t5`.`SobreNombre` from `clientes_datos_adicionales` `t5` where (`t5`.`idCliente` = (select `idClienteAcuerdo`)) limit 1) AS `SobreNombreCliente`,`t2`.`CicloPagos` AS `CicloPagos`,(select `t8`.`NombreCiclo` from `acuerdo_pago_ciclos_pagos` `t8` where (`t8`.`ID` = `t2`.`CicloPagos`) limit 1) AS `NombreCicloPagos`,`t2`.`Estado` AS `EstadoAcuerdo`,(select `t7`.`NombreEstado` from `acuerdo_pago_estados` `t7` where (`t7`.`ID` = `t2`.`Estado`)) AS `NombreEstadoAcuerdo` from (`acuerdo_pago_cuotas_pagadas` `t1` join `acuerdo_pago` `t2` on((`t1`.`idAcuerdoPago` = `t2`.`idAcuerdoPago`))) order by `t2`.`Tercero`,`t1`.`Created` desc;
 
+DROP TABLE IF EXISTS `vista_acuerdo_pago_productos`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_acuerdo_pago_productos` AS select `t1`.`ID` AS `ID`,`t2`.`Fecha` AS `Fecha`,`t2`.`Clientes_idClientes` AS `Clientes_idClientes`,(select `t3`.`Num_Identificacion` from `clientes` `t3` where (`t3`.`idClientes` = `t2`.`Clientes_idClientes`) limit 1) AS `Tercero`,(select `t3`.`RazonSocial` from `clientes` `t3` where (`t3`.`idClientes` = `t2`.`Clientes_idClientes`) limit 1) AS `RazonSocial`,`t1`.`Referencia` AS `Referencia`,`t1`.`Nombre` AS `Nombre`,`t1`.`Departamento` AS `Departamento`,round(`t1`.`ValorUnitarioItem`,0) AS `ValorUnitarioItem`,`t1`.`Cantidad` AS `Cantidad`,round(`t1`.`SubtotalItem`,0) AS `SubtotalItem`,round(`t1`.`IVAItem`,0) AS `IVAItem`,round(`t1`.`TotalItem`,0) AS `TotalItem`,`t1`.`PorcentajeIVA` AS `PorcentajeIVA`,`t1`.`PrecioCostoUnitario` AS `PrecioCostoUnitario`,round(`t1`.`SubtotalCosto`,0) AS `SubtotalCosto`,`t1`.`GeneradoDesde` AS `GeneradoDesde`,`t1`.`NumeroIdentificador` AS `idAcuerdoPago`,(select `t4`.`ID` from `acuerdo_pago` `t4` where (`t4`.`idAcuerdoPago` = `t1`.`NumeroIdentificador`) limit 1) AS `ConsecutivoAcuerdo`,(select `t4`.`Estado` from `acuerdo_pago` `t4` where (`t4`.`idAcuerdoPago` = `t1`.`NumeroIdentificador`) limit 1) AS `EstadoAcuerdo` from (`facturas_items` `t1` join `facturas` `t2` on((`t1`.`idFactura` = `t2`.`idFacturas`))) where (`t1`.`GeneradoDesde` = 'Acuerdo') order by `t2`.`Fecha`,`t1`.`ID` desc;
+
 DROP TABLE IF EXISTS `vista_af`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_af` AS select `ts5`.`salud_archivo_facturacion_mov_generados`.`id_fac_mov_generados` AS `id_fac_mov_generados`,`ts5`.`salud_archivo_facturacion_mov_generados`.`cod_prest_servicio` AS `cod_prest_servicio`,`ts5`.`salud_archivo_facturacion_mov_generados`.`razon_social` AS `razon_social`,`ts5`.`salud_archivo_facturacion_mov_generados`.`tipo_ident_prest_servicio` AS `tipo_ident_prest_servicio`,`ts5`.`salud_archivo_facturacion_mov_generados`.`num_ident_prest_servicio` AS `num_ident_prest_servicio`,`ts5`.`salud_archivo_facturacion_mov_generados`.`num_factura` AS `num_factura`,`ts5`.`salud_archivo_facturacion_mov_generados`.`fecha_factura` AS `fecha_factura`,`ts5`.`salud_archivo_facturacion_mov_generados`.`fecha_inicio` AS `fecha_inicio`,`ts5`.`salud_archivo_facturacion_mov_generados`.`fecha_final` AS `fecha_final`,`ts5`.`salud_archivo_facturacion_mov_generados`.`cod_enti_administradora` AS `cod_enti_administradora`,`ts5`.`salud_archivo_facturacion_mov_generados`.`nom_enti_administradora` AS `nom_enti_administradora`,`ts5`.`salud_archivo_facturacion_mov_generados`.`num_contrato` AS `num_contrato`,`ts5`.`salud_archivo_facturacion_mov_generados`.`plan_beneficios` AS `plan_beneficios`,`ts5`.`salud_archivo_facturacion_mov_generados`.`num_poliza` AS `num_poliza`,`ts5`.`salud_archivo_facturacion_mov_generados`.`valor_total_pago` AS `valor_total_pago`,`ts5`.`salud_archivo_facturacion_mov_generados`.`valor_comision` AS `valor_comision`,`ts5`.`salud_archivo_facturacion_mov_generados`.`valor_descuentos` AS `valor_descuentos`,`ts5`.`salud_archivo_facturacion_mov_generados`.`valor_neto_pagar` AS `valor_neto_pagar`,`ts5`.`salud_archivo_facturacion_mov_generados`.`tipo_negociacion` AS `tipo_negociacion`,`ts5`.`salud_archivo_facturacion_mov_generados`.`nom_cargue` AS `nom_cargue`,`ts5`.`salud_archivo_facturacion_mov_generados`.`fecha_cargue` AS `fecha_cargue`,`ts5`.`salud_archivo_facturacion_mov_generados`.`idUser` AS `idUser`,`ts5`.`salud_archivo_facturacion_mov_generados`.`eps_radicacion` AS `eps_radicacion`,`ts5`.`salud_archivo_facturacion_mov_generados`.`dias_pactados` AS `dias_pactados`,`ts5`.`salud_archivo_facturacion_mov_generados`.`fecha_radicado` AS `fecha_radicado`,`ts5`.`salud_archivo_facturacion_mov_generados`.`numero_radicado` AS `numero_radicado`,`ts5`.`salud_archivo_facturacion_mov_generados`.`Soporte` AS `Soporte`,`ts5`.`salud_archivo_facturacion_mov_generados`.`estado` AS `estado`,`ts5`.`salud_archivo_facturacion_mov_generados`.`EstadoCobro` AS `EstadoCobro`,`ts5`.`salud_archivo_facturacion_mov_generados`.`Arma030Anterior` AS `Arma030Anterior`,`ts5`.`salud_archivo_facturacion_mov_generados`.`Updated` AS `Updated`,`ts5`.`salud_archivo_facturacion_mov_generados`.`Sync` AS `Sync`,(select `ts5`.`salud_eps`.`Genera030` from `salud_eps` where (`ts5`.`salud_eps`.`cod_pagador_min` = `ts5`.`salud_archivo_facturacion_mov_generados`.`cod_enti_administradora`)) AS `GeneraCircular` from `salud_archivo_facturacion_mov_generados`;
 
@@ -5759,4 +5839,4 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 DROP TABLE IF EXISTS `vista_totales_facturacion`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_totales_facturacion` AS select `facturas_items`.`FechaFactura` AS `FechaFactura`,sum(`facturas_items`.`Cantidad`) AS `Items`,round(sum(`facturas_items`.`SubtotalItem`),0) AS `Subtotal`,round(sum(`facturas_items`.`IVAItem`),0) AS `IVA`,round(sum(`facturas_items`.`ValorOtrosImpuestos`),0) AS `OtrosImpuestos`,round(sum(`facturas_items`.`TotalItem`),0) AS `Total` from `facturas_items` group by `facturas_items`.`FechaFactura`;
 
--- 2020-03-11 09:06:52
+-- 2020-03-17 14:54:40

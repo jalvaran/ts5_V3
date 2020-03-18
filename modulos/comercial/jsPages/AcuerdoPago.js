@@ -64,13 +64,24 @@ function ImprimirAcuerdoPago(idAcuerdo){
 
 
 
-function FormularioAbonarAcuerdoPago(idAcuerdo){
+function FormularioAbonarAcuerdoPago(idAcuerdo,divDraw='DivBusquedasPOS',Invoca=0){
     
-    
+    if(Invoca==1){//Si la funcion está siendo invocada desde la devolucion de un producto
+        var idItemDevolucion=document.getElementById('idItemDevolucionAcuerdo').value;
+        var CantidadDevolucion=document.getElementById('Cantidad_Devolucion_Acuerdo_Pago').value;
+        
+    }
     var form_data = new FormData();
         
         form_data.append('Accion', 2);
         form_data.append('idAcuerdo', idAcuerdo);
+        form_data.append('Invoca', Invoca);
+        if(Invoca==1){
+            form_data.append('idItemDevolucion', idItemDevolucion);
+            form_data.append('CantidadDevolucion', CantidadDevolucion);
+            
+        }
+        
         $.ajax({
         url: './Consultas/AcuerdoPago.draw.php',
         //dataType: 'json',
@@ -80,7 +91,7 @@ function FormularioAbonarAcuerdoPago(idAcuerdo){
         data: form_data,
         type: 'post',
         success: function(data){
-            document.getElementById('DivBusquedasPOS').innerHTML=data;
+            document.getElementById(divDraw).innerHTML=data;
             DibujeHistorialDeCuotas(idAcuerdo);
         },
         error: function (xhr, ajaxOptions, thrownError) {

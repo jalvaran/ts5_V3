@@ -724,7 +724,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Condicion=" WHERE ID>0 ";
             
             if($Busqueda<>''){
-                $Condicion.=" AND (ID = '$Busqueda' or idAcuerdoPago like '$Busqueda%')";
+                $Condicion.=" AND (idAcuerdoPago like '$Busqueda%' or Nombre like '%$Busqueda%')";
             }
             
             if($idCliente<>''){
@@ -824,6 +824,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 
                 $css->ColTabla("<strong>ID</strong>", 1);
+                $css->ColTabla("<strong>Devolver</strong>", 1);
                 $css->ColTabla("<strong>Fecha</strong>", 1);
                 $css->ColTabla("<strong>Acuerdo</strong>", 1);
                 $css->ColTabla("<strong>Tercero</strong>", 1);
@@ -831,6 +832,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->ColTabla("<strong>Nombre</strong>", 1);
                 $css->ColTabla("<strong>ValorUnitarioItem</strong>", 1);
                 $css->ColTabla("<strong>Cantidad</strong>", 1);
+                
                 $css->ColTabla("<strong>SubtotalItem</strong>", 1);                
                 $css->ColTabla("<strong>IVAItem</strong>", 1);
                 $css->ColTabla("<strong>TotalItem</strong>", 1);
@@ -840,8 +842,14 @@ if( !empty($_REQUEST["Accion"]) ){
 
             
                 while($DatosAcuerdo=$obCon->FetchAssoc($Consulta)){
-                    
+                    $idItem=$DatosAcuerdo["ID"];
+                    $idAcuerdo=$DatosAcuerdo["idAcuerdoPago"];
                     $css->ColTabla($DatosAcuerdo["ID"], 1);
+                    print("<td style='text-align:center'>");    
+                        print('<span class="input-group-btn">
+                            <button type="button" class="btn btn-danger btn-flat" onclick=FormularioDevolverItem(`'.$idAcuerdo.'`,`'.$idItem.'`)> <i class="fa fa-remove"> </i> </button>
+                          </span>');
+                    print("</td>"); 
                     $css->ColTabla($DatosAcuerdo["Fecha"], 1);
                     $css->ColTabla($DatosAcuerdo["ConsecutivoAcuerdo"], 1);                        
                     $css->ColTabla($DatosAcuerdo["Tercero"]." ".$DatosAcuerdo["RazonSocial"], 1);
@@ -850,6 +858,9 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     $css->ColTabla(number_format($DatosAcuerdo["ValorUnitarioItem"]), 1);
                     $css->ColTabla(number_format($DatosAcuerdo["Cantidad"]), 1);
+                    
+                    
+                    
                     $css->ColTabla(number_format($DatosAcuerdo["SubtotalItem"]), 1);
                     $css->ColTabla(number_format($DatosAcuerdo["IVAItem"]), 1);
                     $css->ColTabla(number_format($DatosAcuerdo["TotalItem"]), 1);
@@ -862,6 +873,117 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CerrarTabla();
             
         break;//fin caso 5
+        
+        case 6:// Historial anulacion de acuerdos 
+            
+        break; //Fin caso 6 
+        
+        case 7:// Historial anulacion de abonos 
+            
+        break; //Fin caso 7
+    
+        case 8:// Historial productos de acuerdos devueltos
+            
+        break; //Fin caso 8
+        
+        case 9:// formulario para anular un producto
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            
+            $DatosProducto=$obCon->DevuelveValores("facturas_items", "ID", $idItem);
+            $idAcuerdo=$DatosProducto["NumeroIdentificador"];
+            $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
+            $DatosTercero=$obCon->DevuelveValores("clientes", "Num_Identificacion", $DatosAcuerdo["Tercero"]);
+            $sql="SELECT sum(Cantidad) as CantidadDevoluciones FROM acuerdo_pago_productos_devueltos WHERE idFacturasItems='$idItem'";
+            $DatosConsulta=$obCon->FetchAssoc($obCon->Query($sql));
+            $CantidadDevuelta=$DatosConsulta["CantidadDevoluciones"];
+            if($CantidadDevuelta==''){
+                $CantidadDevuelta=0;
+            }
+            $CantidadDisponibleADevolver=$DatosProducto["Cantidad"]-$CantidadDevuelta;
+            if($CantidadDisponibleADevolver<=0){
+                $css->CrearTitulo("<strong>Este producto no tiene cantidades disponibles para devolver</strong>");
+                exit("");
+            }
+            
+            
+                print('<span class="input-group-btn">
+                    <button type="button" class="btn btn-success btn-flat" onclick=FormularioDevolverItem(`'.$idAcuerdo.'`,`'.$idItem.'`)> <i class="fa fa-refresh"> </i> </button>
+                  </span>');
+            
+            $css->input("hidden", "idItemDevolucionAcuerdo", "", "idItemDevolucionAcuerdo", "", $idItem, "", "", "", "");
+            
+            $ValorUnitario=round($DatosProducto["TotalItem"]/$DatosProducto["Cantidad"]);
+            $ValorADevolver=$ValorUnitario*$CantidadDisponibleADevolver;
+            $css->CrearTitulo("<strong>Devolución de un producto</strong>");
+            $css->CrearTabla();
+                
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Datos del Cliente</strong>", 4,'C');
+                    
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Tercero</strong>", 1);
+                    $css->ColTabla("<strong>Razon Social</strong>", 1);
+                    $css->ColTabla("<strong>Direccion</strong>", 1);
+                    $css->ColTabla("<strong>Telefono</strong>", 1);
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla($DatosTercero["Num_Identificacion"], 1);
+                    $css->ColTabla($DatosTercero["RazonSocial"], 1);
+                    $css->ColTabla($DatosTercero["Direccion"], 1);
+                    $css->ColTabla($DatosTercero["Telefono"], 1);
+                $css->CierraFilaTabla();
+                
+                
+                
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Datos del Producto</strong>", 4,'C');
+                    
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Referencia</strong>", 1);
+                    $css->ColTabla("<strong>Producto</strong>", 1);
+                    $css->ColTabla("<strong>Cantidad</strong>", 1);
+                    $css->ColTabla("<strong>Devoluciones</strong>", 1);
+                $css->CierraFilaTabla();
+                
+                
+                $css->FilaTabla(16);
+                    $css->ColTabla($DatosProducto["Referencia"], 1);
+                    $css->ColTabla($DatosProducto["Nombre"], 1);
+                    $css->ColTabla(($DatosProducto["Cantidad"]), 1);
+                    $css->ColTabla($CantidadDevuelta, 1);
+                $css->CierraFilaTabla();
+                
+                
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Valor Unitario</strong>", 1);
+                    $css->ColTabla("<strong>Total Disponible</strong>", 1);
+                    $css->ColTabla("<strong>Cantidad</strong>", 1);
+                    $css->ColTabla("<strong>Observacion</strong>", 1);
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                    $css->ColTabla(number_format($DatosProducto["TotalItem"]), 1);
+                    $css->ColTabla(number_format($ValorADevolver), 1);
+                    print("<td>");
+                        $css->input("number", "Cantidad_Devolucion_Acuerdo_Pago", "form-control", "Cantidad_Devolucion", "", $CantidadDisponibleADevolver, "Cantidad", "off", "", "onchange=FormularioAbonarAcuerdoPago(`$idAcuerdo`,`DivAbonosDevolucion`,`1`)");
+                        
+                    print("</td>"); 
+                    print("<td>");
+                        $css->textarea("TxtObservacionesDevolucion", "form-control", "TxtObservacionesDevolucion", "", "Observaciones", "", "");
+                        $css->Ctextarea();
+                    print("</td>");
+                $css->CierraFilaTabla();
+                
+            $css->CerrarTabla();
+            
+            $css->CrearDiv("DivAbonosDevolucion", "", "", 1, 1);
+            $css->CerrarDiv();
+            
+            
+        break; //Fin caso 9
         
     }
     

@@ -253,6 +253,37 @@ function HistorialProductosAcuerdos(Page=1){
       })  
 }  
 
+function FormularioDevolverItem(idAcuerdoPago,idItem){
+    var idDiv="DivDrawTables";
+    
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess"><br><img   src="../../images/loading.gif" alt="Cargando" height="50" width="50"></div>';  
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 9);
+        form_data.append('idItem', idItem);
+        
+        
+        
+        $.ajax({
+        url: './Consultas/adminAcuerdosPago.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            FormularioAbonarAcuerdoPago(idAcuerdoPago,'DivAbonosDevolucion',1);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
 function ConstruyeHojaDeTrabajoInforme(){
     var idDiv="DivDrawTables";
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">Construyendo la hoja de trabajo...<br><img   src="../../images/loading.gif" alt="Cargando" height="50" width="50"></div>';  

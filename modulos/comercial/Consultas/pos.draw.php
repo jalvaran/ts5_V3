@@ -1263,7 +1263,48 @@ if( !empty($_REQUEST["Accion"]) ){
             //print("Total Cuotas: <h2><strong>". number_format($TotalCuotasProyectadas)."</strong></h2>");
             $Diferencia=$ValorAProyectar-$TotalCuotasProyectadas;
             print("Diferencia: <h2><strong>". number_format($Diferencia)."</strong></h2>");
-        break;//Fin caso 17    
+        break;//Fin caso 17   
+    
+        case 18://Dibuja el formulario para un anticipo
+           
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]); 
+            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
+            if($idCliente<=1){
+                $css->CrearTitulo("<strong>Debes Seleccionar un tercero</strong>", "rojo");
+                exit();
+            }
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 5, "", "", "", ""); //5 guarda el anticipo
+            $css->CrearTitulo("Crear un Anticipo para el cliente ".$DatosCliente["RazonSocial"]." ".$DatosCliente["Num_Identificacion"]);
+
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Observaciones</strong>", 1);
+                    $css->ColTabla("<strong>Metodo de Pago</strong>", 1);
+                    $css->ColTabla("<strong>Valor</strong>", 1);
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    print("<td>");
+                        $css->textarea("TxtObservacionesEncargos", "form-control", "TxtObservacionesEncargos", "", "Observaciones", "", "");
+                        $css->Ctextarea();
+                    print("</td>");
+                    print("<td>");
+                        $sql="SELECT * FROM metodos_pago WHERE SoloAdmin=0 ORDER BY ID";
+                        $Consulta=$obCon->Query($sql);
+                        $css->select("CmbMetodoPagoAnticipo", "form-control", "CmbMetodoPagoAnticipo", "", "", "", "");
+                            while($DatosMetodos=$obCon->FetchAssoc($Consulta)){
+                                $css->option("", "", "", $DatosMetodos["ID"], "", "");
+                                    print($DatosMetodos["Metodo"]);
+                                $css->Coption();
+                            }
+
+                        $css->Cselect();
+                    print("</td>");
+                    print("<td>");
+                        $css->input("number", "TxtValorAnticipoEncargo", "form-control", "TxtValorAnticipoEncargo", "", "", "Valor", "off", "", "");
+                    print("</td>");
+                $css->CierraFilaTabla();
+            $css->CerrarTabla();
+        break;// Fin caso 18    
         
     }
     

@@ -105,7 +105,7 @@ if( !empty($_REQUEST["Accion"]) ){
         
         case 2:// Dibuja el formulario para realizar un abono
             $idAcuerdo=$obAcuerdo->normalizar($_REQUEST["idAcuerdo"]);
-            
+            $Invoca=$obAcuerdo->normalizar($_REQUEST["Invoca"]);
             $DatosAcuerdo=$obAcuerdo->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
             $Tercero=$DatosAcuerdo["Tercero"];
             $Parametros=$obAcuerdo->DevuelveValores("parametros_contables", "ID", 36);//Saldos a favor de clientes
@@ -128,6 +128,41 @@ if( !empty($_REQUEST["Accion"]) ){
             if($Anticipos<>0){
                 $Mensaje.=", Anticipos: <strong>". number_format(ABS($Anticipos))."</strong>";
             }
+            $ValorCuotaGeneral=$DatosAcuerdo["ValorCuotaGeneral"];
+            if($Invoca==1){
+                $idItemDevolucion=$obCon->normalizar($_REQUEST["idItemDevolucion"]);
+                $CantidadDevolucion=$obCon->normalizar($_REQUEST["CantidadDevolucion"]);
+                
+                if($idItemDevolucion==''){
+                    $css->CrearTitulo("No se recibió el item a Devolver", "rojo");
+                    exit();
+                }
+                if(!is_numeric($CantidadDevolucion) or $CantidadDevolucion<=0){
+                    $css->CrearTitulo("<strong>La cantidad de items a devolver debe ser mayor a cero</strong>", "rojo");
+                    exit();
+                }
+                
+                $DatosProducto=$obCon->DevuelveValores("facturas_items", "ID", $idItemDevolucion);
+                $sql="SELECT sum(Cantidad) as CantidadDevoluciones FROM acuerdo_pago_productos_devueltos WHERE idFacturasItems='$idItemDevolucion'";
+                $DatosConsulta=$obCon->FetchAssoc($obCon->Query($sql));
+                $CantidadDevuelta=$DatosConsulta["CantidadDevoluciones"];
+                if($CantidadDevuelta==''){
+                    $CantidadDevuelta=0;
+                }
+                $CantidadDisponibleADevolver=$DatosProducto["Cantidad"]-$CantidadDevuelta;
+                if($CantidadDisponibleADevolver<=0){
+                    $css->CrearTitulo("<strong>Este producto no tiene cantidades disponibles para devolver</strong>",'rojo');
+                    exit("");
+                }
+                if($CantidadDisponibleADevolver<$CantidadDevolucion){
+                    $css->CrearTitulo("<strong>La cantidad digitada supera la cantidad disponible a devolver</strong>",'rojo');
+                    exit("");
+                }
+                $ValorUnitario=round($DatosProducto["TotalItem"]/$DatosProducto["Cantidad"]);
+                $ValorADevolver=$CantidadDevolucion*$ValorUnitario;
+                $ValorCuotaGeneral=$ValorADevolver;
+            }
+            
             $css->CrearTitulo($Mensaje, "verde");
             $css->input("hidden", "idFormulario", "", "idFormulario", "", 5, "", "", "", "");
             $css->input("hidden", "idAcuerdoAbono", "", "idAcuerdoAbono", "", $DatosAcuerdo["idAcuerdoPago"], "", "", "", "");
@@ -141,7 +176,12 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->FilaTabla(16);
                     print("<td>");
                         $css->select("CmbMetodoPagoAbonoAcuerdo", "form-control", "CmbMetodoPagoAbonoAcuerdo", "", "", "", "");
-                            $sql="SELECT * FROM metodos_pago WHERE Estado=1";
+                            if($Invoca==1){//Indica que la funcion está siendo invocada por abonos desde una devolucion de un producto 
+                                $sql="SELECT * FROM metodos_pago WHERE ID=12";
+                            }else{
+                                $sql="SELECT * FROM metodos_pago WHERE Estado=1 AND ID<>12 ";
+                            }
+                            
                             $Consulta=$obAcuerdo->Query($sql);
                             while($DatosMetodo=$obAcuerdo->FetchAssoc($Consulta)){
                                 $css->option("", "form-control", "", $DatosMetodo["ID"], "", "");
@@ -151,7 +191,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->Cselect();
                     print("</td>");
                     print("<td>");
-                        $css->input("number", "TxtValorAbonoAcuerdoExistente", "form-control", "TxtValorAbonoAcuerdoExistente", "", $DatosAcuerdo["ValorCuotaGeneral"], "Valor de la Cuota", "off", "", "");
+                        $css->input("number", "TxtValorAbonoAcuerdoExistente", "form-control", "TxtValorAbonoAcuerdoExistente", "", $ValorCuotaGeneral, "Valor de la Cuota", "off", "", "");
                     print("</td>");
                     print("<td>");
                         $css->input("number", "TxtRecargosIntereses", "form-control", "TxtRecargosIntereses", "", "0", "Recargos o intereses", "off", "", "");

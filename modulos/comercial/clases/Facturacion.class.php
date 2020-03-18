@@ -778,6 +778,7 @@ class Facturacion extends ProcesoVenta{
         $this->update("pos_registro_descuentos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUsuario='$idUser'");  
         $this->update("acuerdo_pago_cuotas_pagadas", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'"); 
         $this->update("acuerdo_recargos_intereses", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'");  
+        $this->update("anticipos_encargos_abonos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'");  
         return ($idCierre);
         
     }
@@ -1048,6 +1049,36 @@ class Facturacion extends ProcesoVenta{
         
         
     }
+    
+    public function NuevoAnticipoPorEncargo($Fecha,$Tercero,$Observaciones,$idUser) {
+        $Datos["Fecha"]=$Fecha;
+        $Datos["Tercero"]=$Tercero;
+        $Datos["Observaciones"]=$Observaciones;
+        $Datos["idUser"]=$idUser;
+        $Datos["Estado"]=1;
+        $Datos["Created"]=date("Y-m-d H:i:s");
+        
+        $sql=$this->getSQLInsert("anticipos_encargos", $Datos);
+        $this->Query($sql);
+        $id= $this->ObtenerMAX("anticipos_encargos", "ID", 1, "");
+        return($id);
+    }
+    
+    public function AbonoAnticipoPorEncargo($Fecha,$idAnticipo,$Metodo,$Valor,$idUser) {
+        $tab="anticipos_encargos_abonos";
+        $Datos["Fecha"]=$Fecha;
+        $Datos["idAnticipo"]=$idAnticipo;
+        $Datos["Metodo"]=$Metodo;
+        $Datos["Valor"]=$Valor;
+        $Datos["idUser"]=$idUser;
+        $Datos["Created"]=date("Y-m-d H:i:s");
+        
+        $sql=$this->getSQLInsert($tab, $Datos);
+        $this->Query($sql);
+        $id= $this->ObtenerMAX($tab, "ID", 1, "");
+        return($id);
+    }
+    
     /**
      * Fin Clase
      */

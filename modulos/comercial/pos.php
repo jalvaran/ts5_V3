@@ -108,6 +108,36 @@ $css->PageInit($myTitulo);
             $css->legend("", "");
                 print("<a href='#'>Opciones Adicionales:</a>");
             $css->Clegend();  
+            
+            $css->CrearDiv("", "col-md-5", "left", 1, 1);
+                print('<div class="input-group input-group-md">');
+                    $css->select("CmbNuevaOpcion", "form-control", "CmbNuevaOpcion", "", "", "", "");
+                        $css->option("", "", "", 1, "", "");
+                            print("Agregar Preventa");
+                        $css->Coption();
+                        $css->option("", "", "", 2, "", "");
+                            print("Crear Tercero");
+                        $css->Coption();
+                        $css->option("", "", "", 3, "", "");
+                            print("Ingresos por plataformas de Pago");
+                        $css->Coption();
+                        $css->option("", "", "", 4, "", "");
+                            print("Crear Separado");
+                        $css->Coption();
+                        $css->option("", "", "", 5, "", "");
+                            print("Crear Egreso");
+                        $css->Coption();
+                        $css->option("", "", "", 6, "", "");
+                            print("Anticipos por Encargos");
+                        $css->Coption();
+                    $css->Cselect();
+                    print('<div class="input-group-btn">');                
+                        $css->CrearBotonEvento("BtnNuevaOpcion", "+", 1, "onclick", "SeleccionaNuevaAccion()", "verde");
+                    $css->CerrarDiv();
+                $css->CerrarDiv();    
+            $css->CerrarDiv();
+            
+            /*
             $css->CrearDiv("", "col-md-2", "left", 1, 1);
                 $css->CrearBotonEvento("BtnAgregarPreventa", "Agregar Preventa", 1, "onclick", "AgregarPreventa();", "azulclaro", "");
             $css->CerrarDiv();
@@ -128,6 +158,8 @@ $css->PageInit($myTitulo);
                $css->CrearBotonEvento("BtnCrearEgreso", "Crear Egreso", 1, "onclick", "ModalCrearEgreso();", "azul", "");
             $css->CerrarDiv();
             
+             * 
+             */
             $css->CrearDiv("", "col-md-2", "left", 1, 1);
                $css->CrearBotonEvento("BtnCerrarTurno", "Cerrar Turno", 1, "onclick", "CerrarTurno();", "rojo", "");
             $css->CerrarDiv();

@@ -17,6 +17,34 @@ function posiciona(id){
 }
 
 posiciona('Codigo');
+
+function SeleccionaNuevaAccion(){
+    var Opcion=document.getElementById("CmbNuevaOpcion").value;
+    if(Opcion==1){
+        AgregarPreventa();
+    }
+    
+    if(Opcion==2){
+        ModalCrearTercero();
+    }
+    
+    if(Opcion==3){
+        ModalIngresosPlataformas();
+    }
+    
+    if(Opcion==4){
+        ModalCrearSeparado();
+    }
+    
+    if(Opcion==5){
+        ModalCrearEgreso();
+    }
+    
+    if(Opcion==6){
+        ModalAnticiposEncargos();
+    }
+}
+
 /**
  * Agrega una opcion de preventa
  * @returns {undefined}
@@ -686,6 +714,10 @@ function AccionesPOS(){
     
     if(idFormulario==4){
         GuardarIngresoPlataformasPago();
+    }
+    
+    if(idFormulario==5){
+        GuardarIngresoAnticipoPorEncargos();
     }
     
     if(idFormulario==101){
@@ -2926,4 +2958,88 @@ function VisualizarTotalesAcuerdo(idAcuerdo=''){
       
 }
 
+
+function ModalAnticiposEncargos(){
+    
+    $("#ModalAccionesPOS").modal();
+    var idPreventa=document.getElementById('idPreventa').value;
+    var idCliente=document.getElementById('idCliente').value;
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 18);
+        form_data.append('idPreventa', idPreventa);
+        form_data.append('idCliente', idCliente);
+        $.ajax({
+        url: './Consultas/pos.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivFrmPOS').innerHTML=data;
+                        
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+      
+      
+}
+
+
+function GuardarIngresoAnticipoPorEncargos(idAcuerdoPago){    
+    var idBoton='BntModalPOS';
+    document.getElementById(idBoton).disabled=true;
+    var TxtObservacionesEncargos=document.getElementById('TxtObservacionesEncargos').value;
+    var CmbMetodoPagoAnticipo=document.getElementById('CmbMetodoPagoAnticipo').value;  
+    var TxtValorAnticipoEncargo=document.getElementById('TxtValorAnticipoEncargo').value;  
+    var idPreventa = document.getElementById('idPreventa').value;    
+    var idCliente = document.getElementById('idCliente').value;    
+       
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 30);
+        form_data.append('idAcuerdoPago', idAcuerdoPago);
+        form_data.append('TxtObservacionesEncargos', TxtObservacionesEncargos);
+        form_data.append('CmbMetodoPagoAnticipo', CmbMetodoPagoAnticipo);
+        form_data.append('TxtValorAnticipoEncargo', TxtValorAnticipoEncargo);
+        form_data.append('idPreventa', idPreventa);
+        form_data.append('idCliente', idCliente);
+        $.ajax({
+        url: './procesadores/pos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+                CierraModal('ModalAccionesPOS');
+                document.getElementById(idBoton).disabled=false;
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
+                document.getElementById(idBoton).disabled=false;
+            }else{
+                alertify.alert(data);
+                document.getElementById(idBoton).disabled=false;
+            }
+               
+            document.getElementById(idBoton).disabled=false;
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
 
