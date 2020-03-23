@@ -566,8 +566,12 @@ class html_estruct_class {
      * @param type $title ->atr global. id
      * @param type $vectorhtml ->vector por si se desea meter mas atributos al elemento(se debe definir antes de ulitlizarlo y en la clase definir el uso para tal atributo)
      */
-    function select($id,$class,$name,$title,$vectorhtml,$Script,$style){        
-        print('<strong>'.$title.'</strong><select id="'.$id.'" class="'.$class.'" name="'.$name.'" title="'.$title.'" '.$Script.' '.$style.' required>');
+    function select($id,$class,$name,$title,$vectorhtml,$Script,$style,$Requerido=1){  
+        $Required="";
+        if($Requerido==1){
+            $Required="required";
+        }
+        print('<strong>'.$title.'</strong><select id="'.$id.'" class="'.$class.'" name="'.$name.'" title="'.$title.'" '.$Script.' '.$style.' '.$Required.'>');
     }
     
     /**

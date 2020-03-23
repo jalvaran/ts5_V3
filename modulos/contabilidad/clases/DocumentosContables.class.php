@@ -48,7 +48,7 @@ class DocumentosContables extends ProcesoVenta{
      * @param type $NumDocSoporte
      * @param type $Soporte
      */
-    function AgregaMovimientoDocumentoContable($idDocumento,$Tercero,$CuentaPUC,$TipoMovimiento,$Valor,$Concepto,$NumDocSoporte,$Soporte){
+    function AgregaMovimientoDocumentoContable($idDocumento,$Tercero,$CuentaPUC,$TipoMovimiento,$Valor,$Concepto,$NumDocSoporte,$Soporte,$Fecha='0000-00-00'){
         $DatosCuentas=$this->DevuelveValores("subcuentas", "PUC", $CuentaPUC);
         $NombreCuenta=$DatosCuentas["Nombre"];
         if($TipoMovimiento=="DB"){
@@ -61,6 +61,7 @@ class DocumentosContables extends ProcesoVenta{
         $Tabla="documentos_contables_items";
         
         $Datos["idDocumento"]=$idDocumento;
+        $Datos["Fecha"]=$Fecha;
         $Datos["Tercero"]=$Tercero;
         $Datos["CuentaPUC"]=$CuentaPUC;
         $Datos["NombreCuenta"]=$NombreCuenta;
@@ -86,7 +87,7 @@ class DocumentosContables extends ProcesoVenta{
         
         $DatosDocumento= $this->DevuelveValores("vista_documentos_contables", "ID", $idDocumento);
         
-        $Fecha=$DatosDocumento["Fecha"];
+        
         $idCentroCostos=$DatosDocumento["idCentroCostos"];
         $idEmpresa=$DatosDocumento["idEmpresa"];
         $idSucursal=$DatosDocumento["idSucursal"];
@@ -94,7 +95,10 @@ class DocumentosContables extends ProcesoVenta{
         $Consecutivo=$DatosDocumento["Consecutivo"];
         $Consulta=$this->ConsultarTabla("documentos_contables_items", "WHERE idDocumento='$idDocumento'");
         while($DatosItems= $this->FetchAssoc($Consulta)){
-        
+            $Fecha=$DatosItems["Fecha"];
+            if($DatosItems["Fecha"]=='0000-00-00'){
+                $Fecha=$DatosDocumento["Fecha"];
+            }
             $DatosTercero= $this->DevuelveValores("proveedores", "Num_Identificacion", $DatosItems["Tercero"]);
             if($DatosTercero["Num_Identificacion"]==''){
                 $DatosTercero= $this->DevuelveValores("clientes", "Num_Identificacion", $DatosItems["Tercero"]);
