@@ -95,20 +95,20 @@ $css->PageInit($myTitulo);
             
                     $css->Cdiv();
                     $css->Cdiv();
-                    
+                     /*
                     $css->CrearDiv("DivProcesoCierre", "box-header with-border", "left", 1, 1);
                     print('<h3 class="box-title">Cierre de Cuentas</h3>');
-
+                   
                     $css->CrearDiv("", "box-tools", "left", 1, 1);    
                        print('<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
                         </button>
                       </div>
                   ');
-        
+                       
                    $css->div("DivFiltros", "box-body no-padding", "", "", "", "", "");
                                 
-                                //Creamos el Selector que contiene las bases de datos
-                         $css->select("cmbTipoCierre", "form-control", "cmbTipoCierre", "", "", "onchange=DibujeProcesoSegunTipo()"/*funcion js para listar las tablas de  una base de datos*/, "");
+                               
+                         $css->select("cmbTipoCierre", "form-control", "cmbTipoCierre", "", "", "onchange=DibujeProcesoSegunTipo()");
 
                            $css->option("", "", "", "1", "", "");
                                 print("Cierre de Cuentas de Resultado");
@@ -123,6 +123,7 @@ $css->PageInit($myTitulo);
                     $css->Cdiv();
                     $css->Cdiv();
                     
+                    */
                     
                    //$css->Cdiv();
         

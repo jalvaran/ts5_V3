@@ -92,6 +92,7 @@ if( !empty($_REQUEST["Accion"]) ){
         
         case 5: //Guardar un documento contable
             $idDocumento=$obCon->normalizar($_REQUEST["idDocumento"]);
+            $DatosDocumento=$obCon->DevuelveValores("documentos_contables_control", "ID", $idDocumento);
             
             $Debitos=$obCon->Sume("documentos_contables_items", "Debito", "WHERE idDocumento='$idDocumento'");
             $Creditos=$obCon->Sume("documentos_contables_items", "Credito", "WHERE idDocumento='$idDocumento'");
@@ -101,6 +102,12 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit();
             }
             $obCon->GuardarDocumentoContable($idDocumento); 
+            
+            if($DatosDocumento["idDocumento"]==9){ //Verifico si es un cierre contable y cambio el estado en el control
+                $Anio=substr($DatosDocumento["Fecha"],0,4);                
+                $sql="UPDATE cierre_contable_control SET ContabilizarCierre=1, Estado=2 WHERE Anio='$Anio' AND ContabilizarCierre=0 AND Estado=1";
+                $obCon->Query($sql);                
+            }
             $Ruta="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=32&idDocumentoContable=$idDocumento";
             $Mensaje="Documento Guardado <a href='$Ruta' target='_blank'>Imprimir</>";
             print("OK;$Mensaje");
@@ -329,6 +336,14 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit("E1;El documento ya está abierto");
             }
             $obCon->AbrirDocumentoContable($idDocumento);
+            $DatosDocumentoControl=$obCon->DevuelveValores("documentos_contables_control", "ID", $idDocumento);
+            if($DatosDocumentoControl["idDocumento"]==9){//Comprueba si es un cierre contable y si lo es reicio el control y borro los items del documento
+                $Anio=substr($DatosDocumentoControl["Fecha"],0,4);                
+                $sql="UPDATE cierre_contable_control SET CerrarCuentasResultado=0,TrasladarSaldosBalance=0,ContabilizarCierre=0,Estado=1 WHERE Anio='$Anio' AND Estado=2";
+                $obCon->Query($sql);
+                $sql="DELETE FROM documentos_contables_items WHERE idDocumento='$idDocumento'";
+                $obCon->Query($sql);
+            }
             print("OK;$DatosDocumento[NombreDocumento] $DatosDocumento[Consecutivo] Abierto;$idDocumento;$DatosDocumento[NombreDocumento] $DatosDocumento[Consecutivo]");
         break;    
         

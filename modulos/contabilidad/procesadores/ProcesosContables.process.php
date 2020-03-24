@@ -21,20 +21,31 @@ if( !empty($_REQUEST["Accion"]) ){
             $idDocumento=$obCon->normalizar($_REQUEST["idDocumento"]);
             $AnioSiguiente=$Anio+1;
             if($Empresa==''){
-                $css->CrearTitulo("<strong>DEBES SELECCIONAR UNA EMPRESA PARA CERRAR</strong>","rojo");
+                exit("<strong>DEBES SELECCIONAR UNA EMPRESA PARA CERRAR</strong>");
                 
             }
             
             
             if($Anio==''){
-                $css->CrearTitulo("<strong>DEBES SELECCIONAR UN AÑO PARA CERRAR</strong>","rojo");
-                exit();
+                exit("<strong>DEBES SELECCIONAR UN AÑO PARA CERRAR</strong>");
+                
             }
             
             if($idDocumento==''){
-                $css->CrearTitulo("<strong>DEBES SELECCIONAR DOCUMENTO DONDE SE REALIZARÁ EL CIERRE</strong>","rojo");
-                 exit();
+                exit("<strong>DEBES SELECCIONAR DOCUMENTO DONDE SE REALIZARÁ EL CIERRE</strong>");
+                 
             }
+            $AnioActual=date("Y");
+            if($Anio==$AnioActual){
+                exit("<strong>EL AÑO SELECCIONADO ES EL ACTUAL, EL PROCESO NO SE PUEDE REALIZAR</strong>");
+                 
+            }
+            $sql="SELECT CerrarCuentasResultado FROM cierre_contable_control WHERE Anio='$Anio' AND Estado=1";
+            $DatosControl=$obCon->FetchAssoc($obCon->Query($sql));
+            if($DatosControl["CerrarCuentasResultado"]==1){
+                exit("Las Cuentas de Resultado ya han sido cerradas");
+            }
+            
             $FechaInicial="$Anio-01-01";
             $FechaFinal="$Anio-12-31";
             $Condicion=" WHERE Fecha>='$FechaInicial' AND Fecha<='$FechaFinal' ";
@@ -134,6 +145,9 @@ if( !empty($_REQUEST["Accion"]) ){
                 
             }
             
+            $sql="UPDATE cierre_contable_control SET CerrarCuentasResultado=1 WHERE Anio='$Anio' AND Estado=1";
+            //print($sql);
+            $obCon->Query($sql);
                
             print("OK;Cierre de cuentas de Resultado agregados");
         break; //Fin caso 1
@@ -147,24 +161,37 @@ if( !empty($_REQUEST["Accion"]) ){
             $jsonSelects= $_REQUEST["jsonSelects"];
             $AnioSiguiente=$Anio+1;
             if($Empresa==''){
-                $css->CrearTitulo("<strong>DEBES SELECCIONAR UNA EMPRESA PARA CERRAR</strong>","rojo");
+                exit("<strong>DEBES SELECCIONAR UNA EMPRESA PARA CERRAR</strong>");
                 
             }
             
             
             if($Anio==''){
-                $css->CrearTitulo("<strong>DEBES SELECCIONAR UN AÑO PARA CERRAR</strong>","rojo");
-                exit();
+                exit("<strong>DEBES SELECCIONAR UN AÑO PARA CERRAR</strong>");
+                
             }
             
             if($idDocumento==''){
-                $css->CrearTitulo("<strong>DEBES SELECCIONAR DOCUMENTO DONDE SE REALIZARÁ EL CIERRE</strong>","rojo");
-                 exit();
+                exit("<strong>DEBES SELECCIONAR DOCUMENTO DONDE SE REALIZARÁ EL CIERRE</strong>");
+                 
             }
             if($jsonSelects==''){
-                $css->CrearTitulo("<strong>NO SE RECIBIÓ NINGUNA CUENTA A TRASLADAR</strong>","rojo");
-                 exit();
+                exit("<strong>NO SE RECIBIÓ NINGUNA CUENTA A TRASLADAR</strong>");
+               
             }
+            
+            $sql="SELECT CerrarCuentasResultado FROM cierre_contable_control WHERE Anio='$Anio' AND Estado=1";
+            $DatosControl=$obCon->FetchAssoc($obCon->Query($sql));
+            if($DatosControl["CerrarCuentasResultado"]==0){
+                exit("Debe cerrar primero las cuentas de Resultado");
+            }
+            
+            $sql="SELECT TrasladarSaldosBalance FROM cierre_contable_control WHERE Anio='$Anio' AND Estado=1";
+            $DatosControl=$obCon->FetchAssoc($obCon->Query($sql));
+            if($DatosControl["TrasladarSaldosBalance"]==1){
+                exit("Las Cuentas de Balance ya han sido Trasladadas");
+            }
+            
             parse_str($jsonSelects,$CuentasTraslados);
             //print($CuentasTraslados["SaldoCuenta"][110505]);
             //print_r($CuentasTraslados);
@@ -248,30 +275,9 @@ if( !empty($_REQUEST["Accion"]) ){
                 $obCon->AgregaMovimientoDocumentoContable($idDocumento, $DatosEmpresa["NIT"], $CuentaGPPatrimonio["CuentaPUC"], "DB", abs($GananciaPerdidaBalance), "Cierre Contable Año $Anio","Cierre $Anio",  "",$FechaTraslado);
                 
             }
-           
-               /*       
-            
-            if($TotalDocumentoContable<>0){
-                if($TotalDocumentoContable>0){ //Si hay ganacia
-                    
-                    $CuentaGPResultado=$obCon->DevuelveValores("parametros_contables", "ID", 13); //Cuenta patrimonio para utilidades 
-
-                    $obCon->AgregaMovimientoDocumentoContable($idDocumento, $Tercero, $CuentaGPResultado["CuentaPUC"], "CR", abs($TotalDocumentoContable), "Cierre Contable Año $Anio","Cierre $Anio",  "",$FechaMes13);
-
-                }
-
-                if($TotalDocumentoContable<0){ //si hay perdida
-                    
-                    $CuentaGPResultado=$obCon->DevuelveValores("parametros_contables", "ID", 13); //Cuenta patrimonio para utilidades 
-
-                    $obCon->AgregaMovimientoDocumentoContable($idDocumento, $Tercero, $CuentaGPResultado["CuentaPUC"], "DB", abs($TotalDocumentoContable), "Cierre Contable Año $Anio","Cierre $Anio",  "",$FechaMes13);
-
-                }
-            }
-         
-            
-                * 
-                */
+                       
+            $sql="UPDATE cierre_contable_control SET TrasladarSaldosBalance=1 WHERE Anio='$Anio' AND Estado=1";
+            $obCon->Query($sql);
             
             print("OK;Traslado de cuentas de Balance agregadas");
         break;//Fin caso 2    

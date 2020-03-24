@@ -35,6 +35,26 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CrearTitulo("<strong>DEBES SELECCIONAR DOCUMENTO DONDE SE REALIZARÁ EL CIERRE</strong>","rojo");
                  exit();
             }
+            
+            $sql="SELECT ID FROM cierre_contable_control WHERE Anio='$Anio' AND Estado=2";            
+            $DatosControlCierre=$obCon->FetchAssoc($obCon->Query($sql));
+            if($DatosControlCierre["ID"]<>''){
+                $css->CrearTitulo("<strong>EL AÑO $Anio ya fué cerrado</strong>","rojo");
+                exit();
+            }
+            $sql="SELECT ID FROM cierre_contable_control WHERE Anio='$Anio' AND Estado=1";            
+            $DatosControlCierre=$obCon->FetchAssoc($obCon->Query($sql));
+            
+            if($DatosControlCierre["ID"]==''){
+                $Datos["idDocumentoContable"]=$idDocumento;
+                $Datos["Anio"]=$Anio;
+                $Datos["idUser"]=$idUser;
+                $Datos["Estado"]=1;
+                $Datos["Created"]=date("Y-m-d");
+                $sql=$obCon->getSQLInsert("cierre_contable_control", $Datos);
+                $obCon->Query($sql);
+            }
+            
             $FechaInicial="$Anio-01-01";
             $FechaFinal="$Anio-12-31";
             $Condicion=" WHERE Fecha>='$FechaInicial' AND Fecha<='$FechaFinal' ";
@@ -138,12 +158,16 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CierraFilaTabla();
             $css->CerrarTabla();
             
-            $css->CrearDiv("", "col-md-6", "center", 1, 1);
+            $css->CrearDiv("", "col-md-4", "center", 1, 1);
                 $css->CrearBotonEvento("BtnCuentasResultados", "Ver Cuentas de Resultado", 1, "onclick", "DibujeAgrupacionCuentas(2)", "azul");
             $css->CerrarDiv();
             
-            $css->CrearDiv("", "col-md-6", "center", 1, 1);
+            $css->CrearDiv("", "col-md-4", "center", 1, 1);
                 $css->CrearBotonEvento("BtnCuentasOrden", "Ver Cuentas del Balance", 1, "onclick", "DibujeAgrupacionCuentas(3)", "verde");
+            $css->CerrarDiv();
+            
+            $css->CrearDiv("", "col-md-4", "center", 1, 1);
+                $css->CrearBotonEvento("BtnContabilizarCierre", "Contabilizar el Cierre", 1, "onclick", "ConfirmeContabilizarCierre()", "naranja");
             $css->CerrarDiv();
             print("<br><br>");
             $css->CrearDiv("DivDrawCuentas", "col-md-12", "center", 1, 1);

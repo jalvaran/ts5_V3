@@ -331,4 +331,76 @@ function TrasladarSaldosCuentasBalance(){
 
 }
 
+
+function ConfirmeContabilizarCierre(){
+    var idBoton='BtnContabilizarCierre';
+    document.getElementById(idBoton).disabled=true;
+    document.getElementById(idBoton).value="Contabilizando...";
+    
+    alertify.confirm('Está seguro que desea Contabilizar el Cierre Contable?',
+        function (e) {
+            if (e) {
+             
+                ContabilizarCierreContable();
+            }else{
+                alertify.error("Se canceló el proceso");
+                var idBoton='BtnContabilizarCierre';
+                document.getElementById(idBoton).disabled=false;
+                document.getElementById(idBoton).value="Contabilizar el Cierre";
+                return;
+            }
+        });
+}
+
+
+function ContabilizarCierreContable(idDocumento=''){
+    
+    if(idDocumento==''){
+        var idDocumento = document.getElementById('idDocumento').value;
+    }
+        
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '5'); 
+        form_data.append('idDocumento', idDocumento);
+        
+        
+        $.ajax({
+        url: './procesadores/DocumentosContables.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                                
+                var mensaje=respuestas[1];
+                
+                var x = document.getElementById("idDocumento");
+                x.remove(x.selectedIndex);
+                
+                var y = document.getElementById("CmbAnio");
+                y.remove(y.selectedIndex);
+                
+                alertify.alert(mensaje);
+                EjecutarProcesoSegunTipo();
+            }else{
+                alertify.alert(data);
+                document.getElementById('BtnContabilizarCierre').disabled=false;
+                document.getElementById('BtnContabilizarCierre').value="Guardar";
+            }
+            
+                        
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
 initModule();
