@@ -490,3 +490,13 @@ FROM facturas_items t1
 INNER JOIN facturas t2 ON t1.idFactura=t2.idFacturas WHERE t1.GeneradoDesde='Acuerdo'
 ORDER BY t2.Fecha,t1.ID DESC;
 
+DROP VIEW IF EXISTS `vista_auditoria_librodiario_sumas_saldos`;
+CREATE VIEW vista_auditoria_librodiario_sumas_saldos AS
+SELECT Tipo_Documento_Intero,Num_Documento_Interno,Num_Documento_Externo,idEmpresa,
+SUM(Debito-Credito) as TotalSaldo,SUM(Neto) as SaldoNeto 
+FROM librodiario GROUP BY Tipo_Documento_Intero,Num_Documento_Interno;
+
+DROP VIEW IF EXISTS `vista_auditoria_librodiario_documento_sin_balance`;
+CREATE VIEW vista_auditoria_librodiario_documento_sin_balance AS
+SELECT * 
+FROM vista_auditoria_librodiario_sumas_saldos WHERE (TotalSaldo>1 and TotalSaldo<1) or (SaldoNeto>1 and SaldoNeto<1) or (TotalSaldo<>SaldoNeto);

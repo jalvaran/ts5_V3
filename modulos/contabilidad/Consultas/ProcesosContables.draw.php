@@ -453,8 +453,284 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CerrarDiv();    
             $css->Cform();
         break; //Fin caso 3
-    
         
+        case 4://Dibuja los registros contables que no tienen cuenta contable
+            $idEmpresa=$obCon->normalizar($_REQUEST["idEmpresa"]);
+            
+            if($idEmpresa==''){
+                $css->CrearTitulo("<strong>Por favor selecciona una Empresa</strong>", "rojo");
+                exit();
+            }
+            
+            $css->CrearTitulo("<strong>Registros Sin Cuenta Contable</strong>", "azul");
+            
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>ID</strong>", 1);
+                    $css->ColTabla("<strong>Fecha</strong>", 1);
+                    $css->ColTabla("<strong>Documento</strong>", 1);
+                    $css->ColTabla("<strong>Numero del Documento</strong>", 1);
+                    $css->ColTabla("<strong>Referencia</strong>", 1);
+                    $css->ColTabla("<strong>Tercero</strong>", 1);
+                    $css->ColTabla("<strong>Cuenta</strong>", 1);
+                    $css->ColTabla("<strong>Debito</strong>", 1);
+                    $css->ColTabla("<strong>Credito</strong>", 1);
+                $css->CierraFilaTabla();
+                
+                $sql="SELECT * FROM librodiario WHERE (CuentaPUC='' or CuentaPUC=0) AND idEmpresa='$idEmpresa' LIMIT 15";
+                $Consulta=$obCon->Query($sql);
+                while($DatosLibro=$obCon->FetchAssoc($Consulta)){
+                    $idItem=$DatosLibro["idLibroDiario"];
+                    $css->FilaTabla(16);
+                        $css->ColTabla($idItem, 1);
+                        $css->ColTabla($DatosLibro["Fecha"], 1);
+                        $css->ColTabla($DatosLibro["Tipo_Documento_Intero"], 1);
+                        $css->ColTabla($DatosLibro["Num_Documento_Interno"], 1);
+                        $css->ColTabla($DatosLibro["Num_Documento_Externo"], 1);
+                        $css->ColTabla($DatosLibro["Tercero_Razon_Social"]." ".$DatosLibro["Tercero_Identificacion"], 1);
+                        print("<td>");
+                            print('<div class="input-group input-group-md">');
+                                $css->select("cmbCuentaPUCAuditoria_".$idItem, "cmbCuentaPUC", "cmbCuentaPUCAuditoria", "", "", "", "style=width:300px;");
+                                    $css->option("", "", "", "", "", "");
+                                        print("Seleccione una Cuenta Contable");
+                                    $css->Coption();
+                                $css->Cselect();
+                                print('<span class="input-group-btn">
+                                        <button type="button" class="btn btn-success btn-flat" onclick="EditarCuentaContable(`'.$idItem.'`,`'."cmbCuentaPUCAuditoria_".$idItem.'`)"><i class="fa fa-edit"></i></button>
+                                      </span>');
+                                            
+                                            
+                            print("</div>");
+                        print("</td>");
+                        $css->ColTabla(number_format($DatosLibro["Debito"]), 1);
+                        $css->ColTabla(number_format($DatosLibro["Credito"]), 1);
+                    $css->CierraFilaTabla();
+                }
+                
+            $css->CerrarTabla();
+        break;//fin caso 4   
+        
+        case 5://Dibuja los registros contables que no tienen tercero
+            $idEmpresa=$obCon->normalizar($_REQUEST["idEmpresa"]);
+            
+            if($idEmpresa==''){
+                $css->CrearTitulo("<strong>Por favor selecciona una Empresa</strong>", "rojo");
+                exit();
+            }
+            
+            $css->CrearTitulo("<strong>Registros Sin Tercero</strong>", "verde");
+            
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>ID</strong>", 1);
+                    $css->ColTabla("<strong>Fecha</strong>", 1);
+                    $css->ColTabla("<strong>Documento</strong>", 1);
+                    $css->ColTabla("<strong>Numero del Documento</strong>", 1);
+                    $css->ColTabla("<strong>Referencia</strong>", 1);
+                    $css->ColTabla("<strong>Tercero</strong>", 1);
+                    $css->ColTabla("<strong>Cuenta</strong>", 1);
+                    $css->ColTabla("<strong>Debito</strong>", 1);
+                    $css->ColTabla("<strong>Credito</strong>", 1);
+                $css->CierraFilaTabla();
+                
+                $sql="SELECT * FROM librodiario WHERE (Tercero_Identificacion='' or Tercero_Identificacion=0) AND idEmpresa='$idEmpresa' LIMIT 15";
+                $Consulta=$obCon->Query($sql);
+                while($DatosLibro=$obCon->FetchAssoc($Consulta)){
+                    $idItem=$DatosLibro["idLibroDiario"];
+                    $css->FilaTabla(16);
+                        $css->ColTabla($idItem, 1);
+                        $css->ColTabla($DatosLibro["Fecha"], 1);
+                        $css->ColTabla($DatosLibro["Tipo_Documento_Intero"], 1);
+                        $css->ColTabla($DatosLibro["Num_Documento_Interno"], 1);
+                        $css->ColTabla($DatosLibro["Num_Documento_Externo"], 1);
+                        
+                        print("<td>");
+                            print('<div class="input-group input-group-md">');
+                                $css->select("cmbTercero_".$idItem, "cmbTercero", "cmbTercero", "", "", "", "style=width:300px;");
+                                    $css->option("", "", "", "", "", "");
+                                        print("Seleccione un tercero");
+                                    $css->Coption();
+                                $css->Cselect();
+                                print('<span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary btn-flat" onclick="EditarTerceroEnRegistroContable(`'.$idItem.'`,`'."cmbTercero_".$idItem.'`)"><i class="fa fa-edit"></i></button>
+                                      </span>');
+                                            
+                                            
+                            print("</div>");
+                        print("</td>");
+                        $css->ColTabla($DatosLibro["CuentaPUC"]." ".$DatosLibro["NombreCuenta"], 1);
+                        $css->ColTabla(number_format($DatosLibro["Debito"]), 1);
+                        $css->ColTabla(number_format($DatosLibro["Credito"]), 1);
+                    $css->CierraFilaTabla();
+                }
+                
+            $css->CerrarTabla();
+        break;//fin caso 5
+        
+        case 6://Dibuja los registros contables en una cuenta padre
+            $idEmpresa=$obCon->normalizar($_REQUEST["idEmpresa"]);
+            
+            if($idEmpresa==''){
+                $css->CrearTitulo("<strong>Por favor selecciona una Empresa</strong>", "rojo");
+                exit();
+            }
+            
+            $css->CrearTitulo("<strong>Registros En Cuentas Padre</strong>", "naranja");
+            
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>ID</strong>", 1);
+                    $css->ColTabla("<strong>Fecha</strong>", 1);
+                    $css->ColTabla("<strong>Documento</strong>", 1);
+                    $css->ColTabla("<strong>Numero del Documento</strong>", 1);
+                    $css->ColTabla("<strong>Referencia</strong>", 1);
+                    $css->ColTabla("<strong>Tercero</strong>", 1);
+                    $css->ColTabla("<strong>Cuenta Actual</strong>", 1);
+                    $css->ColTabla("<strong>Editar Cuenta A</strong>", 1);
+                    $css->ColTabla("<strong>Debito</strong>", 1);
+                    $css->ColTabla("<strong>Credito</strong>", 1);
+                $css->CierraFilaTabla();
+                
+                $sql="SELECT * FROM librodiario WHERE LENGTH(CuentaPUC) <=4 AND idEmpresa='$idEmpresa' LIMIT 15";
+                $Consulta=$obCon->Query($sql);
+                while($DatosLibro=$obCon->FetchAssoc($Consulta)){
+                    $idItem=$DatosLibro["idLibroDiario"];
+                    $css->FilaTabla(16);
+                        $css->ColTabla($idItem, 1);
+                        $css->ColTabla($DatosLibro["Fecha"], 1);
+                        $css->ColTabla($DatosLibro["Tipo_Documento_Intero"], 1);
+                        $css->ColTabla($DatosLibro["Num_Documento_Interno"], 1);
+                        $css->ColTabla($DatosLibro["Num_Documento_Externo"], 1);
+                        $css->ColTabla($DatosLibro["Tercero_Razon_Social"]." ".$DatosLibro["Tercero_Identificacion"], 1);
+                        $css->ColTabla(($DatosLibro["CuentaPUC"]), 1);
+                        print("<td>");
+                            print('<div class="input-group input-group-md">');
+                                $css->select("cmbCuentaPUCAuditoria_".$idItem, "cmbCuentaPUC", "cmbCuentaPUCAuditoria", "", "", "", "style=width:300px;");
+                                    $css->option("", "", "", "", "", "");
+                                        print("Seleccione una Cuenta Contable");
+                                    $css->Coption();
+                                $css->Cselect();
+                                print('<span class="input-group-btn">
+                                        <button type="button" class="btn btn-success btn-flat" title="Editar solo este registro" onclick="EditarCuentaContable(`'.$idItem.'`,`'."cmbCuentaPUCAuditoria_".$idItem.'`)"><i class="fa fa-edit"></i></button>
+                                      </span>');
+                                print('<span class="input-group-btn">
+                                        <button type="button" class="btn btn-danger btn-flat" title="Editar todos los registros con esta cuenta" onclick="EditarCuentaContable(`'.$idItem.'`,`'."cmbCuentaPUCAuditoria_".$idItem.'`,`1`)"><i class="fa fa-retweet"></i></button>
+                                      </span>');
+                                            
+                                            
+                            print("</div>");
+                        print("</td>");
+                        $css->ColTabla(number_format($DatosLibro["Debito"]), 1);
+                        $css->ColTabla(number_format($DatosLibro["Credito"]), 1);
+                    $css->CierraFilaTabla();
+                }
+                
+            $css->CerrarTabla();
+        break;//fin caso 6
+        
+        case 7://Dibuja los documentos Contables descuadrados
+            $idEmpresa=$obCon->normalizar($_REQUEST["idEmpresa"]);
+            
+            if($idEmpresa==''){
+                $css->CrearTitulo("<strong>Por favor selecciona una Empresa</strong>", "rojo");
+                exit();
+            }
+            $css->CrearDiv("DivDocumentosDescuadrados", "col-md-6", "left", 1, 1);
+                $css->CrearTitulo("<strong>Documentos Descuadrados</strong>", "rojo");
+
+                $css->CrearTabla();
+                    $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Documento</strong>", 1);
+                        $css->ColTabla("<strong>Numero</strong>", 1);
+                        $css->ColTabla("<strong>Referencia</strong>", 1);                    
+                        $css->ColTabla("<strong>Saldo</strong>", 1);
+                        $css->ColTabla("<strong>Neto</strong>", 1);
+                        $css->ColTabla("<strong>Ver</strong>", 1);
+                    $css->CierraFilaTabla();
+
+                    $sql="SELECT * FROM vista_auditoria_librodiario_documento_sin_balance WHERE idEmpresa='$idEmpresa' LIMIT 15";
+                    $Consulta=$obCon->Query($sql);
+                    while($DatosLibro=$obCon->FetchAssoc($Consulta)){
+                        $TipoDocumento=$DatosLibro["Tipo_Documento_Intero"];
+                        $NumeroDocumento=$DatosLibro["Num_Documento_Interno"];
+                        $css->FilaTabla(16);
+
+                            $css->ColTabla($DatosLibro["Tipo_Documento_Intero"], 1);
+                            $css->ColTabla($DatosLibro["Num_Documento_Interno"], 1);
+                            $css->ColTabla($DatosLibro["Num_Documento_Externo"], 1);
+                            $css->ColTabla(number_format($DatosLibro["TotalSaldo"]), 1);
+                            $css->ColTabla(number_format($DatosLibro["SaldoNeto"]), 1);
+                            print("<td>");
+                                print('<div class="input-group input-group-md">');
+
+                                    print('<span class="input-group-btn">
+                                            <button type="button" class="btn btn-warning btn-flat" onclick="VerDocumentoDescuadrado(`'.$TipoDocumento.'`,`'.$NumeroDocumento.'`)"><i class="fa fa-eye"></i></button>
+                                          </span>');
+
+
+                                print("</div>");
+                            print("</td>");
+                        $css->CierraFilaTabla();
+                    }
+
+                $css->CerrarTabla();
+            $css->CerrarDiv();
+            
+            $css->CrearDiv("DivMovimientosDocumentoDescuadrado", "col-md-6", "left", 1, 1);
+            
+            $css->CerrarDiv();
+            
+        break;//fin caso 7
+        
+        case 8://Veo los movimientos de un documento contable
+            $TipoDocumento=$obCon->normalizar($_REQUEST["TipoDocumento"]);
+            $NumeroDocumento=$obCon->normalizar($_REQUEST["NumeroDocumento"]);
+            
+            if($TipoDocumento==''){
+                $css->CrearTitulo("<strong>No se recibió un tipo de documento</strong>", "rojo");
+                exit();
+            }
+            
+            if($NumeroDocumento==''){
+                $css->CrearTitulo("<strong>No se recibió un Número de documento</strong>", "rojo");
+                exit();
+            }
+            
+            $css->CrearTitulo("<strong>Movimientos del $TipoDocumento No. $NumeroDocumento </strong>", "rojo");
+            
+            $sql="SELECT * FROM librodiario WHERE Tipo_Documento_Intero='$TipoDocumento' AND Num_Documento_Interno='$NumeroDocumento'";
+            $Consulta=$obCon->Query($sql);
+            
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Cuenta</strong>", 1);
+                    $css->ColTabla("<strong>Debito</strong>", 1);
+                    $css->ColTabla("<strong>Credito</strong>", 1);
+                    $css->ColTabla("<strong>Neto</strong>", 1);
+                $css->CierraFilaTabla();
+            
+            while($DatosLibro=$obCon->FetchAssoc($Consulta)){
+                $idItem=$DatosLibro["idLibroDiario"];
+                $css->FilaTabla(16);
+                    $css->ColTabla($DatosLibro["CuentaPUC"], 1);
+                    print("<td>");
+                        $idCaja="TxtDebito_".$idItem;
+                        $css->input("text", "TxtDebito_".$idItem, "form-control", "TxtDebito_".$idItem, "", $DatosLibro["Debito"], "Debito", "off", "", "onchange=EditarRegistroAuditoria(`1`,`$idItem`,`$idCaja`,`Debito`)");
+                    print("</td>");
+                    print("<td>");
+                        $idCaja="TxtCredito_".$idItem;
+                        $css->input("text", "TxtCredito_".$idItem, "form-control", "TxtCredito_".$idItem, "", $DatosLibro["Credito"], "Credito", "off", "", "onchange=EditarRegistroAuditoria(`1`,`$idItem`,`$idCaja`,`Credito`)");
+                    print("</td>");
+                    print("<td>");
+                        $idCaja="TxtNeto_".$idItem;
+                        $css->input("text", "TxtNeto_".$idItem, "form-control", "TxtNeto_".$idItem, "", $DatosLibro["Neto"], "Neto", "off", "", "onchange=EditarRegistroAuditoria(`1`,`$idItem`,`$idCaja`,`Neto`)");
+                    print("</td>");
+                $css->CierraFilaTabla();
+            }
+            
+            $css->CerrarTabla();
+            
+        break;//Fin caso 8    
         
     }
     

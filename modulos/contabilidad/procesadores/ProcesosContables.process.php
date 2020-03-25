@@ -281,6 +281,97 @@ if( !empty($_REQUEST["Accion"]) ){
             
             print("OK;Traslado de cuentas de Balance agregadas");
         break;//Fin caso 2    
+        case 3://Editar la cuenta de un registro contable
+            $idLibro=$obCon->normalizar($_REQUEST["idLibro"]);
+            $CuentaPUC=$obCon->normalizar($_REQUEST["CuentaPUC"]);
+            $TodosLosRegistros=$obCon->normalizar($_REQUEST["TodosLosRegistros"]);
+            if($idLibro==''){
+                exit("E1;No se recibió el id del libro diario a editar");
+            }
+            if($CuentaPUC==''){
+                exit("E1;No se recibió La Cuenta Contable");
+            }
+            $DatosCuenta=$obCon->DevuelveValores("subcuentas", "PUC", $CuentaPUC);
+            
+            $NombreCuenta=$DatosCuenta["Nombre"];
+            $Condicion=" WHERE idLibroDiario='$idLibro' ";
+            if($TodosLosRegistros==1){
+                $DatosLibro=$obCon->DevuelveValores("librodiario", "idLibroDiario", $idLibro);
+                $CuentaAEditar=$DatosLibro["CuentaPUC"];
+                $Condicion="WHERE CuentaPUC='$CuentaAEditar'";
+            
+            }
+            
+            $sql="UPDATE librodiario SET CuentaPUC='$CuentaPUC',NombreCuenta='$NombreCuenta' $Condicion";
+            
+            $obCon->Query($sql);
+            
+            exit("OK;Se cambió el registro a la cuenta contable $CuentaPUC");
+            
+        break;//Fin caso 3 
+        
+        case 4://Editar el tercero de un registro contable
+            $idLibro=$obCon->normalizar($_REQUEST["idLibro"]);
+            $Tercero=$obCon->normalizar($_REQUEST["Tercero"]);
+            if($idLibro==''){
+                exit("E1;No se recibió el id del libro diario a editar");
+            }
+            if($Tercero==''){
+                exit("E1;No se recibió el Tercero");
+            }
+            $DatosTercero=$obCon->DevuelveValores("proveedores", "Num_Identificacion", $Tercero);
+            
+            $sql="UPDATE librodiario SET Tercero_Tipo_Documento='$DatosTercero[Tipo_Documento]',
+                    Tercero_Identificacion='$DatosTercero[Num_Identificacion]',
+                    Tercero_DV='$DatosTercero[DV]',
+                    Tercero_Primer_Apellido='$DatosTercero[Primer_Apellido]',
+                    Tercero_Segundo_Apellido='$DatosTercero[Segundo_Apellido]',
+                    Tercero_Primer_Nombre='$DatosTercero[Primer_Nombre]',
+                    Tercero_Otros_Nombres='$DatosTercero[Otros_Nombres]',
+                    Tercero_Razon_Social='$DatosTercero[RazonSocial]', 
+                        
+                    Tercero_Direccion='$DatosTercero[Direccion]',
+                    Tercero_Cod_Dpto='$DatosTercero[Cod_Dpto]',
+                    Tercero_Cod_Mcipio='$DatosTercero[Cod_Mcipio]',
+                    Tercero_Pais_Domicilio='$DatosTercero[Pais_Domicilio]'      
+
+                    WHERE idLibroDiario='$idLibro'";
+            
+            $obCon->Query($sql);
+            
+            exit("OK;Se cambió el registro al Tercero $Tercero");
+            
+        break;//Fin caso 4
+        
+        case 5://editar el registro de una tabla
+            $Tabla=$obCon->normalizar($_REQUEST["Tabla"]);
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $ValorEditar=$obCon->normalizar($_REQUEST["ValorEditar"]);
+            $ColumnaEditar=$obCon->normalizar($_REQUEST["ColumnaEditar"]);
+            $idCaja=$obCon->normalizar($_REQUEST["idCaja"]);
+            
+            if($Tabla==''){
+                exit("E1; No se recibió la tabla a editar");
+            }
+            if(!is_numeric($ValorEditar) ){
+                exit("E1;El Valor a Editar debe ser un número;$idCaja");
+            }
+            if($ColumnaEditar==''){
+                exit("E1; No se recibió la Columna a editar");
+            }
+            if($idItem==''){
+                exit("E1; No se recibió id del registro a editar");
+            }
+            
+            if($Tabla==1){
+                $TablaEdit="librodiario";
+                $idTabla="idLibroDiario";
+            }
+            
+            $sql="UPDATE $TablaEdit SET $ColumnaEditar='$ValorEditar' WHERE $idTabla='$idItem' ";
+            $obCon->Query($sql);
+            exit("OK;La Columna $ColumnaEditar del Registo $idItem fue editada con el valor $ValorEditar");
+        break;//Fin caso 5    
         
     }
     

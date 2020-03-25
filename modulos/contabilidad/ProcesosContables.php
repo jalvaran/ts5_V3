@@ -46,7 +46,7 @@ $css->PageInit($myTitulo);
                    $css->div("DivFiltros", "box-body no-padding", "", "", "", "", "");
                                 
                                 //Creamos el Selector que contiene las bases de datos
-                        $css->select("cmbTipoProceso", "form-control", "cmbTipoProceso", "", "", "onchange=DibujeProcesoSegunTipo()"/*funcion js para listar las tablas de  una base de datos*/, "");
+                        $css->select("cmbTipoProceso", "form-control", "cmbTipoProceso", "", "", "onchange=EjecutarProcesoSegunTipo()"/*funcion js para listar las tablas de  una base de datos*/, "");
 
                            $css->option("", "", "", "1", "", "");
                                    print("Auditoría de documentos");
@@ -82,11 +82,11 @@ $css->PageInit($myTitulo);
                                 print("Registros Sin Tercero");
                            $css->Coption();   
                            
-                           $css->option("", "", "", "1", "", "");
+                           $css->option("", "", "", "3", "", "");
                                 print("Registros a Cuentas Padre");
                            $css->Coption();
                            
-                           $css->option("", "", "", "3", "", "");
+                           $css->option("", "", "", "4", "", "");
                                 print("Documentos Sin Balance");
                            $css->Coption();    
                             

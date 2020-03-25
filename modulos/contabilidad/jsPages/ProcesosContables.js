@@ -132,14 +132,19 @@ function DibujeAgrupacionCuentas(Accion){
 function EjecutarProcesoSegunTipo(){
     var cmbTipoProceso = document.getElementById("cmbTipoProceso").value;
     
-    if(cmbTipoProceso==1 ){
+    if(cmbTipoProceso==1){
+        
+        MuestraXID("DivProcesosAuditoria");
         MuestreAuditoriaSegunTipo();
     }
     
     if(cmbTipoProceso==2){
+        
+        OcultaXID("DivProcesosAuditoria");
         IniciaCierreContable();
     }
 }
+
 
 
 function ConfirmaCierreCuentasResultados(){
@@ -402,5 +407,339 @@ function ContabilizarCierreContable(idDocumento=''){
       });
 }
 
+function MuestreAuditoriaSegunTipo(){
+    
+    var cmbTipoAuditoria = document.getElementById("cmbTipoAuditoria").value;
+    
+    if(cmbTipoAuditoria==1){
+        MuestreRegistrosSinCuentaContable();
+    }
+    
+    if(cmbTipoAuditoria==2){
+        MuestreRegistrosSinTercero();
+    }
+    
+    if(cmbTipoAuditoria==3){
+        
+        MuestreRegistrosACuentasPadre();
+    }
+    
+    if(cmbTipoAuditoria==4){
+        MuestreDocumentosSinBalance();
+    }
+}
+
+function MuestreRegistrosSinCuentaContable(){
+    var idDiv="DivDrawTables";
+    var idEmpresa=document.getElementById('idEmpresa').value;
+   
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 4);
+        form_data.append('idEmpresa', idEmpresa);
+                
+        $.ajax({
+        url: './Consultas/ProcesosContables.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+            $('.cmbCuentaPUC').select2({
+		
+                placeholder: 'Seleccione una Cuenta Contable',
+                ajax: {
+                  url: 'buscadores/CuentaPUC.search.php',
+                  dataType: 'json',
+                  delay: 250,
+                                    
+                  processResults: function (data) {
+                      
+                    return {                     
+                      results: data
+                    };
+                  },
+                 cache: true
+                }
+              }); 
+              
+              
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+function EditarCuentaContable(idLibro,idSelect,TodosLosRegistros=0){
+            
+    var CuentaPUC=document.getElementById(idSelect).value;
+   
+    var form_data = new FormData();
+        form_data.append('Accion', '3'); 
+        form_data.append('idLibro', idLibro);
+        form_data.append('CuentaPUC', CuentaPUC);
+        form_data.append('TodosLosRegistros', TodosLosRegistros);
+        $.ajax({
+        url: './procesadores/ProcesosContables.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                                
+                alertify.success(respuestas[1]);
+            }else if(respuestas[0]=="E1"){
+                alertify.error(respuestas[1]);
+            }else{
+                alertify.alert(data);
+                
+            }
+            
+                        
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function MuestreRegistrosSinTercero(){
+    var idDiv="DivDrawTables";
+    var idEmpresa=document.getElementById('idEmpresa').value;
+   
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 5);
+        form_data.append('idEmpresa', idEmpresa);
+                
+        $.ajax({
+        url: './Consultas/ProcesosContables.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+            $('.cmbTercero').select2({
+		
+                placeholder: 'Seleccione un tercero',
+                ajax: {
+                  url: 'buscadores/proveedores.search.php',
+                  dataType: 'json',
+                  delay: 250,
+                                    
+                  processResults: function (data) {
+                      
+                    return {                     
+                      results: data
+                    };
+                  },
+                 cache: true
+                }
+              }); 
+              
+              
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+function EditarTerceroEnRegistroContable(idLibro,idSelect){
+            
+    var Tercero=document.getElementById(idSelect).value;
+   
+    var form_data = new FormData();
+        form_data.append('Accion', '4'); 
+        form_data.append('idLibro', idLibro);
+        form_data.append('Tercero', Tercero);
+        
+        $.ajax({
+        url: './procesadores/ProcesosContables.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                                
+                alertify.success(respuestas[1]);
+            }else if(respuestas[0]=="E1"){
+                alertify.error(respuestas[1]);
+            }else{
+                alertify.alert(data);
+                
+            }
+            
+                        
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function MuestreRegistrosACuentasPadre(){
+    var idDiv="DivDrawTables";
+    var idEmpresa=document.getElementById('idEmpresa').value;
+   
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 6);
+        form_data.append('idEmpresa', idEmpresa);
+                
+        $.ajax({
+        url: './Consultas/ProcesosContables.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+            $('.cmbCuentaPUC').select2({
+		
+                placeholder: 'Seleccione una Cuenta Contable',
+                ajax: {
+                  url: 'buscadores/CuentaPUC.search.php',
+                  dataType: 'json',
+                  delay: 250,
+                                    
+                  processResults: function (data) {
+                      
+                    return {                     
+                      results: data
+                    };
+                  },
+                 cache: true
+                }
+              }); 
+              
+              
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+
+function MuestreDocumentosSinBalance(){
+    var idDiv="DivDrawTables";
+    var idEmpresa=document.getElementById('idEmpresa').value;
+   
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 7);
+        form_data.append('idEmpresa', idEmpresa);
+                
+        $.ajax({
+        url: './Consultas/ProcesosContables.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+function VerDocumentoDescuadrado(TipoDocumento,NumeroDocumento){
+    var idDiv="DivMovimientosDocumentoDescuadrado";
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 8);
+        form_data.append('TipoDocumento', TipoDocumento);
+        form_data.append('NumeroDocumento', NumeroDocumento);
+                
+        $.ajax({
+        url: './Consultas/ProcesosContables.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+function EditarRegistroAuditoria(Tabla,idItem,idCaja,ColumnaEditar){
+    var ValorEditar=document.getElementById(idCaja).value;  
+    var form_data = new FormData();
+        form_data.append('Accion', '5'); 
+        form_data.append('Tabla', Tabla);
+        form_data.append('idItem', idItem);
+        form_data.append('ValorEditar', ValorEditar);
+        form_data.append('ColumnaEditar', ColumnaEditar);
+        form_data.append('idCaja', idCaja);
+        
+        $.ajax({
+        url: './procesadores/ProcesosContables.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){                                
+                alertify.success(respuestas[1]);
+            }else if(respuestas[0]=="E1"){
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
+            }else{
+                alertify.alert(data);
+                
+            }
+            
+                        
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
 
 initModule();
