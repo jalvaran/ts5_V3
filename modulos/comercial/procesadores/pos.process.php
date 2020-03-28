@@ -458,7 +458,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $CuotaInicial=$TotalesCuotaInicial["TotalCuotaInicial"];
                 $SaldoInicial=$SaldoFinal;
                 $SaldoFinal=$SaldoInicial-$CuotaInicial;
-                $obAcuerdo->CrearAcuerdoPagoDesdePOS($idAcuerdoPago, $FechaInicialParaPagos, $DatosCliente["Num_Identificacion"],$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$CuotaInicial, $SaldoInicial, $SaldoFinal, 1, $idUser);
+                $obAcuerdo->CrearAcuerdoPagoDesdePOS($idAcuerdoPago,$idFactura, $FechaInicialParaPagos, $DatosCliente["Num_Identificacion"],$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$CuotaInicial, $SaldoInicial, $SaldoFinal, 1, $idUser);
                 
                 $CuentaDestino=$DatosCaja["CuentaPUCEfectivo"];
                 $CentroCosto=$DatosCaja["CentroCostos"];

@@ -283,11 +283,14 @@ class AcuerdoPago extends ProcesoVenta{
         if($VariablesAcuerdo["cicloPagos"]==''){
             exit("E4;Debe seleccionar el ciclo de pagos;cicloPagos");            
         }
+        /*
         $sql="SELECT ID FROM acuerdo_pago_cuotas_pagadas_temp WHERE idAcuerdoPago='$idAcuerdo' AND TipoCuota=0 LIMIT 1";
         $DatosAcuerdo= $this->FetchAssoc($this->Query($sql));
         if($DatosAcuerdo["ID"]==""){
             exit("E4;Debe agregar una cuota inicial");
         }
+         * 
+         */
         $sql="SELECT ID FROM acuerdo_pago_proyeccion_pagos_temp WHERE idAcuerdoPago='$idAcuerdo' AND TipoCuota=2 LIMIT 1";
         $DatosAcuerdo= $this->FetchAssoc($this->Query($sql));
         if($DatosAcuerdo["ID"]==""){
@@ -334,8 +337,9 @@ class AcuerdoPago extends ProcesoVenta{
         }
     }
     
-    public function CrearAcuerdoPago($idAcuerdoPago,$FechaInicialParaPagos,$Tercero,$ValorCuotaGeneral,$CicloPagos,$Observaciones,$SaldoAnterior,$TotalAbonos,$SaldoInicial,$SaldoFinal,$Estado,$idUser) {
+    public function CrearAcuerdoPago($idAcuerdoPago,$FechaInicialParaPagos,$Tercero,$ValorCuotaGeneral,$CicloPagos,$Observaciones,$SaldoAnterior,$TotalAbonos,$SaldoInicial,$SaldoFinal,$Estado,$idUser,$idFactura='') {
         $Datos["idAcuerdoPago"]=$idAcuerdoPago;
+        $Datos["idFactura"]=$idFactura;
         $Datos["Fecha"]=date("Y-m-d");
         $Datos["FechaInicialParaPagos"]=$FechaInicialParaPagos;
         $Datos["Tercero"]=$Tercero;
@@ -351,7 +355,7 @@ class AcuerdoPago extends ProcesoVenta{
         $Datos["Created"]=date("Y-m-d H:i:s");
         $sql= $this->getSQLInsert("acuerdo_pago", $Datos);
         $this->Query($sql);
-        
+                
     }
     
     public function CopiarProyeccionCuotasDesdeTemporal($idAcuerdo) {
@@ -368,9 +372,9 @@ class AcuerdoPago extends ProcesoVenta{
               WHERE acuerdo_pago_cuotas_pagadas_temp.idAcuerdoPago='$idAcuerdo' ";
         $this->Query($sql);
     }
-    public function CrearAcuerdoPagoDesdePOS($idAcuerdoPago, $FechaInicialParaPagos, $Tercero,$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$TotalAbonos, $SaldoInicial, $SaldoFinal, $Estado, $idUser) {
+    public function CrearAcuerdoPagoDesdePOS($idAcuerdoPago, $idFactura,$FechaInicialParaPagos, $Tercero,$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$TotalAbonos, $SaldoInicial, $SaldoFinal, $Estado, $idUser) {
         
-        $this->CrearAcuerdoPago($idAcuerdoPago, $FechaInicialParaPagos, $Tercero,$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$TotalAbonos, $SaldoInicial, $SaldoFinal, $Estado, $idUser);
+        $this->CrearAcuerdoPago($idAcuerdoPago, $FechaInicialParaPagos, $Tercero,$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$TotalAbonos, $SaldoInicial, $SaldoFinal, $Estado, $idUser,$idFactura);
         $this->CopiarCuotasPagadasDesdeTemporal($idAcuerdoPago);
         $this->CopiarProyeccionCuotasDesdeTemporal($idAcuerdoPago);
         $this->BorraReg("acuerdo_pago_cuotas_pagadas_temp", 'idAcuerdoPago', $idAcuerdoPago);

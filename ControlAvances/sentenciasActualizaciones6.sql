@@ -475,3 +475,6 @@ ALTER TABLE `facturas_items` ADD INDEX(`GeneradoDesde`);
 ALTER TABLE `facturas_items` ADD INDEX(`NumeroIdentificador`);
 
 ALTER TABLE `documentos_contables_items` ADD `Fecha` DATE NOT NULL AFTER `idDocumento`;
+ALTER TABLE `acuerdo_pago` ADD `idFactura` VARCHAR(45) NOT NULL AFTER `idAcuerdoPago`;
+ALTER TABLE `acuerdo_pago` ADD INDEX(`idFactura`);
+

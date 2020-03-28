@@ -2599,7 +2599,7 @@ function DibujeFormularioAcuerdoPago(idPreventa=""){
         type: 'post',
         success: function(data){
             document.getElementById('DivAcuerdoPago').innerHTML=data;
-            
+            VisualizarTotalesAcuerdo();
             inicieVideo();
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -2761,7 +2761,7 @@ function CalculeProyeccionPagosAcuerdo(idAcuerdo=''){
         type: 'post',
         success: function(data){
             document.getElementById('DivProyeccionPagosAcuerdo').innerHTML=data;
-            
+            VisualizarTotalesAcuerdo();
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.status);

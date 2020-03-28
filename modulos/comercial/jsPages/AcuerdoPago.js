@@ -570,3 +570,11 @@ function DibujeRecomendadosCliente(idCliente='',idDiv="DivRecomendadosExistentes
       
       
 }
+
+function SumaRestaDiferenciaCuota(idCaja){
+    var Diferencia = document.getElementById('TxtDiferenciaCuotasAcuerdo').value;
+    var CuotaActual = document.getElementById(idCaja).value;
+    var TotalCuota=parseInt(CuotaActual)+parseInt(Diferencia);
+    document.getElementById(idCaja).value=TotalCuota;
+    
+}

@@ -927,9 +927,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         print("</td>");
                         print("<td>");
                             $css->select("metodoPagoCuotaInicial", "form-control", "metodoPagoCuotaInicial", "", "", "onchange=CalculeCuotasAcuerdo()", "");
-                                $css->option("", "", "", "", "", "");
-                                    print("Metodo de pago");
-                                $css->Coption();
+                                
                                 $sql="SELECT * FROM metodos_pago WHERE Estado=1";
                                 $Consulta=$obCon->Query($sql);
                                 while($DatosCiclo=$obCon->FetchAssoc($Consulta)){
@@ -954,7 +952,7 @@ if( !empty($_REQUEST["Accion"]) ){
                             $css->input("number", "CuotaProgramadaAcuerdo", "form-control", "CuotaProgramadaAcuerdo", "Cuota Programada", "", "Cuota Programada", "off", "", "onchange=CalculeCuotas()");
                         print("</td>");
                         print("<td>");
-                            $css->input("date", "TxtFechaCuotaProgramada", "form-control", "TxtFechaCuotaProgramada", "Fecha", date("Y-m-d"), "Fecha", "off", "", "","style='line-height: 15px;'");
+                            $css->input("date", "TxtFechaCuotaProgramada", "form-control", "TxtFechaCuotaProgramada", "Fecha", date("Y-m-d"), "Fecha", "off", "", "","style='line-height: 15px;' min='".date("Y-m-d")."'");
                         print("</td>"); 
                         print("<td>");
                             $css->CrearBotonEvento("btnAgregarCuotaProgramada", "+", 1, "onclick", "AgregarCuotaProgramadaAcuerdoPagoTemporal('$idAcuerdo')", "verde");
@@ -1002,7 +1000,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CierraFilaTabla(); 
                     $css->FilaTabla(16);
                         print("<td>");
-                            $css->input("date", "TxtFechaInicialPagos", "form-control", "TxtFechaInicialPagos", "Fecha", date("Y-m-d"), "Fecha", "off", "", "","style='line-height: 15px;'");
+                            $css->input("date", "TxtFechaInicialPagos", "form-control", "TxtFechaInicialPagos", "Fecha", date("Y-m-d"), "Fecha", "off", "", "","style='line-height: 15px;' min='".date("Y-m-d")."'");
                         print("</td>"); 
                         print("<td>");
                             
@@ -1239,7 +1237,13 @@ if( !empty($_REQUEST["Accion"]) ){
                             $css->ColTabla($DatosAcuerdoProyeccion["Fecha"], 1); 
                             $css->ColTabla(($obAcuerdo->obtenerNombreDiaFecha($DatosAcuerdoProyeccion["Fecha"])), 1);
                             print("<td>");
-                                $css->input("number", "TxtValorCuotaNormal_$idItem", "form-control", "TxtValorCuotaNormal_$idItem", "Cuota", round($DatosAcuerdoProyeccion["ValorCuota"]), "Valor de la cuota", "off", "", "onChange=EditarCuotaTemporal(`$idItem`)", "style=width:150px");
+                                print('<div class="input-group input-group-md">');
+                                    print('<span class="input-group-btn">
+                                        <button type="button" class="btn btn-success btn-flat" onclick=SumaRestaDiferenciaCuota(`TxtValorCuotaNormal_'.$idItem.'`);EditarCuotaTemporal(`'.$idItem.'`)> <i class="fa fa-plus"> </i> </button>
+                                      </span> ');
+                                    $css->input("number", "TxtValorCuotaNormal_$idItem", "form-control", "TxtValorCuotaNormal_$idItem", "Cuota", round($DatosAcuerdoProyeccion["ValorCuota"]), "Valor de la cuota", "off", "", "onChange=EditarCuotaTemporal(`$idItem`)", "style=width:150px");
+                                    
+                                print("</div>");
                             print("</td>");
                                                      
                         $css->CierraFilaTabla();
@@ -1258,10 +1262,11 @@ if( !empty($_REQUEST["Accion"]) ){
             $TotalPreventa=$Totales["Total"];
             
             $ValorAProyectar=$obAcuerdo->ValorAProyectarTemporalAcuerdo($idAcuerdo, $TotalPreventa, $idCliente);
-            print("Valor a Proyectar: <h2><strong>". number_format($ValorAProyectar)."</strong></h2>");
+            print("Valor a Proyectar: <h2 style=color:red><strong>". number_format($ValorAProyectar)."</strong></h2>");
             $TotalCuotasProyectadas=$obAcuerdo->TotalCuotasTemporalAcuerdoPago($idAcuerdo);
             //print("Total Cuotas: <h2><strong>". number_format($TotalCuotasProyectadas)."</strong></h2>");
             $Diferencia=$ValorAProyectar-$TotalCuotasProyectadas;
+            $css->input("hidden", "TxtDiferenciaCuotasAcuerdo", "", "TxtDiferenciaCuotasAcuerdo", "", $Diferencia, "", "", "", "");
             print("Diferencia: <h2><strong>". number_format($Diferencia)."</strong></h2>");
         break;//Fin caso 17   
     
