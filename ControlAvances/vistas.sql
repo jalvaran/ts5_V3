@@ -499,4 +499,16 @@ FROM librodiario GROUP BY Tipo_Documento_Intero,Num_Documento_Interno;
 DROP VIEW IF EXISTS `vista_auditoria_librodiario_documento_sin_balance`;
 CREATE VIEW vista_auditoria_librodiario_documento_sin_balance AS
 SELECT * 
-FROM vista_auditoria_librodiario_sumas_saldos WHERE (TotalSaldo>1 and TotalSaldo<1) or (SaldoNeto>1 and SaldoNeto<1) or (TotalSaldo<>SaldoNeto);
+FROM vista_auditoria_librodiario_sumas_saldos WHERE (TotalSaldo>1 and TotalSaldo<1) or (SaldoNeto>1 and SaldoNeto<1) or (round(TotalSaldo)<>round(SaldoNeto));
+
+
+DROP VIEW IF EXISTS `vista_balance_comprobacion_terceros`;
+CREATE VIEW vista_balance_comprobacion_terceros AS
+
+SELECT CuentaPUC,NombreCuenta, 
+Tercero_Identificacion,Tercero_DV,Tercero_Razon_Social,
+Tercero_Direccion,Tercero_Cod_Mcipio,
+SUM(Debito) as Debitos,SUM(Credito) as Creditos
+FROM librodiario 
+GROUP BY CuentaPUC,Tercero_Identificacion;
+

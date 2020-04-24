@@ -261,8 +261,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             
         break;// fin caso 2  
         
-        case 5://dibuja el listado de las reservas
-                        
+        case 3://Listar las clasificaciones
             $Limit=20;
             $Page=$obCon->normalizar($_REQUEST["Page"]);
             $NumPage=$obCon->normalizar($_REQUEST["Page"]);
@@ -271,41 +270,47 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 $NumPage=1;
             }
             $Busquedas=$obCon->normalizar($_REQUEST["Busquedas"]);
-            $Estado=$obCon->normalizar($_REQUEST["Estado"]);
+            $idLocal=$obCon->normalizar($_REQUEST["idLocal"]);
+            $dbLocal=$obCon->normalizar($_REQUEST["dbLocal"]);
+            if($idLocal==''){
+                $css->CrearTitulo("No se envío el ID de un local","rojo");
+                exit();
+            }
+            if($dbLocal==''){
+                $css->CrearTitulo("No se envío la base de datos un local","rojo");
+                exit();
+            }
+            
             $Condicion=" WHERE ID>0 ";
-            
             if($Busquedas<>''){
-                $Condicion.=" AND ( NumeroAutorizacion like '%$Busquedas%' or NumeroDocumento like '%$Busquedas%' or NombreCompleto like '%$Busquedas%' or Telefono like '%$Busquedas%')";
+                $Condicion.=" AND (Clasificacion like '%$Busquedas%')";
             }
-            
-            if($Estado<>''){
-                $Condicion.=" AND Estado='$Estado'";
-            }
-            
+            $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 1000);//Allí se aloja la informacion del servidor de DOMI
+                        
             $PuntoInicio = ($Page * $Limit) - $Limit;
             
             $sql = "SELECT COUNT(ID) as Items 
-                   FROM vista_prefactura_reservas t1 $Condicion;";
+                   FROM inventarios_clasificacion $Condicion;";
             
-            $Consulta=$obCon->Query($sql);
+            
+            $Consulta=$obCon->QueryExterno($sql, $DatosServidor["IP"], $DatosServidor["Usuario"], $DatosServidor["Password"], $dbLocal, "");
             $totales = $obCon->FetchAssoc($Consulta);
             $ResultadosTotales = $totales['Items'];
                         
             $sql="SELECT *
-                  FROM vista_prefactura_reservas $Condicion ORDER BY ID DESC LIMIT $PuntoInicio,$Limit;";
-            $Consulta=$obCon->Query($sql);
+                  FROM inventarios_clasificacion $Condicion ORDER BY ID ASC LIMIT $PuntoInicio,$Limit;";
+            $Consulta=$obCon->QueryExterno($sql, $DatosServidor["IP"], $DatosServidor["Usuario"], $DatosServidor["Password"], $dbLocal, "");
             
-            
-            $css->CrearTitulo("Lista de Reservas", "azul");
-            
-            
+            $css->CrearTitulo("Clasificacion del Inventario o Servicios", "verde");   
             
             $css->div("", "box-body no-padding", "", "", "", "", "");
                 $css->div("", "mailbox-controls", "", "", "", "", "");
-                    print('<a class="btn btn-app" style="background-color:blue;color:white;" onclick=FormularioCrearEditarReserva()>
-                        <span class="badge bg-green" style="font-size:14px">'.$ResultadosTotales.'</span>
-                        <i class="fa fa-ambulance"></i> Reservar 
+                
+                    print('<a class="btn btn-app" style="background-color:blue;color:white;" onclick=FormularioCrearEditarClasificacion()>
+                        <span class="badge bg-orange" style="font-size:14px">'.$ResultadosTotales.'</span>
+                        <i class="fa fa-sitemap"></i> Agregar 
                       </a>');
+                   
                     $css->div("", "pull-right", "", "", "", "", "");
                         if($ResultadosTotales>$Limit){
                             $TotalPaginas= ceil($ResultadosTotales/$Limit);                               
@@ -347,52 +352,19 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                                 
                                 $idItem=$RegistrosTabla["ID"];
                                 
-                                $NombreCompleto= utf8_encode($RegistrosTabla["NombreCompleto"]);
                                 print('<tr>');
                                     print("<td>");
-                                        print('<button type="button" class="btn btn-warning btn-sm" title="Editar" onclick=FormularioCrearEditarReserva(`2`,`'.$idItem.'`)><i class="fa fa-edit"></i></button>');
-                                    print("</td>");
-                                    print("<td>");
-                                        print('<button type="button" class="btn btn-success btn-sm" title="Ver Reserva" onclick=VerReserva(`'.$idItem.'`)><i class="fa fa-eye"></i></button>');
-                                    print("</td>");
-                                    print("<td>");
-                                        print('<button type="button" class="btn btn-primary btn-sm" title="Validar Reserva" onclick=FormularioValidarReserva(`'.$idItem.'`)><i class="fa fa-check"></i></button>');
+                                        print('<button type="button" class="btn btn-warning btn-sm" onclick=FormularioCrearEditarClasificacion(`2`,`'.$idItem.'`)><i class="fa fa-edit"></i></button>');
                                     print("</td>");
                                     print("<td class='mailbox-name'>");
                                         print($RegistrosTabla["ID"]);
                                     print("</td>");
                                     print("<td class='mailbox-subject'>");
-                                        print("<strong>".$NombreCompleto."</strong>");
+                                        print("<strong>".utf8_encode($RegistrosTabla["Clasificacion"])."</strong>");
                                     print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print($RegistrosTabla["TipoDocumento"]);
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print($RegistrosTabla["NumeroDocumento"]);
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print(($RegistrosTabla["Sexo"]));
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print("<strong>".$RegistrosTabla["NumeroAutorizacion"]."</strong>");
-                                    print("</td>");
-                                    
-                                    print("<td class='mailbox-subject'>");
-                                        print(utf8_encode($RegistrosTabla["Direccion"]." <br>(".$RegistrosTabla["Municipio"]." ".$RegistrosTabla["Departamento"].")"));
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print(($RegistrosTabla["Telefono"]));
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        if($RegistrosTabla["Estado"]==3){
-                                            print('<a href="'.substr($RegistrosTabla["RutaSoporte"], 3).'" target="blank" class="mailbox-attachment-name"><i class="fa fa-paperclip"></i> '.$RegistrosTabla["NombreArchivo"].'</a>');
-                                        }else{
-                                            print("");
-                                        }
-                                        
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print(utf8_encode("<strong>".$RegistrosTabla["NombreEstado"]."</strong>"));
+                                                                
+                                    print("<td class='mailbox-date'>");
+                                        print(($RegistrosTabla["Estado"]));
                                     print("</td>");
                                                                         
                                 print('</tr>');
@@ -403,594 +375,72 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                     print('</table>');
                 $css->Cdiv();
             $css->Cdiv();
-        break;//fin caso 5
+        break;// fin caso 3
         
-        case 6:// formulario para crear o editar un paciente
+        case 4:// formulario para crear o editar una clasificacion
             $TipoFormulario=$obCon->normalizar($_REQUEST["TipoFormulario"]);
             $idEditar=$obCon->normalizar($_REQUEST["idEditar"]);
-            $DatosReserva=$obCon->DevuelveValores("prefactura_reservas", "ID", $idEditar);
-            $DatosPaciente=$obCon->DevuelveValores("prefactura_paciente", "ID", $DatosReserva["idPaciente"]);
-            $css->CrearTitulo("Crear o Editar una Reserva", "verde");
+            $dbLocal=$obCon->normalizar($_REQUEST["dbLocal"]);
+            $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 1000);//Servidor DOMI
+            $sql="SELECT * FROM inventarios_clasificacion WHERE ID='$idEditar'";
+            $Consulta=$obCon->QueryExterno($sql, $DatosServidor["IP"], $DatosServidor["Usuario"], $DatosServidor["Password"], $dbLocal, "");
+            $DatosLocal=$obCon->FetchAssoc($Consulta);
+            $css->CrearTitulo("Crear o Editar una Clasificacion", "naranja");
             $css->CrearDiv("", "box box-default", "", 1, 1);
                 $css->CrearDiv("", "box-body", "", 1, 1);
                     $css->CrearDiv("", "row", "", 1, 1);
-                        $css->CrearDiv("", "col-md-12", "", 1, 1);
+                                               
+                        $css->CrearDiv("", "col-md-4", "", 1, 1);
                             $css->CrearDiv("", "form-group", "", 1, 1);
-                                print('<label>Seleccione un Paciente</label>');
-                                $css->select("idPaciente", "form-control", "idPaciente", "", "", "", "");
-                                    $sel=0;
-                                    $css->option("", "", "", '', "", "",$sel);
-                                        print("Seleccione un paciente");
-                                    $css->Coption();
-                                    $sel=0;
-                                    if($DatosReserva["idPaciente"]<>''){
-                                        $sel=1;
-                                        $NombreCompleto=$DatosPaciente["PrimerNombre"]." ".$DatosPaciente["PrimerNombre"]." ".$DatosPaciente["PrimerApellido"]." ".$DatosPaciente["SegundoApellido"];
-                                        $css->option("", "", "", $DatosPaciente["ID"], "", "",$sel);
-                                            print($DatosPaciente["ID"]." || ".$NombreCompleto." || ".$DatosPaciente["TipoDocumento"]." || ".$DatosPaciente["NumeroDocumento"]." || ".utf8_encode($DatosPaciente["Direccion"])." || ".$DatosPaciente["Telefono"]);
-                                        $css->Coption();
-                                    }
-                                    
-                                $css->Cselect();
-                            $css->CerrarDiv();                             
-                        $css->CerrarDiv();
-                        
-                    $css->CerrarDiv();
-                    //Fin Fila 1
-                    //Inicia Fila 2
-                    $css->CrearDiv("", "row", "", 1, 1);
-                        $css->CrearDiv("", "col-md-3", "", 1, 1);
-                            $css->CrearDiv("", "form-group", "", 1, 1);
-                                print('<label>Número de Autorización</label>');
-                                $css->input("text", "NumeroAutorizacion", "form-control", "NumeroAutorizacion", "Número de Autorización", $DatosReserva["NumeroAutorizacion"], "Numero de autorizacion", "off", "", "");
+                                print('<label>Clasificacion</label>');                                
+                                $css->input("text", "Clasificacion", "form-control", "Clasificacion", "Clasificacion", $DatosLocal["Clasificacion"], "Clasificacion", "off", "", "");
                             $css->CerrarDiv(); 
                             
                         $css->CerrarDiv(); 
-                        $css->CrearDiv("", "col-md-3", "", 1, 1);
+                        
+                        
+                        $css->CrearDiv("", "col-md-4", "", 1, 1);
                             $css->CrearDiv("", "form-group", "", 1, 1);
-                                print('<label>Cantidad de Servicios</label>');
-                                $css->input("text", "CantidadServicios", "form-control", "CantidadServicios", "Cantidad de Servicios", $DatosReserva["CantidadServicios"], "Cantidad de Servicios", "off", "", "");
-                            $css->CerrarDiv(); 
-                            
-                        $css->CerrarDiv();  
-                        $css->CrearDiv("", "col-md-6", "", 1, 1);
-                            $css->CrearDiv("", "form-group", "", 1, 1);
-                                print('<label>Diagnóstico</label>');
-                                $css->select("Cie10", "form-control", "Cie10", "", "", "", "");
+                                print('<label>Estado</label>');
+                                $css->select("Estado", "form-control", "Estado", "", "", "", "");
                                     $sel=0;
-                                    $css->option("", "", "", '', "", "",$sel);
-                                        print("Seleccione un diagnostico");
+                                    if($DatosLocal["Estado"]==1){
+                                        $sel=1;
+                                    }
+                                    $css->option("", "", "", '1', "", $sel);
+                                        print("Activo");
                                     $css->Coption();
                                     $sel=0;
-                                    if($DatosReserva["Cie10"]<>''){
+                                    if($DatosLocal["Estado"]==0){
                                         $sel=1;
-                                        $DatosCIE=$obCon->DevuelveValores("salud_cie10", "codigo_sistema", $DatosReserva["Cie10"]);
-                                        
-                                        $css->option("", "", "", $DatosCIE["codigo_sistema"], "", "",$sel);
-                                            print(utf8_encode($DatosCIE["codigo_sistema"]." || ".$DatosCIE["descripcion_cups"]));
-                                        $css->Coption();
                                     }
-                                    
+                                    $css->option("", "", "", '0', "", $sel);
+                                        print("Deshabilitado");
+                                    $css->Coption();
+                                                                        
                                 $css->Cselect();
-                            $css->CerrarDiv(); 
-                            
-                        $css->CerrarDiv();  
-                        
-                    $css->CerrarDiv(); 
-                    //Fin Fila 2
-                    
-                    //Inicio Fila 3
-                    $css->CrearDiv("", "row", "", 1, 1);
-                        
-                        $css->CrearDiv("", "col-md-9", "", 1, 1);
-                            $css->CrearDiv("", "form-group", "", 1, 1);
-                                print('<label>Observaciones</label>');
-                                $css->textarea("Observaciones", "form-control", "Observaciones", "", "Observaciones", "", "");
-                                    print(utf8_encode($DatosReserva["Observaciones"]));
-                                $css->Ctextarea();
-                                
                             $css->CerrarDiv();                             
                         $css->CerrarDiv();
                         
-                        $css->CrearDiv("", "col-md-3", "", 1, 1);
+                        $css->CrearDiv("", "col-md-4", "", 1, 1);
                             $css->CrearDiv("", "form-group", "", 1, 1);
                                 print('<label>Guardar</label>');
-                                $css->CrearBotonEvento("btnGuardarReserva", "Guardar", 1, "onclick", "ConfirmaGuardarEditarReserva(`$TipoFormulario`,`$idEditar`)", "rojo");
+                                $css->CrearBotonEvento("btnGuardarClasificacion", "Guardar", 1, "onclick", "ConfirmaGuardarEditarClasificacion(`$TipoFormulario`,`$idEditar`)", "rojo");
                             $css->CerrarDiv();                             
-                        $css->CerrarDiv();
-                        
-                    $css->CerrarDiv(); 
-                    //Fin Fila 3
-                $css->CerrarDiv();
-                
-            $css->CerrarDiv();
-            
-        break;// fin caso 6
-        
-        case 7://Dibuja una Reserva con sus citas y formulario para agregar citas
-            $idReserva=$obCon->normalizar($_REQUEST["idReserva"]);
-            if($idReserva==''){
-                exit("E1;No se recibió el id de la reserva");
-            }
-            $DatosReserva=$obCon->DevuelveValores("prefactura_reservas", "ID", $idReserva);
-            $DatosPaciente=$obCon->DevuelveValores("prefactura_paciente", "ID", $DatosReserva["idPaciente"]);
-            $DatosMunicipio=$obCon->DevuelveValores("catalogo_municipios", "CodigoDANE", $DatosPaciente["CodigoDANE"]);
-            $DatosEps=$obCon->DevuelveValores("salud_eps", "cod_pagador_min", $DatosPaciente["CodEPS"]);
-            $NombreCompleto= utf8_encode($DatosPaciente["PrimerNombre"]." ".$DatosPaciente["SegundoNombre"]." ".$DatosPaciente["PrimerApellido"]." ".$DatosPaciente["SegundoApellido"]);
-            $sql="SELECT COUNT(ID) as TotalCitas FROM prefactura_reservas_citas WHERE idReserva='$idReserva' AND Estado<10";
-            $Validacion=$obCon->FetchAssoc($obCon->Query($sql));
-            $TotalCitasAgregadas=$Validacion["TotalCitas"];
-            $css->CrearTitulo("<strong>Reserva $idReserva</strong>", "azul");
-            $css->CrearDiv("", "col-md-4", "center", 1, 1);
-                $css->CrearDiv("", "box box-widget widget-user-2", "left", 1, 1);
-                    $css->CrearDiv("", "widget-user-header bg-aqua-active", "left", 1, 1);
-                        $css->CrearDiv("", "widget-user-image", "left", 1, 1);
-                            print('<img class="img-circle" src="../../images/usuariostipo.png" alt="User Avatar"></img>');
-                        $css->CerrarDiv();
-                        print('<h4 class="widget-user-username">');
-                            print("<strong>".$NombreCompleto."</strong>");
-                        print('</h4>');
-                    $css->CerrarDiv();   
-                    
-                    $css->CrearDiv("", "box-footer no-padding", "left", 1, 1);
-                        print('<ul class="nav nav-stacked" style="font-size:16px;">');
-                            print('<li><a onclick="CopiarAlPortapapelesID(`#spAutorizacionReserva`);">Autorización <span id="spAutorizacionReserva" class="pull-right" style="font-size:16px;"><strong>'.$DatosReserva["NumeroAutorizacion"].'</strong></span></a></li>');
-                            print('<li><a>No. Servicios Autorizados<span  class="pull-right" style="font-size:16px;"><strong>'.$DatosReserva["CantidadServicios"].'</strong></span></a></li>');
-                            print('<li><a>No. Servicios Disponibles<span id="spServiciosDisponibles" class="pull-right badge bg-blue" style="font-size:16px;"><strong>'.($DatosReserva["CantidadServicios"]-$TotalCitasAgregadas).'</strong></span></a></li>');
-                            print('<li><a>Sexo <span  class="pull-right" style="font-size:16px;"><strong>'.$DatosPaciente["Sexo"].'</strong></span></a></li>');
-                            print('<li><a>Tipo de Documento <span class="pull-right" style="font-size:16px;"><strong>'.$DatosPaciente["TipoDocumento"].'</strong></span></a></li>');
-                            print('<li><a onclick="CopiarAlPortapapelesID(`#spIdentificacionPaciente`);">Numero de Documento <span id="spIdentificacionPaciente" class="pull-right" style="font-size:16px;"><strong>'.$DatosPaciente["NumeroDocumento"].'</strong></span></a></li>');
-                            print('<li><a onclick="CopiarAlPortapapelesID(`#spTelefonoPaciente`);">Teléfono <span id="spTelefonoPaciente" class="pull-right" style="font-size:16px;"><strong>'.$DatosPaciente["Telefono"].'</strong></span></a></li>');
-                            print('<li><a disabled onclick="CopiarAlPortapapelesID(`#spDireccionPaciente`);">Dirección <span  id="spDireccionPaciente" class="pull-right" style="font-size:16px;"><strong>'.utf8_encode($DatosPaciente["Direccion"]).'</strong></span></a></li>');
-                            print('<li><a disabled >Ciudad <span class="pull-right" style="font-size:16px;"><strong>'.utf8_encode($DatosMunicipio["Nombre"]).'</strong></span></a></li>');
-                            print('<li><a disabled >Departamento <span class="pull-right" style="font-size:16px;"><strong>'.utf8_encode($DatosMunicipio["Departamento"]).'</strong></span></a></li>');
-                            print('<li><a disabled >EPS<span class="pull-right" style="font-size:16px;"><strong>'.utf8_encode($DatosEps["nombre_completo"]).'</strong></span></a></li>');
-                           
-                        print('</ul>');
-                    $css->CerrarDiv();
-                $css->CerrarDiv();    
-                
-            $css->CerrarDiv();
-            $css->CrearDiv("", "col-md-8", "center", 1, 1);
-                $css->CrearDiv("DivFormularioCitas", "", "center", 1, 1);
-                    $css->CrearTitulo("<strong>Agregar una Cita</strong>","verde");
-                    $css->CrearDiv("", "box box-default", "", 1, 1);
-                        $css->CrearDiv("", "box-body", "", 1, 1);
-                            $css->CrearDiv("", "row", "", 1, 1);
-                                $css->CrearDiv("", "col-md-12", "", 1, 1);
-                                    $css->CrearDiv("", "form-group", "", 1, 1);
-                                        print('<label>Seleccione un Hospital</label>');
-                                        $css->select("idHospital", "form-control", "idHospital", "", "", "", "");                                            
-                                            $css->option("", "", "", '', "", "");
-                                                print("Seleccione un Hospital");
-                                            $css->Coption();                                            
-                                        $css->Cselect();
-                                    $css->CerrarDiv();                             
-                                $css->CerrarDiv();
-
-                            $css->CerrarDiv();
-                            //Fila 2
-                            $css->CrearDiv("", "row", "", 1, 1);
-                                $css->CrearDiv("", "col-md-6", "", 1, 1);
-                                    $css->CrearDiv("", "form-group", "", 1, 1);
-                                        print('<label>Fecha</label>');
-                                        $css->input("date", "Fecha", "form-control", "Fecha", "Fecha", "", "Fecha", "off", "", "","style='line-height: 15px;'");
-                        
-                                    $css->CerrarDiv();                             
-                                $css->CerrarDiv();
-                                
-                                $css->CrearDiv("", "col-md-6", "", 1, 1);
-                                    $css->CrearDiv("", "form-group", "", 1, 1);
-                                        
-                                                        
-                                        print('<div class="bootstrap-timepicker">
-                                            <div class="form-group">
-                                              <label>Hora:</label>
-
-                                              <div class="input-group">
-                                                <input id="Hora" type="text" class="form-control timepicker">
-
-                                                <div class="input-group-addon">
-                                                  <i class="fa fa-clock-o"></i>
-                                                </div>
-                                              </div>
-                                              <!-- /.input group -->
-                                            </div>
-                                            <!-- /.form group -->
-                                          </div>');
-                                          
-                                       // print('<label>Hora</label>');
-                                       // $css->input("text", "Hora", "form-control", "Hora", "Hora", "", "Hora", "off", "", "","style='line-height: 15px;'");
-                        
-                                    $css->CerrarDiv();                             
-                                $css->CerrarDiv();
-                                
-                                
-
-                            $css->CerrarDiv();
-                            //Fin fila 2
-                            //Fila 3
-                            $css->CrearDiv("", "row", "", 1, 1);
-                                
-                                $css->CrearDiv("", "col-md-8", "", 1, 1);
-                                    $css->CrearDiv("", "form-group", "", 1, 1);
-                                        print('<label>Observaciones</label>');
-                                        $css->textarea("Observaciones", "form-control", "Observaciones", "", "Observaciones", "", "");
-                                            
-                                        $css->Ctextarea();
-                                    $css->CerrarDiv();                             
-                                $css->CerrarDiv();
-                                $css->CrearDiv("", "col-md-4", "", 1, 1);
-                                    $css->CrearDiv("", "form-group", "", 1, 1);
-                                        print('<label>Agregar</label>');
-                                        $css->CrearBotonEvento("btnCrearCita", "Agregar", 1, "onclick", "AgregarCitaAReserva(`$idReserva`)", "naranja");
-                                    $css->CerrarDiv();                             
-                                $css->CerrarDiv();
-                            $css->CerrarDiv();                            
-                            //Fin fila 3
-                            
-                            
-                        $css->CerrarDiv();    
-
+                        $css->CerrarDiv();  
+                                                
                     $css->CerrarDiv();
                     
-                $css->CerrarDiv();
-                
-                $css->CrearDiv("DivCitasReserva", "", "center", 1, 1);
-                    
-                $css->CerrarDiv();
-            $css->CerrarDiv();
-        break;//Fin caso 7   
-        
-        case 8://Listar las citas de una reserva
-            $idReserva=$obCon->normalizar($_REQUEST["idReserva"]);
-            if($idReserva==''){
-                exit("E;No se recibió el id de la reserva");
-            }
-            $css->CrearTitulo("<strong>Citas agregadas a la Reserva $idReserva</strong>", "naranja");
-            $sql="SELECT t1.*,
-                    (SELECT t2.Nombre FROM ips t2 WHERE t2.ID=t1.idHospital) as NombreHospital,
-                    (SELECT t2.NIT FROM ips t2 WHERE t2.ID=t1.idHospital) as NITHospital,
-                    (SELECT t2.Direccion FROM ips t2 WHERE t2.ID=t1.idHospital) as DireccionHospital,
-                    (SELECT t2.Municipio FROM ips t2 WHERE t2.ID=t1.idHospital) as MunicipioHospital,
-                    (SELECT t2.Departamento FROM ips t2 WHERE t2.ID=t1.idHospital) as DepartamentoHospital,
-                    (SELECT t3.EstadoCita FROM prefactura_reservas_citas_estados t3 WHERE t3.ID=t1.Estado) as NombreEstadoCita
-                    FROM prefactura_reservas_citas t1 WHERE t1.idReserva='$idReserva' AND Estado<10";
-            $Consulta=$obCon->Query($sql);
-            
-            $css->CrearDiv("", "table-responsive mailbox-messages", "", 1, 1);
-                    print('<table class="table table-hover table-striped">');
-                        print('<tbody>');
-                            while($RegistrosTabla=$obCon->FetchAssoc($Consulta)){
-                                
-                                $idItem=$RegistrosTabla["ID"];
-                                
-                                $NombreCompleto= utf8_encode($RegistrosTabla["NombreHospital"]);
-                                print('<tr>');
-                                    print("<td>");
-                                        $disabled="";
-                                        if($RegistrosTabla["Estado"]>1){
-                                            $disabled="disabled";
-                                        }
-                                        print('<button '.$disabled.' type="button" class="btn btn-success btn-sm" onclick=ConfirmarCita(`'.$idReserva.'`,`'.$idItem.'`)><i class="fa fa-hand-o-up"></i></button>');
-                                    print("</td>");
-                                    print("<td>");
-                                        print('<button type="button" class="btn btn-primary btn-sm" onclick=FormularioAdjuntarDocumentosCita(`'.$idItem.'`)><i class="fa fa-paperclip"></i></button>');
-                                    print("</td>");
-                                    print("<td>");
-                                        $Ruta="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2000&ID=".$idItem;
-                                        print('<a class="btn btn-danger btn-sm" href="'.$Ruta.'" target="_blank"><i class="fa fa-file-pdf-o"></i></a>');
-                                    print("</td>");
-                                    print("<td class='mailbox-name'>");
-                                        print($RegistrosTabla["ID"]);
-                                    print("</td>");
-                                    print("<td class='mailbox-name'>");
-                                        print($RegistrosTabla["Fecha"]." ".$RegistrosTabla["Hora"]);
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print("<strong>".$NombreCompleto."</strong>");
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print($RegistrosTabla["Observaciones"]);
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print($RegistrosTabla["NombreEstadoCita"]);
-                                    print("</td>");
-                                    print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");                             
-                                        $css->li("", "fa  fa-remove", "", "onclick=EliminarCita(`$idReserva`,`1`,`$idItem`) style=font-size:16px;cursor:pointer;text-align:center;color:red");
-                                        $css->Cli();
-                                    print("</td>");                                                                       
-                                print('</tr>');
-
-                            }
-
-                        print('</tbody>');
-                    print('</table>');
-                $css->Cdiv();
-            
-        break;//Fin caso 8   
-        
-        case 9://Dibuja formulario para validar una reserva
-            $idReserva=$obCon->normalizar($_REQUEST["idReserva"]);
-            if($idReserva==''){
-                exit("E1;No se recibió el id de la reserva");
-            }
-            $DatosReserva=$obCon->DevuelveValores("prefactura_reservas", "ID", $idReserva);
-            $DatosPaciente=$obCon->DevuelveValores("prefactura_paciente", "ID", $DatosReserva["idPaciente"]);
-            $DatosMunicipio=$obCon->DevuelveValores("catalogo_municipios", "CodigoDANE", $DatosPaciente["CodigoDANE"]);
-            $DatosEps=$obCon->DevuelveValores("salud_eps", "cod_pagador_min", $DatosPaciente["CodEPS"]);
-            $NombreCompleto= utf8_encode($DatosPaciente["PrimerNombre"]." ".$DatosPaciente["SegundoNombre"]." ".$DatosPaciente["PrimerApellido"]." ".$DatosPaciente["SegundoApellido"]);
-            
-            $css->CrearTitulo("<strong>Validar la Reserva $idReserva</strong>", "azul");
-            $css->CrearDiv("", "col-md-4", "center", 1, 1);
-                $css->CrearDiv("", "box box-widget widget-user-2", "left", 1, 1);
-                    $css->CrearDiv("", "widget-user-header bg-aqua-active", "left", 1, 1);
-                        $css->CrearDiv("", "widget-user-image", "left", 1, 1);
-                            print('<img class="img-circle" src="../../images/usuariostipo.png" alt="User Avatar"></img>');
-                        $css->CerrarDiv();
-                        print('<h4 class="widget-user-username">');
-                            print("<strong>".$NombreCompleto."</strong>");
-                        print('</h4>');
-                    $css->CerrarDiv();   
-                    
-                    $css->CrearDiv("", "box-footer no-padding", "left", 1, 1);
-                        print('<ul class="nav nav-stacked" style="font-size:16px;">');
-                            print('<li><a onclick="CopiarAlPortapapelesID(`#spAutorizacionReserva`);">Autorización <span id="spAutorizacionReserva" class="pull-right" style="font-size:16px;"><strong>'.$DatosReserva["NumeroAutorizacion"].'</strong></span></a></li>');
-                            print('<li><a>No. Servicios Autorizados<span  class="pull-right" style="font-size:16px;"><strong>'.$DatosReserva["CantidadServicios"].'</strong></span></a></li>');
-                            //print('<li><a>No. Servicios Disponibles<span id="spServiciosDisponibles" class="pull-right badge bg-blue" style="font-size:16px;"><strong>'.($DatosReserva["CantidadServicios"]-$TotalCitasAgregadas).'</strong></span></a></li>');
-                            print('<li><a>Sexo <span  class="pull-right" style="font-size:16px;"><strong>'.$DatosPaciente["Sexo"].'</strong></span></a></li>');
-                            print('<li><a>Tipo de Documento <span class="pull-right" style="font-size:16px;"><strong>'.$DatosPaciente["TipoDocumento"].'</strong></span></a></li>');
-                            print('<li><a onclick="CopiarAlPortapapelesID(`#spIdentificacionPaciente`);">Numero de Documento <span id="spIdentificacionPaciente" class="pull-right" style="font-size:16px;"><strong>'.$DatosPaciente["NumeroDocumento"].'</strong></span></a></li>');
-                            print('<li><a onclick="CopiarAlPortapapelesID(`#spTelefonoPaciente`);">Teléfono <span id="spTelefonoPaciente" class="pull-right" style="font-size:16px;"><strong>'.$DatosPaciente["Telefono"].'</strong></span></a></li>');
-                            print('<li><a disabled onclick="CopiarAlPortapapelesID(`#spDireccionPaciente`);">Dirección <span  id="spDireccionPaciente" class="pull-right" style="font-size:16px;"><strong>'.utf8_encode($DatosPaciente["Direccion"]).'</strong></span></a></li>');
-                            print('<li><a disabled >Ciudad <span class="pull-right" style="font-size:16px;"><strong>'.utf8_encode($DatosMunicipio["Nombre"]).'</strong></span></a></li>');
-                            print('<li><a disabled >Departamento <span class="pull-right" style="font-size:16px;"><strong>'.utf8_encode($DatosMunicipio["Departamento"]).'</strong></span></a></li>');
-                            print('<li><a disabled >EPS<span class="pull-right" style="font-size:16px;"><strong>'.utf8_encode($DatosEps["nombre_completo"]).'</strong></span></a></li>');
-                           
-                        print('</ul>');
-                    $css->CerrarDiv();
-                $css->CerrarDiv();    
-                
-            $css->CerrarDiv();
-            $css->CrearDiv("", "col-md-8", "center", 1, 1);
-                $css->CrearDiv("DivFormularioValidacion", "", "center", 1, 1);
-                    $css->CrearTitulo("<strong>Validar Autorización</strong>","verde");
-                    $css->CrearDiv("", "box box-default", "", 1, 1);
-                        $css->CrearDiv("", "box-body", "", 1, 1);
-                            
-                            //Fila 1
-                            $css->CrearDiv("", "row", "", 1, 1);
-                                $css->CrearDiv("", "col-md-3", "", 1, 1);
-                                    $css->CrearDiv("", "form-group", "", 1, 1);
-                                        print('<label>Fecha</label>');
-                                        $css->input("date", "Fecha", "form-control", "Fecha", "Fecha", "", "Fecha", "off", "", "","style='line-height: 15px;'");
-                        
-                                    $css->CerrarDiv();                             
-                                $css->CerrarDiv();
-                                
-                                $css->CrearDiv("", "col-md-4", "", 1, 1);
-                                    $css->CrearDiv("", "form-group", "", 1, 1);
-                                        print('<label>Observaciones</label>');
-                                        $css->textarea("Observaciones", "form-control", "Observaciones", "", "Observaciones", "", "");
-                                            
-                                        $css->Ctextarea();
-                                    $css->CerrarDiv();                             
-                                $css->CerrarDiv();
-                                
-                                $css->CrearDiv("", "col-md-5", "", 1, 1);
-                                    $css->CrearDiv("", "form-group", "", 1, 1);
-                                        print('<label>Soporte</label>');
-                                        $css->input("file", "SoporteValidacionReserva", "form-control", "SoporteValidacionReserva", "", "Subir Soporte", "Subir Soporte", "off", "", "");
-                                        print("<br>");
-                                        $css->CrearBotonEvento("btnValidarReserva", "Validar", 1, "onclick", "ValidarReserva(`$idReserva`)", "rojo");
-                                    $css->CerrarDiv();                             
-                                $css->CerrarDiv();
-
-                            $css->CerrarDiv();
-                            //Fin fila 1
-                        $css->CerrarDiv();    
-
-                    $css->CerrarDiv();
+                    //Fin Fila 1
                     
                 $css->CerrarDiv();
                 
-                $css->CrearDiv("DivValidacionesReservas", "", "center", 1, 1);
-                    
-                $css->CerrarDiv();
             $css->CerrarDiv();
-            print("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>");
-        break;//Fin caso 9
+            
+        break;// fin caso 4
         
-        case 10;//Dibujar la validacion de las reservas
-            $idReserva=$obCon->normalizar($_REQUEST["idReserva"]);
-            if($idReserva==''){
-                exit("E;No se recibió el id de la reserva");
-            }
-            $css->CrearTitulo("<strong>Datos de la Validacion de la Reserva $idReserva</strong>", "naranja");
-            $sql="SELECT t1.*,
-                    (SELECT CONCAT(t2.Nombre,t2.Apellido) FROM usuarios t2 WHERE t2.idUsuarios=t1.idUser) as NombreUsuario
-                    
-                    FROM prefactura_reservas_validacion t1 WHERE t1.idReserva='$idReserva'";
-            $Consulta=$obCon->Query($sql);
+        case 5://Listar productos
             
-            $css->CrearDiv("", "table-responsive mailbox-messages", "", 1, 1);
-                    print('<table class="table table-hover table-striped">');
-                        print('<tbody>');
-                            while($RegistrosTabla=$obCon->FetchAssoc($Consulta)){
-                                
-                                $idItem=$RegistrosTabla["ID"];
-                                
-                                $NombreCompleto= utf8_encode($RegistrosTabla["NombreUsuario"]);
-                                print('<tr>');
-                                    
-                                    print("<td class='mailbox-name'>");
-                                        print($RegistrosTabla["Fecha"]);
-                                    print("</td>");                                    
-                                    print("<td class='mailbox-subject'>");
-                                        print($RegistrosTabla["Observaciones"]);
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print('<a href="'.substr($RegistrosTabla["Ruta"], 3).'" target="blank" class="mailbox-attachment-name"><i class="fa fa-paperclip"></i> '.$RegistrosTabla["NombreArchivo"].'</a>');
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print("<strong>".$NombreCompleto."</strong>");
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print($RegistrosTabla["Created"]);
-                                    print("</td>");
-                                    print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");                             
-                                        $css->li("", "fa  fa-remove", "", "onclick=EliminarValidacion(`$idReserva`,`1`,`$idItem`) style=font-size:16px;cursor:pointer;text-align:center;color:red");
-                                        $css->Cli();
-                                    print("</td>");                                                                       
-                                print('</tr>');
-
-                            }
-
-                        print('</tbody>');
-                    print('</table>');
-                $css->Cdiv();
-            
-            
-        break;//fin caso 10    
-        
-        case 11://Dibuja formulario para agregar adjuntos a una cita
-            $idCita=$obCon->normalizar($_REQUEST["idCita"]);
-            $ListaAActualizar=$obCon->normalizar($_REQUEST["ListaAActualizar"]);
-            if($idCita==''){
-                exit("E1;No se recibió el id de la cita");
-            }
-            $DatosCita=$obCon->DevuelveValores("prefactura_reservas_citas", "ID", $idCita);
-            $idReserva=$DatosCita["idReserva"];
-            $DatosHospital=$obCon->DevuelveValores("ips", "ID", $DatosCita["idHospital"]);
-            $DatosReserva=$obCon->DevuelveValores("prefactura_reservas", "ID", $DatosCita["idReserva"]);
-            $DatosPaciente=$obCon->DevuelveValores("prefactura_paciente", "ID", $DatosReserva["idPaciente"]);
-            $DatosMunicipio=$obCon->DevuelveValores("catalogo_municipios", "CodigoDANE", $DatosPaciente["CodigoDANE"]);
-            $DatosEps=$obCon->DevuelveValores("salud_eps", "cod_pagador_min", $DatosPaciente["CodEPS"]);
-            $NombreCompleto= utf8_encode($DatosPaciente["PrimerNombre"]." ".$DatosPaciente["SegundoNombre"]." ".$DatosPaciente["PrimerApellido"]." ".$DatosPaciente["SegundoApellido"]);
-            
-            $css->CrearTitulo("<strong>Adjuntar los Documentos de la Cita $idCita</strong>", "azul");
-            $css->CrearDiv("", "col-md-4", "center", 1, 1);
-                $css->CrearDiv("", "box box-widget widget-user-2", "left", 1, 1);
-                    $css->CrearDiv("", "widget-user-header bg-aqua-active", "left", 1, 1);
-                        $css->CrearDiv("", "widget-user-image", "left", 1, 1);
-                            print('<img class="img-circle" src="../../images/usuariostipo.png" alt="User Avatar"></img>');
-                        $css->CerrarDiv();
-                        print('<h4 class="widget-user-username">');
-                            print("<strong>".$NombreCompleto."</strong>");
-                        print('</h4>');
-                    $css->CerrarDiv();   
-                    
-                    $css->CrearDiv("", "box-footer no-padding", "left", 1, 1);
-                        print('<ul class="nav nav-stacked" style="font-size:16px;">');
-                            print('<li><a>Fecha y Hora <span class="pull-right" style="font-size:16px;"><strong>'.$DatosCita["Fecha"].' '.$DatosCita["Hora"].' </strong></span></a></li>');
-                            print('<li><a>Hospital <span  class="pull-right" style="font-size:16px;"><strong>'.$DatosHospital["Nombre"].'</strong></span></a></li>');
-                            print('<li><a onclick="CopiarAlPortapapelesID(`#spAutorizacionReserva`);">Autorización <span id="spAutorizacionReserva" class="pull-right" style="font-size:16px;"><strong>'.$DatosReserva["NumeroAutorizacion"].'</strong></span></a></li>');
-                            print('<li><a>No. Servicios Autorizados<span  class="pull-right" style="font-size:16px;"><strong>'.$DatosReserva["CantidadServicios"].'</strong></span></a></li>');
-                            //print('<li><a>No. Servicios Disponibles<span id="spServiciosDisponibles" class="pull-right badge bg-blue" style="font-size:16px;"><strong>'.($DatosReserva["CantidadServicios"]-$TotalCitasAgregadas).'</strong></span></a></li>');
-                            print('<li><a>Sexo <span  class="pull-right" style="font-size:16px;"><strong>'.$DatosPaciente["Sexo"].'</strong></span></a></li>');
-                            print('<li><a>Tipo de Documento <span class="pull-right" style="font-size:16px;"><strong>'.$DatosPaciente["TipoDocumento"].'</strong></span></a></li>');
-                            print('<li><a onclick="CopiarAlPortapapelesID(`#spIdentificacionPaciente`);">Numero de Documento <span id="spIdentificacionPaciente" class="pull-right" style="font-size:16px;"><strong>'.$DatosPaciente["NumeroDocumento"].'</strong></span></a></li>');
-                            print('<li><a onclick="CopiarAlPortapapelesID(`#spTelefonoPaciente`);">Teléfono <span id="spTelefonoPaciente" class="pull-right" style="font-size:16px;"><strong>'.$DatosPaciente["Telefono"].'</strong></span></a></li>');
-                            print('<li><a disabled onclick="CopiarAlPortapapelesID(`#spDireccionPaciente`);">Dirección <span  id="spDireccionPaciente" class="pull-right" style="font-size:16px;"><strong>'.utf8_encode($DatosPaciente["Direccion"]).'</strong></span></a></li>');
-                            print('<li><a disabled >Ciudad <span class="pull-right" style="font-size:16px;"><strong>'.utf8_encode($DatosMunicipio["Nombre"]).'</strong></span></a></li>');
-                            print('<li><a disabled >Departamento <span class="pull-right" style="font-size:16px;"><strong>'.utf8_encode($DatosMunicipio["Departamento"]).'</strong></span></a></li>');
-                            print('<li><a disabled >EPS<span class="pull-right" style="font-size:16px;"><strong>'.utf8_encode($DatosEps["nombre_completo"]).'</strong></span></a></li>');
-                           
-                        print('</ul>');
-                    $css->CerrarDiv();
-                $css->CerrarDiv();    
-                
-            $css->CerrarDiv();
-            $css->CrearDiv("", "col-md-8", "center", 1, 1);
-                $css->CrearDiv("DivFormularioValidacion", "", "center", 1, 1);
-                    $css->CrearTitulo("<strong>Adjuntar Documento</strong>","verde");
-                    $css->CrearDiv("", "box box-default", "", 1, 1);
-                        $css->CrearDiv("", "box-body", "", 1, 1);
-                            
-                            //Fila 1
-                            $css->CrearDiv("", "row", "", 1, 1);
-                                
-                                $css->CrearDiv("", "col-md-6", "", 1, 1);
-                                    $css->CrearDiv("", "form-group", "", 1, 1);
-                                        print('<label>Soporte</label>');
-                                        $css->input("file", "upSoporte", "form-control", "upSoporte", "", "Subir Soporte", "Subir Soporte", "off", "", "");
-                                        
-                                    $css->CerrarDiv();                             
-                                $css->CerrarDiv();
-                                $css->CrearDiv("", "col-md-6", "", 1, 1);
-                                    $css->CrearDiv("", "form-group", "", 1, 1);
-                                        print('<label>Adjuntar</label>');
-                                        
-                                        $css->CrearBotonEvento("btnAdjuntar", "Adjuntar", 1, "onclick", "AdjuntarDocumentoCita(`$idCita`,`$idReserva`,`$ListaAActualizar`)", "verde");
-                                    $css->CerrarDiv();                             
-                                $css->CerrarDiv();
-
-                            $css->CerrarDiv();
-                            //Fin fila 1
-                        $css->CerrarDiv();    
-
-                    $css->CerrarDiv();
-                    
-                $css->CerrarDiv();
-                
-                $css->CrearDiv("DivAdjuntosCita", "", "center", 1, 1);
-                    
-                $css->CerrarDiv();
-            $css->CerrarDiv();
-            print("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>");
-        break;//Fin caso 11
-        
-        case 12;//Dibujar los adjuntos de una cita
-            $idCita=$obCon->normalizar($_REQUEST["idCita"]);
-            $ListadoAActualizar=$obCon->normalizar($_REQUEST["ListadoAActualizar"]);
-            if($idCita==''){
-                exit("E;No se recibió el id de la cita");
-            }
-            $DatosCita=$obCon->DevuelveValores("prefactura_reservas_citas", "ID", $idCita);
-            $idReserva=$DatosCita["idReserva"];
-            $css->CrearTitulo("<strong>Documentos adjuntados a la cita $idCita</strong>", "naranja");
-            $sql="SELECT t1.*,
-                    (SELECT CONCAT(t2.Nombre,t2.Apellido) FROM usuarios t2 WHERE t2.idUsuarios=t1.idUser) as NombreUsuario
-                    
-                    FROM prefactura_reservas_citas_adjuntos t1 WHERE t1.idCita='$idCita'";
-            $Consulta=$obCon->Query($sql);
-            
-            $css->CrearDiv("", "table-responsive mailbox-messages", "", 1, 1);
-                    print('<table class="table table-hover table-striped">');
-                        print('<tbody>');
-                            while($RegistrosTabla=$obCon->FetchAssoc($Consulta)){
-                                
-                                $idItem=$RegistrosTabla["ID"];
-                                
-                                $NombreCompleto= utf8_encode($RegistrosTabla["NombreUsuario"]);
-                                print('<tr>');
-                                    
-                                    print("<td class='mailbox-subject'>");
-                                        print('<a href="'.substr($RegistrosTabla["Ruta"], 3).'" target="blank" class="mailbox-attachment-name"><i class="fa fa-paperclip"></i> '.$RegistrosTabla["NombreArchivo"].'</a>');
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print("<strong>".$NombreCompleto."</strong>");
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print($RegistrosTabla["Created"]);
-                                    print("</td>");
-                                    print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");                             
-                                        $css->li("", "fa  fa-remove", "", "onclick=EliminarAdjuntoCita(`$idReserva`,`$idCita`,`1`,`$idItem`,`$ListadoAActualizar`) style=font-size:16px;cursor:pointer;text-align:center;color:red");
-                                        $css->Cli();
-                                    print("</td>");                                                                       
-                                print('</tr>');
-
-                            }
-
-                        print('</tbody>');
-                    print('</table>');
-                $css->Cdiv();
-            
-            
-        break;//fin caso 12
-        
-        case 13://dibuja el listado de las citas
-                        
             $Limit=20;
             $Page=$obCon->normalizar($_REQUEST["Page"]);
             $NumPage=$obCon->normalizar($_REQUEST["Page"]);
@@ -999,44 +449,48 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 $NumPage=1;
             }
             $Busquedas=$obCon->normalizar($_REQUEST["Busquedas"]);
-            $Estado=$obCon->normalizar($_REQUEST["Estado"]);
-            $FechaInicialRangos=$obCon->normalizar($_REQUEST["FechaInicialRangos"]);
-            $FechaFinalRangos=$obCon->normalizar($_REQUEST["FechaFinalRangos"]);
+            $idLocal=$obCon->normalizar($_REQUEST["idLocal"]);
+            $dbLocal=$obCon->normalizar($_REQUEST["dbLocal"]);
+            if($idLocal==''){
+                $css->CrearTitulo("No se envío el ID de un local","rojo");
+                exit();
+            }
+            if($dbLocal==''){
+                $css->CrearTitulo("No se envío la base de datos un local","rojo");
+                exit();
+            }
+            
             $Condicion=" WHERE ID>0 ";
-            
             if($Busquedas<>''){
-                $Condicion.=" AND ( NumeroAutorizacion like '%$Busquedas%' or NumeroDocumento like '%$Busquedas%' or NombrePaciente like '%$Busquedas%')";
+                $Condicion.=" AND (Nombre like '%$Busquedas%' or Referencia like '$Busquedas%')";
             }
-            
-            if($Estado<>''){
-                $Condicion.=" AND Estado='$Estado'";
-            }
-            
-            if($FechaInicialRangos<>''){
-                $Condicion.=" AND Fecha>='$FechaInicialRangos'";
-            }
-            if($FechaFinalRangos<>''){
-                $Condicion.=" AND Fecha<='$FechaFinalRangos'";
-            }
+            $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 1000);//Allí se aloja la informacion del servidor de DOMI
+                        
             $PuntoInicio = ($Page * $Limit) - $Limit;
             
             $sql = "SELECT COUNT(ID) as Items 
-                   FROM vista_prefactura_reservas_citas t1 $Condicion;";
+                   FROM productos_servicios $Condicion;";
             
-            $Consulta=$obCon->Query($sql);
+            
+            $Consulta=$obCon->QueryExterno($sql, $DatosServidor["IP"], $DatosServidor["Usuario"], $DatosServidor["Password"], $dbLocal, "");
             $totales = $obCon->FetchAssoc($Consulta);
             $ResultadosTotales = $totales['Items'];
                         
-            $sql="SELECT *
-                  FROM vista_prefactura_reservas_citas $Condicion ORDER BY ID DESC LIMIT $PuntoInicio,$Limit;";
-            $Consulta=$obCon->Query($sql);
+            $sql="SELECT t1.*,
+                (SELECT t2.Clasificacion FROM inventarios_clasificacion t2 WHERE t2.ID=t1.idClasificacion LIMIT 1) AS NombreClasificacion 
+                  FROM productos_servicios t1 $Condicion ORDER BY ID DESC LIMIT $PuntoInicio,$Limit;";
+            $Consulta=$obCon->QueryExterno($sql, $DatosServidor["IP"], $DatosServidor["Usuario"], $DatosServidor["Password"], $dbLocal, "");
             
-            
-            $css->CrearTitulo("Lista de Citas", "naranja");
+            $css->CrearTitulo("Lista de Productos o Servicios", "azul");   
             
             $css->div("", "box-body no-padding", "", "", "", "", "");
                 $css->div("", "mailbox-controls", "", "", "", "", "");
-                    print('<span class="badge bg-orange" style="font-size:14px">'.$ResultadosTotales.'</span>');
+                
+                    print('<a class="btn btn-app primary" style="background-color:aqua" onclick=FormularioCrearEditarProducto()>
+                        <span class="badge bg-orange" style="font-size:14px">'.$ResultadosTotales.'</span>
+                        <i class="fa fa-th-list"></i> Agregar 
+                      </a>');
+                   
                     $css->div("", "pull-right", "", "", "", "", "");
                         if($ResultadosTotales>$Limit){
                             $TotalPaginas= ceil($ResultadosTotales/$Limit);                               
@@ -1077,52 +531,37 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                             while($RegistrosTabla=$obCon->FetchAssoc($Consulta)){
                                 
                                 $idItem=$RegistrosTabla["ID"];
-                                $idReserva=$RegistrosTabla["idReserva"];
-                                $NombreCompleto= utf8_encode($RegistrosTabla["NombrePaciente"]);
+                                
                                 print('<tr>');
                                     print("<td>");
-                                        $disabled="";
-                                        if($RegistrosTabla["Estado"]>1){
-                                            $disabled="disabled";
-                                        }
-                                        print('<button '.$disabled.' type="button" class="btn btn-success btn-sm" onclick=ConfirmarCita(`'.$idReserva.'`,`'.$idItem.'`)><i class="fa fa-hand-o-up"></i></button>');
-                                    print("</td>");
-                                    print("<td>");
-                                        print('<button type="button" class="btn btn-primary btn-sm" onclick=FormularioAdjuntarDocumentosCita(`'.$idItem.'`,`2`)><i class="fa fa-paperclip"></i></button>');
+                                        print('<button type="button" class="btn btn-warning btn-sm" onclick=FormularioCrearEditarProducto(`2`,`'.$idItem.'`)><i class="fa fa-edit"></i></button>');
                                     print("</td>");
                                     
-                                    print("<td>");
-                                        $Ruta="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2000&ID=".$idItem;
-                                        print('<a class="btn btn-danger btn-sm" href="'.$Ruta.'" target="_blank"><i class="fa fa-file-pdf-o"></i></a>');
+                                    print("<td class='mailbox-subject'>");
+                                        print("<strong>".utf8_encode($RegistrosTabla["Nombre"])."</strong>");
+                                    print("</td>");
+                                    
+                                    print("<td class='mailbox-subject'>");
+                                        print("<strong>".number_format($RegistrosTabla["PrecioVenta"])."</strong>");
+                                    print("</td>");
+                                    
+                                    print("<td class='mailbox-subject'>");
+                                        print("<strong>".utf8_encode($RegistrosTabla["DescripcionCorta"])."</strong>");
+                                    print("</td>");
+                                    print("<td class='mailbox-name'>");
+                                        print($RegistrosTabla["Orden"]);
                                     print("</td>");
                                     
                                     print("<td class='mailbox-name'>");
                                         print($RegistrosTabla["ID"]);
                                     print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print(($RegistrosTabla["Fecha"]));
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print(($RegistrosTabla["Hora"]));
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print(($RegistrosTabla["NombreHospital"]));
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print("<strong>".$NombreCompleto."</strong>");
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print($RegistrosTabla["TipoDocumento"]);
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print($RegistrosTabla["NumeroDocumento"]);
-                                    print("</td>");                                     
-                                    print("<td class='mailbox-subject'>");
-                                        print(($RegistrosTabla["Telefono"]));
-                                    print("</td>");
                                     
                                     print("<td class='mailbox-subject'>");
-                                        print(utf8_encode("<strong>".$RegistrosTabla["NombreEstado"]."</strong>"));
+                                        print("<strong>".utf8_encode($RegistrosTabla["DescripcionLarga"])."</strong>");
+                                    print("</td>");
+                                                                
+                                    print("<td class='mailbox-date'>");
+                                        print(($RegistrosTabla["Estado"]));
                                     print("</td>");
                                                                         
                                 print('</tr>');
@@ -1133,7 +572,161 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                     print('</table>');
                 $css->Cdiv();
             $css->Cdiv();
-        break;//fin caso 13
+            
+        break;//Fin caso 5 
+        
+        case 7:// formulario para crear o editar un producto
+            $TipoFormulario=$obCon->normalizar($_REQUEST["TipoFormulario"]);
+            $idEditar=$obCon->normalizar($_REQUEST["idEditar"]);
+            $dbLocal=$obCon->normalizar($_REQUEST["dbLocal"]);
+            
+            $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 1000);//Servidor DOMI
+            
+            $sql="SELECT * FROM productos_servicios WHERE ID='$idEditar'";
+            $Consulta=$obCon->QueryExterno($sql, $DatosServidor["IP"], $DatosServidor["Usuario"], $DatosServidor["Password"], $dbLocal, "");
+            
+            $DatosLocal=$obCon->FetchAssoc($Consulta);
+            
+            $css->CrearTitulo("Crear o Editar un Producto", "azul");
+            
+            $css->CrearDiv("", "box box-default", "", 1, 1);
+                $css->CrearDiv("", "box-body", "", 1, 1);
+                    $css->CrearDiv("", "row", "", 1, 1);
+                                               
+                        $css->CrearDiv("", "col-md-2", "", 1, 1);
+                            $css->CrearDiv("", "form-group", "", 1, 1);
+                                print('<label>Clasificacion</label>');
+                                $sql="SELECT * FROM inventarios_clasificacion";
+                                $Consulta=$obCon->QueryExterno($sql, $DatosServidor["IP"], $DatosServidor["Usuario"], $DatosServidor["Password"], $dbLocal, "");
+                                
+                                $css->select("idClasificacion", "form-control", "idClasificacion", "", "", "", "");
+                                    $css->option("", "", "", "", "", "");
+                                        print("Seleccione la clasificacion");
+                                    $css->Coption();
+                                    
+                                    while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
+                                        $sel=0;
+                                        if($DatosConsulta["ID"]==$DatosLocal["idClasificacion"]){
+                                            $sel=1;
+                                        }
+                                        $css->option("", "", "", $DatosConsulta["ID"], "", "",$sel);
+                                            print(utf8_encode($DatosConsulta["Clasificacion"]));
+                                        $css->Coption();
+                                    }
+                                $css->Cselect();
+                                
+                            $css->CerrarDiv(); 
+                           
+                        $css->CerrarDiv(); 
+                        
+                        $css->CrearDiv("", "col-md-3", "", 1, 1);
+                            
+                            $css->CrearDiv("", "form-group", "", 1, 1);
+                                print('<label>Referencia</label>');  
+                                $Referencia=$obCon->getUniqId();
+                                if($DatosLocal["Referencia"]<>""){
+                                    $Referencia=$DatosLocal["Referencia"];
+                                }
+                                $css->input("text", "Referencia", "form-control", "Referencia", "", $Referencia, "Referencia", "off", "", "");
+                                
+                            $css->CerrarDiv(); 
+                            
+                        $css->CerrarDiv();
+                        
+                        $css->CrearDiv("", "col-md-3", "", 1, 1);
+                            $css->CrearDiv("", "form-group", "", 1, 1);
+                                print('<label>Nombre</label>');
+                                
+                                $css->input("text", "Nombre", "form-control", "Nombre", "", $DatosLocal["Nombre"], "Nombre", "off", "", "");
+                                
+                            $css->CerrarDiv(); 
+                            
+                        $css->CerrarDiv();
+                        
+                        $css->CrearDiv("", "col-md-2", "", 1, 1);
+                            $css->CrearDiv("", "form-group", "", 1, 1);
+                                print('<label>Precio de Venta</label>');                                
+                                $css->input("number", "PrecioVenta", "form-control", "PrecioVenta", "", $DatosLocal["PrecioVenta"], "PrecioVenta", "off", "", "");
+                                
+                            $css->CerrarDiv(); 
+                            
+                        $css->CerrarDiv();
+                        
+                        $css->CrearDiv("", "col-md-2", "", 1, 1);
+                            $css->CrearDiv("", "form-group", "", 1, 1);
+                                print('<label>Orden</label>');                                
+                                $css->input("number", "Orden", "form-control", "Orden", "", $DatosLocal["Orden"]+1, "Orden", "off", "", "");
+                                
+                            $css->CerrarDiv(); 
+                            
+                        $css->CerrarDiv();
+                        
+                    $css->CerrarDiv();    
+                    $css->CrearDiv("", "row", "", 1, 1);    
+                        
+                        $css->CrearDiv("", "col-md-3", "", 1, 1);
+                            $css->CrearDiv("", "form-group", "", 1, 1);
+                                print('<label>Descripcion Corta</label>');                                
+                                $css->textarea("DescripcionCorta", "form-control", "DescripcionCorta", "", "Descripcion Corta", "", "");
+                                    print($DatosLocal["DescripcionCorta"]);
+                                $css->Ctextarea();
+                            $css->CerrarDiv(); 
+                            
+                        $css->CerrarDiv();
+                        
+                        $css->CrearDiv("", "col-md-3", "", 1, 1);
+                            $css->CrearDiv("", "form-group", "", 1, 1);
+                                print('<label>Descripcion Larga</label>');                                
+                                $css->textarea("DescripcionLarga", "form-control", "DescripcionLarga", "", "Descripcion Larga", "", "");
+                                    print($DatosLocal["DescripcionLarga"]);
+                                $css->Ctextarea();
+                            $css->CerrarDiv(); 
+                            
+                        $css->CerrarDiv();
+                    
+                        $css->CrearDiv("", "col-md-4", "", 1, 1);
+                            $css->CrearDiv("", "form-group", "", 1, 1);
+                                print('<label>Imagen</label>');
+                                $css->input("file", "ImagenProducto", "form-control", "ImagenProducto", "", "", "Seleccione una imagen", "", "", "");
+                            $css->CerrarDiv();                             
+                        $css->CerrarDiv();
+                        
+                        $css->CrearDiv("", "col-md-2", "", 1, 1);
+                            $css->CrearDiv("", "form-group", "", 1, 1);
+                                print('<label>Guardar</label>');
+                                $css->select("Estado", "form-control", "Estado", "", "", "", "");
+                                    $sel=0;
+                                    if($DatosLocal["Estado"]==1){
+                                        $sel=1;
+                                    }
+                                    $css->option("", "", "", '1', "", $sel);
+                                        print("Activo");
+                                    $css->Coption();
+                                    $sel=0;
+                                    if($DatosLocal["Estado"]==0){
+                                        $sel=1;
+                                    }
+                                    $css->option("", "", "", '0', "", $sel);
+                                        print("Deshabilitado");
+                                    $css->Coption();
+                                                                        
+                                $css->Cselect();
+                                print("<br>");
+                                $css->CrearBotonEvento("btnGuardarProducto", "Guardar", 1, "onclick", "ConfirmaGuardarEditarProducto(`$TipoFormulario`,`$idEditar`)", "rojo");
+                            $css->CerrarDiv();                             
+                        $css->CerrarDiv();  
+                                                
+                    $css->CerrarDiv();
+                    
+                    //Fin Fila 1
+                    
+                $css->CerrarDiv();
+                
+            $css->CerrarDiv();
+            
+            
+        break;// fin caso 7
+        
  }
     
           

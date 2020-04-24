@@ -209,6 +209,38 @@ class Contabilidad extends conexion{
         $this->Query($sql);
     }
     
+    
+    public function ConstruirVistaBalanceComprobacionXTercero($FechaInicial, $FechaFinal,$CmbTercero, $Empresa, $CentroCostos,$CuentaPUC) {
+        $sql="DROP VIEW IF EXISTS `vista_balance_comprobacion_terceros`;";
+        $this->Query($sql);
+        
+        $Condicion=" WHERE Fecha>='$FechaInicial' AND Fecha <='$FechaFinal' ";
+        
+        if($Empresa<>"ALL"){
+            $Condicion.=" AND idEmpresa = '$Empresa'";
+        }
+        
+        if($CmbTercero<>""){
+            $Condicion.=" AND Tercero_Identificacion = '$CmbTercero'";
+        }
+        
+        if($CuentaPUC<>""){
+            $Condicion.=" AND CuentaPUC LIKE '$CuentaPUC%'";
+        }
+        
+        if($CentroCostos<>"ALL"){
+            $Condicion.=" AND idCentroCosto = '$CentroCostos'";
+        }
+        $sql="CREATE VIEW vista_balance_comprobacion_terceros AS 
+                SELECT CuentaPUC,NombreCuenta, 
+                    Tercero_Identificacion,Tercero_DV,Tercero_Razon_Social,
+                    Tercero_Direccion,Tercero_Cod_Mcipio,
+                    SUM(Debito) as Debitos,SUM(Credito) as Creditos
+                    FROM librodiario $Condicion 
+                    GROUP BY CuentaPUC,Tercero_Identificacion;";         
+        $this->Query($sql);
+    }
+    
     /**
      * Fin Clase
      */

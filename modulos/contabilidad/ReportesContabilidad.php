@@ -36,6 +36,10 @@ $css->PageInit($myTitulo);
                     print("Balance de Comprobación");
                 $css->Coption();
                 
+                $css->option("", "", "Balance de comprobacion x terceros", 6, "", "");
+                    print("Balance de Comprobación x Terceros");
+                $css->Coption();
+                
                 $css->option("", "", "Balance General", 5, "", "");
                     print("Balance General");
                 $css->Coption();

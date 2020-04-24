@@ -478,3 +478,21 @@ ALTER TABLE `documentos_contables_items` ADD `Fecha` DATE NOT NULL AFTER `idDocu
 ALTER TABLE `acuerdo_pago` ADD `idFactura` VARCHAR(45) NOT NULL AFTER `idAcuerdoPago`;
 ALTER TABLE `acuerdo_pago` ADD INDEX(`idFactura`);
 
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+(198,	'Procesos Contables',	16,	10,	0,	'',	0,	'',	'ProcesosContables.php',	'_BLANK',	1,	'contabilidad.jpg',	5,	'2019-01-13 09:12:44',	'2019-01-13 09:12:44');
+
+
+DROP TABLE IF EXISTS `cierres_contables` ;
+CREATE TABLE `cierres_contables` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `idUsuario` bigint(20) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `CuerpoFormato`, `NotasPiePagina`, `Updated`, `Sync`) VALUES
+(38,	'BALANCE DE COMPROBACION POR TERCEROS',	'001',	'F-GF-002',	'2017-08-09',	'',	'',	'2019-03-31 09:07:01',	'2019-03-31 15:57:34');
+
+

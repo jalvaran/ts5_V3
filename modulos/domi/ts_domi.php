@@ -23,6 +23,7 @@ $sql="SELECT TipoUser,Role FROM usuarios WHERE idUsuarios='$idUser'";
 $DatosUsuario=$obCon->Query($sql);
 $DatosUsuario=$obCon->FetchAssoc($DatosUsuario);
 $TipoUser=$DatosUsuario["TipoUser"];
+$DatosServidor=$obCon->DevuelveValores("servidores", "ID", 1000);//Allí se aloja la informacion del servidor de DOMI
 
 $css->PageInit($myTitulo);
     //$css->div("", "col-md-12", "", "", "", "", "");
@@ -37,6 +38,31 @@ $css->PageInit($myTitulo);
             $css->CrearDiv("", "col-md-2", "left", 1, 1);
             //$css->CrearBotonEvento("BtnNuevoTicket", "Abrir Nuevo Ticket", 1, "onclick", "FormularioNuevoTicket()", "azul");
                 $css->CrearDiv("", "box box-solid", "left", 1, 1);
+                    $Condicion="";
+                    if($TipoUser<>'administrador'){
+                        $RelacionUsuarioLocal=$obCon->DevuelveValores("domi_usuarios_as_locales", "idUsuario", $idUser);
+                        $idLocalUsuario=$RelacionUsuarioLocal["idLocal"];
+                        $Condicion=" WHERE ID='$idLocalUsuario'";
+                    }
+                    
+                    $sql="SELECT * FROM locales $Condicion";                     
+                    $Consulta=$obCon->QueryExterno($sql, $DatosServidor["IP"], $DatosServidor["Usuario"], $DatosServidor["Password"], $DatosServidor["DataBase"], "");
+                    $css->select("idLocal", "form-control", "idLocal", "", "", "onchange=setDbLocal()", "");
+                        
+                        while($DatosLocales=$obCon->FetchAssoc($Consulta)){
+                            $dbLocal= $DatosLocales["db"];  
+                            $idLocal=$DatosLocales["ID"];
+                            
+                            
+                            $css->option("", "", "", $dbLocal, "", "");
+                                
+                                print($DatosLocales["Nombre"]." || ".$DatosLocales["Telefono"]." || ".$DatosLocales["Direccion"]);
+                            $css->Coption();
+                        }
+                    $css->Cselect();
+                $css->CerrarDiv();  
+                
+                $css->CrearDiv("", "box box-solid", "left", 1, 1);
                     $css->CrearDiv("", "box-header with-border", "left", 1, 1);
                         print('<h3 class="box-title">Carpetas</h3>');
                         $css->CrearDiv("", "box-tools", "left", 1, 1);
@@ -45,10 +71,12 @@ $css->PageInit($myTitulo);
                     $css->CerrarDiv();
                     $css->CrearDiv("", "box-body no-padding", "left", 1, 1);
                         print('<ul class="nav nav-pills nav-stacked">');
-                            print('<li><a href="#" onclick="ListarLocales()"><i class="fa fa-inbox"></i>Locales</a></li>');
+                            if($TipoUser=='administrador'){
+                                print('<li><a href="#" onclick="ListarLocales()"><i class="fa fa-inbox"></i>Locales</a></li>');
+                            }
                             print('<li><a href="#" onclick="ListarClasificacion()"><i class="fa fa-inbox"></i>Clasificacion</a></li>');
-                            print('<li><a href="#" onclick="listarProductos()"><i class="fa fa-inbox"></i>Productos</a></li>');
-                            print('<li><a href="#" onclick="ListarPedidos()"><i class="fa fa-inbox"></i>Pedidos</a></li>');
+                            print('<li><a href="#" onclick="ListarProductos()"><i class="fa fa-inbox"></i>Productos</a></li>');
+                            print('<li><a href="#" onclick="LlistarProductosistarPedidos()"><i class="fa fa-inbox"></i>Pedidos</a></li>');
                         print('</ul>');
                     $css->CerrarDiv(); 
                     
@@ -86,7 +114,7 @@ $css->PageInit($myTitulo);
         $css->CrearDiv("", "col-md-10", "left", 1, 1);
             $css->CrearDiv("", "box-tools pull-right", "left", 1, 1);                
                     print('<div class="input-group">');               
-                        $css->input("text", "TxtBusquedas", "form-control", "TxtBusquedas", "", "", "Buscar", "", "", "onchange=VerListadoTickets()");
+                        $css->input("text", "TxtBusquedas", "form-control", "TxtBusquedas", "", "", "Buscar", "", "", "onchange=MostrarListadoSegunID()");
 
                     print('<span class="input-group-addon"><i class="fa fa-fw fa-search"></i></span>
                               </div>');

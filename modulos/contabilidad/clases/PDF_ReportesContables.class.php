@@ -8,6 +8,7 @@ class PDF_ReportesContables extends Documento{
     
     public function EstadosResultadosAnio_PDF($FechaInicial,$FechaFinal,$idEmpresa,$CentroCosto,$Vector ) {
         $TipoReporte="Rango";
+        $idEmpresaEncabezado="";
         if($idEmpresa=="ALL"){
             $idEmpresaEncabezado=1;
         }
@@ -143,7 +144,7 @@ class PDF_ReportesContables extends Documento{
            $html.='</tr>';  
         }
         
-        
+        $TotalGastos=0;
         if($TotalClases[5]<>""){
             $TotalGastos=  number_format($TotalClases[5]);
         }
@@ -418,6 +419,66 @@ class PDF_ReportesContables extends Documento{
         return($html);
     }
     
+    
+    public function HtmlBalanceComprobacionXTerceros() {
+        $sql="SELECT * FROM vista_balance_comprobacion_terceros";
+        $Consulta=$this->obCon->Query($sql);
+        $TotalValorCuotas=0;
+        $TotalPagos=0;
+        $TotalSaldo=0;
+        
+        $Back="#CEE3F6";
+        $html='<table id="TableBalanceComprobacionXTerceros" class="table table-bordered table table-hover" cellspacing="1" cellpadding="2" border="0"  align="left" >';
+        $html.='<thead>';
+        $html.='<tr style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">';        
+            $html.='<th><strong>CUENTA</strong></th>';
+            $html.='<th><strong>NOMBRE</strong></th>';
+            $html.='<th><strong>TERCERO</strong></th>';
+            $html.='<th><strong>RAZON SOCIAL</strong></th>';
+            $html.='<th><strong>DIRECCION</strong></th>';
+            $html.='<th><strong>DEBITO</strong></th>';
+            $html.='<th><strong>CREDITO</strong></th>';
+            $html.='<th><strong>SALDO</strong></th>';
+        $html.='</tr></thead><tbody>';
+        $h=0;
+        while($DatosConsulta=$this->obCon->FetchAssoc($Consulta)){
+            if($h==0){
+                $Back="#f2f2f2";
+                $h=1;
+            }else{
+                $Back="white";
+                $h=0;
+            }
+            
+            $html.='<tr style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">';
+                $html.='<td>'.$DatosConsulta["CuentaPUC"].'</td>';
+                $html.='<td>'.utf8_encode($DatosConsulta["NombreCuenta"]).'</td>';
+                $html.='<td>'.($DatosConsulta["Tercero_Identificacion"]).'</td>';
+                $html.='<td>'.utf8_encode($DatosConsulta["Tercero_Razon_Social"]).'</td>';
+                $html.='<td>'.utf8_encode($DatosConsulta["Tercero_Direccion"]).'</td>';
+                $html.='<td>'.number_format($DatosConsulta["Debitos"]).'</td>';
+                $html.='<td>'.number_format($DatosConsulta["Creditos"]).'</td>';
+                $html.='<td>'.number_format($DatosConsulta["Debitos"]-$DatosConsulta["Creditos"]).'</td>';
+            $html.='</tr>';
+        }
+        
+        $html.="</tbody></table>";
+        return($html);
+    }
+    
+    public function BalanceComprobacionXTerceros_PDF($FechaInicial,$FechaFinal,$idEmpresa,$CentroCosto) {
+        $idEmpresaEncabezado="";
+        if($idEmpresa=="ALL"){
+            $idEmpresaEncabezado=1;
+        }
+        $this->PDF_Ini("Balance de Comprobacion por Terceros", 8, "",1,"../../../");
+        $this->PDF_Encabezado($FechaFinal,$idEmpresaEncabezado, 38, "","","../../../");
+        
+        $html= $this->HtmlBalanceComprobacionXTerceros();
+        $this->PDF_Write($html);
+             
+        $this->PDF_Output("BalanceComprobacionTerceros_$FechaFinal");
+    }
     /**
      * Fin Clase
      */

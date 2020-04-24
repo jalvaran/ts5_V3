@@ -128,6 +128,45 @@ if(isset($_REQUEST["idDocumento"])){
     
             
         break;//Fin caso 4
+    
+        case 5://Genera el html con los datos del balance de comprobacion por tercerso
+            
+           
+            $FechaInicial=$obCon->normalizar($_REQUEST["TxtFechaInicial"]);
+            $FechaFinal=$obCon->normalizar($_REQUEST["TxtFechaFinal"]);
+            $Empresa=$obCon->normalizar($_REQUEST["CmbEmpresa"]);
+            $CentroCostos=$obCon->normalizar($_REQUEST["CmbCentroCosto"]);             
+            $CmbTercero=$obCon->normalizar($_REQUEST["CmbTercero"]);
+            $TxtCuentaContable=$obCon->normalizar($_REQUEST["TxtCuentaContable"]);
+            
+            if($FechaInicial==""){
+                exit("E1;Debe elegir una fecha inicial;TxtFechaInicial");
+            }
+            if($FechaFinal==""){
+                exit("E1;Debe elegir una fecha Final;TxtFechaFinal");
+            }
+                        
+            $obCon->ConstruirVistaBalanceComprobacionXTercero($FechaInicial, $FechaFinal, $CmbTercero, $Empresa, $CentroCostos, $TxtCuentaContable);
+            $html=$obDoc->HtmlBalanceComprobacionXTerceros();
+            $page="Consultas/PDF_ReportesContables.draw.php?idDocumento=6&TxtFechaInicial=$FechaInicial&TxtFechaFinal=$FechaFinal"; 
+            $page.="&CmbEmpresa=$Empresa&CmbCentroCosto=$CentroCostos";
+            print("<a href='$page' target='_blank'><button class='btn btn-warning' >Exportar a PDF</button></a>");
+            print("<input type='button' class='btn btn-success' value='Exportar a Excel' onclick=ExportarTablaToExcel('TableBalanceComprobacionXTerceros')> ");
+            print($html);
+            
+        break;//Fin caso 5
+        
+        case 6://Genera el PDF de un balance de comprobacion por terceros
+            
+            $FechaInicial=$obCon->normalizar($_REQUEST["TxtFechaInicial"]);
+            $FechaFinal=$obCon->normalizar($_REQUEST["TxtFechaFinal"]);
+            $idEmpresa=$obCon->normalizar($_REQUEST["CmbEmpresa"]);
+            $CentroCosto=$obCon->normalizar($_REQUEST["CmbCentroCosto"]);             
+            
+            $obDoc->BalanceComprobacionXTerceros_PDF($FechaInicial,$FechaFinal,$idEmpresa,$CentroCosto );
+    
+            
+        break;//Fin caso 6
         
     }
 }else{

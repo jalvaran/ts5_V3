@@ -21,6 +21,22 @@ class Domi extends ProcesoVenta{
         $this->QueryExterno($sql, $DatosServidor["IP"], $DatosServidor["Usuario"], $DatosServidor["Password"], $DatosServidor["DataBase"], "");
     }
     
+    public function RegistreImagenProducto($DatosServidor,$idProducto,$destino,$Tamano, $NombreArchivo, $Extension, $idUser) {
+        
+        $tab="productos_servicios_imagenes";
+        
+        $Datos["idProducto"]=$idProducto;
+        
+        $Datos["Ruta"]=$destino;    
+        $Datos["NombreArchivo"]=$NombreArchivo;    
+        $Datos["Extension"]=$Extension;    
+        $Datos["Tamano"]=$Tamano; 
+        $Datos["idUser"]=$idUser;		
+        $Datos["Created"]=date("Y-m-d H:i:s");	
+        $sql=$this->getSQLInsert($tab, $Datos);
+        $this->QueryExterno($sql, $DatosServidor["IP"], $DatosServidor["Usuario"], $DatosServidor["Password"], $DatosServidor["DataBase"], "");
+    }
+    
    
    
     /**

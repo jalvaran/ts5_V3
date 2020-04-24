@@ -6496,6 +6496,11 @@ public function VerificaPermisos($VectorPermisos) {
         
         return($idAlerta);
     }
+    
+    public function getUniqId($prefijo='') {
+         return (str_replace(".","",uniqid($prefijo, true)));
+     }
+     
 //////////////////////////////Fin	
 }
 

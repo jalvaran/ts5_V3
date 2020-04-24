@@ -23,7 +23,7 @@ class db_conexion{
    // evita la injeccion de codigo sql
     public function normalizar($string){		
         $str=str_ireplace("'", "", $string);
-        $str=str_ireplace('"', "", $string);
+        $str=str_ireplace('"', "", $str);
         //$str=$string;
         $str=str_ireplace("CREATE ", "ISQL", $str);
         $str=str_ireplace("DROP ", "ISQL", $str);
