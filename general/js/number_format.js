@@ -1,4 +1,5 @@
     function number_format(numero,decimals=0){
-        var numbero_formatear=parseFloat(numero);
-        return (numbero_formatear.toLocaleString('en-IN', {minimumFractionDigits: decimals, maximumFractionDigits: decimals}))
+        var numero_formatear=parseFloat(numero,decimals);
+        //console.log(numero+" || "+numero_formatear);
+        return (numero_formatear.toLocaleString('en', {minimumFractionDigits: decimals, maximumFractionDigits: decimals}));
     }
