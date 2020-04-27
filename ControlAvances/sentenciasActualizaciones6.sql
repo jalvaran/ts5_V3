@@ -496,3 +496,19 @@ INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `C
 (38,	'BALANCE DE COMPROBACION POR TERCEROS',	'001',	'F-GF-002',	'2017-08-09',	'',	'',	'2019-03-31 09:07:01',	'2019-03-31 15:57:34');
 
 
+CREATE TABLE `cierre_contable_control` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `idDocumentoContable` bigint(20) NOT NULL COMMENT 'Docuemento contable con el que se crea el cierre',
+  `Anio` int(4) NOT NULL COMMENT 'Anio del cierre',
+  `CerrarCuentasResultado` int(11) NOT NULL COMMENT '1 indica que las cuentas de resultado fueron cerradas',
+  `TrasladarSaldosBalance` int(11) NOT NULL COMMENT '1 indica que las cuentas del balance fueron trasladadas',
+  `ContabilizarCierre` int(11) NOT NULL COMMENT '1 indica que el cierre fué contabilizado',
+  `idUser` int(11) NOT NULL COMMENT 'usuario que lo realiza',
+  `Estado` int(11) NOT NULL COMMENT '1 para abierto, 2 para cerrado, 3 para anulado',
+  `Created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP COMMENT 'Fecha de Creacion',
+  PRIMARY KEY (`ID`),
+  KEY `idDocumentoContable` (`idDocumentoContable`),
+  KEY `Anio` (`Anio`),
+  KEY `idUser` (`idUser`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+

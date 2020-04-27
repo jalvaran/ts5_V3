@@ -923,7 +923,8 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CierraFilaTabla();
                     $css->FilaTabla(16);
                         print("<td>");
-                            $css->input("number", "CuotaInicialAcuerdo", "form-control", "CuotaInicialAcuerdo", "Cuota Inicial", "", "Cuota Inicial", "off", "", "onchange=CalculeCuotas()");
+                           //$css->input("number", "CuotaInicialAcuerdo", "form-control", "CuotaInicialAcuerdo", "Cuota Inicial", "", "Cuota Inicial", "off", "", "onchange=CalculeCuotas()");
+                            $css->input_number_format( "","CuotaInicialAcuerdo", "form-control", "CuotaInicialAcuerdo", "Cuota Inicial", "", "Cuota Inicial", "off", "", "onchange=CalculeCuotas()");
                         print("</td>");
                         print("<td>");
                             $css->select("metodoPagoCuotaInicial", "form-control", "metodoPagoCuotaInicial", "", "", "onchange=CalculeCuotasAcuerdo()", "");
@@ -949,7 +950,8 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CierraFilaTabla();
                     $css->FilaTabla(16);
                         print("<td>");
-                            $css->input("number", "CuotaProgramadaAcuerdo", "form-control", "CuotaProgramadaAcuerdo", "Cuota Programada", "", "Cuota Programada", "off", "", "onchange=CalculeCuotas()");
+                            //$css->input("number", "CuotaProgramadaAcuerdo", "form-control", "CuotaProgramadaAcuerdo", "Cuota Programada", "", "Cuota Programada", "off", "", "onchange=CalculeCuotas()");
+                            $css->input_number_format("number", "CuotaProgramadaAcuerdo", "form-control", "CuotaProgramadaAcuerdo", "Cuota Programada", "", "Cuota Programada", "off", "", "onchange=CalculeCuotas()");
                         print("</td>");
                         print("<td>");
                             $css->input("date", "TxtFechaCuotaProgramada", "form-control", "TxtFechaCuotaProgramada", "Fecha", date("Y-m-d"), "Fecha", "off", "", "","style='line-height: 15px;' min='".date("Y-m-d")."'");
@@ -1004,7 +1006,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         print("</td>"); 
                         print("<td>");
                             
-                            $css->input("text", "ValorCuotaAcuerdo", "form-control", "ValorCuotaAcuerdo", "ValorCuotaAcuerdo", $ValorAnteriorCuota, "Valor de la Cuota", "off", "", "");
+                            $css->input_number_format("text", "ValorCuotaAcuerdo", "form-control", "ValorCuotaAcuerdo", "ValorCuotaAcuerdo", $ValorAnteriorCuota, "Valor de la Cuota", "off", "", "");
                         print("</td>"); 
                         
                         print("<td>");
@@ -1241,7 +1243,7 @@ if( !empty($_REQUEST["Accion"]) ){
                                     print('<span class="input-group-btn">
                                         <button type="button" class="btn btn-success btn-flat" onclick=SumaRestaDiferenciaCuota(`TxtValorCuotaNormal_'.$idItem.'`);EditarCuotaTemporal(`'.$idItem.'`)> <i class="fa fa-plus"> </i> </button>
                                       </span> ');
-                                    $css->input("number", "TxtValorCuotaNormal_$idItem", "form-control", "TxtValorCuotaNormal_$idItem", "Cuota", round($DatosAcuerdoProyeccion["ValorCuota"]), "Valor de la cuota", "off", "", "onChange=EditarCuotaTemporal(`$idItem`)", "style=width:150px");
+                                    $css->input_number_format("number", "TxtValorCuotaNormal_$idItem", "form-control", "TxtValorCuotaNormal_$idItem", "Cuota", round($DatosAcuerdoProyeccion["ValorCuota"]), "Valor de la cuota", "off", "", "onChange=EditarCuotaTemporal(`$idItem`)", "style=width:150px");
                                     
                                 print("</div>");
                             print("</td>");

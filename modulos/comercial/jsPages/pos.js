@@ -1621,7 +1621,7 @@ function CodigoTarjeta(){
         type: 'post',
         success: function(data){
             var respuestas = data.split(';');
-            console.log(data);
+            //console.log(data);
             if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
                 
@@ -2572,7 +2572,7 @@ function MostrarOpcionesFacturacionPOS(Ancla=0){
 
 
 function MarqueErrorElemento(idElemento){
-    console.log(idElemento);
+    //console.log(idElemento);
     if(idElemento==undefined){
        return; 
     }
@@ -2599,6 +2599,9 @@ function DibujeFormularioAcuerdoPago(idPreventa=""){
         type: 'post',
         success: function(data){
             document.getElementById('DivAcuerdoPago').innerHTML=data;
+            
+            Number_Format_Input();
+            
             VisualizarTotalesAcuerdo();
             inicieVideo();
         },
@@ -2761,6 +2764,7 @@ function CalculeProyeccionPagosAcuerdo(idAcuerdo=''){
         type: 'post',
         success: function(data){
             document.getElementById('DivProyeccionPagosAcuerdo').innerHTML=data;
+            Number_Format_Input();
             VisualizarTotalesAcuerdo();
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -2832,6 +2836,8 @@ function CalculeValorCuotaAcuerdo(idAcuerdo=''){
             if(respuestas[0]=="OK"){
                 alertify.success(respuestas[1]);
                  document.getElementById('ValorCuotaAcuerdo').value=respuestas[2];
+                 
+                 document.getElementById('ValorCuotaAcuerdo_Format_Number').value=number_format(respuestas[2],2);
             }else if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
             }else{
@@ -3042,4 +3048,5 @@ function GuardarIngresoAnticipoPorEncargos(idAcuerdoPago){
           }
       })  
 }  
+
 

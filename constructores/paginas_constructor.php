@@ -718,6 +718,8 @@ class PageConstruct extends html_estruct_class{
         print('<script src="../../componentes/select2/dist/js/select2.full.min.js"></script>');
         print('<script src="../../general/js/tablas.js"></script>');  //script genrral de la pagina
         print('<script src="../../general/js/formularios.js"></script>');  //script genrral de la pagina
+        print('<script src="../../general/js/number_format.js"></script>');  //script genrral de la pagina
+        print('<script src="../../componentes/techno/js/number_format_inputs.js"></script>');
         //print('<script type="text/javascript" src="../ext/jquery/jquery-1.11.0.min.js"></script>');
         
     }
@@ -2048,6 +2050,14 @@ class PageConstruct extends html_estruct_class{
         public function AddJSTextAreaEnriquecida(){
             print(' <link rel="stylesheet" href="../../plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
                     <script src="../../plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>');
+        }
+        
+        public function input_number_format($type,$id,$class,$name,$title,$value,$placeholder,$autocomplete,$vectorhtml,$Script,$styles='') {
+            if($value==''){
+                $value=0;
+            }
+            $this->input("hidden", $id, $class." input-number", $name, $title, $value, $placeholder, $autocomplete, $vectorhtml, "", $styles, "");
+            $this->input("text", $id."_Format_Number", $class." input-number", $name, $title, number_format($value,2), $placeholder, $autocomplete, $vectorhtml, $Script, $styles, 'pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$"');
         }
         
         //////////////////////////////////FIN

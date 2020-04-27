@@ -576,5 +576,6 @@ function SumaRestaDiferenciaCuota(idCaja){
     var CuotaActual = document.getElementById(idCaja).value;
     var TotalCuota=parseInt(CuotaActual)+parseInt(Diferencia);
     document.getElementById(idCaja).value=TotalCuota;
+    document.getElementById(idCaja+"_Format_Number").value=number_format(TotalCuota);
     
 }
