@@ -105,6 +105,9 @@ if(isset($_REQUEST["idDocumento"])){
         case 37: //PDF de un acuerdo de pago
             $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdo"]);
             $EstadoGeneral=$obCon->normalizar($_REQUEST["EstadoGeneral"]);
+            include_once '../../modulos/comercial/clases/AcuerdoPago.class.php';
+            $obAcuerdo=new AcuerdoPago($idUser);      
+            $obAcuerdo->ActualiceEstadosProyeccionPagos($idAcuerdo);            
             $obDoc->AcuerdoPagoPDF($idAcuerdo,$EstadoGeneral,"");            
         break;//Fin caso 37
         case 38://Envia una factura y un acuerdo de pago si existe por email
@@ -128,7 +131,8 @@ if(isset($_REQUEST["idDocumento"])){
             if($DatosAcuerdo["ID"]<>''){
                 $idAcuerdo=$DatosAcuerdo["idAcuerdoPago"];
                 include_once '../../modulos/comercial/clases/AcuerdoPago.class.php';
-                $obAcuerdo=new AcuerdoPago($idUser);                
+                $obAcuerdo=new AcuerdoPago($idUser);      
+                
                 $EstadoAcuerdo=$obAcuerdo->ObtengaEstadoGeneralAcuerdo($idAcuerdo);
                 $EstadoGeneral="AL DIA";
                 if($EstadoAcuerdo==4){

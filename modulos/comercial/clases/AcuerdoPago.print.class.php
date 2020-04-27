@@ -108,6 +108,19 @@ class AcuerdoPagoPrint extends PrintPos{
                 fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
             }
             
+            
+            fwrite($handle,"PAGOS AGRUPADOS POR FECHA: "); // ciclo de pagos
+            fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+            $sql="SELECT t1.Fecha,sum(ValorPagado) as TotalPago
+                     FROM acuerdo_pago_cuotas_pagadas t1 WHERE t1.idAcuerdoPago='$idAcuerdo' AND t1.TipoCuota>0 GROUP BY t1.Fecha ORDER BY t1.Fecha ASC";
+            $Consulta= $this->Query($sql);
+            while($DatosPagos= $this->FetchAssoc($Consulta)){
+                fwrite($handle,"FECHA: ".$DatosPagos["Fecha"]);                
+                fwrite($handle," || Valor: $". number_format($DatosPagos["TotalPago"])); // ciclo de pagos                
+                fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+            }
+            
+            
             $this->SeparadorHorizontal($handle, "*", $AnchoSeparador);
             fwrite($handle,"PROYECCION DE PAGOS: "); // ciclo de pagos
             fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
@@ -116,12 +129,20 @@ class AcuerdoPagoPrint extends PrintPos{
                 
                     FROM acuerdo_pago_proyeccion_pagos t1 WHERE idAcuerdoPago='$idAcuerdo' ORDER BY t1.Fecha";
             $Consulta= $this->Query($sql);
-            
+            $TotalCuotasVencidas=0;
             while($DatosProyeccion= $this->FetchAssoc($Consulta)){
-                fwrite($handle,$DatosProyeccion["NombreTipoCuota"]." || ".$DatosProyeccion["Fecha"]." || ". number_format($DatosProyeccion["ValorCuota"])." || ".$DatosProyeccion["NombreEstado"]); 
+                $SaldoCuota=$DatosProyeccion["ValorCuota"]-$DatosPagos["ValorPagado"];
+                if($DatosProyeccion["Estado"]==4){
+                    $TotalCuotasVencidas=$TotalCuotasVencidas+$SaldoCuota;
+                }
+                fwrite($handle,$DatosProyeccion["NombreTipoCuota"]." || ".$DatosProyeccion["Fecha"]." || ". number_format($SaldoCuota)." || ".$DatosProyeccion["NombreEstado"]); 
                 fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
             }
             
+            if($TotalCuotasVencidas>1){
+                fwrite($handle,"TOTAL DE CUOTAS VENCIDAS: ".number_format($TotalCuotasVencidas)); // ciclo de pagos
+                fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+            }
             
             $this->Footer($handle);
             

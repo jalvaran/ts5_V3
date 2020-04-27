@@ -468,10 +468,14 @@ class AcuerdoPago extends ProcesoVenta{
                 //$FechaVencimiento=$this->SumeDiasAFechaAcuerdo($DatosProyeccion["Fecha"], $DiasPlazo);
                 //$FechaActual=date("Y-m-d");
                 $Estado=2;
-                
-                $sql="UPDATE acuerdo_pago_proyeccion_pagos SET Estado='$Estado',ValorPagado=(ValorPagado+$ValorPago),idPago='$idPago' WHERE ID='$idProyeccion'";
-                
+                $sql="UPDATE acuerdo_pago_proyeccion_pagos SET ValorPagado=(ValorPagado+$ValorPago),idPago='$idPago' WHERE ID='$idProyeccion'";
                 $this->Query($sql);
+                if($DatosProyeccion["Estado"]<>4){
+                    $sql="UPDATE acuerdo_pago_proyeccion_pagos SET Estado='$Estado' WHERE ID='$idProyeccion'";
+                    $this->Query($sql);
+                }
+                
+                
                 //exit("E1;$sql");
                 break;
             }
@@ -540,9 +544,15 @@ class AcuerdoPago extends ProcesoVenta{
                 $FechaVencimiento=$this->SumeDiasAFechaAcuerdo($DatosProyeccion["Fecha"], $DiasPlazo);
                 $FechaActual=date("Y-m-d");
                 $Estado=2;
-                
-                $sql="UPDATE acuerdo_pago_proyeccion_pagos SET Estado='$Estado',ValorPagado=(ValorPagado+$ValorPago),idPago='$idPago' WHERE ID='$idProyeccion'";
+                $sql="UPDATE acuerdo_pago_proyeccion_pagos SET ValorPagado=(ValorPagado+$ValorPago),idPago='$idPago' WHERE ID='$idProyeccion'";
                 $this->Query($sql);
+                if($DatosProyeccion["Estado"]<>4){
+                    $sql="UPDATE acuerdo_pago_proyeccion_pagos SET Estado='$Estado' WHERE ID='$idProyeccion'";
+                    $this->Query($sql);
+                    
+                }
+                
+                
                
             }
             

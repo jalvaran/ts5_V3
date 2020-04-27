@@ -6430,7 +6430,7 @@ public function VerificaPermisos($VectorPermisos) {
         $datetime2 = date_create($FechaFinal);
         $interval = date_diff($datetime1, $datetime2);
         $Resultados["Dias"]=$interval->format('%a');
-        
+        $Resultados["Meses"]=$interval->format('%m');
         return($Resultados);
     }
     //Agregue un sistema a una preventa

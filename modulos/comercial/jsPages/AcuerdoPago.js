@@ -579,3 +579,5 @@ function SumaRestaDiferenciaCuota(idCaja){
     document.getElementById(idCaja+"_Format_Number").value=number_format(TotalCuota);
     
 }
+
+

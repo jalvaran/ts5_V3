@@ -162,7 +162,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $ValorADevolver=$CantidadDevolucion*$ValorUnitario;
                 $ValorCuotaGeneral=$ValorADevolver;
             }
-            
+            print('<button type="button" class="btn btn-success btn-flat" onclick="TotalAbonoAcuerdo=0;FormularioAbonarAcuerdoPago(`'.$DatosAcuerdo["idAcuerdoPago"].'`)"> <i class="fa fa-refresh"> </i> </button>');
             $css->CrearTitulo($Mensaje, "verde");
             $css->input("hidden", "idFormulario", "", "idFormulario", "", 5, "", "", "", "");
             $css->input("hidden", "idAcuerdoAbono", "", "idAcuerdoAbono", "", $DatosAcuerdo["idAcuerdoPago"], "", "", "", "");
@@ -172,6 +172,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>Valor del Abono</strong>", 1);
                     $css->ColTabla("<strong>Recargos o Intereses</strong>", 1);
                     $css->ColTabla("<strong>Abonar</strong>", 1);
+                    $css->ColTabla("<strong>Imprimir</strong>", 1);
                 $css->CierraFilaTabla();
                 $css->FilaTabla(16);
                     print("<td>");
@@ -200,6 +201,9 @@ if( !empty($_REQUEST["Accion"]) ){
                         print('
                           <button type="button" id="BtnGuardarAbonoAcuerdo" class="btn btn-success btn-flat" onclick=ConfirmarAbonoAcuerdoPago(`'.$idAcuerdo.'`)><i class="fa fa-save"></i></button>
                         ');
+                    print("</td>");
+                    print("<td style='text-align:center'>");
+                        print('<button type="button" class="btn btn-primary btn-flat" onclick="ImprimirAcuerdoPago(`'.$idAcuerdo.'`)"> <i class="fa fa-print"> </i> </button>');
                     print("</td>");
                 $css->CierraFilaTabla();
             $css->CerrarTabla();
@@ -243,19 +247,23 @@ if( !empty($_REQUEST["Accion"]) ){
                     while($DatosCuotas=$obAcuerdo->FetchAssoc($Consulta)){
                         $idCuota=$DatosCuotas["ID"];
                         $TotalCuotasPendientes=$TotalCuotasPendientes+$DatosCuotas["ValorCuota"]-$DatosCuotas["ValorPagado"];
+                        $Back="";
+                        if($DatosCuotas["Estado"]==4){
+                            $Back="background-color:#f3351e;color:white";
+                        }
                         $css->FilaTabla(16);
-                            $css->ColTabla($DatosCuotas["ID"], 1);
-                            $css->ColTabla($DatosCuotas["NumeroCuota"], 1);
-                            $css->ColTabla($DatosCuotas["Fecha"], 1);
-                            $css->ColTabla(number_format($DatosCuotas["ValorCuota"]), 1);
-                            $css->ColTabla(number_format($DatosCuotas["ValorPagado"]), 1);
-                            $css->ColTabla(number_format($DatosCuotas["ValorCuota"]-$DatosCuotas["ValorPagado"]), 1);
+                            $css->ColTabla($DatosCuotas["ID"], 1,"L",$Back);
+                            $css->ColTabla($DatosCuotas["NumeroCuota"], 1,"L",$Back);
+                            $css->ColTabla($DatosCuotas["Fecha"], 1,"L",$Back);
+                            $css->ColTabla(number_format($DatosCuotas["ValorCuota"]), 1,"L",$Back);
+                            $css->ColTabla(number_format($DatosCuotas["ValorPagado"]), 1,"L",$Back);
+                            $css->ColTabla(number_format($DatosCuotas["ValorCuota"]-$DatosCuotas["ValorPagado"]), 1,"L",$Back);
                             print("<td style=text-align:center>");
                                 print('<span class="input-group-btn">
                                     <button type="button" class="btn btn-primary btn-flat" onclick=AbonarCuotaAcuerdoIndividual(`'.$idAcuerdo.'`,`'.$idCuota.'`)> <i class="fa fa-plus"> </i> </button>
                                   </span> ');
                             print("</td>");
-                            $css->ColTabla($DatosCuotas["NombreEstado"], 1);
+                            $css->ColTabla($DatosCuotas["NombreEstado"], 1,"L",$Back);
                         $css->CierraFilaTabla();
                     }
                     

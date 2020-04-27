@@ -3103,11 +3103,15 @@ $tbl.= "</table>";
             $TotalValorCuotas=0;
             $TotalPagos=0;
             $TotalSaldo=0;
+            $TotalCuotasVencidas=0;
             while($DatosCuotas=$this->obCon->FetchAssoc($Consulta)){
                 $TotalValorCuotas=$TotalValorCuotas+$DatosCuotas["ValorCuota"];
                 $TotalPagos=$TotalPagos+$DatosCuotas["ValorPagado"];
                 $SaldoCuota=$DatosCuotas["ValorCuota"]-$DatosCuotas["ValorPagado"];
                 $TotalSaldo=$TotalSaldo+$SaldoCuota;
+                if($DatosCuotas["Estado"]==4){
+                    $TotalCuotasVencidas=$TotalCuotasVencidas+$SaldoCuota;
+                }
                 $html.="<tr>";
                     $html.='<td colspan="1" >';
                         $html.=$DatosCuotas["NumeroCuota"];
@@ -3148,6 +3152,23 @@ $tbl.= "</table>";
                     $html.="";
                 $html.="</td>"; 
             $html.="</tr>";
+            
+            if($TotalCuotasVencidas>1){
+                $html.="<tr>";
+                    $ColorFondo="#e41818";
+                    $html.='<td colspan="4" style="text-align:right;background-color:'.$ColorFondo.';color:white">';
+                        $html.="<strong>TOTAL CUOTAS VENCIDAS:</strong>";
+                    $html.="</td>";
+                    
+                    $html.='<td colspan="1" style="text-align:left;background-color:'.$ColorFondo.';color:white;font-size:14px">';
+                        $html.=number_format($TotalCuotasVencidas);
+                    $html.="</td>";
+
+                    $html.='<td colspan="1" style="text-align:left;background-color:'.$ColorFondo.';color:white;">';
+                        $html.="";
+                    $html.="</td>"; 
+                $html.="</tr>";
+            }
         $html.="</table>";
         return($html);
     }

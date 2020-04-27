@@ -891,7 +891,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $ValorAnteriorCuota=$DatosAcuerdoAnterior["ValorCuotaGeneral"];
             $css->FilaTabla(16);
                 $css->ColTabla("<strong>Acuerdo Anterior</strong>", "1", "C");
-                $css->ColTabla("<strong>Datos Adicionales</strong>", "1", "C");
+                $css->ColTabla("<strong>Datos Cliente || Adicional</strong>", "1", "C");
+                
                 $css->ColTabla("<strong>Recomendados</strong>", "1", "C");
             
             $css->CierraFilaTabla();
@@ -905,17 +906,23 @@ if( !empty($_REQUEST["Accion"]) ){
                 print("</td>");
                 print("<td style='text-align:center' >");        
                     print('<span class="input-group-btn"> 
+                        <button type="button" class="btn btn-info btn-flat" onclick=ModalEditarTercero(`ModalAccionesPOS`,`DivFrmPOS`,`'.$idCliente.'`,`clientes`)> <i class="fa fa-user"> </i> </button>
+                      </span>');
+                    print('<span class="input-group-btn"> 
                         <button type="button" class="btn btn-primary btn-flat" onclick=DibujarFormularioDatosAdicionalesCliente(`'.$idCliente.'`,`DivProyeccionPagosAcuerdo`)> <i class="fa fa-user-plus"> </i> </button>
                       </span>');
 
                 print("</td>");
+                
                 print("<td style='text-align:center' >");        
                     print('<span class="input-group-btn"> 
                         <button type="button" class="btn btn-warning btn-flat" onclick=DibujarFormularioRecomendadosCliente(`'.$idCliente.'`,`DivProyeccionPagosAcuerdo`)> <i class="fa fa-users"> </i> </button>
                       </span>');
 
                 print("</td>");
-            $css->CierraFilaTabla();
+                $css->CierraFilaTabla();
+                
+            
                     $css->FilaTabla(16);   
                         $css->ColTabla("<strong>Cuota Inicial</strong>", 1);
                         $css->ColTabla("<strong>Metodo</strong>", 1); 

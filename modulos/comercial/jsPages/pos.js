@@ -696,8 +696,8 @@ function atajosPOS(){
  * @returns {undefined}
  */
 function AccionesPOS(){
-    document.getElementById("BntModalPOS").disabled=true;
-    document.getElementById("BntModalPOS").value="Guardando...";
+    //document.getElementById("BntModalPOS").disabled=true;
+    //document.getElementById("BntModalPOS").value="Guardando...";
     var idFormulario=document.getElementById('idFormulario').value; //determina el tipo de formulario que se va a guardar
     
     if(idFormulario==1){
@@ -724,6 +724,10 @@ function AccionesPOS(){
         CrearProductoVenta(1);
     }
     
+    if(idFormulario==103){
+        var idTercero=document.getElementById("idTercero").value;
+        EditarTercero('ModalAccionesPOS','BntModalPOS',idTercero,'clientes');
+    }
 }
 /**
  * Crear un tercero

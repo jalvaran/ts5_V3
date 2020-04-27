@@ -421,7 +421,11 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $DatosImpresora=$obCon->DevuelveValores("config_puertos", "ID", 1);
             if($DatosImpresora["Habilitado"]=="SI" AND $CmbPrint=='SI'){
-                $obPrint->ImprimeFacturaPOS($idFactura,$DatosImpresora["Puerto"],1);
+                $Copias=1;
+                if($CmbFormaPago=="Acuerdo"){
+                    $Copias=2;
+                }
+                $obPrint->ImprimeFacturaPOS($idFactura,$DatosImpresora["Puerto"],$Copias);
                 $DatosTikete=$obCon->DevuelveValores("config_tiketes_promocion", "ID", 1);
                 if($Total>=$DatosTikete["Tope"] AND $DatosTikete["Activo"]=="SI"){
                     $VectorTiket["F"]=0;

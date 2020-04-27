@@ -125,7 +125,7 @@ if( !empty($_REQUEST["Accion"]) ){
             if($DatosAcuerdo["SaldoFinal"]<=0){
                 $obCon->ActualizaRegistro("acuerdo_pago", "Estado", 2, "idAcuerdoPago", $idAcuerdo);
             }
-            $obPrint->PrintAcuerdoPago($idAcuerdo, 1, 0);
+            //$obPrint->PrintAcuerdoPago($idAcuerdo, 1, 0);
             print("OK;Pago Ingresado");
         break; //fin caso 2
         
@@ -240,7 +240,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6); //Contrapartida del comprobante de ingreso aqui se aloja la cuenta de clientes
                 $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAbono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdo", "CERRADO");
                 $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
-                $obPrint->PrintAcuerdoPago($idAcuerdo, 1, 0);
+                //$obPrint->PrintAcuerdoPago($idAcuerdo, 1, 0);
             }
             if($RecargosIntereses>0){
                 $idInteres=$obCon->InteresesAcuerdoPagos($idAcuerdo, $RecargosIntereses, $MetodoPago, $idUser);

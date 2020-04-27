@@ -199,7 +199,8 @@ function CrearTercero(idModal,idBotonModal){
  * @returns {undefined}
  */
 function EditarTercero(idModal,idBotonModal,idTercero,Tabla){
-    
+    document.getElementById(idBotonModal).disabled=true;
+    document.getElementById(idBotonModal).value="Guardando...";
     var TipoDocumento=document.getElementById('TipoDocumento').value;
     var Num_Identificacion=document.getElementById('Num_Identificacion').value;    
     var CodigoMunicipio=document.getElementById('CodigoMunicipio').value;
@@ -289,7 +290,7 @@ function EditarTercero(idModal,idBotonModal,idTercero,Tabla){
         form_data.append('idTercero', idTercero);
         form_data.append('Tabla', Tabla);
         
-        document.getElementById("RazonSocial").value='';
+        //document.getElementById("RazonSocial").value='';
         
         $.ajax({
         url: '../../general/procesadores/formularios.process.php',
@@ -300,6 +301,8 @@ function EditarTercero(idModal,idBotonModal,idTercero,Tabla){
         data: form_data,
         type: 'post',
         success: function(data){
+            document.getElementById(idBotonModal).disabled=false;
+            document.getElementById(idBotonModal).value="Guardar";
             var respuestas = data.split(';');
             if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
