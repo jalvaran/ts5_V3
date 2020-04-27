@@ -19,7 +19,7 @@ class TS_Mail extends ProcesoVenta{
         //$DatosParametrosFE=$this->DevuelveValores("facturas_electronicas_parametros", "ID", 4);
         
         //recipient
-        $to = $para;
+        $to = strtolower($para);
 
         //sender
         $from = $de;
@@ -43,12 +43,15 @@ class TS_Mail extends ProcesoVenta{
         //multipart boundary 
         $message = "--{$mime_boundary}\n" . "Content-Type: text/html; charset=\"UTF-8\"\n" .
         "Content-Transfer-Encoding: 7bit\n\n" . $htmlContent . "\n\n"; 
-
+        //$Adjuntos[0]="../clases/Factura.pdf";
         //preparing attachment
-        if($Adjuntos<>''){
+        if($Adjuntos[0]<>''){
             foreach($Adjuntos as $file){
-                if(!empty($file) > 0){
+                //print("Enviando: ".$file);
+                if(!empty($file)){
+                    
                     if(is_file($file)){
+                        //print($file);
                         $message .= "--{$mime_boundary}\n";
                         $fp =    @fopen($file,"rb");
                         $data =  @fread($fp,filesize($file));
@@ -84,7 +87,7 @@ class TS_Mail extends ProcesoVenta{
         Primero, obtenemos el listado de e-mails
         desde nuestra base de datos y la incorporamos a un Array.
         */
-        $email=$para;
+        $email=strtolower($para);
         $name="";
         $email_from=$de;
         $name_from=$nombreRemitente;
@@ -110,7 +113,7 @@ class TS_Mail extends ProcesoVenta{
         $mail->IsHTML(true);
         $mail->Subject = $asunto;
         $mail->Body = $mensajeHTML;
-        if($Adjuntos<>''){
+        if($Adjuntos[0]<>''){
             foreach ($Adjuntos as $value) {
                 $Vector=explode('/',$value);
                 $Total=count($Vector);

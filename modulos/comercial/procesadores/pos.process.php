@@ -439,10 +439,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $obCon->Query($sql);
             
             
-            
-            $LinkFactura="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2&ID=$idFactura";
-            $Mensaje="<br><strong>Factura $NumFactura Creada Correctamente </strong><a href='$LinkFactura'  target='blank'> Imprimir</a>";
-            $Mensaje.="<br><h3>Devuelta: ".number_format($Devuelta)."</h3>";
+            $Mensaje2="";
             
             if($CmbFormaPago=="Acuerdo"){
                 $obPrintAcuerdo = new AcuerdoPagoPrint($idUser);
@@ -473,10 +470,17 @@ if( !empty($_REQUEST["Accion"]) ){
                 $obAcuerdo->ActualizaRegistro("vestasactivas", "IdentificadorUnico", $NuevoIdAcuerdo, "idVestasActivas", $idPreventa);
                 $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);
                 $obPrintAcuerdo->PrintAcuerdoPago($idAcuerdoPago, 2, 0);
+                $LinkAcuerdo="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=37&idAcuerdo=$idAcuerdoPago&EstadoGeneral=0";
+                $Mensaje2="<br><strong>Acuerdo de Pago Creado Correctamente </strong><a href='$LinkAcuerdo'  target='blank'> Imprimir</a>";
+                
             }
-            
+            $LinkFactura="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2&ID=$idFactura";
+            $Mensaje="<br><strong>Factura $NumFactura Creada Correctamente </strong><a href='$LinkFactura'  target='blank'> Imprimir</a>";
+            $MensajeDevuelta="<br><h3>Devuelta: ".number_format($Devuelta)."</h3>";
+            $LinkProcessMail="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=38&idFactura=$idFactura";
+            $MensajeMail="<br><a href='$LinkProcessMail'  target='blank'><strong>Click para enviar Factura por Email</strong></a>";
             $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);
-            print("OK;$Mensaje");
+            print("OK;$Mensaje.$Mensaje2.$MensajeDevuelta.$MensajeMail");
             
             
             
@@ -1129,6 +1133,8 @@ if( !empty($_REQUEST["Accion"]) ){
             
             print("OK;Anticipo x encargo recibido");
         break;//Fin caso 30    
+        
+        
         
     }
     

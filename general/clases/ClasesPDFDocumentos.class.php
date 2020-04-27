@@ -132,8 +132,13 @@ $this->PDF->writeHTML("<br>", true, false, false, false, '');
         $this->PDF->AddPage();
     }     
 //Crear el documento PDF
-    public function PDF_Output($NombreArchivo) {
-        $this->PDF->Output("$NombreArchivo".".pdf", 'I');
+    public function PDF_Output($NombreArchivo,$Guardar=0,$Ruta="../../tmp/") {
+        $out="I";
+        if($Guardar==1){
+            $out="F";
+            $NombreArchivo=$Ruta.$NombreArchivo;
+        }
+        $this->PDF->Output("$NombreArchivo".".pdf", $out);
     } 
     
     public function PDF_Egreso($idEgreso) {
@@ -898,7 +903,7 @@ $this->PDF->MultiCell(93, 25, $tbl, 0, 'R', 1, 0, '', '', true,0, true, true, 10
      * @param type $TipoFactura
      * @param type $Vector
      */
-    public function PDF_Factura($idFactura,$TipoFactura,$Vector) {
+    public function PDF_Factura($idFactura,$TipoFactura,$Vector,$Guardar=0,$Ruta="../../tmp/") {
         $VistaFactura=1;
         $DatosFactura=$this->obCon->DevuelveValores("facturas", "idFacturas", $idFactura);
         $CodigoFactura="$DatosFactura[Prefijo] - $DatosFactura[NumeroFactura]";
@@ -929,7 +934,7 @@ $this->PDF->MultiCell(93, 25, $tbl, 0, 'R', 1, 0, '', '', true,0, true, true, 10
             $html=$this->FirmaDocumentos();
             $this->PDF_Write($html);
         }
-        $this->PDF_Output("Factura_$CodigoFactura");
+        $this->PDF_Output("Factura_$CodigoFactura",$Guardar,$Ruta);
     }
     
     /**
@@ -2920,7 +2925,7 @@ $tbl.= "</table>";
         return($html);
     }
     
-    public function AcuerdoPagoPDF($idAcuerdo,$EstadoAcuerdo) {
+    public function AcuerdoPagoPDF($idAcuerdo,$EstadoAcuerdo,$Guardar=0,$Ruta="") {
         $idFormato=37;
         
         $DatosFormatos= $this->obCon->DevuelveValores("formatos_calidad", "ID", $idFormato);
@@ -2948,7 +2953,7 @@ $tbl.= "</table>";
         $html=$this->AbonosRealizadosAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente);        
         $this->PDF->writeHTML("<br><br>".$html, true, false, false, false, ''); 
         
-        $this->PDF_Output("Acuerdo_Pago_$idAcuerdo");
+        $this->PDF_Output("Acuerdo_Pago_$idAcuerdo",$Guardar,$Ruta);
     }
     
     public function EncabezadoAcuerdo($idAcuerdo,$DatosAcuerdo,$DatosUsuario,$DatosCliente,$EstadoAcuerdo) {

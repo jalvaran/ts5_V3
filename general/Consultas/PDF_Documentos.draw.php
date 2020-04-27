@@ -28,11 +28,15 @@ if(isset($_REQUEST["idDocumento"])){
             
             $idFactura=$obCon->normalizar($_REQUEST["ID"]);
             $TipoFactura="ORIGINAL";
+            $Guardar=0;
             if(isset($_REQUEST["TipoFactura"])){
                 $TipoFactura=$obCon->normalizar($_REQUEST["TipoFactura"]);
             }
+            if(isset($_REQUEST["Guardar"])){
+                $Guardar=$obCon->normalizar($_REQUEST["Guardar"]);
+            }
             
-            $obDoc->PDF_Factura($idFactura,$TipoFactura, "");
+            $obDoc->PDF_Factura($idFactura,$TipoFactura, "",$Guardar);
 
             $DatosImpresora=$obCon->DevuelveValores("config_puertos", "ID", 1);
             if($DatosImpresora["Habilitado"]=="SI"){
@@ -102,7 +106,52 @@ if(isset($_REQUEST["idDocumento"])){
             $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdo"]);
             $EstadoGeneral=$obCon->normalizar($_REQUEST["EstadoGeneral"]);
             $obDoc->AcuerdoPagoPDF($idAcuerdo,$EstadoGeneral,"");            
-            break;//Fin caso 35
+        break;//Fin caso 37
+        case 38://Envia una factura y un acuerdo de pago si existe por email
+            include_once '../clases/mail.class.php';
+            $obMail= new TS_Mail($idUser);
+            $idFactura=$obCon->normalizar($_REQUEST["idFactura"]);
+            $DatosFactura=$obCon->DevuelveValores("facturas", "idFacturas", $idFactura);
+            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
+            if(!filter_var($DatosCliente["Email"], FILTER_VALIDATE_EMAIL) or strtolower($DatosCliente["Email"])=="no@no.com"){
+                exit("<h3>El cliente no tiene un mail válido</h3>");
+            }
+            $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idFactura", $idFactura);
+            $TipoFactura="ORIGINAL";                        
+            $obDoc->PDF_Factura($idFactura,$TipoFactura, "",1);
+            $DatosConfiguracion=$obCon->DevuelveValores("configuracion_general", "ID", 25);
+            $mensajeHTML="<h3>Cordial Saludo <strong>".$DatosCliente["RazonSocial"]."</strong></h3><br><br><br>";
+            $mensajeHTML.="En adjunto encontrarás tu Factura de Venta Numero: ".$DatosFactura["NumeroFactura"];
+            $mensajeHTML.="<br><br><br>Mil gracias por tu compra y que tengas un feliz dia!";
+            $CodigoFactura=$DatosFactura["Prefijo"]." - ".$DatosFactura["NumeroFactura"];
+            $Adjuntos[0]="../../tmp/Factura_$CodigoFactura".".pdf";
+            if($DatosAcuerdo["ID"]<>''){
+                $idAcuerdo=$DatosAcuerdo["idAcuerdoPago"];
+                include_once '../../modulos/comercial/clases/AcuerdoPago.class.php';
+                $obAcuerdo=new AcuerdoPago($idUser);                
+                $EstadoAcuerdo=$obAcuerdo->ObtengaEstadoGeneralAcuerdo($idAcuerdo);
+                $EstadoGeneral="AL DIA";
+                if($EstadoAcuerdo==4){
+                    $EstadoGeneral="EN MORA";
+                }
+                $obDoc->AcuerdoPagoPDF($idAcuerdo, $EstadoAcuerdo, 1,"../../tmp/");
+                $Adjuntos[1]="../../tmp/Acuerdo_Pago_$idAcuerdo".".pdf";
+            }
+            if($DatosConfiguracion["Valor"]==1){
+                $obMail->EnviarMailXPHPNativo(($DatosCliente["Email"]),"technosoluciones_fe@gmail.com", "TS5", "Factura TS5 ".$DatosFactura["NumeroFactura"], $mensajeHTML, $Adjuntos);
+                
+            }else{
+                $obMail->EnviarMailXPHPMailer(($DatosCliente["Email"]),"technosoluciones_fe@gmail.com", "TS5", "Factura TS5 ".$DatosFactura["NumeroFactura"], $mensajeHTML, $Adjuntos);
+            }
+            /*  Activar si desea limpiar el temporal
+            foreach ($Adjuntos as $value){
+                unlink($value);
+            }
+             * 
+             */
+            
+            print("OK;Factura Enviada");
+        break;//Fin caso 38
     }
 }else{
     print("No se recibió parametro de documento");
