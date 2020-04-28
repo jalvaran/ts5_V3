@@ -23,6 +23,13 @@ $css->PageInit($myTitulo);
     /*
      * Inicio de la maqueta propia de cada programador
      */
+
+    $css->Modal("ModalAcciones", "TS5", "", 1);
+        $css->div("DivModalAcciones", "", "", "", "", "", "");
+        $css->Cdiv();
+       
+    $css->CModal("BntModalAcciones", "onclick=GuardarSegunFormulario()", "button", "Guardar");
+    
     $css->section("", "content-header", "", "");
         print("<h1>Administrador de Acuerdos de Pago</h1>");
          

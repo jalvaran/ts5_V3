@@ -35,12 +35,13 @@ if( !empty($_REQUEST["Accion"]) ){
             $FechaFinalRangos=$obCon->normalizar($_REQUEST["FechaFinalRangos"]);
             $cmbCicloPagos=$obCon->normalizar($_REQUEST["cmbCicloPagos"]);
             $Condicion=" WHERE ID>0 ";
-            
+            $Order="";
             if($Busqueda<>''){
                 $Condicion.=" AND (ID = '$Busqueda' or idAcuerdoPago like '$Busqueda%')";
             }
             
             if($idCliente<>''){
+                $Order="ORDER BY Fecha ASC";
                 $Condicion.=" AND (Tercero = '$idCliente')";
             }
             if($FechaInicialRangos<>''){
@@ -68,7 +69,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Total=$totales["Total"];
             
             $sql="SELECT *
-                  FROM $Tabla t1 $Condicion LIMIT $PuntoInicio,$Limit;";
+                  FROM $Tabla t1 $Condicion $Order LIMIT $PuntoInicio,$Limit;";
             $Consulta=$obCon->Query($sql);
             
             
@@ -142,7 +143,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->FilaTabla(16);
                 
                 
-                $css->ColTabla("<strong>ID</strong>", 1);                
+                $css->ColTabla("<strong>ID</strong>", 1); 
+                $css->ColTabla("<strong>VER</strong>", 1);
                 $css->ColTabla("<strong>PDF</strong>", 1);
                 $css->ColTabla("<strong>Anular</strong>", 1);
                 $css->ColTabla("<strong>Reportar</strong>", 1);
@@ -173,9 +175,12 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     $css->FilaTabla(16);
                         $css->ColTabla($DatosAcuerdo["ID"], 1);
+                        print("<td style='text-align:center;'>");  
+                            print('<button type="button" class="btn btn-success btn-flat" onclick="DibujarAcuerdoPagoExistente(`'.$idAcuerdo.'`,`DivModalAcciones`,`ModalAcciones`)"> <i class="fa fa-eye"> </i> </button>');
+                        print("</td>");
                         print("<td style='text-align:center;'>");        
                             print('<span class="input-group-btn">
-                                <a class="btn btn-success btn-flat" href="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=37&idAcuerdo='.$idAcuerdo.'&EstadoGeneral='.$EstadoAcuerdo.'" target="_blank"> <i class="fa fa-file-pdf-o"> </i> </a>
+                                <a class="btn btn-primary btn-flat" href="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=37&idAcuerdo='.$idAcuerdo.'&EstadoGeneral='.$EstadoAcuerdo.'" target="_blank"> <i class="fa fa-file-pdf-o"> </i> </a>
                               </span>');
                                 
                         print("</td>");

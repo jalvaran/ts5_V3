@@ -192,10 +192,10 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->Cselect();
                     print("</td>");
                     print("<td>");
-                        $css->input("number", "TxtValorAbonoAcuerdoExistente", "form-control", "TxtValorAbonoAcuerdoExistente", "", $ValorCuotaGeneral, "Valor de la Cuota", "off", "", "");
+                        $css->input_number_format("number", "TxtValorAbonoAcuerdoExistente", "form-control", "TxtValorAbonoAcuerdoExistente", "", $ValorCuotaGeneral, "Valor de la Cuota", "off", "", "");
                     print("</td>");
                     print("<td>");
-                        $css->input("number", "TxtRecargosIntereses", "form-control", "TxtRecargosIntereses", "", "0", "Recargos o intereses", "off", "", "");
+                        $css->input_number_format("number", "TxtRecargosIntereses", "form-control", "TxtRecargosIntereses", "", "0", "Recargos o intereses", "off", "", "");
                     print("</td>");
                     print("<td style='text-align:center'>");
                         print('
@@ -396,7 +396,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>Cuota General</strong>", 1);
                     $css->ColTabla("<strong>Saldo Inicial</strong>", 1);
                     $css->ColTabla("<strong>Total Abonos</strong>", 1);
-                    $css->ColTabla("<strong>Saldo Actual</strong>", 1);
+                    $css->ColTabla("<strong>Saldo Final</strong>", 1);
                 $css->CierraFilaTabla();
                 $css->FilaTabla(16);
                     $css->ColTabla($DatosAcuerdo["Fecha"], 1);
@@ -561,6 +561,56 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                     $css->CierraFilaTabla();
                 $css->CerrarTabla();
+                
+                if($DatosAcuerdo["idFactura"]<>''){
+                    $idFactura=$DatosAcuerdo["idFactura"];
+                    $DatosFactura=$obCon->DevuelveValores("facturas", "idFacturas", $DatosAcuerdo["idFactura"]);
+                    $NumeroFactura=$DatosFactura["NumeroFactura"];
+                    $css->CrearDiv("", "col-md-12", "left", 1, 1);
+                        $css->CrearTitulo("<strong>PRODUCTOS LLEVADOS EN ESTE ACUERDO POR MEDIO DE LA FACTURA $NumeroFactura</strong>", "naranja");
+                        $css->CrearTabla();
+
+
+                            $css->FilaTabla(16);
+                                
+                                $css->ColTabla("<strong>Referencia</strong>", 1, "C");
+                                $css->ColTabla("<strong>Nombre</strong>", 1, "C");
+                                $css->ColTabla("<strong>Cantidad</strong>", 1, "C");
+                                $css->ColTabla("<strong>Total</strong>", 1, "C");
+
+                            $css->CierraFilaTabla();
+
+
+                            $sql="SELECT Referencia,Nombre,Cantidad,TotalItem
+                                    FROM facturas_items WHERE idFactura='$idFactura'";
+                            $Consulta=$obAcuerdo->Query($sql);
+                            $Total=0;
+                            while($DatosCuotas=$obAcuerdo->FetchAssoc($Consulta)){
+                                $Total=$Total+$DatosCuotas["TotalItem"];
+                                $css->FilaTabla(16);
+                                    $css->ColTabla($DatosCuotas["Referencia"], 1);
+                                    $css->ColTabla($DatosCuotas["Nombre"], 1);
+
+                                    $css->ColTabla(number_format($DatosCuotas["Cantidad"]), 1);
+                                    $css->ColTabla(number_format($DatosCuotas["TotalItem"]), 1);
+                                    
+                                $css->CierraFilaTabla();
+                            }
+                            $css->FilaTabla(16);
+                                
+                                $css->ColTabla("<strong>TOTAL</strong>", 3, "R");
+                                
+                                $css->ColTabla(number_format($Total), 1, "L");
+
+                            $css->CierraFilaTabla();
+
+                        $css->CerrarTabla();
+
+                    $css->CerrarDiv();
+                }else{
+                    $css->CrearTitulo("Este Acuerdo no tiene una factura Asociada", "rojo");
+                }
+                
             $css->CerrarDiv();
             
         break;//Fin caso 4    

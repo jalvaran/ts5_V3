@@ -92,6 +92,7 @@ function FormularioAbonarAcuerdoPago(idAcuerdo,divDraw='DivBusquedasPOS',Invoca=
         type: 'post',
         success: function(data){
             document.getElementById(divDraw).innerHTML=data;
+            Number_Format_Input();
             DibujeHistorialDeCuotas(idAcuerdo);
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -283,7 +284,11 @@ function RegistrePagoCuotaIndividual(idAcuerdo,idCuota,value){
       });
 }
 
-function DibujarAcuerdoPagoExistente(idAcuerdo,idDiv='DivHistorialAcuerdoPago'){
+function DibujarAcuerdoPagoExistente(idAcuerdo,idDiv='DivHistorialAcuerdoPago',idModal=""){
+    if(idModal != ''){
+        
+        $("#"+idModal).modal();
+    }
     var form_data = new FormData();
         
         form_data.append('Accion', 4);
