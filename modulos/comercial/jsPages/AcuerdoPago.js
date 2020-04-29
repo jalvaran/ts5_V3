@@ -147,6 +147,14 @@ function ConfirmarAbonoAcuerdoPago(idAcuerdo){
 
 function AbonarAcuerdoPago(idAcuerdo){
     document.getElementById("BtnGuardarAbonoAcuerdo").disabled=true;
+    var idItemDevolucionAcuerdo="";
+    var Cantidad_Devolucion_Acuerdo_Pago="";
+    var TxtObservacionesDevolucion="";
+    if($("#idItemDevolucionAcuerdo").length>0){
+        idItemDevolucionAcuerdo=document.getElementById("idItemDevolucionAcuerdo").value;
+        Cantidad_Devolucion_Acuerdo_Pago=document.getElementById("Cantidad_Devolucion_Acuerdo_Pago").value;
+        TxtObservacionesDevolucion=document.getElementById("TxtObservacionesDevolucion").value;
+    }
     var TxtValorAbonoAcuerdoExistente=document.getElementById('TxtValorAbonoAcuerdoExistente').value;
     var TxtRecargosIntereses=document.getElementById('TxtRecargosIntereses').value;
     var CmbMetodoPagoAbonoAcuerdo=document.getElementById('CmbMetodoPagoAbonoAcuerdo').value;
@@ -156,7 +164,9 @@ function AbonarAcuerdoPago(idAcuerdo){
         form_data.append('TxtValorAbonoAcuerdoExistente', TxtValorAbonoAcuerdoExistente);
         form_data.append('CmbMetodoPagoAbonoAcuerdo', CmbMetodoPagoAbonoAcuerdo);
         form_data.append('TxtRecargosIntereses', TxtRecargosIntereses);
-        
+        form_data.append('idItemDevolucionAcuerdo', idItemDevolucionAcuerdo);
+        form_data.append('Cantidad_Devolucion_Acuerdo_Pago', Cantidad_Devolucion_Acuerdo_Pago);
+        form_data.append('TxtObservacionesDevolucion', TxtObservacionesDevolucion);
         $.ajax({
         url: './procesadores/AcuerdoPago.process.php',
         //dataType: 'json',
@@ -171,7 +181,10 @@ function AbonarAcuerdoPago(idAcuerdo){
                 alertify.success(respuestas[1]);
                 document.getElementById('TxtValorAbonoAcuerdoExistente').value=0;
                 document.getElementById('TxtRecargosIntereses').value=0;
-                DibujeHistorialDeCuotas(idAcuerdo);
+                document.getElementById('TxtValorAbonoAcuerdoExistente_Format_Number').value=0;
+                document.getElementById('TxtRecargosIntereses_Format_Number').value=0;
+               
+                DibujeFormularioSegunTipoInforme();
             }else if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
             }else{
@@ -246,6 +259,14 @@ function RegistrePagoCuotaIndividual(idAcuerdo,idCuota,value){
     var TotalAbono=document.getElementById("TxtValorAbonoAcuerdoExistente").value;
     var TxtRecargosIntereses=document.getElementById("TxtRecargosIntereses").value;
     var CmbMetodoPagoAbonoAcuerdo=document.getElementById("CmbMetodoPagoAbonoAcuerdo").value;
+    var idItemDevolucionAcuerdo="";
+    var Cantidad_Devolucion_Acuerdo_Pago="";
+    var TxtObservacionesDevolucion="";
+    if($("#idItemDevolucionAcuerdo").length>0){
+        idItemDevolucionAcuerdo=document.getElementById("idItemDevolucionAcuerdo").value;
+        Cantidad_Devolucion_Acuerdo_Pago=document.getElementById("Cantidad_Devolucion_Acuerdo_Pago").value;
+        TxtObservacionesDevolucion=document.getElementById("TxtObservacionesDevolucion").value;
+    }
     var form_data = new FormData();
         form_data.append('Accion', 4);        
         form_data.append('idCuota', idCuota);
@@ -253,6 +274,9 @@ function RegistrePagoCuotaIndividual(idAcuerdo,idCuota,value){
         form_data.append('MetodoPago', CmbMetodoPagoAbonoAcuerdo); 
         form_data.append('TotalAbono', TotalAbono); 
         form_data.append('TxtRecargosIntereses', TxtRecargosIntereses); 
+        form_data.append('idItemDevolucionAcuerdo', idItemDevolucionAcuerdo); 
+        form_data.append('Cantidad_Devolucion_Acuerdo_Pago', Cantidad_Devolucion_Acuerdo_Pago); 
+        form_data.append('TxtObservacionesDevolucion', TxtObservacionesDevolucion); 
         $.ajax({
         url: './procesadores/AcuerdoPago.process.php',
         //dataType: 'json',
@@ -264,10 +288,13 @@ function RegistrePagoCuotaIndividual(idAcuerdo,idCuota,value){
         success: function(data){
             var respuesta= data.split(';'); 
             if(respuesta[0]=='OK'){
-                document.getElementById("TxtValorAbonoAcuerdoExistente").value=TotalAbono-value;
+                var SaldoAbono=TotalAbono-value;
+                document.getElementById("TxtValorAbonoAcuerdoExistente").value=SaldoAbono;
+                document.getElementById("TxtValorAbonoAcuerdoExistente_Format_Number").value=number_format(SaldoAbono);
                 document.getElementById("TxtRecargosIntereses").value=0;
                 alertify.success(respuesta[1]);
-                DibujeHistorialDeCuotas(idAcuerdo);
+                DibujeFormularioSegunTipoInforme(idAcuerdo);
+                
             }else if(respuesta[0]=='E1'){
                 alertify.alert(respuesta[1]);
             }else{

@@ -76,7 +76,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     print("</td>");
                     
                     print("<td style='text-align:center'>");
-                        $Ruta="procesadores/informesAcuerdoPago.process.php?Accion=2&c=". base64_encode($Condicion);
+                        $Ruta="procesadores/informesAcuerdoPago.process.php?Accion=2&FechaInicialRangos=$FechaInicialRangos&FechaFinalRangos=$FechaFinalRangos&c=".base64_encode($Condicion);
                         print('<a href="'.$Ruta.'" target="_blank"><button type="button" id="BtnExportarExcelCuentas" class="btn btn-success btn-flat"><i class="fa fa-file-excel-o"></i></button></a>');
                     print("</td>");
                    
@@ -133,6 +133,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->ColTabla("<strong>Numero de Cuota</strong>", 1, "C");                
                 $css->ColTabla("<strong>Valor de Cuota</strong>", 1, "C"); 
                 $css->ColTabla("<strong>Valor Pagado</strong>", 1, "C");
+                $css->ColTabla("<strong>Saldo Cuota</strong>", 1, "C");
                 $css->ColTabla("<strong>Estado</strong>", 1, "C");
                 
             $css->CierraFilaTabla();
@@ -151,6 +152,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla($RegistrosTabla["NumeroCuota"], 1, "L");
                         $css->ColTabla(number_format($RegistrosTabla["ValorCuota"]), 1, "L");
                         $css->ColTabla(number_format($RegistrosTabla["ValorPagado"]), 1, "L");
+                        $css->ColTabla(number_format($RegistrosTabla["SaldoCuota"]), 1, "L");
                         $css->ColTabla($RegistrosTabla["NombreEstadoProyeccion"], 1, "L");
                         
                     $css->CierraFilaTabla();

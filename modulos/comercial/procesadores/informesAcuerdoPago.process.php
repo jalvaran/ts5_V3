@@ -22,14 +22,16 @@ if( !empty($_REQUEST["Accion"]) ){
     switch ($_REQUEST["Accion"]) {
         
         case 1: //Construir la hoja de trabajo de los informes
-             
-            $obCon->ConstruirHojaDeTrabajoAcuerdo();
+            $FechaFinal= $obCon->normalizar($_REQUEST["FechaFinalRangos"]);
+            $obCon->ConstruirHojaDeTrabajoAcuerdo($FechaFinal);
             print("OK;Hoja de trabajo construida");
         break; //fin caso 1
         
         case 2://Genere el excel con el informe de cuentas x cobrar
             $Condicion= base64_decode($_REQUEST["c"]);
-            $obExcel->HojaDeTrabajoAcuerdosExcel($Condicion);
+            $FechaInicialRangos= $obCon->normalizar($_REQUEST["FechaInicialRangos"]);
+            $FechaFinalRangos= $obCon->normalizar($_REQUEST["FechaFinalRangos"]);
+            $obExcel->HojaDeTrabajoAcuerdosExcel($Condicion,$FechaInicialRangos,$FechaFinalRangos);
             print("OK;Hoja Exportada");
         break;//fin caso 2    
         

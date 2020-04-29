@@ -5,16 +5,23 @@ class informesAcuerdoPago extends AcuerdoPago{
     /**
      * Construye la hoja de trabajo que se utilizará para los informes
      */
-    public function ConstruirHojaDeTrabajoAcuerdo() {
+    public function ConstruirHojaDeTrabajoAcuerdo($FechaFinal) {
+        
         $HojaDeTrabajo="acuerdo_pago_hoja_trabajo_informes";
         $sql="DROP TABLE IF EXISTS $HojaDeTrabajo";
         $this->Query($sql);
             
         $sql="CREATE TABLE $HojaDeTrabajo AS
-                SELECT t1.ID as ID,t2.ID as ConsecutivoAcuerdo,t1.idAcuerdoPago,t1.TipoCuota,t1.NumeroCuota,t1.Fecha,t1.ValorCuota,t1.ValorPagado,t1.idPago,
-                t1.Estado as EstadoProyeccion,
-                
-                (SELECT t3.NombreEstado FROM acuerdo_pago_proyeccion_estados t3 WHERE t3.ID=t1.Estado LIMIT 1) AS NombreEstadoProyeccion,
+                SELECT t1.ID as ID,t2.ID as ConsecutivoAcuerdo,t1.idAcuerdoPago,t1.TipoCuota,t1.NumeroCuota,t1.Fecha,t1.ValorCuota,t1.ValorPagado,
+                (t1.ValorCuota-t1.ValorPagado) as SaldoCuota,t1.idPago,
+                t1.Estado as EstadoProyeccion,t2.Observaciones,'$FechaFinal' as FechaFinalConstruccion,";
+        if($FechaFinal==''){
+            $sql.="(SELECT SUM(t8.ValorCuota-t8.ValorPagado) FROM acuerdo_pago_proyeccion_pagos t8 WHERE t8.idAcuerdoPago=t1.idAcuerdoPago) as SaldoPendiente,";
+        }else{
+            $sql.="(SELECT SUM(t8.ValorCuota-t8.ValorPagado) FROM acuerdo_pago_proyeccion_pagos t8 WHERE t8.idAcuerdoPago=t1.idAcuerdoPago AND t8.Fecha<='$FechaFinal') as SaldoPendiente,";
+        }
+        
+        $sql.="  (SELECT t3.NombreEstado FROM acuerdo_pago_proyeccion_estados t3 WHERE t3.ID=t1.Estado LIMIT 1) AS NombreEstadoProyeccion,
                 (SELECT t6.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t6 WHERE t6.ID=t1.TipoCuota LIMIT 1) AS NombreTipoCuota,
                 t2.Tercero,
                 (SELECT t4.RazonSocial FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero LIMIT 1) AS RazonSocial,

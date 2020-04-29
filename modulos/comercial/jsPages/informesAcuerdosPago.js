@@ -65,10 +65,11 @@ function DibujeHojaDeTrabajoInforme(Page=1){
 
 function ConstruyeHojaDeTrabajoInforme(){
     var idDiv="DivDrawTables";
+    var FechaFinalRangos = document.getElementById('FechaFinalRangos').value;
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">Construyendo la hoja de trabajo...<br><img   src="../../images/loading.gif" alt="Cargando" height="50" width="50"></div>';  
     var form_data = new FormData();
         form_data.append('Accion', 1);        
-        
+        form_data.append('FechaFinalRangos', FechaFinalRangos);     
         $.ajax({
         url: './procesadores/informesAcuerdoPago.process.php',
         //dataType: 'json',
@@ -99,10 +100,14 @@ function ConstruyeHojaDeTrabajoInforme(){
 
 function ExporteHojaDeTrabajoInforme(Condicion){
     var idDiv="DivDrawTables";
+    var FechaInicialRangos = document.getElementById('FechaInicialRangos').value;
+    var FechaFinalRangos = document.getElementById('FechaFinalRangos').value;
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">Exportando la hoja de trabajo...<br><img   src="../../images/loading.gif" alt="Cargando" height="50" width="50"></div>';  
     var form_data = new FormData();
         form_data.append('Accion', 2);        
         form_data.append('Condicion', Condicion);  
+        form_data.append('FechaInicialRangos', FechaInicialRangos);  
+        form_data.append('FechaFinalRangos', FechaFinalRangos);  
         $.ajax({
         url: './procesadores/informesAcuerdoPago.process.php',
         //dataType: 'json',

@@ -618,6 +618,22 @@ class AcuerdoPago extends ProcesoVenta{
          return($MaxEstado);
      }
     
+     public function RegistreDevolucionProductoAcuerdo($idAcuerdoPago,$idFacturasItems,$Cantidad,$ValorDevolucion,$Observaciones,$idUser) {
+         
+                 
+         $Datos["Fecha"]=date("Y-m-d");
+         $Datos["idFacturasItems"]=$idFacturasItems;
+         $Datos["idAcuerdoPago"]=$idAcuerdoPago;
+         $Datos["Cantidad"]=$Cantidad;
+         $Datos["ValorDevolucion"]=$ValorDevolucion;
+         $Datos["Observaciones"]=$Observaciones;
+         $Datos["idUser"]=$idUser;
+         $Datos["Created"]=date("Y-m-d H:i:s");
+         $sql=$this->getSQLInsert("acuerdo_pago_productos_devueltos", $Datos);
+         $this->Query($sql);   
+         
+     }
+     
     /**
      * Fin Clase
      */

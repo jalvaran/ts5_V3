@@ -33,7 +33,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $MetodoPago=$obCon->normalizar($_REQUEST["CmbMetodoPagoAbonoAcuerdo"]);
             $ValorAbono=$obCon->normalizar($_REQUEST["TxtValorAbonoAcuerdoExistente"]);
             $RecargosIntereses=$obCon->normalizar($_REQUEST["TxtRecargosIntereses"]);
-            
+            $idItemDevolucionAcuerdo=$obCon->normalizar($_REQUEST["idItemDevolucionAcuerdo"]);
+            $Cantidad_Devolucion_Acuerdo_Pago=$obCon->normalizar($_REQUEST["Cantidad_Devolucion_Acuerdo_Pago"]);
+            $ObservacionesDevolucion=$obCon->normalizar($_REQUEST["TxtObservacionesDevolucion"]);
             if($idAcuerdo==''){
                 exit("E1;No se recibió el id del acuerdo");
             }    
@@ -125,6 +127,11 @@ if( !empty($_REQUEST["Accion"]) ){
             if($DatosAcuerdo["SaldoFinal"]<=0){
                 $obCon->ActualizaRegistro("acuerdo_pago", "Estado", 2, "idAcuerdoPago", $idAcuerdo);
             }
+            
+            if($idItemDevolucionAcuerdo<>''){
+                $obCon->RegistreDevolucionProductoAcuerdo($idAcuerdo, $idItemDevolucionAcuerdo, $Cantidad_Devolucion_Acuerdo_Pago, $ValorAbono, $ObservacionesDevolucion, $idUser);
+            }
+            
             //$obPrint->PrintAcuerdoPago($idAcuerdo, 1, 0);
             print("OK;Pago Ingresado");
         break; //fin caso 2
@@ -152,6 +159,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $MetodoPago=$obCon->normalizar($_REQUEST["MetodoPago"]);
             $TotalAbono=$obCon->normalizar($_REQUEST["TotalAbono"]);
             $RecargosIntereses=$obCon->normalizar($_REQUEST["TxtRecargosIntereses"]);
+            $idItemDevolucionAcuerdo=$obCon->normalizar($_REQUEST["idItemDevolucionAcuerdo"]);
+            $Cantidad_Devolucion_Acuerdo_Pago=$obCon->normalizar($_REQUEST["Cantidad_Devolucion_Acuerdo_Pago"]);
+            $ObservacionesDevolucion=$obCon->normalizar($_REQUEST["TxtObservacionesDevolucion"]);
             if(!is_numeric($ValorAbono) or $ValorAbono<0){
                 exit("E1;El valor del abono debe ser un numero mayor a cero");
             }
@@ -253,6 +263,10 @@ if( !empty($_REQUEST["Accion"]) ){
             if($DatosAcuerdo["SaldoFinal"]<=0){
                 $obCon->ActualizaRegistro("acuerdo_pago", "Estado", 2, "idAcuerdoPago", $idAcuerdo);
             }
+            if($idItemDevolucionAcuerdo<>''){
+                $obCon->RegistreDevolucionProductoAcuerdo($idAcuerdo, $idItemDevolucionAcuerdo, $Cantidad_Devolucion_Acuerdo_Pago, $ValorAbono, $ObservacionesDevolucion, $idUser);
+            }
+            
             print("OK;Abono Registrado");
         break;//FIn caso 4    
         

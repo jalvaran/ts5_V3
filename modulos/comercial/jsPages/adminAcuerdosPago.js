@@ -262,8 +262,7 @@ function FormularioDevolverItem(idAcuerdoPago,idItem){
         
         form_data.append('Accion', 9);
         form_data.append('idItem', idItem);
-        
-        
+       
         
         $.ajax({
         url: './Consultas/adminAcuerdosPago.draw.php',

@@ -20,7 +20,7 @@ class ExcelAcuerdoPago extends ProcesoVenta{
     
     // Clase para generar excel de un balance de comprobacion
     
-    public function HojaDeTrabajoAcuerdosExcel($Condicion) {
+    public function HojaDeTrabajoAcuerdosExcel($Condicion,$FechaInicial,$FechaFinal) {
         require_once('../../../librerias/Excel/PHPExcel2.php');
         
         $objPHPExcel = new Spreadsheet();
@@ -35,16 +35,25 @@ class ExcelAcuerdoPago extends ProcesoVenta{
                 
         $Campos=["A","B","C","D","E","F","G","H","I","J","K","L","M",
                  "N","O","P","Q","R","S","T","U","V","W","X","Y","Z","AA","AB"];
-        $FechaActual=date("Y-m-d");
+        $Rango="COMPLETO";
+        if($FechaInicial<>'' AND $FechaFinal<>''){
+            $Rango=" DESDE ".$FechaInicial." HASTA ".$FechaFinal;
+        }
+        if($FechaInicial<>'' AND $FechaFinal==''){
+            $Rango=" MAYORES A ".$FechaInicial;
+        }
+        if($FechaInicial=='' AND $FechaFinal<>''){
+            $Rango=" MENORES A ".$FechaInicial;
+        }
         $objPHPExcel->setActiveSheetIndex(0)
-            ->setCellValue("A1","LISTADO DE COBROS $FechaActual")
+            ->setCellValue("A1","LISTADO DE COBROS $Rango")
              
                 ;
-        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A1:J1');
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A1:M1');
         //$objPHPExcel->getActiveSheet()->getStyle('B2')->getBorders()->getTop()->applyFromArray( [ 'borderStyle' => Border::BORDER_DASHDOT, 'color' => [ 'rgb' => '808080' ] ] ); 
-        $objPHPExcel->getActiveSheet()->getStyle('A1:K1')->applyFromArray($styleTitle);
-        $objPHPExcel->getActiveSheet()->getStyle('A3:K3')->applyFromArray($styleTitle);
-        $objPHPExcel->getActiveSheet()->getStyle('A1:K1')->applyFromArray($styleTitle);
+        //$objPHPExcel->getActiveSheet()->getStyle('A1:K1')->applyFromArray($styleTitle);
+        $objPHPExcel->getActiveSheet()->getStyle('A3:M3')->applyFromArray($styleTitle);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:M1')->applyFromArray($styleTitle);
         $z=0;
         $i=3;
         $objPHPExcel->setActiveSheetIndex(0)
@@ -52,10 +61,13 @@ class ExcelAcuerdoPago extends ProcesoVenta{
             ->setCellValue($Campos[$z++].$i,"Nombre")
             ->setCellValue($Campos[$z++].$i,"Direccion")
             ->setCellValue($Campos[$z++].$i,"Telefono")
+            ->setCellValue($Campos[$z++].$i,"Observaciones")
             ->setCellValue($Campos[$z++].$i,"Ciclo")
             ->setCellValue($Campos[$z++].$i,"#")
             ->setCellValue($Campos[$z++].$i,"Fecha")
-            ->setCellValue($Campos[$z++].$i,"Valor")
+            ->setCellValue($Campos[$z++].$i,"Cuota")
+            ->setCellValue($Campos[$z++].$i,"Abonos")
+            ->setCellValue($Campos[$z++].$i,"Saldo Cuota")
             ->setCellValue($Campos[$z++].$i,"Cuota Pte.")
             ->setCellValue($Campos[$z++].$i,"Saldo")
                         
@@ -66,11 +78,16 @@ class ExcelAcuerdoPago extends ProcesoVenta{
         $i=3;
         $Tercero="";
         $CuotasPendientes=0;
+        
+        $Encabezado=0;
+        $PrimeraEntrada=1;
         while($DatosVista= $this->FetchAssoc($Consulta)){
+            
+            
             $Encabezado=0;
             if($Tercero<>$DatosVista["Tercero"]){
                 $Tercero=$DatosVista["Tercero"];
-                $CuotasPendientes=0;
+                //$CuotasPendientes=0;
                 $Encabezado=1;
             }
             if($Encabezado==1){
@@ -78,6 +95,7 @@ class ExcelAcuerdoPago extends ProcesoVenta{
                 $RazonSocial=$DatosVista["RazonSocial"]." (".$DatosVista["SobreNombreCliente"].")";
                 $Direccion=$DatosVista["DireccionCliente"];
                 $Telefono=$DatosVista["TelefonoCliente"];
+                $Observaciones=$DatosVista["Observaciones"];
                 $NombreCiclo=$DatosVista["NombreCicloPago"];
                 $SaldoFinal=$DatosVista["SaldoFinal"];
             }else{
@@ -85,10 +103,27 @@ class ExcelAcuerdoPago extends ProcesoVenta{
                 $RazonSocial="";
                 $Direccion="";
                 $Telefono="";
+                $Observaciones="";
                 $NombreCiclo="";
                 $SaldoFinal="";
             }
-            $CuotasPendientes=$CuotasPendientes+($DatosVista["ValorCuota"]-$DatosVista["ValorPagado"]);
+            
+            
+            if($Encabezado==1){
+                if($PrimeraEntrada==0){
+                    
+                    //$CuotasPendientes=($DatosVista["SaldoPendiente"]);
+                    $objPHPExcel->setActiveSheetIndex(0)
+                    ->setCellValue($Campos[11].$i,$CuotasPendientes)
+
+                    ;
+                    //$CuotasPendientes=($DatosVista["ValorCuota"]-$DatosVista["ValorPagado"]);
+                }else{
+                    $PrimeraEntrada=0;
+                }
+                
+            }
+            $CuotasPendientes=$DatosVista["SaldoPendiente"];
             $z=0;
             $i++;
             
@@ -98,28 +133,38 @@ class ExcelAcuerdoPago extends ProcesoVenta{
             ->setCellValue($Campos[$z++].$i,$RazonSocial)
             ->setCellValue($Campos[$z++].$i,$Direccion)
             ->setCellValue($Campos[$z++].$i,$Telefono)
+            ->setCellValue($Campos[$z++].$i,$Observaciones)
             ->setCellValue($Campos[$z++].$i,$NombreCiclo)
             ->setCellValue($Campos[$z++].$i,$DatosVista["NumeroCuota"])
             ->setCellValue($Campos[$z++].$i,$DatosVista["Fecha"])
             ->setCellValue($Campos[$z++].$i,$DatosVista["ValorCuota"])
-            ->setCellValue($Campos[$z++].$i,$CuotasPendientes)
+            ->setCellValue($Campos[$z++].$i,$DatosVista["ValorPagado"])
+            ->setCellValue($Campos[$z++].$i,$DatosVista["SaldoCuota"])    
+            ->setCellValue($Campos[$z++].$i,"")
             ->setCellValue($Campos[$z++].$i,$SaldoFinal)
             
             ;
             
         }
         
-        $objPHPExcel->getActiveSheet()->getStyle("A3:J3")->getAlignment()->setWrapText(true);
+        
+        $objPHPExcel->setActiveSheetIndex(0)
+        ->setCellValue($Campos[11].$i,$CuotasPendientes)
+
+        ;
+        
+        $objPHPExcel->getActiveSheet()->getStyle("A3:M3")->getAlignment()->setWrapText(true);
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(1)->setWidth('10');
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(2)->setWidth('45');
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(3)->setWidth('22');
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(4)->setWidth('14');
-        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(5)->setWidth('11');
-        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(6)->setWidth('6');
-        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(7)->setWidth('10');
-        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(8)->setWidth('8');
-        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(9)->setWidth('9');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(5)->setWidth('16');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(6)->setWidth('11');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(7)->setWidth('6');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(8)->setWidth('10');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(9)->setWidth('8');
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(10)->setWidth('9');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(11)->setWidth('9');
    //Informacion del excel
    $objPHPExcel->
     getProperties()
