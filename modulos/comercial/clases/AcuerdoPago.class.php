@@ -424,7 +424,7 @@ class AcuerdoPago extends ProcesoVenta{
     }
     
     
-    function AbonarAcuerdoPago($idAcuerdo,$MetodoPago,$ValorAbono,$idUser) {
+    function AbonarAcuerdoPago($idAcuerdo,$MetodoPago,$ValorAbono,$idUser,$idComprobante="") {
         $DatosAcuerdo=$this->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
         $Saldo=round($DatosAcuerdo["SaldoFinal"]);
         
@@ -485,7 +485,9 @@ class AcuerdoPago extends ProcesoVenta{
             
         }
         
-        
+        if($idComprobante<>''){
+            $this->RelacionAbonosComprobantesIngreso($idAcuerdo, $idComprobante);
+        }
 
         
     }
@@ -509,7 +511,7 @@ class AcuerdoPago extends ProcesoVenta{
     }
     
     
-    function AbonarCuotaAcuerdo($idCuota,$ValorAbono,$MetodoPago,$idUser) {
+    function AbonarCuotaAcuerdo($idCuota,$ValorAbono,$MetodoPago,$idUser,$idComprobante='') {
         $DatosProyeccion=$this->DevuelveValores("acuerdo_pago_proyeccion_pagos", "ID", $idCuota);
         $idAcuerdo=$DatosProyeccion["idAcuerdoPago"];
         $DatosAcuerdo=$this->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $DatosProyeccion["idAcuerdoPago"]);
@@ -556,6 +558,9 @@ class AcuerdoPago extends ProcesoVenta{
                
             }
             
+        if($idComprobante<>''){
+            $this->RelacionAbonosComprobantesIngreso($idAcuerdo, $idComprobante);
+        }
         
     }
     
@@ -598,7 +603,7 @@ class AcuerdoPago extends ProcesoVenta{
         $this->Query($sql);
     }
     
-    public function InteresesAcuerdoPagos($idAcuerdoPago,$ValorPago,$MetodoPago,$idUser) {
+    public function InteresesAcuerdoPagos($idAcuerdoPago,$ValorPago,$MetodoPago,$idUser,$idComprobante) {
          
          $Datos["idAcuerdoPago"]=$idAcuerdoPago;
          $Datos["FechaPago"]=date("Y-m-d");
@@ -609,6 +614,10 @@ class AcuerdoPago extends ProcesoVenta{
          $sql=$this->getSQLInsert("acuerdo_recargos_intereses", $Datos);
          $this->Query($sql);   
          $ID=$this->ObtenerMAX("acuerdo_recargos_intereses", "ID", "idAcuerdoPago", $idAcuerdoPago);
+         
+         if($idComprobante<>''){             
+             $this->RelacionAbonosComprobantesIngreso($idAcuerdoPago, $idComprobante);
+         }
          return($ID);
      }
      
@@ -632,6 +641,30 @@ class AcuerdoPago extends ProcesoVenta{
          $sql=$this->getSQLInsert("acuerdo_pago_productos_devueltos", $Datos);
          $this->Query($sql);   
          
+         $sql="SELECT t2.idProductosVenta,t2.Referencia,t1.PrecioCostoUnitario,t2.Existencias,t2.CostoUnitarioPromedio  
+                    FROM facturas_items t1 INNER JOIN productosventa t2 ON t1.Referencia=t2.Referencia
+                    WHERE t1.ID='$idFacturasItems'";
+         $DatosProducto=$this->FetchAssoc($this->Query($sql));
+        $DatosKardex["Cantidad"]=$Cantidad;
+        $DatosKardex["idProductosVenta"]=$DatosProducto["idProductosVenta"];
+        $DatosKardex["CostoUnitario"]=$DatosProducto['PrecioCostoUnitario'];
+        $DatosKardex["Existencias"]=$DatosProducto['Existencias'];
+        $DatosKardex["Detalle"]="Devolucion Acuerdo Pago";
+        $DatosKardex["idDocumento"]=$idAcuerdoPago;
+        $DatosKardex["TotalCosto"]=$DatosProducto['PrecioCostoUnitario']*$Cantidad;
+        $DatosKardex["CostoUnitarioPromedio"]=$DatosProducto['CostoUnitarioPromedio'];
+        $DatosKardex["Movimiento"]="ENTRADA";
+        
+        $this->InserteKardex($DatosKardex);
+         
+     }
+     
+    function RelacionAbonosComprobantesIngreso($idAcuerdoPago,$idComprobante){
+        $Datos["idAcuerdoPago"]=$idAcuerdoPago;
+        $Datos["idComprobante"]=$idComprobante;
+        $Datos["Created"]=date("Y-m-d H:i:s");
+        $sql=$this->getSQLInsert("acuerdo_pago_rel_abonos_comprobantes", $Datos);
+        $this->Query($sql);   
      }
      
     /**

@@ -1440,7 +1440,7 @@ public function CalculePesoRemision($idCotizacion)
         $Columnas[6]="ValorTotal";                      $Valores[6]=$DatosKardex["TotalCosto"];
         $Columnas[7]="ProductosVenta_idProductosVenta"; $Valores[7]=$DatosKardex['idProductosVenta'];
         $Columnas[8]="CostoUnitarioPromedio";           $Valores[8]=$CostoUnitarioPromedio;
-        $Columnas[9]="CostoTotalPromedio";              $Valores[9]=$DatosKardex['CostoTotalPromedio'];
+        $Columnas[9]="CostoTotalPromedio";              $Valores[9]=$TotalCostoPromedioSaldo;
         
         $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
         /*

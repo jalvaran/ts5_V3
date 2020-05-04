@@ -110,18 +110,18 @@ if( !empty($_REQUEST["Accion"]) ){
                 $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAbono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdo", "CERRADO");
                 $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
 
-                $obCon->AbonarAcuerdoPago($idAcuerdo,$MetodoPago,$ValorAbono,$idUser);
+                $obCon->AbonarAcuerdoPago($idAcuerdo,$MetodoPago,$ValorAbono,$idUser,$idComprobante);
 
                 $sql="UPDATE acuerdo_pago SET TotalAbonos=(TotalAbonos+$ValorAbono),SaldoFinal=(SaldoInicial-TotalAbonos) WHERE idAcuerdoPago='$idAcuerdo'";
                 $obCon->Query($sql);
             }
             
             if($RecargosIntereses>0){
-                $idInteres=$obCon->InteresesAcuerdoPagos($idAcuerdo, $RecargosIntereses, $MetodoPago, $idUser);
+                
                 $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 38); //ingresos no operacionales por recargos o intereses
                 $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $RecargosIntereses, "RecargoInteresAcuerdoPago", "Ingreso por Interes o Recargo de Pago $idAcuerdo", "CERRADO");
                 $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
-
+                $idInteres=$obCon->InteresesAcuerdoPagos($idAcuerdo, $RecargosIntereses, $MetodoPago, $idUser,$idComprobante);
             }
             $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
             if($DatosAcuerdo["SaldoFinal"]<=0){
@@ -243,21 +243,22 @@ if( !empty($_REQUEST["Accion"]) ){
             $Tercero=$DatosAcuerdo["Tercero"];
             $Fecha=date("Y-m-d");
             if($ValorAbono>0){
-                $obCon->AbonarCuotaAcuerdo($idCuota, $ValorAbono, $MetodoPago, $idUser);
-                $sql="UPDATE acuerdo_pago SET TotalAbonos=(TotalAbonos+$ValorAbono),SaldoFinal=(SaldoInicial-TotalAbonos) WHERE idAcuerdoPago='$idAcuerdo'";
-                $obCon->Query($sql);
+                
 
                 $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6); //Contrapartida del comprobante de ingreso aqui se aloja la cuenta de clientes
                 $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAbono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdo", "CERRADO");
                 $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
-                //$obPrint->PrintAcuerdoPago($idAcuerdo, 1, 0);
+                
+                $obCon->AbonarCuotaAcuerdo($idCuota, $ValorAbono, $MetodoPago, $idUser,$idComprobante);
+                $sql="UPDATE acuerdo_pago SET TotalAbonos=(TotalAbonos+$ValorAbono),SaldoFinal=(SaldoInicial-TotalAbonos) WHERE idAcuerdoPago='$idAcuerdo'";
+                $obCon->Query($sql);
             }
             if($RecargosIntereses>0){
-                $idInteres=$obCon->InteresesAcuerdoPagos($idAcuerdo, $RecargosIntereses, $MetodoPago, $idUser);
+                
                 $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 38); //ingresos no operacionales por recargos o intereses
                 $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $RecargosIntereses, "RecargoInteresAcuerdoPago", "Ingreso por Interes o Recargo de Pago $idAcuerdo", "CERRADO");
                 $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
-
+                $idInteres=$obCon->InteresesAcuerdoPagos($idAcuerdo, $RecargosIntereses, $MetodoPago, $idUser,$idComprobante);
             }
             $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
             if($DatosAcuerdo["SaldoFinal"]<=0){

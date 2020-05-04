@@ -145,6 +145,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 $css->ColTabla("<strong>ID</strong>", 1); 
                 $css->ColTabla("<strong>VER</strong>", 1);
+                $css->ColTabla("<strong>PRODUCTOS</strong>", 1);
                 $css->ColTabla("<strong>PDF</strong>", 1);
                 $css->ColTabla("<strong>Anular</strong>", 1);
                 $css->ColTabla("<strong>Reportar</strong>", 1);
@@ -177,6 +178,9 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla($DatosAcuerdo["ID"], 1);
                         print("<td style='text-align:center;'>");  
                             print('<button type="button" class="btn btn-success btn-flat" onclick="DibujarAcuerdoPagoExistente(`'.$idAcuerdo.'`,`DivModalAcciones`,`ModalAcciones`)"> <i class="fa fa-eye"> </i> </button>');
+                        print("</td>");
+                        print("<td style='text-align:center;'>");  
+                            print('<button type="button" class="btn btn-secondary btn-flat" onclick="HistorialProductosAcuerdos(`1`,`'.$idAcuerdo.'`)"> <i class="fa fa-list"> </i> </button>');
                         print("</td>");
                         print("<td style='text-align:center;'>");        
                             print('<span class="input-group-btn">
@@ -716,6 +720,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Page=$obCon->normalizar($_REQUEST["Page"]);
             $NumPage=$obCon->normalizar($_REQUEST["Page"]);
             $Busqueda=$obCon->normalizar($_REQUEST["Busqueda"]);
+            $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
             $cmbEstadosAcuerdos=$obCon->normalizar($_REQUEST["cmbEstadosAcuerdos"]);
             
             if($Page==''){
@@ -744,6 +749,10 @@ if( !empty($_REQUEST["Accion"]) ){
                         
             if($cmbEstadosAcuerdos<>''){
                 $Condicion.=" AND (EstadoAcuerdo = '$cmbEstadosAcuerdos')";
+            }
+            
+            if($idAcuerdoPago<>''){
+                $Condicion.=" AND (idAcuerdoPago = '$idAcuerdoPago')";
             }
             
                                     
@@ -778,11 +787,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         print("".number_format($Total));
                     print("</td>");
                     
-                    print("<td style='text-align:center'>");
-                        $Ruta="../../general/procesadores/GeneradorCSV.process.php?Opcion=2&Tabla=$Tabla&c=". base64_encode($Condicion);
-                        print('<a href="'.$Ruta.'" target="_blank"><button type="button" id="BtnExportarExcelCuentas" class="btn btn-success btn-flat"><i class="fa fa-file-excel-o"></i></button></a>');
-                    print("</td>");
-                   
+                    
                 
                     if($ResultadosTotales>$Limit){
 

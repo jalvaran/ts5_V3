@@ -211,7 +211,7 @@ function ReconstruccionDeCuenta(Page=1){
  * Historial proyeccion de pagos
  * @returns {undefined}
  */
-function HistorialProductosAcuerdos(Page=1){
+function HistorialProductosAcuerdos(Page=1,idAcuerdoPago=""){
     
     var idDiv="DivDrawTables";
     
@@ -232,7 +232,7 @@ function HistorialProductosAcuerdos(Page=1){
         form_data.append('FechaFinalRangos', FechaFinalRangos);
         form_data.append('Busqueda', Busqueda);
         form_data.append('cmbEstadosAcuerdos', cmbEstadosAcuerdos);
-        
+        form_data.append('idAcuerdoPago', idAcuerdoPago);
         
         $.ajax({
         url: './Consultas/adminAcuerdosPago.draw.php',
