@@ -995,6 +995,62 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break; //Fin caso 9
         
+        case 10://Formulario para Anular un acuerdo de pago
+            
+            $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
+            $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdoPago);
+            if($DatosAcuerdo["Estado"]>=10){
+                $css->Notificacion("Error", "Este Acuerdo ya está anulado", "naranja", "", "");
+                exit();
+            }
+            $DatosTercero=$obCon->DevuelveValores("clientes", "Num_Identificacion", $DatosAcuerdo["Tercero"]);
+            $css->CrearTabla();
+            
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>ANULAR EL ACUERDO DE PAGO $DatosAcuerdo[ID]</strong>", 4, "C");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Fecha:</strong>", 2, "L");
+                    $css->ColTabla($DatosAcuerdo["Fecha"], 2, "L");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Cliente:</strong>", 1, "L");
+                    $css->ColTabla($DatosTercero["RazonSocial"], 1, "L");
+                    $css->ColTabla("<strong>Identificación:</strong>", 1, "L");
+                    $css->ColTabla(number_format($DatosTercero["Num_Identificacion"]), 1, "L");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Saldo Anterior:</strong>", 1, "L");
+                    $css->ColTabla(number_format($DatosAcuerdo["SaldoAnterior"]), 1, "L");
+                    $css->ColTabla("<strong>Saldo Inicial:</strong>", 1, "L");
+                    $css->ColTabla(number_format($DatosAcuerdo["SaldoInicial"]), 1, "L");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Total Abonos:</strong>", 1, "L");
+                    $css->ColTabla(number_format($DatosAcuerdo["TotalAbonos"]), 1, "L");
+                    $css->ColTabla("<strong>SaldoFinal:</strong>", 1, "L");
+                    $css->ColTabla(number_format($DatosAcuerdo["SaldoFinal"]), 1, "L");
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                    print("<td colspan=4>");
+                        $css->textarea("ObservacionesAnulacion", "form-control", "ObservacionesAnulacion", "", "Observaciones", "", "");
+                        $css->Ctextarea();
+                    print("</td>");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    print("<td colspan=3>");
+                        
+                    print("</td>");
+                    print("<td colspan=1>");
+                        $css->CrearBotonEvento("btnAnularAcuerdo", "Anular", 1, "onclick", "ConfirmeAnularAcuerdo(`$idAcuerdoPago`)", "rojo");
+                    print("</td>");
+                $css->CierraFilaTabla();
+            $css->CerrarTabla();
+            
+        break;//Fin caso 10
+        
+        
     }
     
     

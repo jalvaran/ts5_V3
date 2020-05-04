@@ -410,6 +410,88 @@ function ExportarTablaToExcel(idTabla){
     excel.generate();
 }
 
+function FormularioAnularAcuerdoPago(idAcuerdoPago){
+    var idDiv="DivDrawTables";
+    
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess"><br><img   src="../../images/loading.gif" alt="Cargando" height="50" width="50"></div>';  
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 10);
+        form_data.append('idAcuerdoPago', idAcuerdoPago);
+       
+        
+        $.ajax({
+        url: './Consultas/adminAcuerdosPago.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+function ConfirmeAnularAcuerdo(idAcuerdoPago){
+    
+    alertify.confirm('Está Seguro que desea Anular este acuerdo? ',
+        function (e) {
+            if (e) {
+                
+                AnularAcuerdoPago(idAcuerdoPago);
+            }else{
+                alertify.error("Se canceló el proceso");
+                
+                return;
+            }
+        });
+}
+
+function AnularAcuerdoPago(idAcuerdoPago){
+    var idBoton="btnAnularAcuerdo";
+    document.getElementById(idBoton).disabled=true;    
+    var Observaciones=document.getElementById("ObservacionesAnulacion").value;
+   
+    var form_data = new FormData();
+        form_data.append('Accion', 8);        
+        form_data.append('idAcuerdoPago', idAcuerdoPago);
+        form_data.append('Observaciones', Observaciones);  
+        $.ajax({
+        url: './procesadores/AcuerdoPago.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idBoton).disabled=false;
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){                
+                alertify.success(respuestas[1]);
+                DibujeListadoSegunTipo();
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+            }else{
+                alertify.alert(data);
+            }
+                       
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
 
 DibujeListadoSegunTipo(1);
 

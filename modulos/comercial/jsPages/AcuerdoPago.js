@@ -183,8 +183,17 @@ function AbonarAcuerdoPago(idAcuerdo){
                 document.getElementById('TxtRecargosIntereses').value=0;
                 document.getElementById('TxtValorAbonoAcuerdoExistente_Format_Number').value=0;
                 document.getElementById('TxtRecargosIntereses_Format_Number').value=0;
-               
-                DibujeListadoSegunTipo();
+                try{
+                    DibujeListadoSegunTipo();
+                }catch(err) {
+                    console.log(err.message);
+                }
+                try{
+                    DibujeHistorialDeCuotas(idAcuerdo);
+                }catch(err) {
+                    console.log(err.message);
+                }
+                
             }else if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
             }else{
@@ -293,7 +302,16 @@ function RegistrePagoCuotaIndividual(idAcuerdo,idCuota,value){
                 document.getElementById("TxtValorAbonoAcuerdoExistente_Format_Number").value=number_format(SaldoAbono);
                 document.getElementById("TxtRecargosIntereses").value=0;
                 alertify.success(respuesta[1]);
-                DibujeListadoSegunTipo();
+                try{
+                    DibujeListadoSegunTipo();
+                }catch(err) {
+                    console.log(err.message);
+                }
+                try{
+                    DibujeHistorialDeCuotas(idAcuerdo);
+                }catch(err) {
+                    console.log(err.message);
+                }
                 
             }else if(respuesta[0]=='E1'){
                 alertify.alert(respuesta[1]);

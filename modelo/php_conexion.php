@@ -1488,7 +1488,7 @@ public function CalculePesoRemision($idCotizacion)
                 $DatosKardex["Detalle"]="Anulacion de Factura";
                 $DatosKardex["idDocumento"]=$idFactura;
                 $DatosKardex["TotalCosto"]=$DatosKardex["CostoUnitario"]*$DatosKardex["Cantidad"];
-                $DatosKardex["Movimiento"]="SALIDA";
+                $DatosKardex["Movimiento"]="ENTRADA";
                 $DatosKardex["CostoUnitarioPromedio"]=$DatosProducto["CostoUnitarioPromedio"];
                 $DatosKardex["CostoTotalPromedio"]=$DatosProducto["CostoUnitarioPromedio"]*$DatosKardex["Cantidad"];
                 $this->InserteKardex($DatosKardex);

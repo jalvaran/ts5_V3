@@ -469,7 +469,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $Abono=$CuotaInicial;
                 $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $Abono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdoPago", "CERRADO");
                 $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
-                
+                $obAcuerdo->RelacionAbonosComprobantesIngreso($idAcuerdoPago, $idComprobante);
                 $NuevoIdAcuerdo=$obAcuerdo->getId("ap_");
                 $obAcuerdo->ActualizaRegistro("vestasactivas", "IdentificadorUnico", $NuevoIdAcuerdo, "idVestasActivas", $idPreventa);
                 $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);

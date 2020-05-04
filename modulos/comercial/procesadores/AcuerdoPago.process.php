@@ -360,6 +360,14 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;//Fin caso 7
         
+        case 8://Anular un acuerdo de pago
+            
+            $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
+            $Observaciones=$obCon->normalizar($_REQUEST["Observaciones"]);
+            $obCon->AnularAcuerdoPago($idAcuerdo, $Observaciones, $idUser);
+            print("OK;Documento Anulado");
+        break;//Fin caso 8    
+        
     }
     
     

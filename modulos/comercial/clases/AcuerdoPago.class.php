@@ -665,7 +665,29 @@ class AcuerdoPago extends ProcesoVenta{
         $Datos["Created"]=date("Y-m-d H:i:s");
         $sql=$this->getSQLInsert("acuerdo_pago_rel_abonos_comprobantes", $Datos);
         $this->Query($sql);   
-     }
+    }
+     
+    function AnularAcuerdoPago($idAcuerdo,$Observaciones,$idUser) {
+        $sql="SELECT * FROM acuerdo_pago_rel_abonos_comprobantes WHERE idAcuerdoPago='$idAcuerdo'";
+        $Consulta= $this->Query($sql);
+        while($DatosConsulta= $this->FetchAssoc($Consulta)){
+            $this->AnularMovimientoLibroDiario("ComprobanteIngreso", $DatosConsulta["idComprobante"], "");
+        }
+        $DatosAcuerdo=$this->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);        
+        $this->ActualizaRegistro("acuerdo_pago", "Estado", 11, "idAcuerdoPago", $idAcuerdo);
+        
+        if($DatosAcuerdo["idFactura"]<>''){
+            $this->AnularMovimientoLibroDiario("FACTURA", $DatosAcuerdo["idFactura"], "");
+            $this->ReingreseItemsInventario($DatosAcuerdo["idFactura"]);
+            $this->ActualizaRegistro("facturas", "FormaPago", "ANULADA", "idFacturas", $DatosAcuerdo["idFactura"]);
+        }
+        $Datos["idAcuerdoPago"]=$idAcuerdo;
+        $Datos["Observaciones"]=$Observaciones;
+        $Datos["Created"]=date("Y-m-d H:i:s");
+        $Datos["idUser"]=$idUser;
+        $sql=$this->getSQLInsert("acuerdo_pago_anulaciones", $Datos);
+        $this->Query($sql);  
+    } 
      
     /**
      * Fin Clase
