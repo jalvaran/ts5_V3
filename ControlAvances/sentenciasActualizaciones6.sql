@@ -512,3 +512,44 @@ CREATE TABLE `cierre_contable_control` (
   KEY `idUser` (`idUser`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
+ALTER TABLE `acuerdo_pago_cuotas_pagadas` ADD `Estado` INT NOT NULL DEFAULT '1' AFTER `idUser`;
+
+CREATE TABLE `acuerdo_pago_rel_abonos_comprobantes` (
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `idComprobante` bigint(20) NOT NULL,
+  `Created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  KEY `idAcuerdoPago` (`idAcuerdoPago`),
+  KEY `idComprobante` (`idComprobante`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_anulaciones` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
+  `Created` date NOT NULL,
+  `idUser` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `acuerdo_pago_abonos_anulaciones` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idAbono` bigint(20) NOT NULL,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
+  `Created` date NOT NULL,
+  `idUser` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`),
+  KEY `idAbono` (`idAbono`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+ALTER TABLE `clientes` ADD INDEX(`Num_Identificacion`);
+ALTER TABLE `proveedores` ADD INDEX(`Num_Identificacion`);
+ALTER TABLE `clientes` ADD `Puntaje` INT NOT NULL DEFAULT '80' AFTER `Soporte`, ADD `Estado` INT NOT NULL AFTER `Puntaje`;
+ALTER TABLE `proveedores` ADD `Puntaje` INT NOT NULL DEFAULT '80' AFTER `Soporte`, ADD `Estado` INT NOT NULL AFTER `Puntaje`;
+
+INSERT INTO `acuerdo_pago_estados` (`ID`, `NombreEstado`, `Observaciones`, `Created`, `Updated`, `Sync`) VALUES
+(12,	'Reportado por Usuario',	'Se Reporta y se beta al usuario',	'0000-00-00 00:00:00',	'2020-02-22 14:56:35',	'0000-00-00 00:00:00');
+

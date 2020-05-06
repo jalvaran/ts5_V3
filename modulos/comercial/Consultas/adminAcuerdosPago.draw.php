@@ -1050,6 +1050,115 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;//Fin caso 10
         
+        case 11://Formulario para Anular un abono
+            
+            $idAbono=$obCon->normalizar($_REQUEST["idAbono"]);
+            $DatosAbono=$obCon->DevuelveValores("acuerdo_pago_cuotas_pagadas", "ID", $idAbono);
+            
+            $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $DatosAbono["idAcuerdoPago"]);
+            if($DatosAcuerdo["Estado"]>=10 ){
+                $css->Notificacion("Error", "Este Acuerdo está anulado", "naranja", "", "");
+                exit();
+            }
+            if($DatosAbono["Estado"]>=10){
+                $css->Notificacion("Error", "Este Abono ya está anulado", "naranja", "", "");
+                exit();
+            }
+            $DatosTercero=$obCon->DevuelveValores("clientes", "Num_Identificacion", $DatosAcuerdo["Tercero"]);
+            $css->CrearTabla();
+            
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>ANULAR EL ABONO $idAbono por valor de $DatosAbono[ValorPago], del Acuerdo $DatosAcuerdo[ID]</strong>", 4, "C");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Fecha:</strong>", 2, "L");
+                    $css->ColTabla($DatosAbono["Created"], 2, "L");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Cliente:</strong>", 1, "L");
+                    $css->ColTabla($DatosTercero["RazonSocial"], 1, "L");
+                    $css->ColTabla("<strong>Identificación:</strong>", 1, "L");
+                    $css->ColTabla(number_format($DatosTercero["Num_Identificacion"]), 1, "L");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Valor Del Abono:</strong>", 2, "L");
+                    $css->ColTabla(number_format($DatosAbono["ValorPago"]), 2, "L");
+                    
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                    print("<td colspan=4>");
+                        $css->textarea("ObservacionesAnulacion", "form-control", "ObservacionesAnulacion", "", "Observaciones", "", "");
+                        $css->Ctextarea();
+                    print("</td>");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    print("<td colspan=3>");
+                        
+                    print("</td>");
+                    print("<td colspan=1>");
+                        $css->CrearBotonEvento("btnAnularAbono", "Anular", 1, "onclick", "ConfirmeAnularAbono(`$idAbono`)", "rojo");
+                    print("</td>");
+                $css->CierraFilaTabla();
+            $css->CerrarTabla();
+            
+        break;//Fin caso 11
+        
+        case 12://Formulario para Reportar  un acuerdo de pago
+            
+            $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdo"]);
+            $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdoPago);
+            if($DatosAcuerdo["Estado"]>=10){
+                $css->Notificacion("Error", "Este Acuerdo ya está reportado o anulado", "rojo", "", "");
+                exit();
+            }
+            $DatosTercero=$obCon->DevuelveValores("clientes", "Num_Identificacion", $DatosAcuerdo["Tercero"]);
+            $css->CrearTabla();
+            
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>DESCARTAR EL ACUERDO DE PAGO $DatosAcuerdo[ID], Y BETAR EL CLIENTE</strong>", 4, "C");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Fecha:</strong>", 2, "L");
+                    $css->ColTabla($DatosAcuerdo["Fecha"], 2, "L");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Cliente:</strong>", 1, "L");
+                    $css->ColTabla($DatosTercero["RazonSocial"], 1, "L");
+                    $css->ColTabla("<strong>Identificación:</strong>", 1, "L");
+                    $css->ColTabla(number_format($DatosTercero["Num_Identificacion"]), 1, "L");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Saldo Anterior:</strong>", 1, "L");
+                    $css->ColTabla(number_format($DatosAcuerdo["SaldoAnterior"]), 1, "L");
+                    $css->ColTabla("<strong>Saldo Inicial:</strong>", 1, "L");
+                    $css->ColTabla(number_format($DatosAcuerdo["SaldoInicial"]), 1, "L");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Total Abonos:</strong>", 1, "L");
+                    $css->ColTabla(number_format($DatosAcuerdo["TotalAbonos"]), 1, "L");
+                    $css->ColTabla("<strong>SaldoFinal:</strong>", 1, "L");
+                    $css->ColTabla(number_format($DatosAcuerdo["SaldoFinal"]), 1, "L");
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                    print("<td colspan=4>");
+                        $css->textarea("ObservacionesAnulacion", "form-control", "ObservacionesAnulacion", "", "Observaciones", "", "");
+                        $css->Ctextarea();
+                    print("</td>");
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    print("<td colspan=3>");
+                        
+                    print("</td>");
+                    print("<td colspan=1>");
+                        $css->CrearBotonEvento("btnReportarAcuerdo", "Reportar este Acuerdo", 1, "onclick", "ConfirmeReportarAcuerdo(`$idAcuerdoPago`)", "rojo");
+                    print("</td>");
+                $css->CierraFilaTabla();
+            $css->CerrarTabla();
+            
+        break;//Fin caso 12
+        
         
     }
     

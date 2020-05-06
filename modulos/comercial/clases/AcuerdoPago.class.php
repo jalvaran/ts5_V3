@@ -688,7 +688,47 @@ class AcuerdoPago extends ProcesoVenta{
         $sql=$this->getSQLInsert("acuerdo_pago_anulaciones", $Datos);
         $this->Query($sql);  
     } 
+    
+    function AnularAbonoAcuerdo($idAbono,$Observaciones,$idUser) {
+        
+        $DatosAbono=$this->DevuelveValores("acuerdo_pago_cuotas_pagadas", "ID", $idAbono);
+        $DatosAcuerdo=$this->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $DatosAbono["idAcuerdoPago"]);
+        $Parametros=$this->DevuelveValores("parametros_contables", "ID", 6); //Cuenta Clientes
+        $CuentaCliente=$Parametros["CuentaPUC"];
+        $NombreCuentaCliente=$Parametros["NombreCuenta"];
+        $Parametros=$this->DevuelveValores("parametros_contables", "ID", 10); //Cuenta caja    
+        $CuentaCaja=$Parametros["CuentaPUC"];
+        $NombreCuentaCaja=$Parametros["NombreCuenta"];
+        $this->IngreseMovimientoLibroDiario(date("Y-m-d"), "ABONO ANULADO", $idAbono, $DatosAbono["idAcuerdoPago"], $DatosAcuerdo["Tercero"], $CuentaCliente, $NombreCuentaCliente, "Anulacion de Abono", "DB", $DatosAbono["ValorPago"], "Anulacion de Abono $idAbono Acuerdo Pago ".$DatosAbono["idAcuerdoPago"], 1, 1, "");
+        $this->IngreseMovimientoLibroDiario(date("Y-m-d"), "ABONO ANULADO", $idAbono, $DatosAbono["idAcuerdoPago"], $DatosAcuerdo["Tercero"], $CuentaCaja, $NombreCuentaCaja, "Anulacion de Abono", "CR", $DatosAbono["ValorPago"], "Anulacion de Abono $idAbono Acuerdo Pago ".$DatosAbono["idAcuerdoPago"], 1, 1, "");
+        $ValorAbono=$DatosAbono["ValorPago"];
+        $idAcuerdoPago=$DatosAbono["idAcuerdoPago"];
+        $sql="UPDATE acuerdo_pago SET TotalAbonos=(TotalAbonos-$ValorAbono),SaldoFinal=SaldoInicial-TotalAbonos WHERE idAcuerdoPago='$idAcuerdoPago'";
+        $this->Query($sql);
+        $this->ActualizaRegistro("acuerdo_pago_cuotas_pagadas", "Estado", 10, "ID", $idAbono);
+        $Datos["idAbono"]=$idAbono;
+        $Datos["idAcuerdoPago"]=$DatosAbono["idAcuerdoPago"];
+        $Datos["Observaciones"]=$Observaciones;
+        $Datos["Created"]=date("Y-m-d H:i:s");
+        $Datos["idUser"]=$idUser;
+        $sql=$this->getSQLInsert("acuerdo_pago_abonos_anulaciones", $Datos);
+        $this->Query($sql);  
+    } 
      
+    function ReportarAcuerdoPago($idAcuerdo,$Observaciones,$idUser) {
+        
+        $DatosAcuerdo=$this->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);        
+        $this->ActualizaRegistro("acuerdo_pago", "Estado", 12, "idAcuerdoPago", $idAcuerdo);        
+        $this->ActualizaRegistro("clientes", "Estado", 10, "Num_Identificacion", $DatosAcuerdo["Tercero"]);
+        $this->ActualizaRegistro("clientes", "Puntaje", 0, "Num_Identificacion", $DatosAcuerdo["Tercero"]);
+        
+        $Datos["idAcuerdoPago"]=$idAcuerdo;
+        $Datos["Observaciones"]=$Observaciones;
+        $Datos["Created"]=date("Y-m-d H:i:s");
+        $Datos["idUser"]=$idUser;
+        $sql=$this->getSQLInsert("acuerdo_pago_anulaciones", $Datos);
+        $this->Query($sql);  
+    } 
     /**
      * Fin Clase
      */

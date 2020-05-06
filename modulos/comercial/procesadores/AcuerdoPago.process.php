@@ -368,6 +368,23 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Documento Anulado");
         break;//Fin caso 8    
         
+        case 9://Anular un abono
+            
+            $idAbono=$obCon->normalizar($_REQUEST["idAbono"]);
+            $Observaciones=$obCon->normalizar($_REQUEST["Observaciones"]);
+            $obCon->AnularAbonoAcuerdo($idAbono, $Observaciones, $idUser);
+            print("OK;Abono Anulado");
+            
+        break;//Fin caso 9   
+    
+        case 10://Reportar un acuerdo de pago
+            
+            $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdo"]);
+            $Observaciones=$obCon->normalizar($_REQUEST["Observaciones"]);
+            $obCon->ReportarAcuerdoPago($idAcuerdo, $Observaciones, $idUser);
+            print("OK;Acuerdo Reportado");
+        break;//Fin caso 10
+        
     }
     
     

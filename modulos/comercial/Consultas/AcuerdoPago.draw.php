@@ -15,6 +15,9 @@ if( !empty($_REQUEST["Accion"]) ){
     $css =  new PageConstruct("", "", 1, "", 1, 0);
     $obCon = new Facturacion($idUser);
     $obAcuerdo = new AcuerdoPago($idUser);
+    $sql="SELECT Role FROM usuarios WHERE idUsuarios='$idUser'";
+    $DatosUsuario=$obCon->FetchAssoc($obCon->Query($sql));
+    $userRole=$DatosUsuario["Role"];
     switch ($_REQUEST["Accion"]) {
                 
         case 1://Dibuja un acuerdo de pago existente
@@ -472,6 +475,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $sql="SELECT t1.*,
                             (SELECT t2.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t2 WHERE t2.ID=t1.TipoCuota) AS NombreTipoCuota,
                             (SELECT t3.NombreEstado FROM acuerdo_pago_proyeccion_estados t3 WHERE t3.ID=t1.Estado) AS NombreEstado,
+                            
                             (SELECT t4.FechaPago FROM acuerdo_pago_cuotas_pagadas t4 WHERE t4.ID=t1.idPago LIMIT 1) AS FechaPago
                             FROM acuerdo_pago_proyeccion_pagos t1 WHERE idAcuerdoPago='$idAcuerdo' AND (Estado=1 OR Estado=3 ) ORDER BY NumeroCuota DESC";
                     $Consulta=$obAcuerdo->Query($sql);
@@ -515,11 +519,16 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     
                     $css->FilaTabla(16);
+                        
                         $css->ColTabla("<strong>Fecha de Pago</strong>", 1, "C");
                         $css->ColTabla("<strong>Tipo de Cuota</strong>", 1, "C");
                         $css->ColTabla("<strong>Valor del pago</strong>", 1, "C");
                         $css->ColTabla("<strong>Metodo de pago</strong>", 1, "C");
                         $css->ColTabla("<strong>Usuario que recibió</strong>", 1, "C");
+                        $css->ColTabla("<strong>Estado</strong>", 1, "C");
+                        if($userRole=="SUPERVISOR"){
+                            $css->ColTabla("<strong>Anular</strong>", 1, "C");
+                        }
                         
                     $css->CierraFilaTabla();
                     
@@ -527,13 +536,16 @@ if( !empty($_REQUEST["Accion"]) ){
                     $sql="SELECT t1.*,
                             (SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t2 WHERE t2.idUsuarios=t1.idUser) AS NombreUsuario,
                             (SELECT (Metodo) FROM metodos_pago t3 WHERE t3.ID=t1.MetodoPago) AS NombreMetodo,
-                            (SELECT (NombreTipoCuota) FROM acuerdo_pago_tipo_cuota t4 WHERE t4.ID=t1.TipoCuota) AS NombreTipoCuota
+                            (SELECT (NombreTipoCuota) FROM acuerdo_pago_tipo_cuota t4 WHERE t4.ID=t1.TipoCuota) AS NombreTipoCuota,
+                            (SELECT t5.NombreEstado FROM acuerdo_pago_cuotas_pagadas_estados t5 WHERE t5.ID=t1.Estado) AS NombreEstadoAbono 
                             FROM acuerdo_pago_cuotas_pagadas t1 WHERE idAcuerdoPago='$idAcuerdo' ORDER BY Created DESC";
                     $Consulta=$obAcuerdo->Query($sql);
                     $TotalPagos=0;
                     while($DatosCuotas=$obAcuerdo->FetchAssoc($Consulta)){
                         $TotalPagos=$TotalPagos+$DatosCuotas["ValorPago"];
+                        $idItem=$DatosCuotas["ID"];
                         $css->FilaTabla(16);
+                            
                             $css->ColTabla($DatosCuotas["Created"], 1);
                             $css->ColTabla($DatosCuotas["NombreTipoCuota"], 1);
                             
@@ -541,6 +553,12 @@ if( !empty($_REQUEST["Accion"]) ){
                             
                             $css->ColTabla($DatosCuotas["NombreMetodo"], 1);
                             $css->ColTabla($DatosCuotas["NombreUsuario"], 1);
+                            $css->ColTabla($DatosCuotas["NombreEstadoAbono"], 1);
+                            if($userRole=="SUPERVISOR"){
+                                print("<td style='text-align:center'>");
+                                    print('<button type="button" class="btn btn-danger btn-flat" onclick="FormularioAnularAbono(`'.$idItem.'`)"> <i class="fa fa-remove"> </i> </button>');
+                                print("</td>");
+                            }
                         $css->CierraFilaTabla();
                     }
                     

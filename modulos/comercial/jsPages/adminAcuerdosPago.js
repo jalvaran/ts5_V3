@@ -493,5 +493,173 @@ function AnularAcuerdoPago(idAcuerdoPago){
       });
 }
 
+function FormularioAnularAbono(idAbono){
+    var idDiv="DivDrawTables";
+    CierraModal("ModalAcciones");
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess"><br><img   src="../../images/loading.gif" alt="Cargando" height="50" width="50"></div>';  
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 11);
+        form_data.append('idAbono', idAbono);
+       
+        
+        $.ajax({
+        url: './Consultas/adminAcuerdosPago.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+function ConfirmeAnularAbono(idAbono){
+    
+    alertify.confirm('Está Seguro que desea Anular este abono? ',
+        function (e) {
+            if (e) {
+                
+                AnularAbonoAcuerdoPago(idAbono);
+            }else{
+                alertify.error("Se canceló el proceso");
+                
+                return;
+            }
+        });
+}
+
+function AnularAbonoAcuerdoPago(idAbono){
+    var idBoton="btnAnularAbono";
+    document.getElementById(idBoton).disabled=true;    
+    var Observaciones=document.getElementById("ObservacionesAnulacion").value;
+   
+    var form_data = new FormData();
+        form_data.append('Accion', 9);        
+        form_data.append('idAbono', idAbono);
+        form_data.append('Observaciones', Observaciones);  
+        $.ajax({
+        url: './procesadores/AcuerdoPago.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idBoton).disabled=false;
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){                
+                alertify.success(respuestas[1]);
+                DibujeListadoSegunTipo();
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+            }else{
+                alertify.alert(data);
+            }
+                       
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+
+function FormularioReportarAcuerdoPago(idAcuerdo){
+    var idDiv="DivDrawTables";
+    
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess"><br><img   src="../../images/loading.gif" alt="Cargando" height="50" width="50"></div>';  
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 12);
+        form_data.append('idAcuerdo', idAcuerdo);
+       
+        
+        $.ajax({
+        url: './Consultas/adminAcuerdosPago.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+function ConfirmeReportarAcuerdo(idAcuerdo){
+    
+    alertify.confirm('Está Seguro que desea Reportar este Acuerdo de Pago? ',
+        function (e) {
+            if (e) {
+                
+                ReportarAcuerdoPago(idAcuerdo);
+            }else{
+                alertify.error("Se canceló el proceso");
+                
+                return;
+            }
+        });
+}
+
+function ReportarAcuerdoPago(idAcuerdo){
+    var idBoton="btnReportarAcuerdo";
+    document.getElementById(idBoton).disabled=true;    
+    var Observaciones=document.getElementById("ObservacionesAnulacion").value;
+   
+    var form_data = new FormData();
+        form_data.append('Accion', 10);        
+        form_data.append('idAcuerdo', idAcuerdo);
+        form_data.append('Observaciones', Observaciones);  
+        $.ajax({
+        url: './procesadores/AcuerdoPago.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idBoton).disabled=false;
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){                
+                alertify.success(respuestas[1]);
+                DibujeListadoSegunTipo();
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+            }else{
+                alertify.alert(data);
+            }
+                       
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
 DibujeListadoSegunTipo(1);
 
