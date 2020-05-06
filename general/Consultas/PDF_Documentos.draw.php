@@ -156,6 +156,51 @@ if(isset($_REQUEST["idDocumento"])){
             
             print("OK;Factura Enviada");
         break;//Fin caso 38
+        
+        case 39://Envia un acuerdo de pago por email
+            include_once '../clases/mail.class.php';
+            $obMail= new TS_Mail($idUser);
+            $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
+            $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdoPago);
+            $DatosCliente=$obCon->DevuelveValores("clientes", "Num_Identificacion", $DatosAcuerdo["Tercero"]);
+            if(!filter_var($DatosCliente["Email"], FILTER_VALIDATE_EMAIL) or strtolower($DatosCliente["Email"])=="no@no.com"){
+                exit("<h3>El cliente no tiene un mail válido</h3>");
+            }
+            
+            
+            $DatosConfiguracion=$obCon->DevuelveValores("configuracion_general", "ID", 25);
+            $mensajeHTML="<h3>Cordial Saludo <strong>".$DatosCliente["RazonSocial"]."</strong></h3><br><br><br>";
+            $mensajeHTML.="En adjunto encontrarás tu Acuerdo de pago";
+            $mensajeHTML.="<br><br><br>Mil gracias por tu compra y que tengas un feliz dia!";
+            
+            if($DatosAcuerdo["ID"]<>''){
+                $idAcuerdo=$DatosAcuerdo["idAcuerdoPago"];
+                include_once '../../modulos/comercial/clases/AcuerdoPago.class.php';
+                $obAcuerdo=new AcuerdoPago($idUser);      
+                
+                $EstadoAcuerdo=$obAcuerdo->ObtengaEstadoGeneralAcuerdo($idAcuerdo);
+                $EstadoGeneral="AL DIA";
+                if($EstadoAcuerdo==4){
+                    $EstadoGeneral="EN MORA";
+                }
+                $obDoc->AcuerdoPagoPDF($idAcuerdo, $EstadoAcuerdo, 1,"../../tmp/");
+                $Adjuntos[0]="../../tmp/Acuerdo_Pago_$idAcuerdo".".pdf";
+            }
+            if($DatosConfiguracion["Valor"]==1){
+                $obMail->EnviarMailXPHPNativo(($DatosCliente["Email"]),"technosoluciones_fe@gmail.com", "TS5", "Acuerdo de Pago TS5 ".$DatosAcuerdo["ID"], $mensajeHTML, $Adjuntos);
+                
+            }else{
+                $obMail->EnviarMailXPHPMailer(($DatosCliente["Email"]),"technosoluciones_fe@gmail.com", "TS5", "Acuerdo de Pago TS5 ".$DatosAcuerdo["ID"], $mensajeHTML, $Adjuntos);
+            }
+            /*  Activar si desea limpiar el temporal
+            foreach ($Adjuntos as $value){
+                unlink($value);
+            }
+             * 
+             */
+            
+            print("OK;Acuerdo de Pago Enviado");
+        break;//Fin caso 39
     }
 }else{
     print("No se recibió parametro de documento");

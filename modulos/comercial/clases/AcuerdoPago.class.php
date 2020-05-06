@@ -379,7 +379,7 @@ class AcuerdoPago extends ProcesoVenta{
         $this->CopiarProyeccionCuotasDesdeTemporal($idAcuerdoPago);
         $this->BorraReg("acuerdo_pago_cuotas_pagadas_temp", 'idAcuerdoPago', $idAcuerdoPago);
         $this->BorraReg("acuerdo_pago_proyeccion_pagos_temp", 'idAcuerdoPago', $idAcuerdoPago);
-        $sql="UPDATE acuerdo_pago SET Estado=10 WHERE Tercero='$Tercero' AND idAcuerdoPago<>'$idAcuerdoPago'";
+        $sql="UPDATE acuerdo_pago SET Estado=10 WHERE Tercero='$Tercero' AND idAcuerdoPago<>'$idAcuerdoPago' AND Estado=1";
         $this->Query($sql);
         
     }

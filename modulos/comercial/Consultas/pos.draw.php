@@ -30,11 +30,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $target="#DialTabla";
                 $css->CrearBotonImagen($Titulo,$Nombre,$target,$RutaImage,$javascript,50,50,"fixed","right:10px;top:50px;z-index:100;",$VectorBim);
             }
-            if($idPreventa>=1){
-                $css->div("DivAcuerdoFlotanteTotales","", "", "", "", "", "style=position:fixed;right:10px;top:150px;z-index:100;");
-                   
-                $css->Cdiv();
-            }
+            
             $css->CrearTabla();
                 $css->FilaTabla(16);
                     

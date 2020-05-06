@@ -23,7 +23,13 @@ $css->PageInit($myTitulo);
     /*
      * Inicio de la maqueta propia de cada programador
      */
-
+     
+    $css->Modal("ModalAccionesPOS", "POS TS5", "", 1);
+        $css->div("DivFrmPOS", "", "", "", "", "", "");
+        $css->Cdiv();
+       
+    $css->CModal("BntModalPOS", "onclick=AccionesPOS(event)", "button", "Guardar");
+    
     $css->Modal("ModalAcciones", "TS5", "", 1);
         $css->div("DivModalAcciones", "", "", "", "", "", "");
         $css->Cdiv();
@@ -40,7 +46,7 @@ $css->PageInit($myTitulo);
          $css->CrearDiv("", "col-md-2", "left", 1, 1);
          $css->CrearBotonEvento("BtnInicio", "Inicio", 1, "onclick", "DibujeListadoSegunTipo()", "azul");   
          print("<br>");
-         $css->CrearBotonEvento("BtnNuevoAcuerdo", "Nuevo Acuerdo de Pago", 1, "onclick", "FormularioNuevoAcuerdo()", "naranja");   
+         $css->CrearBotonEvento("BtnNuevoAcuerdo", "Nuevo Acuerdo de Pago", 1, "onclick", "DibujeFormularioAcuerdoPago(`NA`,`DivDrawTables`)", "naranja");   
          print("<br>");
          print("<br>");
          $css->CrearBotonEvento("BtnLimpiarFiltros", "Limpiar Filtros", 1, "onclick", "LimpiarFiltros();DibujeListadoSegunTipo();", "verde");   
@@ -72,24 +78,13 @@ $css->PageInit($myTitulo);
                             $css->Coption();
                             
                             $css->option("", "", "", "4", "", "");
-                                    print("Reconstruccion de Cuenta");
+                                    print("Movimientos contables");
                             $css->Coption();
                             
                             $css->option("", "", "", "5", "", "");
                                     print("Productos Comprados en acuerdos");
                             $css->Coption();
                             
-                            $css->option("", "", "", "6", "", "");
-                                    print("Anulaciones de Acuerdos");
-                            $css->Coption();
-                            
-                            $css->option("", "", "", "7", "", "");
-                                    print("Anulaciones de Abonos");
-                            $css->Coption();
-                            
-                            $css->option("", "", "", "8", "", "");
-                                    print("Devolucion de productos en acuerdos");
-                            $css->Coption();
                       $css->Cselect();
             
                     $css->Cdiv();
@@ -254,6 +249,8 @@ $css->PageFin();
 $css->AddJSExcel();
 print('<script src="jsPages/adminAcuerdosPago.js"></script>');  //script propio de la pagina
 print('<script src="jsPages/AcuerdoPago.js"></script>');  //script propio de la pagina
+print('<script src="../../componentes/webcam/webcam.js"></script>');  //script para usar la web cam
+
 $css->Cbody();
 $css->Chtml();
 

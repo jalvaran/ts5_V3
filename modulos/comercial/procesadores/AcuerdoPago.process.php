@@ -10,8 +10,8 @@ $fecha=date("Y-m-d");
 
 include_once("../clases/AcuerdoPago.class.php");
 include_once("../clases/AcuerdoPago.print.class.php");
-
 include_once("../../../general/clases/contabilidad.class.php");
+
 if( !empty($_REQUEST["Accion"]) ){
     $obCon = new AcuerdoPago($idUser);
     $obPrint=new AcuerdoPagoPrint($idUser);
@@ -384,6 +384,163 @@ if( !empty($_REQUEST["Accion"]) ){
             $obCon->ReportarAcuerdoPago($idAcuerdo, $Observaciones, $idUser);
             print("OK;Acuerdo Reportado");
         break;//Fin caso 10
+    
+        case 25:// agrega la cuota inicial a un acuerdo de pago temporal
+            
+            $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
+            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
+            if($DatosCliente["Num_Identificacion"]==''){
+                $DatosCliente=$obCon->DevuelveValores("clientes", "Num_Identificacion", $idCliente);
+                $idCliente=$DatosCliente["idClientes"];
+            }
+            $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
+            $TipoCuota=0;
+            $NumeroCuota=0;
+            $ValorPago=$obCon->normalizar($_REQUEST["ValorPago"]);
+            $MetodoPago=$obCon->normalizar($_REQUEST["MetodoPago"]);            
+            
+            if($idAcuerdoPago==''){
+                exit("E1;No se recibió el id del acuerdo de pago");
+            }
+            
+            if(!is_numeric($ValorPago) or $ValorPago<0){
+                exit("E1;La cuota inicial del acuerdo debe ser un numero mayor a cero;CuotaInicialAcuerdo");
+            }
+            if($MetodoPago==''){
+                exit("E1;Debe seleccionar un metodo de pago para la cuota inicial;metodoPagoCuotaInicial");
+            }
+            
+            $obCon->PagoAcuerdoPagosTemporal($NumeroCuota, $TipoCuota, $idAcuerdoPago, $ValorPago, $MetodoPago, $idUser);
+            
+            print("OK;Pago de cuota registrado");
+            
+        break; //Fin caso 25    
+        
+        case 26://Eliminar un item de alguna de las tablas del acuerdo de pago
+            
+            $Tabla=$obCon->normalizar($_REQUEST["Tabla"]);
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            if($Tabla==1){
+                $Tabla="acuerdo_pago_cuotas_pagadas_temp";
+            }
+            if($Tabla==2){
+                $Tabla="acuerdo_pago_proyeccion_pagos_temp";
+            }
+            $obCon->BorraReg($Tabla, "ID", $idItem);
+            print("OK;Registro eliminado");
+        break;//Fin caso 26    
+        
+        case 27:// agrega la cuotas programables a un acuerdo de pago temporal
+            
+            $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);  
+            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
+            if($DatosCliente["Num_Identificacion"]==''){
+                $DatosCliente=$obCon->DevuelveValores("clientes", "Num_Identificacion", $idCliente);
+                $idCliente=$DatosCliente["idClientes"];
+            }
+            $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
+            $TipoCuota=$obCon->normalizar($_REQUEST["TipoCuota"]);            
+            $ValorCuota=$obCon->normalizar($_REQUEST["CuotaProgramadaAcuerdo"]);
+            $FechaCuotaProgramable=$obCon->normalizar($_REQUEST["TxtFechaCuotaProgramada"]);            
+            
+            if($idAcuerdoPago==''){
+                exit("E1;No se recibió el id del acuerdo de pago");
+            }
+            if($TipoCuota==''){
+                exit("E1;No se recibió el tipo de cuota");
+            }
+            if(!is_numeric($ValorCuota) or $ValorCuota<0){
+                exit("E1;El valor de la cuota debe ser un numero mayor a cero;CuotaProgramadaAcuerdo");
+            }
+            if($FechaCuotaProgramable==''){
+                exit("E1;Debe seleccionar una fecha de pago para la cuota programada;TxtFechaCuotaProgramada");
+            }
+            $obCon->CuotaAcuerdoPagosTemporal($FechaCuotaProgramable, 0, $TipoCuota, $idAcuerdoPago, $ValorCuota, $idUser);
+            
+            print("OK;Cuota registrado");
+            
+        break; //Fin caso 27
+        
+        case 28://calcule el valor de las cuotas según el numero de cuotas
+            $obAcuerdo = new AcuerdoPago($idUser);
+            $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdo"]);
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
+            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
+            if($DatosCliente["Num_Identificacion"]==''){
+                $DatosCliente=$obCon->DevuelveValores("clientes", "Num_Identificacion", $idCliente);
+                $idCliente=$DatosCliente["idClientes"];
+            }
+            $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);
+            $NumeroCuotas=$obCon->normalizar($_REQUEST["NumeroCuotas"]);
+                       
+            $sql="SELECT SUM(TotalVenta) AS Total FROM preventa WHERE VestasActivas_idVestasActivas='$idPreventa' ";
+            $Totales=$obCon->FetchAssoc($obCon->Query($sql));
+            $TotalPreventa=$Totales["Total"];
+            $ValorAProyectar=$obAcuerdo->ValorAProyectarTemporalAcuerdo($idAcuerdo, $TotalPreventa, $idCliente);
+            $ValorCuotaCalculada=round($ValorAProyectar/$NumeroCuotas);
+            print("OK;Cuota Calculada;$ValorCuotaCalculada");
+        break;//Fin caso 28
+    
+        case 29://Editar un item de alguna de las tablas del acuerdo de pago
+            
+            $Valor=$obCon->normalizar($_REQUEST["ValorCuota"]);          
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);            
+            $Tabla="acuerdo_pago_proyeccion_pagos_temp";
+            
+            $obCon->ActualizaRegistro($Tabla, "ValorCuota", $Valor, "ID", $idItem, 1);
+            print("OK;Cuota Actualizada");
+        break;//Fin caso 29
+    
+        case 30://Guardo un acuerdo de pago desde admin
+            $idAcuerdo=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
+            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
+            if($DatosCliente["Num_Identificacion"]==''){
+                $DatosCliente=$obCon->DevuelveValores("clientes", "Num_Identificacion", $idCliente);
+                $idCliente=$DatosCliente["idClientes"];
+            }
+            $_REQUEST["idCliente"]=$idCliente;
+            $obCon->ValidarDatosCreacionAcuerdoPagoPOS($_REQUEST);
+            
+            $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
+            $FechaInicialParaPagos=$obCon->normalizar($_REQUEST["TxtFechaInicialPagos"]);
+            $ValorCuotaGeneral=$obCon->normalizar($_REQUEST["ValorCuotaAcuerdo"]);
+            $CicloPagos=$obCon->normalizar($_REQUEST["cicloPagos"]);                
+            $Observaciones=$obCon->normalizar($_REQUEST["TxtObservacionesAcuerdoPago"]);
+            $SaldoAnterior=$obCon->normalizar($_REQUEST["SaldoActualAcuerdoPago"]);
+            $SaldoFinal=$obCon->normalizar($_REQUEST["NuevoSaldoAcuerdoPago"]);
+            $sql="SELECT SUM(ValorPago) as TotalCuotaInicial FROM acuerdo_pago_cuotas_pagadas_temp WHERE idAcuerdoPago='$idAcuerdoPago' AND TipoCuota=0";
+            $TotalesCuotaInicial=$obCon->FetchAssoc($obCon->Query($sql));
+            $CuotaInicial=$TotalesCuotaInicial["TotalCuotaInicial"];
+            $SaldoInicial=$SaldoFinal;
+            $SaldoFinal=$SaldoInicial-$CuotaInicial;
+            $obCon->CrearAcuerdoPagoDesdePOS($idAcuerdoPago,"", $FechaInicialParaPagos, $DatosCliente["Num_Identificacion"],$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$CuotaInicial, $SaldoInicial, $SaldoFinal, 1, $idUser);
+                
+            $DatosCuenta=$obCon->DevuelveValores("parametros_contables", "ID", 21); //Cuenta caja
+            $CuentaDestino=$DatosCuenta["CuentaPUC"];
+            $NombreCuentaDestino=$DatosCuenta["NombreCuenta"];
+            
+            $CentroCosto=1;
+            $Tercero=$DatosCliente["Num_Identificacion"];
+
+            $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6);
+            $Abono=$CuotaInicial;
+            $Fecha=date("Y-m-d");
+            if($Abono>0){
+                $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $Abono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdoPago", "CERRADO");
+                $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], 1, 1, 1);
+                $obCon->RelacionAbonosComprobantesIngreso($idAcuerdoPago, $idComprobante);
+            }
+            $LinkAcuerdo="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=37&idAcuerdo=$idAcuerdoPago&EstadoGeneral=0";
+            $Mensaje2="<br><strong>Acuerdo de Pago Creado Correctamente </strong><a href='$LinkAcuerdo'  target='blank'> Imprimir</a>";
+             
+            $LinkProcessMail="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=39&idAcuerdoPago=$idAcuerdoPago";
+            $MensajeMail="<br><a href='$LinkProcessMail'  target='blank'><strong>Click para enviar Acuerdo por Email</strong></a>";
+            print("OK;$Mensaje2.$MensajeMail");
+                
+        break;//Fin caso 30    
         
     }
     
