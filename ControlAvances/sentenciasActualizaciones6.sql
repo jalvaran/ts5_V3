@@ -553,3 +553,6 @@ ALTER TABLE `proveedores` ADD `Puntaje` INT NOT NULL DEFAULT '80' AFTER `Soporte
 INSERT INTO `acuerdo_pago_estados` (`ID`, `NombreEstado`, `Observaciones`, `Created`, `Updated`, `Sync`) VALUES
 (12,	'Reportado por Usuario',	'Se Reporta y se beta al usuario',	'0000-00-00 00:00:00',	'2020-02-22 14:56:35',	'0000-00-00 00:00:00');
 
+ALTER TABLE `prod_codbarras` ADD INDEX(`ProductosVenta_idProductosVenta`);
+ALTER TABLE `prod_codbarras` ADD INDEX(`CodigoBarras`);
+

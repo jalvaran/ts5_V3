@@ -2943,7 +2943,6 @@ public function CalculePesoRemision($idCotizacion)
         $tb=$Tabla;
         //$tb="librodiario";
         $Columnas=  $this->MostrarColumnas($tb,$db);
-        
         $Leng=count($Columnas);
         
         $sql=" REPLACE INTO `$DataBaseDestino`.`$tb` (";
@@ -3067,7 +3066,6 @@ public function CalculePesoRemision($idCotizacion)
         
         
         $Columnas=  $this->MostrarColumnas($TablaOrigen,$db);
-        
         $Leng=count($Columnas);
         
         $sql="\r REPLACE INTO `$DataBaseDestino`.`$TablaDestino` (";
@@ -3084,7 +3082,7 @@ public function CalculePesoRemision($idCotizacion)
         $ConsultaParcial=$sql;
         $sqlTemporal="SELECT * FROM $TablaOrigen $Condicion";
         if(isset($DatosServer["IP"])){
-            $consulta=$this->QueryExterno($sqlTemporal, $DatosServer["IP"], $DatosServer["Usuario"], $DatosServer["Password"], $DatosServer["DataBase"], "");
+            $consulta=$this->QueryExterno($sql, $DatosServer["IP"], $DatosServer["Usuario"], $DatosServer["Password"], $DatosServer["DataBase"], "");
         }else{
             $consulta=$this->Query($sqlTemporal);
         }

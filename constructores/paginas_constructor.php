@@ -709,6 +709,7 @@ class PageConstruct extends html_estruct_class{
         print('<script src="../../componentes/datatables.net/js/jquery.dataTables.min.js"></script>');
         print('<script src="../../componentes/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>');
         print('<script src="../../componentes/jquery-slimscroll/jquery.slimscroll.min.js"></script>');
+        print('<script src="../../componentes/jquery-knob/js/jquery.knob.js"></script>');
         print('<script src="../../componentes/fastclick/lib/fastclick.js"></script>');
         print('<script src="../../componentes/alertify/lib/alertify.js"></script>');
         print('<script src="../../componentes/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>');
@@ -2058,6 +2059,15 @@ class PageConstruct extends html_estruct_class{
             }
             $this->input("hidden", $id, $class." input-number", $name, $title, $value, $placeholder, $autocomplete, $vectorhtml, "", $styles, "");
             $this->input("text", $id."_Format_Number", $class." input-number", $name, $title, number_format($value,2), $placeholder, $autocomplete, $vectorhtml, $Script, $styles, 'pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$"');
+        }
+        
+        function dialInput($id,$class,$dataMax,$value,$readOnly="",$Color="#00c0ef"){
+            
+            if($readOnly==1){
+                $readOnly="data-readOnly=true";
+            }
+            print('<input type="text" id="'.$id.'" class="'.$class.'" data-max="'.$dataMax.'" value="'.$value.'" '.$readOnly.' data-thickness="0.2" data-anglearc="250" data-angleoffset="-125" data-width="150" data-height="150" data-fgcolor="'.$Color.'" style="width: 64px; height: 40px; border: 0px none; background: rgba(0, 0, 0, 0) none repeat scroll 0% 0%; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; -moz-appearance: none;">');
+                
         }
         
         //////////////////////////////////FIN
