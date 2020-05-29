@@ -456,7 +456,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>Dirección</strong>", 1);
                     $css->ColTabla("<strong>Email</strong>", 1);
                     $css->ColTabla("<strong>Cupo</strong>", 1);
-                    $css->ColTabla("<strong>Código Tarjeta</strong>", 1);
+                    $css->ColTabla("<strong>Cumpleaños</strong>", 1);
                 $css->CierraFilaTabla();
                 
                 $css->FilaTabla(16);
@@ -470,7 +470,32 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->input("number", "Cupo", "form-control", "Cupo", "Cupo", 0, "Cupo Crédito", "off", "", "", "");
                     print("</td>");
                     print("<td>");
-                        $css->input("number", "CodigoTarjeta", "form-control", "CodigoTarjeta", "Codigo Tarjeta", "", "Código Tarjeta", "off", "", "", "onchange=VerificaCodigoTarjeta()");
+                        $css->input("hidden", "CodigoTarjeta", "form-control", "CodigoTarjeta", "Codigo Tarjeta", "", "Código Tarjeta", "off", "", "", "onchange=VerificaCodigoTarjeta()");
+                        $Meses =array('','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
+                        
+                        $css->select("cmbDiaCumple", "form-control", "cmbDiaCumple", "", "", "", "");
+                            $css->option("", "", "", "", "", "");
+                                print("Día");
+                            $css->Coption();
+                            for($i=1;$i<=31;$i++){
+                                $css->option("", "", "", $i, "", "");
+                                    print($i);
+                                $css->Coption();
+                            }
+                            
+                        $css->Cselect();
+                        
+                        $css->select("cmbMesCumple", "form-control", "cmbMesCumple", "", "", "", "");
+                            $css->option("", "", "", "", "", "");
+                                print("Mes");
+                            $css->Coption();
+                            for($i=1;$i<=12;$i++){
+                                $css->option("", "", "", $i, "", "");
+                                    print($Meses[$i]);
+                                $css->Coption();
+                            }
+                            
+                        $css->Cselect();
                     print("</td>");
                 $css->CierraFilaTabla();
                 

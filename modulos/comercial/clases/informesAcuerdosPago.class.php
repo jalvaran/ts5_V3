@@ -28,6 +28,7 @@ class informesAcuerdoPago extends AcuerdoPago{
                 (SELECT t4.idClientes FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero LIMIT 1) AS idClienteAcuerdo,
                 (SELECT t4.Direccion FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero LIMIT 1) AS DireccionCliente,
                 (SELECT t4.Telefono FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero LIMIT 1) AS TelefonoCliente,
+                (SELECT t4.Puntaje FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero LIMIT 1) AS PuntajeCliente,
                 (SELECT t5.SobreNombre FROM clientes_datos_adicionales t5 WHERE t5.idCliente=(SELECT idClienteAcuerdo) LIMIT 1) AS SobreNombreCliente,
                 t2.ValorCuotaGeneral,t2.CicloPagos,
                 (SELECT t7.NombreCiclo FROM acuerdo_pago_ciclos_pagos t7 WHERE t7.ID=t2.CicloPagos LIMIT 1) AS NombreCicloPago,

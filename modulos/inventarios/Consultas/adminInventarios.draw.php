@@ -58,7 +58,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CrearDiv("", "row", "left", 1, 1);
                         $Altura="170";
                         $css->CrearDiv("", "col-md-2", "center", 1, 1,"",'height:'.$Altura.'px;'); 
-                            print('<strong>Crear:</strong><br><br><a class="btn btn-app" style="background-color:#0f6106;color:white;width:120px;height:120px;border-radius: 25px;" onclick=FormularioCrearEditarPaciente()>
+                            print('<strong>Crear:</strong><br><br><a class="btn btn-app" style="background-color:#0f6106;color:white;width:120px;height:120px;border-radius: 25px;" onclick=FormularioCreacionProductos(``,`DivGeneralDraw`,``)>
 
                                 <i class="fa fa-plus-square" style="font-size:80px"></i> 
                               </a>');    

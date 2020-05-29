@@ -722,7 +722,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $Datos["Email"]=$obCon->normalizar($_REQUEST['Email']); 
             $Datos["Cupo"]=$obCon->normalizar($_REQUEST['Cupo']);    
             $Datos["CodigoTarjeta"]=$obCon->normalizar($_REQUEST['CodigoTarjeta']); 
-            
+            $Datos["DiaNacimiento"]=$obCon->normalizar($_REQUEST['cmbDiaCumple']); 
+            $Datos["MesNacimiento"]=$obCon->normalizar($_REQUEST['cmbMesCumple']); 
+                        
             $sqlClientes=$obCon->getSQLInsert("clientes", $Datos);
             $sqlProveedores=$obCon->getSQLInsert("proveedores", $Datos);
             $obCon->Query($sqlClientes);

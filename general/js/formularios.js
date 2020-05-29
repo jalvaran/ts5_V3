@@ -85,6 +85,8 @@ function CrearTercero(idModal,idBotonModal){
     var Email=document.getElementById('Email').value;
     var Cupo=document.getElementById('Cupo').value;
     var CodigoTarjeta=document.getElementById('CodigoTarjeta').value;
+    var cmbDiaCumple=document.getElementById('cmbDiaCumple').value;
+    var cmbMesCumple=document.getElementById('cmbMesCumple').value;
     
     if(!$.isNumeric(Num_Identificacion) || Num_Identificacion <= 0){
         alertify.error("El Campo Identificacion debe ser un número mayor a Cero y no puede estar en blanco");
@@ -158,6 +160,8 @@ function CrearTercero(idModal,idBotonModal){
         form_data.append('Email', Email);
         form_data.append('Cupo', Cupo);
         form_data.append('CodigoTarjeta', CodigoTarjeta);
+        form_data.append('DiaNacimiento', cmbDiaCumple);
+        form_data.append('MesNacimiento', cmbMesCumple);
         
         document.getElementById("RazonSocial").value='';
         
@@ -214,6 +218,8 @@ function EditarTercero(idModal,idBotonModal,idTercero,Tabla){
     var Email=document.getElementById('Email').value;
     var Cupo=document.getElementById('Cupo').value;
     var CodigoTarjeta=document.getElementById('CodigoTarjeta').value;
+    var cmbDiaCumple=document.getElementById('cmbDiaCumple').value;
+    var cmbMesCumple=document.getElementById('cmbMesCumple').value;
     
     if(!$.isNumeric(Num_Identificacion) || Num_Identificacion <= 0){
         alertify.error("El Campo Identificacion debe ser un número mayor a Cero y no puede estar en blanco");
@@ -289,6 +295,8 @@ function EditarTercero(idModal,idBotonModal,idTercero,Tabla){
         form_data.append('CodigoTarjeta', CodigoTarjeta);
         form_data.append('idTercero', idTercero);
         form_data.append('Tabla', Tabla);
+        form_data.append('DiaNacimiento', cmbDiaCumple);
+        form_data.append('MesNacimiento', cmbMesCumple);
         
         //document.getElementById("RazonSocial").value='';
         
@@ -435,12 +443,15 @@ function CompletaRazonSocial() {
 
 }
 
-function FormularioCreacionProductos(idModal,idDivFormulario,idBotonModal){
-    $("#"+idModal).modal();
-    document.getElementById(idBotonModal).disabled=true;
+function FormularioCreacionProductos(idModal,idDivFormulario,idBotonModal,CrearBotonGuardar=0){
+    if(idModal!=""){
+        $("#"+idModal).modal();
+        document.getElementById(idBotonModal).disabled=true;
+    }
     var form_data = new FormData();
         
         form_data.append('Accion', 2);
+        form_data.append('CrearBotonGuardar', CrearBotonGuardar);
         
         $.ajax({
         url: '../../general/Consultas/formularios.draw.php',

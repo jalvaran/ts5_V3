@@ -95,7 +95,7 @@ class ExcelAcuerdoPago extends ProcesoVenta{
                 $RazonSocial=$DatosVista["RazonSocial"]." (".$DatosVista["SobreNombreCliente"].")";
                 $Direccion=$DatosVista["DireccionCliente"];
                 $Telefono=$DatosVista["TelefonoCliente"];
-                $Observaciones=$DatosVista["Observaciones"];
+                $Observaciones=$DatosVista["Observaciones"].", Puntaje:".$DatosVista["PuntajeCliente"];
                 $NombreCiclo=$DatosVista["NombreCicloPago"];
                 $SaldoFinal=$DatosVista["SaldoFinal"];
             }else{

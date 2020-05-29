@@ -16,7 +16,7 @@ $css->PageInit($myTitulo);
         $css->div("DivFrmPOS", "", "", "", "", "", "");
         $css->Cdiv();
        
-    $css->CModal("BntModalPOS", "onclick=AccionesPOS(event)", "button", "Guardar");
+    $css->CModal("BntModalPOS", "onclick=AccionesPOS()", "button", "Guardar");
     
     $css->Modal("ModalAccionesPOSSmall", "POS TS5", "", 0);
         $css->div("DivFrmPOSSmall", "", "", "", "", "", "");
@@ -301,8 +301,9 @@ $css->PageInit($myTitulo);
     print("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>");
 $css->PageFin();
 print('<script src="../../componentes/shortcuts.js"></script>');  //script propio de la pagina
-print('<script src="jsPages/pos.js"></script>');  //script propio de la pagina
+
 print('<script src="jsPages/AcuerdoPago.js"></script>');  //script propio de la pagina
+print('<script src="jsPages/pos.js"></script>');  //script propio de la pagina
 print('<script src="../../componentes/webcam/webcam.js"></script>');  //script para usar la web cam
 
 $css->Cbody();

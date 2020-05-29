@@ -698,6 +698,7 @@ function atajosPOS(){
 function AccionesPOS(){
     //document.getElementById("BntModalPOS").disabled=true;
     //document.getElementById("BntModalPOS").value="Guardando...";
+    console.log("Entra");
     var idFormulario=document.getElementById('idFormulario').value; //determina el tipo de formulario que se va a guardar
     
     if(idFormulario==1){
@@ -748,6 +749,9 @@ function CrearTercero(){
     var Email=document.getElementById('Email').value;
     var Cupo=document.getElementById('Cupo').value;
     var CodigoTarjeta=document.getElementById('CodigoTarjeta').value;
+    
+    var cmbDiaCumple=document.getElementById('cmbDiaCumple').value;
+    var cmbMesCumple=document.getElementById('cmbMesCumple').value;
     
     if(!$.isNumeric(Num_Identificacion) || Num_Identificacion <= 0){
         alertify.error("El Campo Identificacion debe ser un número mayor a Cero y no puede estar en blanco");
@@ -821,6 +825,8 @@ function CrearTercero(){
         form_data.append('Email', Email);
         form_data.append('Cupo', Cupo);
         form_data.append('CodigoTarjeta', CodigoTarjeta);
+        form_data.append('cmbDiaCumple', cmbDiaCumple);
+        form_data.append('cmbMesCumple', cmbMesCumple);
         
         document.getElementById("RazonSocial").value='';
         
@@ -2684,5 +2690,3 @@ function GuardarIngresoAnticipoPorEncargos(idAcuerdoPago){
           }
       })  
 }  
-
-

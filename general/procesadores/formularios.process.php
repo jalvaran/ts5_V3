@@ -42,6 +42,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $Datos["Email"]=$obCon->normalizar($_REQUEST['Email']); 
             $Datos["Cupo"]=$obCon->normalizar($_REQUEST['Cupo']);    
             $Datos["CodigoTarjeta"]=$obCon->normalizar($_REQUEST['CodigoTarjeta']); 
+            $Datos["DiaNacimiento"]=$obCon->normalizar($_REQUEST['DiaNacimiento']); 
+            $Datos["MesNacimiento"]=$obCon->normalizar($_REQUEST['MesNacimiento']); 
             
             $sqlClientes=$obCon->getSQLInsert("clientes", $Datos);
             $sqlProveedores=$obCon->getSQLInsert("proveedores", $Datos);
@@ -99,7 +101,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $Datos["Ciudad"]=$DatosCiudad["Ciudad"];    
             $Datos["Email"]=$obCon->normalizar($_REQUEST['Email']); 
             $Datos["Cupo"]=$obCon->normalizar($_REQUEST['Cupo']);    
-            $Datos["CodigoTarjeta"]=$obCon->normalizar($_REQUEST['CodigoTarjeta']); 
+            $Datos["CodigoTarjeta"]=$obCon->normalizar($_REQUEST['CodigoTarjeta']);
+            $Datos["DiaNacimiento"]=$obCon->normalizar($_REQUEST['DiaNacimiento']); 
+            $Datos["MesNacimiento"]=$obCon->normalizar($_REQUEST['MesNacimiento']); 
             if(!filter_var($Datos["Email"], FILTER_VALIDATE_EMAIL)){
                 exit("E1;El campo Email debe ser del tipo Correo Electronico;Email");
             }

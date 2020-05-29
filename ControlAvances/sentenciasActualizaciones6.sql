@@ -556,3 +556,8 @@ INSERT INTO `acuerdo_pago_estados` (`ID`, `NombreEstado`, `Observaciones`, `Crea
 ALTER TABLE `prod_codbarras` ADD INDEX(`ProductosVenta_idProductosVenta`);
 ALTER TABLE `prod_codbarras` ADD INDEX(`CodigoBarras`);
 
+ALTER TABLE `clientes` ADD `DiaNacimiento` INT NOT NULL AFTER `Cupo`, ADD `MesNacimiento` INT NOT NULL AFTER `DiaNacimiento`;
+ALTER TABLE `proveedores` ADD `DiaNacimiento` INT NOT NULL AFTER `Cupo`, ADD `MesNacimiento` INT NOT NULL AFTER `DiaNacimiento`;
+
+ALTER TABLE `clientes` ADD `Created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `Estado`;
+ALTER TABLE `proveedores` ADD `Created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `Estado`;
