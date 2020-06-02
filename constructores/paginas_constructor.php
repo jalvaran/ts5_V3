@@ -34,6 +34,7 @@ class PageConstruct extends html_estruct_class{
 
                 }
                 print("<link rel='shortcut icon' href='../../images/technoIco.ico'>");
+                print('<link rel="stylesheet" href="../../componentes/summernote/summernote-bs4.css">');
                 print('<link rel="stylesheet" href="../../componentes/font-awesome/css/font-awesome.min.css">');
                 print('<link rel="stylesheet" href="../../componentes/Ionicons/css/ionicons.min.css">');
                 print('<link rel="stylesheet" href="../../componentes/datatables.net-bs/css/dataTables.bootstrap.min.css">');
@@ -712,6 +713,7 @@ class PageConstruct extends html_estruct_class{
         print('<script src="../../componentes/jquery-knob/js/jquery.knob.js"></script>');
         print('<script src="../../componentes/fastclick/lib/fastclick.js"></script>');
         print('<script src="../../componentes/alertify/lib/alertify.js"></script>');
+        print('<script src="../../componentes/summernote/summernote-bs4.min.js"></script>');
         print('<script src="../../componentes/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>');
         
         print('<script src="../../dist/js/adminlte.min.js"></script>');

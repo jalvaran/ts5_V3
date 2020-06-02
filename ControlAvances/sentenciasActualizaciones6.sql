@@ -561,3 +561,14 @@ ALTER TABLE `proveedores` ADD `DiaNacimiento` INT NOT NULL AFTER `Cupo`, ADD `Me
 
 ALTER TABLE `clientes` ADD `Created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `Estado`;
 ALTER TABLE `proveedores` ADD `Created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `Estado`;
+
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+(199,	'Inteligencia de Negocio',	18,	16,	0,	'',	1,	'',	'inteligencia.php',	'_SELF',	1,	'inteligencia.png',	5,	'2019-04-08 09:14:07',	'2019-04-08 09:14:07');
+
+INSERT INTO `menu_carpetas` (`ID`, `Ruta`, `Updated`, `Sync`) VALUES
+(16,	'../modulos/inteligencia/',	'2019-06-22 10:09:52',	'2019-04-07 09:14:07');
+
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+(200,	'Administrador de inventarios',	22,	12,	0,	'',	1,	'',	'adminInventarios.php',	'_SELF',	1,	'admin.png',	13,	'2020-06-02 15:25:19',	'2019-01-13 09:12:44');
+
+

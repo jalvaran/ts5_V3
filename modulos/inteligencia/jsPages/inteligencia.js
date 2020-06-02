@@ -266,4 +266,289 @@ function ListarProductosVendidos(Page=1){
           }
       });
 }
+
+
+function DibujarFormularioDatosAdicionalesCliente(idCliente='',idDiv=""){
+    if(idCliente==''){
+        var idCliente = document.getElementById('idCliente').value;   
+    }
+     
+            
+    var form_data = new FormData();
+        form_data.append('Accion', 5);        
+        form_data.append('idCliente', idCliente);
+                
+        $.ajax({
+        url: './../comercial/Consultas/AcuerdoPago.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+      
+      
+}
+
+function GuardarDatosAdicionalesCliente(idCliente){    
+    var idBoton='BtnGuardarDatosAdicionalesCliente';
+    document.getElementById(idBoton).disabled=true;
+    var SobreNombre=document.getElementById('SobreNombre').value;
+    var LugarTrabajo=document.getElementById('LugarTrabajo').value;        
+    var Cargo = document.getElementById('Cargo').value;    
+    var DireccionTrabajo = document.getElementById('DireccionTrabajo').value; 
+    var TelefonoTrabajo = document.getElementById('TelefonoTrabajo').value;  
+    var TxtFacebook = document.getElementById('TxtFacebook').value;  
+    var TxtInstagram = document.getElementById('TxtInstagram').value;  
+       
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 6);
+        form_data.append('idCliente', idCliente);        
+        form_data.append('SobreNombre', SobreNombre);
+        form_data.append('LugarTrabajo', LugarTrabajo);
+        form_data.append('Cargo', Cargo);
+        form_data.append('DireccionTrabajo', DireccionTrabajo);
+        form_data.append('TelefonoTrabajo', TelefonoTrabajo);
+        form_data.append('TxtFacebook', TxtFacebook);
+        form_data.append('TxtInstagram', TxtInstagram);
+        
+        $.ajax({
+        url: './../comercial/procesadores/AcuerdoPago.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+                document.getElementById(idBoton).disabled=false;
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+                document.getElementById(idBoton).disabled=false;
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                alertify.alert(data);
+            }
+               
+            document.getElementById(idBoton).disabled=false;
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+function DibujarFormularioRecomendadosCliente(idCliente='',idDiv=""){
+    if(idCliente==''){
+        var idCliente = document.getElementById('idCliente').value;   
+    }
+        
+    var form_data = new FormData();
+        form_data.append('Accion', 6);        
+        form_data.append('idCliente', idCliente);
+                
+        $.ajax({
+        url: './../comercial/Consultas/AcuerdoPago.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            DibujeRecomendadosCliente(idCliente);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+      
+      
+}
+
+
+function GuardarRecomendadosCliente(idCliente){    
+    var idBoton='BtnGuardarRecomendadosCliente';
+    document.getElementById(idBoton).disabled=true;
+    var NombreRecomendado=document.getElementById('NombreRecomendado').value;
+    var DireccionRecomendado=document.getElementById('DireccionRecomendado').value;        
+    var TelefonoRecomendado = document.getElementById('TelefonoRecomendado').value;    
+    var DireccionTrabajoRecomendado = document.getElementById('DireccionTrabajoRecomendado').value; 
+    var TelefonoTrabajoRecomendado = document.getElementById('TelefonoTrabajoRecomendado').value;  
+       
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 7);
+        form_data.append('idCliente', idCliente);        
+        form_data.append('NombreRecomendado', NombreRecomendado);
+        form_data.append('DireccionRecomendado', DireccionRecomendado);
+        form_data.append('TelefonoRecomendado', TelefonoRecomendado);
+        form_data.append('DireccionTrabajoRecomendado', DireccionTrabajoRecomendado);
+        form_data.append('TelefonoTrabajoRecomendado', TelefonoTrabajoRecomendado);
+                
+        $.ajax({
+        url: './../comercial/procesadores/AcuerdoPago.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+                LimpiarFormularioRecomendos();
+                DibujeRecomendadosCliente(idCliente);
+                document.getElementById(idBoton).disabled=false;
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+                document.getElementById(idBoton).disabled=false;
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                alertify.alert(data);
+            }
+               
+            document.getElementById(idBoton).disabled=false;
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+function LimpiarFormularioRecomendos(){
+    document.getElementById('NombreRecomendado').value='';
+    document.getElementById('DireccionRecomendado').value='';        
+    document.getElementById('TelefonoRecomendado').value='';    
+    document.getElementById('DireccionTrabajoRecomendado').value=''; 
+    document.getElementById('TelefonoTrabajoRecomendado').value='';  
+}
+
+
+function DibujeRecomendadosCliente(idCliente='',idDiv="DivRecomendadosExistentes"){
+    if(idCliente==''){
+        var idCliente = document.getElementById('idCliente').value;   
+    }
+         
+    var form_data = new FormData();
+        form_data.append('Accion', 7);        
+        form_data.append('idCliente', idCliente);
+                
+        $.ajax({
+        url: './../comercial/Consultas/AcuerdoPago.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+      
+      
+}
+
+
+function DibujeRedactarCorreoClientes(Condicion){
+    var idDiv="DivGeneralDraw";
+    var form_data = new FormData();
+        form_data.append('Accion', 3);        
+        form_data.append('Condicion', Condicion);
+                
+        $.ajax({
+        url: 'Consultas/inteligencia.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+            $('.summernote').summernote({
+                height: 300
+            });
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function EnviarMailClientes(idCliente){    
+    var idBoton='btnEnviar';
+    document.getElementById(idBoton).disabled=true;
+    var Destinatario=document.getElementById('Destinatario').value;
+    var Asunto=document.getElementById('Asunto').value;        
+    var Mensaje = document.getElementById('Mensaje').value;    
+           
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 4);
+        form_data.append('Destinatario', Destinatario);        
+        form_data.append('Asunto', Asunto);
+        form_data.append('Mensaje', Mensaje);
+                
+        $.ajax({
+        url: 'procesadores/inteligencia.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+                document.getElementById(idBoton).disabled=false;
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+                document.getElementById(idBoton).disabled=false;
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                alertify.alert(data);
+            }
+               
+            document.getElementById(idBoton).disabled=false;
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
 MostrarListadoSegunID();

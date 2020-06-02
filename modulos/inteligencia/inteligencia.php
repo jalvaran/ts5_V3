@@ -59,11 +59,7 @@ $css->PageInit($myTitulo);
                         <i class="fa fa-indent"></i>Productos Vendidos</a>
                 </li>
                 
-                <li>
-                    <a href="#" onclick="idListado=3;Filtro=``;MostrarListadoSegunID();">
-                        <i class="fa fa-tags"></i>Compradores</a>
-                </li>
-                               
+                                               
               </ul>
             </div>
             <!-- /.box-body -->

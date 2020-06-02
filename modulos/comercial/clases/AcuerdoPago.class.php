@@ -427,7 +427,9 @@ class AcuerdoPago extends ProcesoVenta{
     function AbonarAcuerdoPago($idAcuerdo,$MetodoPago,$ValorAbono,$idUser,$idComprobante="") {
         $DatosAcuerdo=$this->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
         $Saldo=round($DatosAcuerdo["SaldoFinal"]);
-        
+        $Tercero=$DatosAcuerdo["Tercero"];
+        $DatosTercero=$this->DevuelveValores("clientes", "Num_Identificacion", $Tercero);
+        $Puntaje=$DatosTercero["Puntaje"];
         if($ValorAbono>$Saldo){
             exit("E1;El valor del Abono supera el saldo del Cliente");
         }
@@ -454,6 +456,20 @@ class AcuerdoPago extends ProcesoVenta{
                 $Estado=1;
                 if($FechaActual>$FechaVencimiento){
                     $Estado=3; // se marca como pago extemporaneo
+                    $Puntaje=$Puntaje-10;
+                    if($Puntaje<0){
+                        $Puntaje=0;
+                    }
+                    
+                    $sql="UPDATE clientes SET Puntaje='$Puntaje' WHERE Num_Identificacion='$Tercero'";
+                    $this->Query($sql);
+                }else{
+                    $Puntaje=$Puntaje+10;
+                    if($Puntaje>100){
+                        $Puntaje=100;
+                    }
+                    $sql="UPDATE clientes SET Puntaje='$Puntaje' WHERE Num_Identificacion='$Tercero'";
+                    $this->Query($sql);
                 }
                 $sql="UPDATE acuerdo_pago_proyeccion_pagos SET Estado='$Estado',ValorPagado=ValorCuota,idPago='$idPago' WHERE ID='$idProyeccion'";
                 $this->Query($sql);
@@ -516,7 +532,9 @@ class AcuerdoPago extends ProcesoVenta{
         $idAcuerdo=$DatosProyeccion["idAcuerdoPago"];
         $DatosAcuerdo=$this->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $DatosProyeccion["idAcuerdoPago"]);
         $SaldoAPagarCuota=$DatosProyeccion["ValorCuota"]-$DatosProyeccion["ValorPagado"];
-        
+        $Tercero=$DatosAcuerdo["Tercero"];
+        $DatosTercero=$this->DevuelveValores("clientes", "Num_Identificacion", $Tercero);
+        $Puntaje=$DatosTercero["Puntaje"];
         if($ValorAbono>$SaldoAPagarCuota){
             exit("E1;El valor del Abono supera el saldo de la Cuota");
         }
@@ -535,6 +553,20 @@ class AcuerdoPago extends ProcesoVenta{
                 $Estado=1;
                 if($FechaActual>$FechaVencimiento){
                     $Estado=3; // se marca como pago extemporaneo
+                    $Puntaje=$Puntaje-10;
+                    if($Puntaje<0){
+                        $Puntaje=0;
+                    }
+                    
+                    $sql="UPDATE clientes SET Puntaje='$Puntaje' WHERE Num_Identificacion='$Tercero'";
+                    $this->Query($sql);
+                }else{
+                    $Puntaje=$Puntaje+10;
+                    if($Puntaje>100){
+                        $Puntaje=100;
+                    }
+                    $sql="UPDATE clientes SET Puntaje='$Puntaje' WHERE Num_Identificacion='$Tercero'";
+                    $this->Query($sql);
                 }
                 $sql="UPDATE acuerdo_pago_proyeccion_pagos SET Estado='$Estado',ValorPagado=ValorCuota,idPago='$idPago' WHERE ID='$idProyeccion'";
                 $this->Query($sql);

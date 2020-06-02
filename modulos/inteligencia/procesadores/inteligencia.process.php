@@ -9,7 +9,7 @@ $idUser=$_SESSION['idUser'];
 
 include_once("../clases/inteligencia.class.php");
 include_once("../clases/inteligenciaExcel.class.php");
-
+include_once("../../../general/clases/mail.class.php");
 if( !empty($_REQUEST["Accion"]) ){
     $obCon = new Inteligencia($idUser);
     
@@ -42,7 +42,18 @@ if( !empty($_REQUEST["Accion"]) ){
             $Condicion= urldecode(base64_decode($_REQUEST["c"]));            
             $obExcel->ListadoProductosClientes($Condicion);
             print("OK;Hoja Exportada");
-        break;//fin caso 2
+        break;//fin caso 3
+    
+        case 4://Enviar un mail a los clientes
+            $Destinatario=$obCon->normalizar($_REQUEST['Destinatario']);
+            $Asunto=$obCon->normalizar($_REQUEST['Asunto']);
+            $Mensaje=($_REQUEST['Mensaje']);
+            
+            $obMail=new TS_Mail($idUser);
+            
+            $obMail->EnviarMailXPHPNativo($Destinatario, "klam@gmail.com", "Klam", $Asunto, $Mensaje);
+            print("OK;Mensaje Enviado");
+        break;//Fin caso 4    
         
             
     }

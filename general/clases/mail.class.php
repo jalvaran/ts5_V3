@@ -45,7 +45,7 @@ class TS_Mail extends ProcesoVenta{
         "Content-Transfer-Encoding: 7bit\n\n" . $htmlContent . "\n\n"; 
         //$Adjuntos[0]="../clases/Factura.pdf";
         //preparing attachment
-        if($Adjuntos[0]<>''){
+        if(isset($Adjuntos[0]) and $Adjuntos[0]<>''){
             foreach($Adjuntos as $file){
                 //print("Enviando: ".$file);
                 if(!empty($file)){

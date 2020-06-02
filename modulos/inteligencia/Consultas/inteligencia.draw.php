@@ -125,6 +125,22 @@ if( !empty($_REQUEST["Accion"]) ){
                                   
                                 </div>
                               </div>');
+                        
+                        print('<div class="col-lg-3 col-xs-6">
+                                <!-- small box -->
+                                <div class="small-box bg-blue">
+                                  <div class="inner">
+                                   
+                                    <h3>Mensajería</h3>
+                                    <p>Enviar un correo</p>
+                                  </div>
+                                  <div class="icon">
+                                    <i class="fa fa-send" style="cursor:pointer" onclick=DibujeRedactarCorreoClientes(`'.$CondicionBase64.'`); return false></i>
+                                  </div>
+                                  
+                                </div>
+                              </div>');
+                        
                     $css->Cdiv();
                      
                                        
@@ -172,8 +188,9 @@ if( !empty($_REQUEST["Accion"]) ){
                                 print("</td>");
                             $css->CierraFilaTabla();
                             $css->FilaTabla(16);    
-                                $css->ColTabla("<strong>Acciones</strong>", 1,"C");
-                                
+                                $css->ColTabla("<strong>Editar</strong>", 1,"C");
+                                $css->ColTabla("<strong>+ Datos</strong>", 1,"C");
+                                $css->ColTabla("<strong>Referidos</strong>", 1,"C");
                                 $css->ColTabla("<strong>ID</strong>", 1,"C");                                
                                 $css->ColTabla("<strong>Nombre</strong>", 1,"C");
                                 $css->ColTabla("<strong>Identificacion</strong>", 1,"C");
@@ -193,9 +210,16 @@ if( !empty($_REQUEST["Accion"]) ){
                                 
                                 print('<tr>');
                                     print("<td>");
-                                        print('<button type="button" class="btn btn-warning btn-sm" onclick=ModalEditarTercero(`ModalAcciones`,`DivFrmModalAcciones`,`'.$idItem.'`,`clientes`)><i class="fa fa-edit"></i></button>');
+                                        print('<button type="button" class="btn btn-warning btn-flat" onclick=ModalEditarTercero(`ModalAcciones`,`DivFrmModalAcciones`,`'.$idItem.'`,`clientes`)><i class="fa fa-edit"></i></button>');
                                     print("</td>");
                                     
+                                    print('<td>');
+                                        print('<button type="button" class="btn btn-primary btn-flat" onclick="DibujarFormularioDatosAdicionalesCliente(`'.$idItem.'`,`DivGeneralDraw`)"> <i class="fa fa-user-plus"> </i> </button>');
+                                    print('</td>');
+                                    
+                                    print('<td>');
+                                        print('<button type="button" class="btn btn-success btn-flat" onclick="DibujarFormularioRecomendadosCliente(`'.$idItem.'`,`DivGeneralDraw`)"> <i class="fa fa-users"> </i> </button>');
+                                    print('</td>');
                                    
                                     
                                     print("<td class='mailbox-subject'>");
@@ -450,7 +474,36 @@ if( !empty($_REQUEST["Accion"]) ){
         break; //Fin caso 2
         
         
-        
+        case 3://Dibuja el formulario para enviar un mail
+            $Condicion=$obCon->normalizar(urldecode( base64_decode($_REQUEST["Condicion"])));            
+            $css->CrearTitulo("<strong>Redactar un Correo</strong>", "azul");
+            $sql="SELECT Email FROM clientes $Condicion LIMIT 50";
+            $Consulta=$obCon->Query($sql);
+            $Mails="";
+            while($DatosCliente=$obCon->FetchAssoc($Consulta)){
+                if(filter_var($DatosCliente["Email"], FILTER_VALIDATE_EMAIL)){
+                    $Mails.=$DatosCliente["Email"];
+                    $Mails.=",";
+                }
+                
+            }
+            $Mails = substr($Mails, 0, -1);
+            $css->input("text", "Destinatario", "form-control", "Destinatario", "", $Mails, "Para:", "off", "", "");
+            print("<br>");
+            $css->input("text", "Asunto", "form-control", "Asunto", "", "", "Asunto:", "off", "", "");
+            print("<br>");
+            print('<textarea id="Mensaje" class="summernote" rows="10"></textarea>');
+            print("<br>");
+            $css->div("", "row", "", "", "", "", "");
+                $css->div("", "col-lg-4", "", "", "", "", "");
+                $css->Cdiv();
+                $css->div("", "col-lg-4", "", "", "", "", "");
+                $css->Cdiv();
+                $css->div("", "col-lg-4", "", "", "", "", "");
+                    $css->CrearBotonEvento("btnEnviar", "Enviar", 1, "onclick", "EnviarMailClientes()", "verde");
+                $css->Cdiv();
+            $css->Cdiv();        
+        break;//Fin caso 3    
         
     }
     

@@ -25,7 +25,15 @@ $DatosUsuario=$obCon->FetchAssoc($DatosUsuario);
 $TipoUser=$DatosUsuario["TipoUser"];
 
 $css->PageInit($myTitulo);
-    
+        $Fecha=date("Y-m-d");
+        $sql="SELECT COUNT(*) as Cuotas FROM acuerdo_pago_proyeccion_pagos t1 
+            INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
+            WHERE t2.Estado=1 AND t1.Fecha='$Fecha';";
+        $DatosValidacion=$obCon->FetchAssoc($obCon->Query($sql));
+        if($DatosValidacion["Cuotas"]>0){
+            $css->Notificacion("Acuerdos", "Tienes ".$DatosValidacion["Cuotas"]." Cuotas por recaudar el día de hoy", "naranja", "", "");
+        }
+        
         $css->CrearDiv("DivMenu", "container", "center", 1, 1);        
         
 	$css->IniciaMenu("Menú"); 
