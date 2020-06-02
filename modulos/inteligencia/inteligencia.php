@@ -56,7 +56,12 @@ $css->PageInit($myTitulo);
                 </li>
                 <li>
                     <a href="#" onclick="idListado=2;Filtro=``;MostrarListadoSegunID();">
-                        <i class="fa fa-indent"></i>Informes</a>
+                        <i class="fa fa-indent"></i>Productos Vendidos</a>
+                </li>
+                
+                <li>
+                    <a href="#" onclick="idListado=3;Filtro=``;MostrarListadoSegunID();">
+                        <i class="fa fa-tags"></i>Compradores</a>
                 </li>
                                
               </ul>
