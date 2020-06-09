@@ -476,7 +476,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->input("text", "Email", "form-control", "Email", "Email", "", "Email", "off", "", "", "");
                     print("</td>");
                     print("<td>");
-                        $css->input("number", "Cupo", "form-control", "Cupo", "Cupo", 0, "Cupo Crédito", "off", "", "", "");
+                        $css->input_number_format("number", "Cupo", "form-control", "Cupo", "Cupo", 0, "Cupo Crédito", "off", "", "", "");
                     print("</td>");
                     print("<td>");
                         $css->input("hidden", "CodigoTarjeta", "form-control", "CodigoTarjeta", "Codigo Tarjeta", "", "Código Tarjeta", "off", "", "", "onchange=VerificaCodigoTarjeta()");
@@ -894,12 +894,14 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CrearTabla();
                     $css->FilaTabla(16);                    
                         $css->ColTabla("<strong>Saldo Actual</strong>", 1);
+                        $css->ColTabla("<strong>Factura Actual</strong>", 1);
                         $css->ColTabla("<strong>Cupo</strong>", 1); 
                         $css->ColTabla("<strong>Nuevo Saldo</strong>", 1);
                     $css->CierraFilaTabla();
                     
                     $css->FilaTabla(16);                    
                         $css->ColTabla(number_format($SaldoActualCliente), 1);
+                        $css->ColTabla(number_format($TotalPreventa), 1);
                         $css->ColTabla(number_format($Cupo), 1); 
                         $css->ColTabla("<h2>".number_format($NuevoSaldo)."</h2>", 1);
                     $css->CierraFilaTabla();
@@ -921,8 +923,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $ValorAnteriorCuota=$DatosAcuerdoAnterior["ValorCuotaGeneral"];
             $css->FilaTabla(16);
                 $css->ColTabla("<strong>Acuerdo Anterior</strong>", "1", "C");
-                $css->ColTabla("<strong>Datos Cliente || Adicional</strong>", "1", "C");
-                
+                $css->ColTabla("<strong>Datos Cliente</strong>", "1", "C");
+                $css->ColTabla("<strong>Adicional</strong>", "1", "C");
                 $css->ColTabla("<strong>Recomendados</strong>", "1", "C");
             
             $css->CierraFilaTabla();
@@ -938,6 +940,8 @@ if( !empty($_REQUEST["Accion"]) ){
                     print('<span class="input-group-btn"> 
                         <button type="button" class="btn btn-info btn-flat" onclick=ModalEditarTercero(`ModalAccionesPOS`,`DivFrmPOS`,`'.$idCliente.'`,`clientes`)> <i class="fa fa-user"> </i> </button>
                       </span>');
+                print("</td>");
+                print("<td style='text-align:center' >");        
                     print('<span class="input-group-btn"> 
                         <button type="button" class="btn btn-primary btn-flat" onclick=DibujarFormularioDatosAdicionalesCliente(`'.$idCliente.'`,`DivProyeccionPagosAcuerdo`)> <i class="fa fa-user-plus"> </i> </button>
                       </span>');
@@ -1039,7 +1043,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CierraFilaTabla(); 
                     $css->FilaTabla(16);
                         print("<td>");
-                            $css->input("date", "TxtFechaInicialPagos", "form-control", "TxtFechaInicialPagos", "Fecha", date("Y-m-d"), "Fecha", "off", "", "","style='line-height: 15px;' min='".date("Y-m-d")."'");
+                            $css->input("date", "TxtFechaInicialPagos", "form-control", "TxtFechaInicialPagos", "Fecha", '', "Fecha", "off", "", "","style='line-height: 15px;' min='".date("Y-m-d")."'");
                         print("</td>"); 
                         print("<td>");
                             
@@ -1403,6 +1407,21 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CerrarTabla();
         break;// Fin caso 19
         
+        case 20:// formulario para cerrar turno
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 7, "", "", "", "");
+            $css->div("", "row", "", "", "", "", "");
+                $css->div("", "col-md-4", "", "", "", "", "");
+                $css->Cdiv();
+                $css->div("", "col-md-4", "", "", "", "", "");
+                    $css->CrearTitulo("<strong>Por favor digite el total del efectivo recaudado</strong>", "verde");
+                    $css->input_number_format("number", "total_entrega", "form-control", "total_entrega", "Entrega Total", 0, "Total recaudado", "off", "", "");
+            
+                $css->Cdiv();
+                $css->div("", "col-md-4", "", "", "", "", "");
+                $css->Cdiv();
+            $css->Cdiv();    
+            
+        break;//Fin caso 20    
                
     }
     

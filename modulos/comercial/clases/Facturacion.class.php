@@ -652,7 +652,7 @@ class Facturacion extends ProcesoVenta{
         
     }
     
-    public function CierreTurnoPos($idUser,$idCaja,$VectorCierre) {
+    public function CierreTurnoPos($idUser,$idCaja,$TotalRecaudo) {
         
         $fecha=date("Y-m-d");
         $Hora=date("H:i:s");
@@ -676,7 +676,7 @@ class Facturacion extends ProcesoVenta{
         //Calculo las ventas a credito
         //
         $sql="SELECT SUM(Total) as Total FROM facturas "
-                . "WHERE Usuarios_idUsuarios='$idUser' AND CerradoDiario = '' AND FormaPago<>'ANULADA' AND FormaPago<>'Contado' AND FormaPago<>'SisteCredito' AND FormaPago<>'Separado'";
+                . "WHERE Usuarios_idUsuarios='$idUser' AND CerradoDiario = ''  AND FormaPago<>'Acuerdo' AND FormaPago<>'ANULADA' AND FormaPago<>'Contado' AND FormaPago<>'SisteCredito' AND FormaPago<>'Separado'";
         
         $Consulta=$this->Query($sql);
         $DatosSumatorias=$this->FetchArray($Consulta);
@@ -693,6 +693,16 @@ class Facturacion extends ProcesoVenta{
         $DatosSumatorias=$this->FetchArray($Consulta);
         
         $TotalVentasSisteCredito=$DatosSumatorias["Total"]; 
+        
+        //Calculo las ventas en acuerdo de pago
+        //
+        $sql="SELECT SUM(Total) as Total FROM facturas "
+                . "WHERE Usuarios_idUsuarios='$idUser' AND CerradoDiario = '' AND FormaPago = 'Acuerdo'";
+        
+        $Consulta=$this->Query($sql);
+        $DatosSumatorias=$this->FetchArray($Consulta);
+        
+        $TotalVentasAcuerdoPago=$DatosSumatorias["Total"]; 
         
         //Calculo los retiros de separados
         //
@@ -716,36 +726,53 @@ class Facturacion extends ProcesoVenta{
         
         //Calculo los egresos
         
-        $sql="SELECT SUM(Valor) as Valor, SUM(Retenciones) as Retenciones FROM egresos "
-                . "WHERE Usuario_idUsuario='$idUser' AND CerradoDiario = '' AND PagoProg='Contado'";
+        $sql="SELECT SUM(Debito) as Total FROM librodiario 
+                WHERE idUsuario='$idUser' AND idCierre=0 AND (CuentaPUC like '51%' or CuentaPUC LIKE '52%');";
         
         $Consulta=$this->Query($sql);
         $DatosEgresos=$this->FetchArray($Consulta);
         
-        $TotalEgresos=$DatosEgresos["Valor"];
-        $TotalRetenciones=$DatosEgresos["Retenciones"];
-        $TotalEgresos=$TotalEgresos-$TotalRetenciones;
-        
+        $TotalEgresos=$DatosEgresos["Total"];
+               
         
         //Calculo los abonos de separados
         
-        $TotalAbonos=$this->Sume("separados_abonos", "Valor", "WHERE idUsuarios='$idUser' AND idCierre=''");
+        $TotalAbonos=$this->Sume("separados_abonos", "Valor", "WHERE idUsuarios='$idUser' AND (idCierre='' or idCierre=0) ");
         //Calculo los abonos de Creditos
         
         $TotalAbonosCreditos=$this->Sume("facturas_abonos", "Valor", "WHERE Usuarios_idUsuarios='$idUser' AND idCierre='0'");
         $TotalAbonosSisteCredito=$this->Sume("comercial_plataformas_pago_ingresos", "Valor", "WHERE idUser='$idUser' AND idCierre='0' AND idPlataformaPago=1");
-        //$TotalAbonosKupy=$this->Sume("comercial_plataformas_pago_ingresos", "Valor", "WHERE idUser='$idUser' AND idCierre='0' AND idPlataformaPago=2");
+        $TotalAbonosKupy=$this->Sume("comercial_plataformas_pago_ingresos", "Valor", "WHERE idUser='$idUser' AND idCierre='0' AND idPlataformaPago=2");
+        
+        $sql="SELECT SUM(t1.`ValorPago`) as TotalAbono,MetodoPago,
+                (SELECT Metodo FROM metodos_pago t2 WHERE t1.MetodoPago=t2.ID) as Metodo 
+                FROM `acuerdo_pago_cuotas_pagadas` t1
+                WHERE `idCierre` = '0' AND `idUser` = '3' GROUP BY t1.MetodoPago ";
+        
+        $Consulta=$this->Query($sql);
+        $i=0;
+        while($DatosConsulta=$this->FetchAssoc($Consulta)){
+            if($DatosConsulta["MetodoPago"]==1){
+                $TotalAbonos=$TotalAbonos+$DatosConsulta["TotalAbono"];
+            }
+            
+            $AbonosAcuerdos[$i]["MetodoPago"]=$DatosConsulta["MetodoPago"];
+            $AbonosAcuerdos[$i]["TotalAbono"]=$DatosConsulta["TotalAbono"];
+            $AbonosAcuerdos[$i]["Metodo"]=$DatosConsulta["Metodo"];
+            
+        }
+        
         //Ingreso datos en tabla cierres
         
         $tab="cajas_aperturas_cierres";
-        $NumRegistros=23;
+        $NumRegistros=24;
         $Columnas[0]="ID";                  $Valores[0]="";
         $Columnas[1]="Fecha";               $Valores[1]=$fecha;
         $Columnas[2]="Hora";                $Valores[2]=$Hora;
         $Columnas[3]="Movimiento";           $Valores[3]="Cierre";
         $Columnas[4]="Usuario";               $Valores[4]=$idUser;
         $Columnas[5]="idCaja";            $Valores[5]=$idCaja;
-        $Columnas[6]="TotalVentas";           $Valores[6]=$TotalVentasContado+$TotalVentasCredito+$TotalVentasSisteCredito-$TotalDevoluciones;
+        $Columnas[6]="TotalVentas";           $Valores[6]=$TotalVentasAcuerdoPago+$TotalVentasContado+$TotalVentasCredito+$TotalVentasSisteCredito-$TotalDevoluciones;
         $Columnas[7]="TotalVentasContado";    $Valores[7]=$TotalVentasContado;
         $Columnas[8]="TotalVentasCredito";    $Valores[8]=$TotalVentasCredito;
         $Columnas[9]="TotalAbonos";           $Valores[9]=$TotalAbonos;
@@ -762,6 +789,7 @@ class Facturacion extends ProcesoVenta{
         $Columnas[20]="AbonosSisteCredito";           $Valores[20]=$TotalAbonosSisteCredito;
         $Columnas[21]="TotalVentasSisteCredito";      $Valores[21]=$TotalVentasSisteCredito;
         $Columnas[22]="TotalRetiroSeparados";      $Valores[22]=$TotalRetiroSeparados;
+        $Columnas[23]="EfectivoRecaudado";      $Valores[23]=$TotalRecaudo;
         $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
         $idCierre=$this->ObtenerMAX($tab, "ID", 1, "");
         
@@ -778,7 +806,8 @@ class Facturacion extends ProcesoVenta{
         $this->update("pos_registro_descuentos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUsuario='$idUser'");  
         $this->update("acuerdo_pago_cuotas_pagadas", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'"); 
         $this->update("acuerdo_recargos_intereses", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'");  
-        $this->update("anticipos_encargos_abonos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'");  
+        $this->update("anticipos_encargos_abonos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'"); 
+        $this->update("librodiario", "idCierre", $idCierre, "WHERE idCierre='0' AND idUsuario='$idUser'");  
         return ($idCierre);
         
     }

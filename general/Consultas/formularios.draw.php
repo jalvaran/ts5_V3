@@ -108,7 +108,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->input("text", "Email", "form-control", "Email", "Email", "", "Email", "off", "", "", "");
                     print("</td>");
                     print("<td>");
-                        $css->input("number", "Cupo", "form-control", "Cupo", "Cupo", 0, "Cupo Crédito", "off", "", "", "");
+                        $css->input_number_format("number", "Cupo", "form-control", "Cupo", "Cupo", 0, "Cupo Crédito", "off", "", "", "");
                     print("</td>");
                     print("<td>");
                         $css->input("hidden", "CodigoTarjeta", "form-control", "CodigoTarjeta", "Codigo Tarjeta", "", "Código Tarjeta", "off", "", "", "onchange=VerificaCodigoTarjeta()");
@@ -420,7 +420,8 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->input("text", "Email", "form-control", "Email", "Email", $DatosTercero["Email"], "Email", "off", "", "", "");
                     print("</td>");
                     print("<td>");
-                        $css->input("number", "Cupo", "form-control", "Cupo", "Cupo", $DatosTercero["Cupo"], "Cupo Crédito", "off", "", "", "");
+                        print("Puntaje: ".$DatosTercero["Puntaje"]);
+                        $css->input_number_format("number", "Cupo", "form-control", "Cupo", "Cupo", $DatosTercero["Cupo"], "Cupo Crédito", "off", "", "", "");
                     print("</td>");
                     print("<td>");
                         

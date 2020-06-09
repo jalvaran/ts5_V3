@@ -934,12 +934,14 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CrearTabla();
                     $css->FilaTabla(16);                    
                         $css->ColTabla("<strong>Saldo Actual</strong>", 1);
+                        $css->ColTabla("<strong>Esta venta</strong>", 1); 
                         $css->ColTabla("<strong>Cupo</strong>", 1); 
                         $css->ColTabla("<strong>Nuevo Saldo</strong>", 1);
                     $css->CierraFilaTabla();
                     
                     $css->FilaTabla(16);                    
                         $css->ColTabla(number_format($SaldoActualCliente), 1);
+                        $css->ColTabla(number_format($TotalPreventa), 1); 
                         $css->ColTabla(number_format($Cupo), 1); 
                         $css->ColTabla("<h2>".number_format($NuevoSaldo)."</h2>", 1);
                     $css->CierraFilaTabla();
@@ -957,8 +959,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $ValorAnteriorCuota=$DatosAcuerdoAnterior["ValorCuotaGeneral"];
             $css->FilaTabla(16);
                 $css->ColTabla("<strong>Acuerdo Anterior</strong>", "1", "C");
-                $css->ColTabla("<strong>Datos Cliente || Adicional</strong>", "1", "C");
-                
+                $css->ColTabla("<strong>Datos Cliente</strong>", "1", "C");
+                $css->ColTabla("<strong>Adicional</strong>", "1", "C");
                 $css->ColTabla("<strong>Recomendados</strong>", "1", "C");
             
             $css->CierraFilaTabla();
@@ -974,6 +976,8 @@ if( !empty($_REQUEST["Accion"]) ){
                     print('<span class="input-group-btn"> 
                         <button type="button" class="btn btn-info btn-flat" onclick=ModalEditarTercero(`ModalAccionesPOS`,`DivFrmPOS`,`'.$idCliente.'`,`clientes`)> <i class="fa fa-user"> </i> </button>
                       </span>');
+                print("</td>");
+                print("<td style='text-align:center' >");      
                     print('<span class="input-group-btn"> 
                         <button type="button" class="btn btn-primary btn-flat" onclick=DibujarFormularioDatosAdicionalesCliente(`'.$idCliente.'`,`DivProyeccionPagosAcuerdo`)> <i class="fa fa-user-plus"> </i> </button>
                       </span>');
@@ -994,12 +998,12 @@ if( !empty($_REQUEST["Accion"]) ){
                     exit();
                 }
                     $css->FilaTabla(16);   
-                        $css->ColTabla("<strong>Cuota Inicial</strong>", 1);
+                        $css->ColTabla("<strong>Cuota Inicial</strong>", 2);
                         $css->ColTabla("<strong>Metodo</strong>", 1); 
                         $css->ColTabla("<strong>Agregar</strong>", 1);
                     $css->CierraFilaTabla();
                     $css->FilaTabla(16);
-                        print("<td>");
+                        print("<td colspan=2>");
                            //$css->input("number", "CuotaInicialAcuerdo", "form-control", "CuotaInicialAcuerdo", "Cuota Inicial", "", "Cuota Inicial", "off", "", "onchange=CalculeCuotas()");
                             $css->input_number_format( "","CuotaInicialAcuerdo", "form-control", "CuotaInicialAcuerdo", "Cuota Inicial", "", "Cuota Inicial", "off", "", "onchange=CalculeCuotas()");
                         print("</td>");
@@ -1021,12 +1025,12 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CierraFilaTabla();
                     $css->FilaTabla(16);
                         
-                        $css->ColTabla("<strong>Cuota Programada</strong>", 1);                        
+                        $css->ColTabla("<strong>Cuota Programada</strong>", 2);                        
                         $css->ColTabla("<strong>Fecha cuota programada</strong>", 1);  
                         $css->ColTabla("<strong></strong>", 1);
                     $css->CierraFilaTabla();
                     $css->FilaTabla(16);
-                        print("<td>");
+                        print("<td colspan=2>");
                             //$css->input("number", "CuotaProgramadaAcuerdo", "form-control", "CuotaProgramadaAcuerdo", "Cuota Programada", "", "Cuota Programada", "off", "", "onchange=CalculeCuotas()");
                             $css->input_number_format("number", "CuotaProgramadaAcuerdo", "form-control", "CuotaProgramadaAcuerdo", "Cuota Programada", "", "Cuota Programada", "off", "", "onchange=CalculeCuotas()");
                         print("</td>");
@@ -1040,7 +1044,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     $css->FilaTabla(16);
                         
-                        $css->ColTabla("<strong>Ciclo</strong>", 1);
+                        $css->ColTabla("<strong>Ciclo</strong>", 2);
                         $css->ColTabla("<strong>Cuotas</strong>", 1);
                         $css->ColTabla("", 1);
                     $css->CierraFilaTabla();
@@ -1048,7 +1052,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->FilaTabla(16);
                         
                         
-                        print("<td>");
+                        print("<td colspan=2>");
                             $css->select("cicloPagos", "form-control", "cicloPagos", "", "", "onchange=CalculeCuotasAcuerdo()", "");
                                 $css->option("", "", "", "", "", "");
                                     print("Seleccione el ciclo de pagos");
@@ -1072,14 +1076,14 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     $css->FilaTabla(16);
                         
-                        $css->ColTabla("<strong>Fecha Inicial de pagos</strong>", 1);
+                        $css->ColTabla("<strong>Fecha Inicial de pagos</strong>", 2);
                         $css->ColTabla("<strong>Valor de la Cuota</strong>", 1);  
                          
                         $css->ColTabla("<strong></strong>", 1);
                     $css->CierraFilaTabla(); 
                     $css->FilaTabla(16);
-                        print("<td>");
-                            $css->input("date", "TxtFechaInicialPagos", "form-control", "TxtFechaInicialPagos", "Fecha", date("Y-m-d"), "Fecha", "off", "", "","style='line-height: 15px;' min='".date("Y-m-d")."'");
+                        print("<td colspan=2>");
+                            $css->input("date", "TxtFechaInicialPagos", "form-control", "TxtFechaInicialPagos", "Fecha", '', "Fecha", "off", "", "","style='line-height: 15px;' min='".date("Y-m-d")."'");
                         print("</td>"); 
                         print("<td>");
                             
@@ -1095,18 +1099,18 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     
                     $css->FilaTabla(16);
-                        $css->ColTabla("<strong>Observaciones</strong>", 3,"C");
+                        $css->ColTabla("<strong>Observaciones</strong>", 4,"C");
                         
                     $css->CierraFilaTabla();
                     $css->FilaTabla(16);
-                        print("<td colspan=3>");
+                        print("<td colspan=4>");
                             $css->textarea("TxtObservacionesAcuerdoPago", "form-control", "TxtObservacionesAcuerdoPago", "", "Observaciones", "", "");
                             $css->Ctextarea();
                         print("</td>");
                     $css->CierraFilaTabla();
                     
                     $css->FilaTabla(16);
-                        print("<td colspan=3>");
+                        print("<td colspan=4>");
                             $css->CrearBotonEvento("btnCalcularProyeccion", "Proyectar pagos", 1, "onclick", "CalculeProyeccionPagosAcuerdo('$idAcuerdo')", "verde");
                         print("</td>");
                     $css->CierraFilaTabla();

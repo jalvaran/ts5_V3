@@ -748,6 +748,10 @@ function AccionesPOS(){
         GuardarEgresoAnticipoPorEncargos();
     }
     
+    if(idFormulario==7){
+        CerrarTurno();
+    }
+    
     if(idFormulario==101){
         CrearProductoVenta(1);
     }
@@ -1577,12 +1581,14 @@ function DescuentoCosto(){
  * @returns {undefined}
  */
 function CerrarTurno(){    
-    document.getElementById("BtnCerrarTurno").disabled=true;
-    document.getElementById("BtnCerrarTurno").value="Cerrando Turno...";
+    document.getElementById("BntModalPOS").disabled=true;
+    document.getElementById("BntModalPOS").value="Cerrando Turno...";
+    var TotalRecaudadoCierre= document.getElementById("total_entrega").value;
     var form_data = new FormData();
         
         form_data.append('Accion', 14);
-               
+        form_data.append('TotalRecaudadoCierre', TotalRecaudadoCierre); 
+        
         $.ajax({
         url: './procesadores/pos.process.php',
         //dataType: 'json',
@@ -1596,18 +1602,25 @@ function CerrarTurno(){
             if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
                 
+                document.getElementById("BntModalPOS").disabled=false;
+                document.getElementById("BntModalPOS").value="Cerrar Turno";
             }else if(respuestas[0]=="OK"){
-                alertify.alert(respuestas[1]);
-                document.getElementById("BtnCerrarTurno").disabled=false;
-                document.getElementById("BtnCerrarTurno").value="Cerrar Turno";
+                alertify.success(respuestas[1]);
+                document.getElementById("DivFrmPOS").innerHTML=respuestas[1];
+                document.getElementById("BntModalPOS").disabled=false;
+                document.getElementById("BntModalPOS").value="Cerrar Turno";
             }else{
                 alertify.alert(data);
+                document.getElementById("BntModalPOS").disabled=false;
+                document.getElementById("BntModalPOS").value="Cerrar Turno";
             }
             
             posiciona('Codigo');           
             
         },
         error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById("BntModalPOS").disabled=false;
+            document.getElementById("BntModalPOS").value="Cerrar Turno";
             alert(xhr.status);
             alert(thrownError);
           }
@@ -1711,6 +1724,7 @@ function ModalCrearTercero(){
         success: function(data){
             document.getElementById('DivFrmPOS').innerHTML=data;
             $('#CodigoMunicipio').select2();
+            Number_Format_Input();
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.status);
@@ -2810,3 +2824,77 @@ function GuardarEgresoAnticipoPorEncargos(idAcuerdoPago){
           }
       })  
 }  
+
+function AgregarTrasladoAPos(){    
+    
+    var convert_id=document.getElementById('convert_id').value;      
+    var idPreventa = document.getElementById('idPreventa').value;    
+    var idCliente = document.getElementById('idCliente').value;    
+       
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 32);        
+        form_data.append('convert_id', convert_id);        
+        form_data.append('idPreventa', idPreventa);
+        form_data.append('idCliente', idCliente);
+        $.ajax({
+        url: './procesadores/pos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+                DibujePreventa();
+            }else if(respuestas[0]=="E1"){
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                alertify.alert(data);
+                
+            }
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+
+function ModalCerrarTurno(){
+    
+    $("#ModalAccionesPOS").modal();
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 20);
+        
+        $.ajax({
+        url: './Consultas/pos.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivFrmPOS').innerHTML=data;
+            Number_Format_Input();            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+      
+      
+}

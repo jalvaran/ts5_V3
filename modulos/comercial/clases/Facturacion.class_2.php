@@ -451,14 +451,14 @@ class Facturacion extends ProcesoVenta{
                 $CuentaPUC=$CuentaDestino;
                 $DatosCuenta= $this->DevuelveValores("subcuentas", "PUC", $CuentaDestino);
                 $NombreCuenta=$DatosCuenta["Nombre"];
-                if($Total>0){
-                    $Debito=$DiferenciaFormasPago;
+                if($Total>=0){
+                    $Debito=ABS($DiferenciaFormasPago);
                     $Credito=0;
                     $Neto=$DiferenciaFormasPago;
                 }else{
                     $Debito=0;
-                    $Credito=$DiferenciaFormasPago;
-                    $Neto=$DiferenciaFormasPago*(-1);
+                    $Credito=ABS($DiferenciaFormasPago);
+                    $Neto=ABS($DiferenciaFormasPago)*(-1);
                 }
                 $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
             }
@@ -507,10 +507,15 @@ class Facturacion extends ProcesoVenta{
             $Parametros=$this->DevuelveValores("parametros_contables", "ID", 6); //Cuenta para clientes
             $CuentaPUC=$Parametros["CuentaPUC"];
             $NombreCuenta=$Parametros["NombreCuenta"];
-
-            $Debito=$Total;
-            $Credito=0;
-            $Neto=$Total;
+            if($Total>=0){
+                $Debito=ABS($Total);
+                $Credito=0;
+                $Neto=$Total;
+            }else{
+                $Debito=(0);
+                $Credito=ABS($Total);
+                $Neto=ABS($Total)*(-1);
+            }
             $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
 
 
@@ -546,14 +551,22 @@ class Facturacion extends ProcesoVenta{
             
 
             ///////////////////////Registramos ingresos
-
-            $CuentaPUC=$DatosItems["CuentaPUC"]; 
-            $DatosCuenta=$this->DevuelveValores("subcuentas","PUC",$CuentaPUC);
-            $NombreCuenta=$DatosCuenta["Nombre"];
-            $Debito=0;
-            $Credito=$Subtotal;
-            $Neto=$Subtotal*(-1);
-            
+            if($Subtotal>=0){///Si es una venta  
+                $CuentaPUC=$DatosItems["CuentaPUC"]; 
+                $DatosCuenta=$this->DevuelveValores("subcuentas","PUC",$CuentaPUC);
+                $NombreCuenta=$DatosCuenta["Nombre"];
+                $Debito=0;
+                $Credito=$Subtotal;
+                $Neto=$Subtotal*(-1);
+            }else{//Si el subtotal es negativo se debe ingresar a una devolucion en ventas
+                $ParametrosDevolucion= $this->DevuelveValores("parametros_contables", "ID", 9);//Cuenta para las devoluciones en venta
+                $CuentaPUC= $ParametrosDevolucion["CuentaPUC"];//Cuenta para las devoluciones en venta
+                $DatosCuenta=$this->DevuelveValores("subcuentas","PUC",$CuentaPUC);
+                $NombreCuenta=$DatosCuenta["Nombre"];
+                $Debito=ABS($Subtotal);
+                $Credito=0;
+                $Neto=ABS($Subtotal);
+            }
             $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
          
             ///////////////////////Registramos IVA Generado si aplica
@@ -582,7 +595,7 @@ class Facturacion extends ProcesoVenta{
 
                 $NombreCuenta=$Parametros["NombreCuenta"];
 
-                $Debito=$TotalCostosM;
+                $Debito=ABS($TotalCostosM);
                 $Credito=0;
                 $Neto=$TotalCostosM;
 
@@ -596,7 +609,7 @@ class Facturacion extends ProcesoVenta{
                 $NombreCuenta=$Parametros["NombreCuenta"];
 
                 $Debito=0;
-                $Credito=$TotalCostosM;
+                $Credito=ABS($TotalCostosM);
                 $Neto=$TotalCostosM*(-1);
 
                 $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
@@ -763,12 +776,15 @@ class Facturacion extends ProcesoVenta{
         $this->update("comprobantes_ingreso", "idCierre", $idCierre, "WHERE idCierre='' AND Usuarios_idUsuarios='$idUser'"); 
         $this->update("comercial_plataformas_pago_ingresos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'"); 
         $this->update("pos_registro_descuentos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUsuario='$idUser'");  
+        $this->update("acuerdo_pago_cuotas_pagadas", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'"); 
+        $this->update("acuerdo_recargos_intereses", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'");  
+        $this->update("anticipos_encargos_abonos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'");  
         return ($idCierre);
         
     }
     
     
-    public function pos_InsertarItemsPreventaAItemsFactura($Datos,$idUser){
+    public function pos_InsertarItemsPreventaAItemsFactura($Datos,$idUser,$GeneradoDesde="POS",$idDocGenera=""){
         
         $idPreventa=$Datos["idPreventa"];
         $NumFactura=$Datos["ID"];
@@ -810,7 +826,7 @@ class Facturacion extends ProcesoVenta{
                     $DatosProductoLineaSistema["Sub5"]=0;
                     $DatosProductoLineaSistema["CuentaPUC"]='';
                     
-                    $this->ItemFacturaVenta($NumFactura, $DatosCotizacionLineaSistema, $DatosProductoLineaSistema, 0, 0, 0, 0, 0, '', $DatosOtrosImpuestos, "");
+                    $this->ItemFacturaVenta($NumFactura, $DatosCotizacionLineaSistema, $DatosProductoLineaSistema, 0, 0, 0, 0, 0, '', $DatosOtrosImpuestos, "",$GeneradoDesde,$idDocGenera);
                     
                 }
                  
@@ -835,7 +851,7 @@ class Facturacion extends ProcesoVenta{
                     $DatosProductoLineaSistema["Sub5"]=0;
                     $DatosProductoLineaSistema["CuentaPUC"]='';
                     
-                    $this->ItemFacturaVenta($NumFactura, $DatosCotizacionLineaSistema, $DatosProductoLineaSistema, 0, 0, 0, 0, 0, '', $DatosOtrosImpuestos, "");
+                    $this->ItemFacturaVenta($NumFactura, $DatosCotizacionLineaSistema, $DatosProductoLineaSistema, 0, 0, 0, 0, 0, '', $DatosOtrosImpuestos, "",$GeneradoDesde,$idDocGenera);
                     
                 }
             }
@@ -874,7 +890,7 @@ class Facturacion extends ProcesoVenta{
             }else{
                 $PorcentajeIVA="Exc";
             }
-            $this->ItemFacturaVenta($NumFactura, $DatosCotizacion, $DatosProducto, $SubtotalItem, $IVAItem, $TotalItem, $PorcentajeIVA, $SubtotalCosto, $FechaFactura, $DatosOtrosImpuestos, "");
+            $this->ItemFacturaVenta($NumFactura, $DatosCotizacion, $DatosProducto, $SubtotalItem, $IVAItem, $TotalItem, $PorcentajeIVA, $SubtotalCosto, $FechaFactura, $DatosOtrosImpuestos, "",$GeneradoDesde,$idDocGenera);
                          
         }
         /*
@@ -926,7 +942,143 @@ class Facturacion extends ProcesoVenta{
         }
         $this->ActualizaRegistro("facturas_kardex", "Kardex", "SI", "idFacturas", $idFactura);
      }
+     /**
+      * Obtiene un id unico para uso general
+      * @param type $prefijo
+      */
+     public function getId($prefijo) {
+         return (str_replace(".","",uniqid($prefijo, true)));
+     }
      
+     /**
+      * Esta funcion permite registrar un pago a un acuerdo de pago temporal
+      * @param type $NumeroCuota
+      * @param type $TipoCuota
+      * @param type $idAcuerdoPago
+      * @param type $ValorPago
+      * @param type $MetodoPago
+      * @param type $idUser
+      */
+     public function PagoAcuerdoPagosTemporal($NumeroCuota,$TipoCuota,$idAcuerdoPago,$ValorPago,$MetodoPago,$idUser) {
+         $Datos["NumeroCuota"]=$NumeroCuota;
+         $Datos["TipoCuota"]=$TipoCuota;
+         $Datos["idAcuerdoPago"]=$idAcuerdoPago;
+         $Datos["FechaPago"]=date("Y-m-d");
+         $Datos["ValorPago"]=$ValorPago;
+         $Datos["MetodoPago"]=$MetodoPago;
+         $Datos["idUser"]=$idUser;
+         $Datos["Created"]=date("Y-m-d H:i:s");
+         $sql=$this->getSQLInsert("acuerdo_pago_cuotas_pagadas_temp", $Datos);
+         $this->Query($sql);         
+     }
+     
+     /**
+      * Esta funcion permite registrar un pago a un acuerdo de pago temporal
+      * @param type $NumeroCuota
+      * @param type $TipoCuota
+      * @param type $idAcuerdoPago
+      * @param type $ValorPago
+      * @param type $MetodoPago
+      * @param type $idUser
+      */
+     public function PagoAcuerdoPagos($NumeroCuota,$TipoCuota,$idAcuerdoPago,$ValorPago,$MetodoPago,$idUser) {
+         $Datos["NumeroCuota"]=$NumeroCuota;
+         $Datos["TipoCuota"]=$TipoCuota;
+         $Datos["idAcuerdoPago"]=$idAcuerdoPago;
+         $Datos["FechaPago"]=date("Y-m-d");
+         $Datos["ValorPago"]=$ValorPago;
+         $Datos["MetodoPago"]=$MetodoPago;
+         $Datos["idUser"]=$idUser;
+         $Datos["Created"]=date("Y-m-d H:i:s");
+         $sql=$this->getSQLInsert("acuerdo_pago_cuotas_pagadas", $Datos);
+         $this->Query($sql);         
+     }
+     /**
+      * Agrega una cuota a la proyeccion de pagos temporal
+      * @param type $Fecha
+      * @param type $NumeroCuota
+      * @param type $TipoCuota
+      * @param type $idAcuerdoPago
+      * @param type $ValorCuota
+      * @param type $idUser
+      */
+     public function CuotaAcuerdoPagosTemporal($Fecha,$NumeroCuota,$TipoCuota,$idAcuerdoPago,$ValorCuota,$idUser) {
+         $Datos["idAcuerdoPago"]=$idAcuerdoPago;
+         $Datos["TipoCuota"]=$TipoCuota;
+         $Datos["NumeroCuota"]=$NumeroCuota;
+         $Datos["Fecha"]=$Fecha;
+         $Datos["ValorCuota"]=$ValorCuota;        
+         $Datos["idUser"]=$idUser;
+         $Datos["Created"]=date("Y-m-d H:i:s");
+         $sql=$this->getSQLInsert("acuerdo_pago_proyeccion_pagos_temp", $Datos);
+         $this->Query($sql);         
+     }
+     
+     /**
+      * Agrega una cuota a la proyeccion de pagos 
+      * @param type $Fecha
+      * @param type $NumeroCuota
+      * @param type $TipoCuota
+      * @param type $idAcuerdoPago
+      * @param type $ValorCuota
+      * @param type $idUser
+      */
+     public function CuotaAcuerdoPagos($Fecha,$NumeroCuota,$TipoCuota,$idAcuerdoPago,$ValorCuota,$idUser) {
+         $Datos["idAcuerdoPago"]=$idAcuerdoPago;
+         $Datos["TipoCuota"]=$TipoCuota;
+         $Datos["NumeroCuota"]=$NumeroCuota;
+         $Datos["Fecha"]=$Fecha;
+         $Datos["ValorCuota"]=$ValorCuota;        
+         $Datos["idUser"]=$idUser;
+         $Datos["Created"]=date("Y-m-d H:i:s");
+         $sql=$this->getSQLInsert("acuerdo_pago_proyeccion_pagos", $Datos);
+         $this->Query($sql);         
+     }
+     
+      public function ContabilizaGananciaOcasionalPOS($idFactura,$Valor,$CuentaDestino,$idUser) {
+        $Valor=ABS($Valor);
+        $DatosFactura=$this->DevuelveValores("facturas", "idFacturas", $idFactura);
+        $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
+        if($DatosFactura["FormaPago"]=='Contado'){
+            $ParametrosContables=$this->DevuelveValores("parametros_contables", "ID", 36);//Cuenta para un posible retorno del dinero al cliente
+        }else{
+            $ParametrosContables=$this->DevuelveValores("parametros_contables", "ID", 6);//Cuenta para un posible retorno del dinero al cliente
+        }
+        $this->IngreseMovimientoLibroDiario($DatosFactura["Fecha"], "FACTURA", $idFactura, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDestino, "", "Devoluciones POS", "DB", $Valor, "Devolucion en venta sin retorno al cliente", $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
+        $this->IngreseMovimientoLibroDiario($DatosFactura["Fecha"], "FACTURA", $idFactura, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $ParametrosContables["CuentaPUC"], $ParametrosContables["NombreCuenta"], "Devoluciones POS", "CR", $Valor, "Devolucion en venta sin retorno al cliente", $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
+        
+        
+    }
+    
+    public function NuevoAnticipoPorEncargo($Fecha,$Tercero,$Observaciones,$idUser) {
+        $Datos["Fecha"]=$Fecha;
+        $Datos["Tercero"]=$Tercero;
+        $Datos["Observaciones"]=$Observaciones;
+        $Datos["idUser"]=$idUser;
+        $Datos["Estado"]=1;
+        $Datos["Created"]=date("Y-m-d H:i:s");
+        
+        $sql=$this->getSQLInsert("anticipos_encargos", $Datos);
+        $this->Query($sql);
+        $id= $this->ObtenerMAX("anticipos_encargos", "ID", 1, "");
+        return($id);
+    }
+    
+    public function AbonoAnticipoPorEncargo($Fecha,$idAnticipo,$Metodo,$Valor,$idUser) {
+        $tab="anticipos_encargos_abonos";
+        $Datos["Fecha"]=$Fecha;
+        $Datos["idAnticipo"]=$idAnticipo;
+        $Datos["Metodo"]=$Metodo;
+        $Datos["Valor"]=$Valor;
+        $Datos["idUser"]=$idUser;
+        $Datos["Created"]=date("Y-m-d H:i:s");
+        
+        $sql=$this->getSQLInsert($tab, $Datos);
+        $this->Query($sql);
+        $id= $this->ObtenerMAX($tab, "ID", 1, "");
+        return($id);
+    }
+    
     /**
      * Fin Clase
      */

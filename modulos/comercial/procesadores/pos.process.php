@@ -660,7 +660,15 @@ if( !empty($_REQUEST["Accion"]) ){
         case 14:// Cerrar turno
             $obPrint = new PrintPos($idUser);
             $idCaja=1;
-            $idCierre=$obCon->CierreTurnoPos($idUser,$idCaja,"");
+            $TotalEfectivoRecaudado=$obCon->normalizar($_REQUEST['TotalRecaudadoCierre']);    
+            
+            if(!is_numeric($TotalEfectivoRecaudado) or $TotalEfectivoRecaudado<=0){
+                exit("E1;El Valor debe ser un numero positivo mayor a Cero;total_entrega_Format_Number");
+            }
+            
+            $idCierre=$obCon->CierreTurnoPos($idUser,$idCaja,$TotalEfectivoRecaudado);
+            
+            
             $VectorCierre["idCierre"]=$idCierre;
             $DatosImpresora=$obCon->DevuelveValores("config_puertos", "ID", 1);
                         
@@ -1098,6 +1106,32 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Egreso Realizado");
         break;//Fin caso 31    
         
+        case 32: // agrega un traslado a una preventa  
+        
+            $traslado_id=str_replace(" ", "", $obCon->normalizar($_REQUEST["convert_id"]));
+            $idPreventa= $obCon->normalizar($_REQUEST["idPreventa"]);
+            
+            if($idPreventa==''){
+                exit("Debe seleccionar una preventa");
+            }
+            
+            if($traslado_id==''){
+                exit("E1;Debe digitar un traslado;convert_id");
+            }
+            
+            $sql="SELECT Cantidad,(SELECT idProductosVenta FROM productosventa t2 WHERE t1.Referencia=t2.Referencia ) as producto_id FROM traslados_items t1 WHERE idTraslado='$traslado_id'";
+            $Consulta=$obCon->Query($sql);
+            
+            while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
+                if($DatosConsulta["producto_id"]<>''){
+                    $obCon->POS_AgregaItemPreventa($DatosConsulta["producto_id"], "productosventa", $DatosConsulta["Cantidad"], $idPreventa);
+                }
+                
+            }
+            
+            print("OK;Traslado agregado a la preventa $idPreventa");
+            
+        break;//fin caso 32    
     }
     
     

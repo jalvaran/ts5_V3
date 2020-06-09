@@ -167,7 +167,7 @@ $css->PageInit($myTitulo);
              * 
              */
             $css->CrearDiv("", "col-md-2", "left", 1, 1);
-               $css->CrearBotonEvento("BtnCerrarTurno", "Cerrar Turno", 1, "onclick", "CerrarTurno();", "rojo", "");
+               $css->CrearBotonEvento("BtnCerrarTurno", "Cerrar Turno", 1, "onclick", "ModalCerrarTurno();", "rojo", "");
             $css->CerrarDiv();
             print("<br><br><br>");           
             
@@ -209,6 +209,26 @@ $css->PageInit($myTitulo);
             
             $css->CrearDiv("", "col-md-2", "left", 1, 1);
                $css->input("text", "TxtBuscarAcuerdo", "form-control", "TxtBuscarAcuerdo", "TxtBuscarAcuerdo", "", "Buscar Acuerdo", "off", "", "onkeyup=BuscarAcuerdo()");
+            $css->CerrarDiv();
+            
+            $css->CrearDiv("", "col-md-2", "left", 1, 1);
+            
+                print('<div class="input-group input-group-md">
+                    <input type="text" id="convert_id" class="form-control" placeholder="id convertir">
+                    <div class="input-group-btn">
+                      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false" >Acción
+                        <span class="fa fa-caret-down"></span></button>
+                        <ul class="dropdown-menu">
+
+                            <li><a href="#" onclick="AgregarTrasladoAPos()">Agregar Traslado</a></li>
+                            
+
+                      </ul>
+                    </div>
+
+                  </div>');
+            
+            
             $css->CerrarDiv();
             
             $css->CrearDiv("DivBusquedasPOS", "col-md-12", "left", 1, 1);

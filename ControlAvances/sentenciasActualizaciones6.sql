@@ -572,3 +572,5 @@ INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`,
 (200,	'Administrador de inventarios',	22,	12,	0,	'',	1,	'',	'adminInventarios.php',	'_SELF',	1,	'admin.png',	13,	'2020-06-02 15:25:19',	'2019-01-13 09:12:44');
 
 
+ALTER TABLE `cajas_aperturas_cierres` ADD `EfectivoRecaudado` DOUBLE NULL AFTER `TotalEntrega`;
+

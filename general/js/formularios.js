@@ -27,6 +27,8 @@ function ModalCrearTercero(idModal,idDivFormulario){
         success: function(data){
             document.getElementById(idDivFormulario).innerHTML=data;
             $('#CodigoMunicipio').select2();
+            Number_Format_Input();
+            
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.status);
@@ -58,6 +60,7 @@ function ModalEditarTercero(idModal,idDivFormulario,idTercero,Tabla){
         success: function(data){
             document.getElementById(idDivFormulario).innerHTML=data;
             $('#CodigoMunicipio').select2();
+            Number_Format_Input(); 
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.status);
@@ -318,7 +321,9 @@ function EditarTercero(idModal,idBotonModal,idTercero,Tabla){
             }else if(respuestas[0]=="OK"){
                 alertify.success(respuestas[1]);
                 CierraModal(idModal);
-                
+                if ($('#idAcuerdoPago').length) {
+                    DibujeFormularioAcuerdoPago();
+                }
             }else{
                 alertify.alert(data);
             }
