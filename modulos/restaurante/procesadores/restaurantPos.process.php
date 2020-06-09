@@ -40,6 +40,11 @@ if( !empty($_REQUEST["Accion"]) ){
             if(!is_numeric($Cantidad) or $Cantidad<=0){
                 exit("E1;La cantidad debe ser un numero mayor a cero");
             }
+            
+            $DatosValidacion=$obCon->DevuelveValores("productos_has_complementos", "idProducto", $idProducto);
+            if($DatosValidacion["ID"]>0){
+                exit("E2;Agregue Complementos");
+            }
             $obCon->AgregueProductoAPedido($idPedido,$Cantidad, $idProducto, $Observaciones, $idUser, "");
             $DatosPedido=$obCon->DevuelveValores("restaurante_pedidos", "ID", $idPedido);
             if($DatosPedido["Estado"]<>'1' AND $DatosPedido["Estado"]<>'3'){

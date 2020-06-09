@@ -271,7 +271,7 @@ class AcuerdoPago extends ProcesoVenta{
             exit("E4;No se recibió un el nuevo saldo del cliente");            
         }
         if($VariablesAcuerdo["TxtObservacionesAcuerdoPago"]==''){
-            exit("E4;Debe escribir las observaciones del acuerdo de pago");            
+            //exit("E4;Debe escribir las observaciones del acuerdo de pago");            
         }
         $idAcuerdo= $this->normalizar($VariablesAcuerdo["idAcuerdoPago"]);
         if($VariablesAcuerdo["TxtFechaInicialPagos"]==''){

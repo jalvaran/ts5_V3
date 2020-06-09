@@ -114,6 +114,22 @@ class Inventarios extends ProcesoVenta{
         
     }
     
+    
+    function crearVistaSeparados(){
+        $sql="DROP VIEW IF EXISTS `vista_separados_reportes`;";
+        $this->Query($sql);
+                
+        $sql="CREATE VIEW vista_separados_reportes AS 
+                SELECT t1.*,t2.RazonSocial,t2.Num_Identificacion,t2.Telefono,t2.Direccion,          
+                (SELECT DATE_ADD(t1.Fecha, INTERVAL 2 MONTH) ) as FechaVencimiento 
+                FROM separados t1 INNER JOIN clientes t2 ON t1.idCliente=t2.idClientes 
+                
+                ;
+                    
+           ";
+        $this->Query($sql);
+    }
+    
     /**
      * Fin Clase
      */

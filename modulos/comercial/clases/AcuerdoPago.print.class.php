@@ -111,8 +111,8 @@ class AcuerdoPagoPrint extends PrintPos{
             
             fwrite($handle,"PAGOS AGRUPADOS POR FECHA: "); // ciclo de pagos
             fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
-            $sql="SELECT t1.Fecha,sum(ValorPagado) as TotalPago
-                     FROM acuerdo_pago_cuotas_pagadas t1 WHERE t1.idAcuerdoPago='$idAcuerdo' AND t1.TipoCuota>0 GROUP BY t1.Fecha ORDER BY t1.Fecha ASC";
+            $sql="SELECT t1.FechaPago as Fecha,sum(ValorPago) as TotalPago
+                     FROM acuerdo_pago_cuotas_pagadas t1 WHERE t1.idAcuerdoPago='$idAcuerdo' AND t1.TipoCuota>0 GROUP BY t1.FechaPago ORDER BY t1.FechaPago ASC";
             $Consulta= $this->Query($sql);
             while($DatosPagos= $this->FetchAssoc($Consulta)){
                 fwrite($handle,"FECHA: ".$DatosPagos["Fecha"]);                

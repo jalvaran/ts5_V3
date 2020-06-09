@@ -2466,6 +2466,13 @@ public function CalculePesoRemision($idCotizacion)
             }
         }else{
             $DatosProveedor=$this->DevuelveValores("proveedores","idProveedores",$idProveedor);
+            if($DatosProveedor==''){
+                $DatosProveedor=$this->DevuelveValores("proveedores","Num_Identificacion",$idProveedor);
+                if($DatosProveedor==''){
+                    exit("E1;El proveedor no existe");
+                }
+            }
+            
         }
         if($TipoEgreso==3){
 			
@@ -2622,7 +2629,7 @@ public function CalculePesoRemision($idCotizacion)
 			$NombreCuenta=$DatosCuenta["Nombre"];
 		}
 		if($TipoPago=="Programado"){
-			$CuentaPUC="2205";
+			$CuentaPUC="220501";
 			$NombreCuenta="Proveedores Nacionales $RazonSocial $NIT";
 		}
 		

@@ -43,15 +43,6 @@ function SeleccionaNuevaAccion(){
     if(Opcion==6){
         ModalAnticiposEncargos();
     }
-    
-    if(Opcion==7){
-        ModalRetornoAnticiposEncargos();
-    }
-    
-    if(Opcion==8){
-        SeleccioneTablaDB(`vista_anticipos_clientes`);
-    }
-    
 }
 
 /**
@@ -621,26 +612,13 @@ function AbrirModalFacturarPOS(){
  * @returns {undefined}
  */
 function CalculeDevuelta(){
-    
-    setTimeout(escribre_devuelta, 100);
-}
-
-function escribre_devuelta(){
     var TotalFactura = parseFloat(document.getElementById("TxtTotalFactura").value);
     var Efectivo = parseFloat(document.getElementById("Efectivo").value);
     var Tarjetas = parseFloat(document.getElementById("Tarjetas").value);
     var Cheque = parseFloat(document.getElementById("Cheque").value);
     var Otros = parseFloat(document.getElementById("Otros").value);
-    var AnticiposCruzados = parseFloat(document.getElementById("AnticiposCruzados").value);
     if(document.getElementById("Tarjetas").value==''){
         Tarjetas=0;
-    }
-    if(document.getElementById("AnticiposCruzados").value==''){
-        AnticiposCruzados=0;
-    }
-    if($('#btn_agregue_anticipos').data("anticipo_cliente")<AnticiposCruzados){
-        alertify.error("El valor del acticipo digitado es mayor a los anticipos que tiene este cliente");
-        
     }
     if(document.getElementById("Cheque").value==''){
         Cheque=0;
@@ -684,11 +662,12 @@ function escribre_devuelta(){
     }else{
         document.getElementById("Otros").style.backgroundColor="white";
     }
-    var TotalRecibido = Efectivo+Tarjetas+Cheque+Otros+AnticiposCruzados;
+    var TotalRecibido = Efectivo+Tarjetas+Cheque+Otros;
     var Devuelta = TotalRecibido-TotalFactura;
-    
+    console.log("Recibido "+TotalRecibido+" "+TotalFactura+" = "+Devuelta);
     document.getElementById("Devuelta").value=Devuelta;
     document.getElementById("Devuelta_Format_Number").value=number_format(Devuelta);
+    
 }
 
 /**
@@ -742,10 +721,6 @@ function AccionesPOS(){
     
     if(idFormulario==5){
         GuardarIngresoAnticipoPorEncargos();
-    }
-    
-    if(idFormulario==6){
-        GuardarEgresoAnticipoPorEncargos();
     }
     
     if(idFormulario==101){
@@ -2595,15 +2570,10 @@ function MostrarOpcionesFacturacionPOS(Ancla=0){
         type: 'post',
         success: function(data){
             document.getElementById('DivOpcionesPagoManta').innerHTML=data;
-            Number_Format_Input();
             if(Ancla==0){
-                setTimeout(function(){document.getElementById("Efectivo_Format_Number").select();}, 100);
+                setTimeout(function(){document.getElementById("Efectivo").select();}, 100);
             }
-            $('#btn_agregue_anticipos').on('click',function(){
-                
-                escriba_anticipo_cliente($(this).data("anticipo_cliente"));
-                
-            });
+            Number_Format_Input();
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.status);
@@ -2612,10 +2582,6 @@ function MostrarOpcionesFacturacionPOS(Ancla=0){
       })  
 }  
 
-function escriba_anticipo_cliente(valor_anticipo){
-    $('#AnticiposCruzados_Format_Number').val(number_format(valor_anticipo));
-    $('#AnticiposCruzados').val(valor_anticipo);
-}
 
 function MarqueErrorElemento(idElemento){
     //console.log(idElemento);
@@ -2689,90 +2655,6 @@ function GuardarIngresoAnticipoPorEncargos(idAcuerdoPago){
         
         form_data.append('Accion', 30);
         form_data.append('idAcuerdoPago', idAcuerdoPago);
-        form_data.append('TxtObservacionesEncargos', TxtObservacionesEncargos);
-        form_data.append('CmbMetodoPagoAnticipo', CmbMetodoPagoAnticipo);
-        form_data.append('TxtValorAnticipoEncargo', TxtValorAnticipoEncargo);
-        form_data.append('idPreventa', idPreventa);
-        form_data.append('idCliente', idCliente);
-        $.ajax({
-        url: './procesadores/pos.process.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            var respuestas = data.split(';');
-            if(respuestas[0]=="OK"){
-                alertify.success(respuestas[1]);
-                CierraModal('ModalAccionesPOS');
-                document.getElementById(idBoton).disabled=false;
-            }else if(respuestas[0]=="E1"){
-                alertify.alert(respuestas[1]);
-                MarqueErrorElemento(respuestas[2]);
-                document.getElementById(idBoton).disabled=false;
-            }else{
-                alertify.alert(data);
-                document.getElementById(idBoton).disabled=false;
-            }
-               
-            document.getElementById(idBoton).disabled=false;
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            document.getElementById(idBoton).disabled=false;
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      })  
-}  
-
-
-function ModalRetornoAnticiposEncargos(){
-    
-    $("#ModalAccionesPOS").modal();
-    var idPreventa=document.getElementById('idPreventa').value;
-    var idCliente=document.getElementById('idCliente').value;
-    var form_data = new FormData();
-        
-        form_data.append('Accion', 19);
-        form_data.append('idPreventa', idPreventa);
-        form_data.append('idCliente', idCliente);
-        $.ajax({
-        url: './Consultas/pos.draw.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            document.getElementById('DivFrmPOS').innerHTML=data;
-            Number_Format_Input();            
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      })  
-      
-      
-}
-
-
-function GuardarEgresoAnticipoPorEncargos(idAcuerdoPago){    
-    var idBoton='BntModalPOS';
-    document.getElementById(idBoton).disabled=true;
-    var TxtObservacionesEncargos=document.getElementById('TxtObservacionesEncargos').value;
-    var CmbMetodoPagoAnticipo=document.getElementById('CmbMetodoPagoAnticipo').value;  
-    var TxtValorAnticipoEncargo=document.getElementById('TxtValorAnticipoEncargo').value;  
-    var idPreventa = document.getElementById('idPreventa').value;    
-    var idCliente = document.getElementById('idCliente').value;    
-       
-    var form_data = new FormData();
-        
-        form_data.append('Accion', 31);        
         form_data.append('TxtObservacionesEncargos', TxtObservacionesEncargos);
         form_data.append('CmbMetodoPagoAnticipo', CmbMetodoPagoAnticipo);
         form_data.append('TxtValorAnticipoEncargo', TxtValorAnticipoEncargo);

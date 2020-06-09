@@ -8,6 +8,7 @@ if (!isset($_SESSION['username'])){
 $idUser=$_SESSION['idUser'];
 
 include_once("../clases/inventarios.class.php");
+include_once("../clases/inventariosExcel.class.php");
 
 if( !empty($_REQUEST["Accion"]) ){
     $obCon = new Inventarios($idUser);
@@ -277,6 +278,13 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Codigos de barras Actualizados, Fin del proceso");
             
         break;//Fin caso 12
+    
+        case 13://Genere el excel con el listado de separados
+            $obExcel= new ExcelIntentarios($idUser);
+            $Condicion= urldecode(base64_decode($_REQUEST["c"]));            
+            $obExcel->ListadoSeparadosExcel($Condicion);
+            print("OK;Hoja Exportada");
+        break;//fin caso 13
     
         
        

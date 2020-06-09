@@ -512,3 +512,12 @@ SUM(Debito) as Debitos,SUM(Credito) as Creditos
 FROM librodiario 
 GROUP BY CuentaPUC,Tercero_Identificacion;
 
+DROP VIEW IF EXISTS `vista_anticipos_clientes`;
+CREATE VIEW vista_anticipos_clientes AS
+
+SELECT Fecha,CuentaPUC,NombreCuenta, 
+Tercero_Identificacion,Tercero_DV,Tercero_Razon_Social,Detalle,(Concepto) as Concepto,
+Tercero_Direccion,Tercero_Cod_Mcipio, Credito as TotalAnticipo, Debito as CruceAnticipo 
+FROM librodiario WHERE CuentaPUC=(SELECT CuentaPUC FROM parametros_contables WHERE ID=20) 
+ORDER BY idLibroDiario DESC; 
+

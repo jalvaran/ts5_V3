@@ -432,7 +432,10 @@ function AgregarItem(){
             }else if(respuestas[0]=="E1"){
                 
                 alertify.alert(respuestas[1]);
-            
+            }else if(respuestas[0]=="E2"){
+                
+                DibujeComplementos();
+                
             }else{
                 alertify.alert(data);
                               
@@ -1044,6 +1047,39 @@ function EditarPrecioVenta(idItem,idCajaTexto){
     
     
 }
+
+/*
+ * Dibuja el formulario para crear un pedido a una mesa
+ */
+function DibujeComplementos(){
+    
+    $("#ModalAccionesPOS").modal();
+    var Codigo = document.getElementById("Codigo").value;
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 9);
+        form_data.append('Codigo', Codigo);
+        
+        $.ajax({
+        url: './Consultas/restaurantPos.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivFrmPOS').innerHTML=data;
+                  
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+} 
 
 
 DibujeListaPedidos();

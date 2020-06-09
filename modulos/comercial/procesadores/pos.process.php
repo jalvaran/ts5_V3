@@ -998,8 +998,6 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;    //Fin caso 24
     
-        
-        
         case 30://Crear un anticipo por encargos
             
             $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);            
@@ -1039,8 +1037,8 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             
             
-            $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 35);  //Cuenta para los Anticipos de los clientes
-            $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAnticipoEncargo, "AnticiposPorEncargos", "Ingreso por Anticipo por encargo No. $idAnticipo", "CERRADO");
+            $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 20);  //Cuenta para los Anticipos de los clientes
+            $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAnticipoEncargo, "AnticiposPorEncargos", $Observaciones." Ingreso por Anticipo por encargo No. $idAnticipo ", "CERRADO");
             $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
             
             $obCon->update("anticipos_encargos_abonos", "idComprobanteIngreso", $idComprobante, "WHERE ID='$idAbono'");
@@ -1048,7 +1046,57 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Anticipo x encargo recibido");
         break;//Fin caso 30    
         
-        
+        case 31://Crear un egreso por un retorno de un anticipo
+            
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
+            $Observaciones=$obCon->normalizar($_REQUEST["TxtObservacionesEncargos"]);
+            $MetodoPagoAnticipo=$obCon->normalizar($_REQUEST["CmbMetodoPagoAnticipo"]);
+            $ValorAnticipoEncargo=$obCon->normalizar($_REQUEST["TxtValorAnticipoEncargo"]);
+            
+            if($idCliente<=1){
+                exit("E1;No se recibió un tercero válido");
+            }
+            
+            if($Observaciones==''){
+                exit("E1;El campo observaciones no puede estar vacío;TxtObservacionesEncargos");
+            }
+            
+            if($MetodoPagoAnticipo==''){
+                exit("E1;El campo observaciones no puede estar vacío;CmbMetodoPagoAnticipo");
+            }
+            
+            if(!is_numeric($ValorAnticipoEncargo) or $ValorAnticipoEncargo<=0){
+                exit("E1;El Valor debe ser un numero positivo mayor a Cero;TxtValorAnticipoEncargo");
+            }
+            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
+            
+            $NIT=$DatosCliente["Num_Identificacion"];
+            $ParametrosAnticipos=$obCon->DevuelveValores("parametros_contables", "ID", 20);//Aqui se encuentra la cuenta para los anticipos
+            $CuentaAnticipos=$ParametrosAnticipos["CuentaPUC"];
+            $sql="SELECT SUM(Debito) as Debito, SUM(Credito) AS Credito FROM librodiario WHERE CuentaPUC='$CuentaAnticipos' AND Tercero_Identificacion='$NIT'";
+            $Consulta=$obCon->Query($sql);
+            $DatosAnticipos=$obCon->FetchAssoc($Consulta);
+            $SaldoAnticiposTercero=$DatosAnticipos["Credito"]-$DatosAnticipos["Debito"];
+
+            if($SaldoAnticiposTercero<$ValorAnticipoEncargo){
+                $Mensaje="El Cliente no cuenta con el anticipo registrado";
+                print("E1;$Mensaje");
+                exit();
+            }
+                
+            $Fecha=date("Y-m-d");
+            $Tercero=$DatosCliente["Num_Identificacion"];
+            
+            $DatosCuentaOrigen=$obCon->DevuelveValores("parametros_contables", "ID", 21);//Cuenta para erogaciones de dinero
+            $DatosCuentaAnticipos=$obCon->DevuelveValores("parametros_contables", "ID", 20);//Cuenta para anticipos del cliente
+            $idEgreso=$obCon->CrearEgreso($Fecha, $Fecha, $idUser, 1, "Contado", $DatosCuentaOrigen["CuentaPUC"], $DatosCuentaAnticipos["CuentaPUC"], 0, $Tercero, "Retorno de anticipo", "NA", "", "POS", $ValorAnticipoEncargo, 0, $ValorAnticipoEncargo, 0, 0, 0, 0, 0, 0, "");
+                     
+            $DatosImpresora=$obCon->DevuelveValores("config_puertos", "ID", 1);
+            if($DatosImpresora["Habilitado"]=="SI"){
+                $obPrint->ImprimeEgresoPOS($idEgreso, "", "", 2);
+            }
+            print("OK;Egreso Realizado");
+        break;//Fin caso 31    
         
     }
     

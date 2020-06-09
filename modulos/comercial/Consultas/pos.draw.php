@@ -224,23 +224,23 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     print("<td >");
                         
-                        $css->input("number", "Efectivo", "form-control input-lg", "Efectivo", "Efectivo", $TotalFactura, "Efectivo", "off", "", "onKeyUp=CalculeDevuelta()");
+                        $css->input_number_format("number", "Efectivo", "form-control input-lg", "Efectivo", "Efectivo", $TotalFactura, "Efectivo", "off", "", "onKeyUp=CalculeDevuelta();");
                     print("</td>");
                     print("<td >");
                         
-                        $css->input("number", "Tarjetas", "form-control input-lg", "Tarjetas", "Tarjetas", 0, "Tarjetas", "off", "", "onKeyUp=CalculeDevuelta()");
+                        $css->input_number_format("number", "Tarjetas", "form-control input-lg", "Tarjetas", "Tarjetas", 0, "Tarjetas", "off", "", "onKeyUp=CalculeDevuelta();");
                     print("</td>");
                     print("<td>");
                         
-                        $css->input("number", "Cheque", "form-control input-lg", "Cheque", "Cheque", 0, "Cheque", "off", "", "onKeyUp=CalculeDevuelta()");
+                        $css->input_number_format("number", "Cheque", "form-control input-lg", "Cheque", "Cheque", 0, "Cheque", "off", "", "onKeyUp=CalculeDevuelta();");
                     print("</td>");
                     print("<td >");
                         
-                        $css->input("number", "Otros", "form-control input-lg", "Otros", "Otros", 0, "Otros", "off", "", "onKeyUp=CalculeDevuelta()");
+                        $css->input_number_format("number", "Otros", "form-control input-lg", "Otros", "Otros", 0, "Otros", "off", "", "onKeyUp=CalculeDevuelta()");
                     print("</td>");
                    
                     print("<td >");                        
-                        $css->input("number", "Devuelta", "form-control input-lg", "Devuelta", "Devuelta", 0, "Efectivo", "off", "", " disabled");
+                        $css->input_number_format("number", "Devuelta", "form-control input-lg", "Devuelta", "Devuelta", 0, "Efectivo", "off", "", " disabled");
                     print("</td>");
                     
                 
@@ -276,7 +276,9 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                         $css->CrearDiv("DivCuotaInicialCredito", "", "left", 0, 1);
                             print("<br>");
-                            $css->input("text", "TxtCuotaInicialCredito", "form-control", "TxtCuotaInicialCredito", "", "", "Cuota Inicial", "off", "", "");
+                            
+                            $css->input_number_format("text", "TxtCuotaInicialCredito", "form-control", "TxtCuotaInicialCredito", "", "", "Cuota Inicial", "off", "", "");
+                                                                
                         $css->CerrarDiv();
                     print("</td>");
                     
@@ -328,8 +330,15 @@ if( !empty($_REQUEST["Accion"]) ){
                     print("</td>"); 
                     
                     print("<td>");
+                        $css->div("", "form-group", "", "", "", "", "");
+                                $css->div("", "input-group", "", "", "", "", "");
+                                    $css->div("", "input-group-addon", "", "", "", "", "");
+                                        print('<button id="btn_agregue_anticipos" data-anticipo_cliente="'.$SaldoAnticiposTercero.'" class="btn fa fa-plus-square btn-md btn-primary"></button>');
+                                    $css->Cdiv();
+                                        $css->input_number_format("number", "AnticiposCruzados", "form-control input-lg", "AnticiposCruzados", "Cruzar Anticipos", 0, "", "", "", "onkeyup=CalculeDevuelta();");
+                                $css->Cdiv();    
+                            $css->Cdiv();
                         
-                        $css->input("number", "AnticiposCruzados", "form-control input-lg", "AnticiposCruzados", "Cruzar Anticipos", 0, "", "", "", "");
                     print("</td>");
                     
                     
@@ -1335,12 +1344,66 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->Cselect();
                     print("</td>");
                     print("<td>");
-                        $css->input("number", "TxtValorAnticipoEncargo", "form-control", "TxtValorAnticipoEncargo", "", "", "Valor", "off", "", "");
+                                               
+                        $css->input_number_format("number", "TxtValorAnticipoEncargo", "form-control", "TxtValorAnticipoEncargo", 0, 0, "Valor", "off", "", "");
+                        
                     print("</td>");
                 $css->CierraFilaTabla();
             $css->CerrarTabla();
-        break;// Fin caso 18    
+        break;// Fin caso 18   
         
+        case 19://Dibuja el formulario para retornar un anticipo
+           
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]); 
+            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
+            if($idCliente<=1){
+                $css->CrearTitulo("<strong>Debes Seleccionar un tercero</strong>", "rojo");
+                exit();
+            }
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 6, "", "", "", ""); //5 guarda el anticipo
+            $css->CrearTitulo("Retornar un Anticipo del cliente ".$DatosCliente["RazonSocial"]." ".$DatosCliente["Num_Identificacion"],"rojo");
+
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Observaciones</strong>", 1);
+                    $css->ColTabla("<strong>Metodo de Pago</strong>", 1);
+                    $css->ColTabla("<strong>Valor</strong>", 1);
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    print("<td>");
+                        $css->textarea("TxtObservacionesEncargos", "form-control", "TxtObservacionesEncargos", "", "Por qué retorna el anticipo?", "", "");
+                        $css->Ctextarea();
+                    print("</td>");
+                    print("<td>");
+                        $sql="SELECT * FROM metodos_pago WHERE  ID=1";
+                        $Consulta=$obCon->Query($sql);
+                        $css->select("CmbMetodoPagoAnticipo", "form-control", "CmbMetodoPagoAnticipo", "", "", "", "");
+                            while($DatosMetodos=$obCon->FetchAssoc($Consulta)){
+                                $css->option("", "", "", $DatosMetodos["ID"], "", "");
+                                    print($DatosMetodos["Metodo"]);
+                                $css->Coption();
+                            }
+
+                        $css->Cselect();
+                    print("</td>");
+                    print("<td>");
+                    
+                        $NIT=$DatosCliente["Num_Identificacion"];
+                        $ParametrosAnticipos=$obCon->DevuelveValores("parametros_contables", "ID", 20);//Aqui se encuentra la cuenta para los anticipos
+                        $CuentaAnticipos=$ParametrosAnticipos["CuentaPUC"];
+                        $sql="SELECT SUM(Debito) as Debito, SUM(Credito) AS Credito FROM librodiario WHERE CuentaPUC='$CuentaAnticipos' AND Tercero_Identificacion='$NIT'";
+                        $Consulta=$obCon->Query($sql);
+                        $DatosAnticipos=$obCon->FetchAssoc($Consulta);
+                        $SaldoAnticiposTercero=$DatosAnticipos["Credito"]-$DatosAnticipos["Debito"];
+                        
+                        $css->input_number_format("number", "TxtValorAnticipoEncargo", "form-control", "TxtValorAnticipoEncargo", $SaldoAnticiposTercero, $SaldoAnticiposTercero, "Valor", "off", "", "");
+                        
+                    print("</td>");
+                $css->CierraFilaTabla();
+            $css->CerrarTabla();
+        break;// Fin caso 19
+        
+               
     }
     
     

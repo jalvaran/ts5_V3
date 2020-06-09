@@ -54,6 +54,7 @@ $css->PageInit($myTitulo);
                     <a href="#" onclick="idListado=1;Filtro=``;MostrarListadoSegunID();">
                         <i class="fa fa-list-ol"></i>Productos</a>
                 </li>
+                <!--
                 <li>
                     <a href="#" onclick="idListado=2;Filtro=``;MostrarListadoSegunID();">
                         <i class="fa fa-indent"></i>Servicios</a>
@@ -69,6 +70,11 @@ $css->PageInit($myTitulo);
                 <li>
                     <a href="#" onclick="idListado=5;Filtro=``;MostrarListadoSegunID();">
                         <i class="fa fa-list"></i>Kardex</a>
+                </li>
+                -->
+                <li>
+                    <a href="#" onclick="idListado=6;Filtro=``;MostrarListadoSegunID();">
+                        <i class="fa fa-object-ungroup"></i>Separados</a>
                 </li>
                
               </ul>
@@ -88,6 +94,16 @@ $css->PageInit($myTitulo);
             $css->CrearDiv("DivMensajes", "col-md-4", "left", 1, 1);
             
             $css->CerrarDiv();
+            
+            $css->CrearDiv("", "col-md-2", "right", 1, 1); 
+
+                    $css->input("date", "FechaInicialRangos", "form-control", "FechaInicialRangos", "Fecha", "", "Fecha Inicial", "off", "", "onchange=MostrarListadoSegunID();","style='line-height: 15px;'");
+
+                $css->CerrarDiv();
+                $css->CrearDiv("", "col-md-2", "right", 1, 1); 
+                    $css->input("date", "FechaFinalRangos", "form-control", "FechaFinalRangos", "Fecha", "", "Fecha Final", "off", "", "onchange=MostrarListadoSegunID();","style='line-height: 15px;'");
+
+                $css->CerrarDiv();
             
             $css->CrearDiv("DivContenidoFiltros", "box-tools pull-right", "left", 1, 1);      
                         

@@ -944,11 +944,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla("<h2>".number_format($NuevoSaldo)."</h2>", 1);
                     $css->CierraFilaTabla();
                     
-            if($NuevoSaldo>$Cupo){
-                $css->CrearTitulo("El Cliente no tiene cupo suficiente para realizar esta compra a credito", "rojo");
-                $css->CerrarTabla();
-                exit();
-            }
+            
             
             $ValorAnteriorCuota="";
             
@@ -992,7 +988,11 @@ if( !empty($_REQUEST["Accion"]) ){
                 print("</td>");
                 $css->CierraFilaTabla();
                 
-            
+                if($NuevoSaldo>$Cupo){
+                    $css->CrearTitulo("El Cliente no tiene cupo suficiente para realizar esta compra a credito", "rojo");
+                    $css->CerrarTabla();
+                    exit();
+                }
                     $css->FilaTabla(16);   
                         $css->ColTabla("<strong>Cuota Inicial</strong>", 1);
                         $css->ColTabla("<strong>Metodo</strong>", 1); 

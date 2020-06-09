@@ -204,6 +204,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             
             $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
+            $Tercero=$DatosAcuerdo["Tercero"];
             if($DatosAcuerdo["SaldoFinal"]<=0){
                 
             }
@@ -227,7 +228,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     exit("E1;El Saldo a Favor del cliente es menor al Valor del Abono");
                 }
             }elseif($MetodoPago==11){
-                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 35); //Anticipos de un cliente
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 20); //Anticipos de un cliente
                 $CuentaDestino=$Parametros["CuentaPUC"];    
                 $CuentaPUCSaldoFavor=$Parametros["CuentaPUC"];
                 $sql="SELECT SUM(Debito-Credito) as Saldo  FROM librodiario WHERE Tercero_Identificacion='$Tercero' AND CuentaPUC='$CuentaPUCSaldoFavor'";
@@ -240,7 +241,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 30); //Otras formas de pago
                 $CuentaDestino=$Parametros["CuentaPUC"];
             }
-            $Tercero=$DatosAcuerdo["Tercero"];
+            
             $Fecha=date("Y-m-d");
             if($ValorAbono>0){
                 
@@ -402,6 +403,25 @@ if( !empty($_REQUEST["Accion"]) ){
             
             if($idAcuerdoPago==''){
                 exit("E1;No se recibió el id del acuerdo de pago");
+            }
+            
+            if($MetodoPago=='11'){
+                
+                $NIT=$DatosCliente["Num_Identificacion"];
+                $ParametrosAnticipos=$obCon->DevuelveValores("parametros_contables", "ID", 20);//Aqui se encuentra la cuenta para los anticipos
+                $CuentaAnticipos=$ParametrosAnticipos["CuentaPUC"];
+                $sql="SELECT SUM(Debito) as Debito, SUM(Credito) AS Credito FROM librodiario WHERE CuentaPUC='$CuentaAnticipos' AND Tercero_Identificacion='$NIT'";
+                $Consulta=$obCon->Query($sql);
+                $DatosAnticipos=$obCon->FetchAssoc($Consulta);
+                $SaldoAnticiposTercero=$DatosAnticipos["Credito"]-$DatosAnticipos["Debito"];
+                
+                if($SaldoAnticiposTercero<$ValorPago){
+                    $Mensaje="El Cliente solo cuenta con ". number_format($SaldoAnticiposTercero)." en su cuenta de anticipos";
+                    print("E3;$Mensaje");
+                    exit();
+                }
+                
+                
             }
             
             if(!is_numeric($ValorPago) or $ValorPago<0){
