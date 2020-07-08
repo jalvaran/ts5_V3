@@ -6,7 +6,7 @@ if (!isset($_SESSION['username'])){
   
 }
 $idUser=$_SESSION['idUser'];
-
+$TipoUser=$_SESSION['tipouser'];
 include_once("../clases/inteligencia.class.php");
 include_once("../../../constructores/paginas_constructor.php");
 
@@ -72,6 +72,17 @@ if( !empty($_REQUEST["Accion"]) ){
                 
             }
             
+            if($cmbFiltroCliente=='4' and ($FechaInicialRangos<>'' or $FechaFinalRangos<>'')){
+                if($FechaInicialRangos<>''){
+                    $Condicion.=" AND Updated >= '$FechaInicialRangos' ";
+                }
+                
+                if($FechaFinalRangos<>''){
+                    $Condicion.=" AND Updated <= '$FechaFinalRangos' ";
+                }
+                
+            }
+            
             if($idCliente<>''){
                 $Condicion.=" AND idClientes = '$idCliente' ";
             }
@@ -111,21 +122,22 @@ if( !empty($_REQUEST["Accion"]) ){
                               </div>');
                         $CondicionBase64= base64_encode(urlencode($Condicion));
                         $Link="procesadores/inteligencia.process.php?Accion=2&c=$CondicionBase64";
-                        print('<div class="col-lg-3 col-xs-6">
-                                <!-- small box -->
-                                <div class="small-box bg-green">
-                                  <div class="inner">
-                                    <h3>Exportar</h3>
+                        if($TipoUser=="administrador"){
+                            print('<div class="col-lg-3 col-xs-6">
+                                    <!-- small box -->
+                                    <div class="small-box bg-green">
+                                      <div class="inner">
+                                        <h3>Exportar</h3>
 
-                                    <p>Clientes</p>
-                                  </div>
-                                  <div class="icon">
-                                    <a href="'.$Link.'" target="_blank" class="fa fa-file-excel-o" style="cursor:pointer" ></a>
-                                  </div>
-                                  
-                                </div>
-                              </div>');
-                        
+                                        <p>Clientes</p>
+                                      </div>
+                                      <div class="icon">
+                                        <a href="'.$Link.'" target="_blank" class="fa fa-file-excel-o" style="cursor:pointer" ></a>
+                                      </div>
+
+                                    </div>
+                                  </div>');
+                        }
                         print('<div class="col-lg-3 col-xs-6">
                                 <!-- small box -->
                                 <div class="small-box bg-blue">

@@ -18,7 +18,7 @@ include_once("../../constructores/paginas_constructor.php"); //Construye la pagi
 $css =  new PageConstruct($myTitulo, ""); //instancia para el objeto con las funciones del html
 
 $obCon = new conexion($idUser); //instancia para Conexion a la base de datos
-
+$TipoUser=$_SESSION['tipouser'];
 $css->PageInit($myTitulo);
     /*
      * Inicio de la maqueta propia de cada programador
@@ -44,9 +44,11 @@ $css->PageInit($myTitulo);
     $css->section("", "content", "", "");
         $css->CrearDiv("", "row", "left", 1, 1);
          $css->CrearDiv("", "col-md-2", "left", 1, 1);
-         $css->CrearBotonEvento("BtnInicio", "Inicio", 1, "onclick", "DibujeListadoSegunTipo()", "azul");   
-         print("<br>");
-         $css->CrearBotonEvento("BtnNuevoAcuerdo", "Nuevo Acuerdo de Pago", 1, "onclick", "DibujeFormularioAcuerdoPago(`NA`,`DivDrawTables`)", "naranja");   
+         $css->CrearBotonEvento("BtnInicio", "Inicio", 1, "onclick", "DibujeListadoSegunTipo()", "azul"); 
+         if($TipoUser=="administrador"){
+            print("<br>");
+            $css->CrearBotonEvento("BtnNuevoAcuerdo", "Nuevo Acuerdo de Pago", 1, "onclick", "DibujeFormularioAcuerdoPago(`NA`,`DivDrawTables`)", "naranja");   
+         }
          print("<br>");
          print("<br>");
          $css->CrearBotonEvento("BtnLimpiarFiltros", "Limpiar Filtros", 1, "onclick", "LimpiarFiltros();DibujeListadoSegunTipo();", "verde");   
@@ -83,6 +85,9 @@ $css->PageInit($myTitulo);
                             
                             $css->option("", "", "", "5", "", "");
                                     print("Productos Comprados en acuerdos");
+                            $css->Coption();
+                            $css->option("", "", "", "6", "", "");
+                                    print("Historial de productos devueltos");
                             $css->Coption();
                             
                       $css->Cselect();

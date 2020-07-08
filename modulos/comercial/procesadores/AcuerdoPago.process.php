@@ -447,6 +447,9 @@ if( !empty($_REQUEST["Accion"]) ){
             if($Tabla==2){
                 $Tabla="acuerdo_pago_proyeccion_pagos_temp";
             }
+            if($Tabla==3){
+                $Tabla="clientes_recomendados";
+            }
             $obCon->BorraReg($Tabla, "ID", $idItem);
             print("OK;Registro eliminado");
         break;//Fin caso 26    

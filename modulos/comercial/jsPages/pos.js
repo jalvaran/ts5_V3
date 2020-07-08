@@ -620,18 +620,25 @@ function AbrirModalFacturarPOS(){
  * Calcula la devuelta 
  * @returns {undefined}
  */
-function CalculeDevuelta(){
+function CalculeDevuelta(invoca=1){
     
-    setTimeout(escribre_devuelta, 100);
+    setTimeout(escribre_devuelta, 100,invoca);
 }
 
-function escribre_devuelta(){
+function escribre_devuelta(invoca){
+    
     var TotalFactura = parseFloat(document.getElementById("TxtTotalFactura").value);
     var Efectivo = parseFloat(document.getElementById("Efectivo").value);
+    
     var Tarjetas = parseFloat(document.getElementById("Tarjetas").value);
     var Cheque = parseFloat(document.getElementById("Cheque").value);
     var Otros = parseFloat(document.getElementById("Otros").value);
     var AnticiposCruzados = parseFloat(document.getElementById("AnticiposCruzados").value);
+    if(invoca==2){
+        Efectivo=TotalFactura-AnticiposCruzados;
+        document.getElementById("Efectivo").value=Efectivo;
+        document.getElementById("Efectivo_Format_Number").value=number_format(Efectivo);
+    }
     if(document.getElementById("Tarjetas").value==''){
         Tarjetas=0;
     }
@@ -721,7 +728,7 @@ function atajosPOS(){
 function AccionesPOS(){
     //document.getElementById("BntModalPOS").disabled=true;
     //document.getElementById("BntModalPOS").value="Guardando...";
-    console.log("Entra");
+    
     var idFormulario=document.getElementById('idFormulario').value; //determina el tipo de formulario que se va a guardar
     
     if(idFormulario==1){
@@ -2629,6 +2636,7 @@ function MostrarOpcionesFacturacionPOS(Ancla=0){
 function escriba_anticipo_cliente(valor_anticipo){
     $('#AnticiposCruzados_Format_Number').val(number_format(valor_anticipo));
     $('#AnticiposCruzados').val(valor_anticipo);
+    CalculeDevuelta(2);
 }
 
 function MarqueErrorElemento(idElemento){
@@ -2897,4 +2905,13 @@ function ModalCerrarTurno(){
       })  
       
       
+}
+
+function AbreModalEditarClientePOS(){
+    var idCliente = document.getElementById('idCliente').value;  
+    if(idCliente==1){
+        alertify.error("Este Cliente no se puede editar",2000);
+        return;
+    }
+    ModalEditarTercero(`ModalAccionesPOS`,`DivFrmPOS`,idCliente,`clientes`);
 }

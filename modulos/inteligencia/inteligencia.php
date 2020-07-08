@@ -99,6 +99,10 @@ $css->PageInit($myTitulo);
                             print("Creación");
                         $css->Coption();
                         
+                        $css->option("", "", "", "4", "", "");
+                            print("Actualización");
+                        $css->Coption();
+                        
                         $css->option("", "", "", "3", "", "");
                             print("Puntaje");
                         $css->Coption();

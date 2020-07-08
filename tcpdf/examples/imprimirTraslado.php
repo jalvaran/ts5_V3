@@ -1,6 +1,7 @@
 <?php
 
 include("../../modelo/php_conexion.php");
+include("../../modelo/PrintPos.php");
 
 $idTraslado = $_REQUEST["idTraslado"];
 $idFormatoCalidad=17;
@@ -13,6 +14,7 @@ require_once('Encabezado.php');
 ////////////////////////////////////////////
 
 $obVenta=new ProcesoVenta(1);
+$obPrint=new PrintPos(1);
 
   $DatosTraslado=$obVenta->DevuelveValores("traslados_mercancia","ID",$idTraslado);
   $fecha=$DatosTraslado["Fecha"];
@@ -60,4 +62,6 @@ $pdf->Output($nombre_file.'.pdf', 'I');
 //============================================================+
 // END OF FILE
 //============================================================+
+
+$obPrint->ImprimeTraslado($idTraslado, 1);
 ?>

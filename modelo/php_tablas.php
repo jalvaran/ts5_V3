@@ -1,5 +1,6 @@
 <?php
 include_once("php_conexion.php");
+
 /*
  * Esta clase contiene los datos necesarios para tratar y dibujar las tablas
  * 
@@ -372,6 +373,7 @@ public function CreeFiltroCobros($Vector){
   
 public function DibujeTabla($Vector){
     //print_r($Vector);
+    $TipoUser=$_SESSION['tipouser'];
     $this->css=new CssIni("");
     $Tabla["Tabla"]=$Vector["Tabla"];
     $tbl=$Tabla["Tabla"];
@@ -408,17 +410,19 @@ public function DibujeTabla($Vector){
     $this->css->CrearBotonVerde("BtnFiltrar", "Filtrar");
     $TxtSt=urlencode($statement);
     $TxtTabla= base64_encode($Tabla["Tabla"]);
+    if($TipoUser=='administrador'){
+        $imagerute="../images/excel.png";    
+        $this->css->CrearImageLink("$myPage?BtnExportarExcel=1&TxtT=$TxtTabla&TxtL=$TxtSt", $imagerute, "_blank",50,50);
+        $imagerute="../images/csv2.png";    
+        $this->css->CrearImageLink("ProcesadoresJS/GeneradorCSV.php?Opcion=1&TxtT=$TxtTabla&TxtL=$TxtSt", $imagerute, "_blank",50,50);
     
-    $imagerute="../images/excel.png";    
-    $this->css->CrearImageLink("$myPage?BtnExportarExcel=1&TxtT=$TxtTabla&TxtL=$TxtSt", $imagerute, "_blank",50,50);
-    $imagerute="../images/csv2.png";    
-    $this->css->CrearImageLink("ProcesadoresJS/GeneradorCSV.php?Opcion=1&TxtT=$TxtTabla&TxtL=$TxtSt", $imagerute, "_blank",50,50);
+        //$this->css->CrearBoton("BtnExportarExcel", "Exportar a Excel");
+        //$this->css->CrearBotonNaranja("BtnVerPDF", "Exportar a PDF");
+        $imagerute="../images/pdf2.png";    
+        $this->css->CrearImageLink("CreePDFFromTabla.php?BtnVerPDF=1&TxtT=$TxtTabla&TxtL=$TxtSt", $imagerute, "_blank",50,50);
     
-    //$this->css->CrearBoton("BtnExportarExcel", "Exportar a Excel");
-    //$this->css->CrearBotonNaranja("BtnVerPDF", "Exportar a PDF");
-    $imagerute="../images/pdf2.png";
     
-    $this->css->CrearImageLink("CreePDFFromTabla.php?BtnVerPDF=1&TxtT=$TxtTabla&TxtL=$TxtSt", $imagerute, "_blank",50,50);
+    }
     if($_SESSION["tipouser"]=='administrador'){
         $Titulo="Ajustes";
         $Nombre="ImgShowMenu";

@@ -6,6 +6,7 @@ if (!isset($_SESSION['username'])){
   
 }
 $idUser=$_SESSION['idUser'];
+$TipoUser=$_SESSION['tipouser'];
 include_once("../clases/AcuerdoPago.class.php");
 include_once("../clases/informesAcuerdosPago.class.php");
 include_once("../../../constructores/paginas_constructor.php");
@@ -77,26 +78,26 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $css->CrearTabla();
                 
-            
+            print('<thead >');
             $css->FilaTabla(16);
-                    print("<td style='text-align:center'>");
+                    print("<th style='text-align:center'>");
                         print("<strong>Registros:</strong> <h4 style=color:green>". number_format($ResultadosTotales)."</h4>");
-                    print("</td>");
-                    print("<td>");
-                    print("</td>");
-                    print("<td>");
-                    print("</td>");
-                    print("<td>");
-                    print("</td>");
-                    print("<td style='text-align:center'>");
+                    print("</th>");
+                    print("<th>");
+                    print("</th>");
+                    print("<th>");
+                    print("</th>");
+                    print("<th>");
+                    print("</th>");
+                    print("<th style='text-align:center'>");
                         print("<strong>Total Saldo:</strong><br>");
                         print("".number_format($Total));
-                    print("</td>");
+                    print("</th>");
                     
-                    print("<td style='text-align:center'>");
+                    print("<th style='text-align:center'>");
                         $Ruta="../../general/procesadores/GeneradorCSV.process.php?Opcion=2&Tabla=$Tabla&c=". base64_encode($Condicion);
                         print('<a href="'.$Ruta.'" target="_blank"><button type="button" id="BtnExportarExcelCuentas" class="btn btn-success btn-flat"><i class="fa fa-file-excel-o"></i></button></a>');
-                    print("</td>");
+                    print("</th>");
                    
                 
                     if($ResultadosTotales>$Limit){
@@ -104,7 +105,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         //$css->FilaTabla(14);
                             
                             $TotalPaginas= ceil($ResultadosTotales/$Limit);
-                            print("<td  style=text-align:center>");
+                            print("<th  style=text-align:center>");
                             //print("<strong>Página: </strong>");
                             
                             print('<div class="input-group" style=width:150px>');
@@ -134,7 +135,7 @@ if( !empty($_REQUEST["Accion"]) ){
                             print('<span class="input-group-addon" onclick=CambiePagina(`'.$NumPage1.'`,`'.$idCambioPagina.'`) style=cursor:pointer><i class="fa fa-chevron-right" ></i></span>');
                             }
                             print("</div>");
-                            print("</td>");
+                            print("</th>");
                             
                             
                           
@@ -144,8 +145,9 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 
                 $css->ColTabla("<strong>ID</strong>", 1); 
-                $css->ColTabla("<strong>VER</strong>", 1);
-                $css->ColTabla("<strong>PRODUCTOS</strong>", 1);
+                $css->ColTabla("<strong>Imprimir</strong>", 1); 
+                $css->ColTabla("<strong>Ver</strong>", 1);
+                $css->ColTabla("<strong>Productos</strong>", 1);
                 $css->ColTabla("<strong>PDF</strong>", 1);
                 $css->ColTabla("<strong>Anular</strong>", 1);
                 $css->ColTabla("<strong>Reportar</strong>", 1);
@@ -165,7 +167,8 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->ColTabla("<strong>idAcuerdo</strong>", 1);
                 
             $css->CierraFilaTabla();
-
+            
+            print('</thead>');
             
                 while($DatosAcuerdo=$obCon->FetchAssoc($Consulta)){
                     
@@ -176,6 +179,11 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     $css->FilaTabla(16);
                         $css->ColTabla($DatosAcuerdo["ID"], 1);
+                        print("<td style='text-align:center'>");    
+                            print('<span class="input-group-btn">
+                                <button type="button" class="btn btn-primary btn-flat" onclick=ImprimirAcuerdoPago(`'.$idAcuerdo.'`)> <i class="fa fa-print"> </i> </button>
+                              </span>');
+                        print("</td>");  
                         print("<td style='text-align:center;'>");  
                             print('<button type="button" class="btn btn-success btn-flat" onclick="DibujarAcuerdoPagoExistente(`'.$idAcuerdo.'`,`DivModalAcciones`,`ModalAcciones`)"> <i class="fa fa-eye"> </i> </button>');
                         print("</td>");
@@ -189,15 +197,18 @@ if( !empty($_REQUEST["Accion"]) ){
                                 
                         print("</td>");
                         print("<td style='text-align:center'>");    
-                            print('<span class="input-group-btn">
-                                <button type="button" class="btn btn-warning btn-flat" onclick=FormularioAnularAcuerdoPago(`'.$idAcuerdo.'`)> <i class="fa fa-remove"> </i> </button>
-                              </span>');
+                            if($TipoUser=="administrador"){
+                                print('<span class="input-group-btn">
+                                    <button type="button" class="btn btn-warning btn-flat" onclick=FormularioAnularAcuerdoPago(`'.$idAcuerdo.'`)> <i class="fa fa-remove"> </i> </button>
+                                  </span>');
+                            }
                         print("</td>");  
-                        print("<td style='text-align:center'>");        
-                            print('<span class="input-group-btn">
-                                <button type="button" class="btn btn-danger btn-flat" onclick=FormularioReportarAcuerdoPago(`'.$idAcuerdo.'`)> <i class="fa fa-trash"> </i> </button>
-                              </span>');
-                                
+                        print("<td style='text-align:center'>");   
+                            if($TipoUser=="administrador"){
+                                print('<span class="input-group-btn">
+                                    <button type="button" class="btn btn-danger btn-flat" onclick=FormularioReportarAcuerdoPago(`'.$idAcuerdo.'`)> <i class="fa fa-trash"> </i> </button>
+                                  </span>');
+                            }    
                         print("</td>");
                         
                         $css->ColTabla($DatosAcuerdo["Tercero"]." ".$DatosAcuerdo["RazonSocial"], 1);
@@ -855,10 +866,12 @@ if( !empty($_REQUEST["Accion"]) ){
                     $idItem=$DatosAcuerdo["ID"];
                     $idAcuerdo=$DatosAcuerdo["idAcuerdoPago"];
                     $css->ColTabla($DatosAcuerdo["ID"], 1);
-                    print("<td style='text-align:center'>");    
-                        print('<span class="input-group-btn">
-                            <button type="button" class="btn btn-danger btn-flat" onclick=FormularioDevolverItem(`'.$idAcuerdo.'`,`'.$idItem.'`)> <i class="fa fa-remove"> </i> </button>
-                          </span>');
+                    print("<td style='text-align:center'>");   
+                        if($TipoUser=="administrador"){
+                            print('<span class="input-group-btn">
+                                <button type="button" class="btn btn-danger btn-flat" onclick=FormularioDevolverItem(`'.$idAcuerdo.'`,`'.$idItem.'`)> <i class="fa fa-remove"> </i> </button>
+                              </span>');
+                        }
                     print("</td>"); 
                     $css->ColTabla($DatosAcuerdo["Fecha"], 1);
                     $css->ColTabla($DatosAcuerdo["ConsecutivoAcuerdo"], 1);                        
@@ -884,8 +897,161 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;//fin caso 5
         
-        case 6:// Historial anulacion de acuerdos 
+        case 6:// Historial productos devueltos en acuerdos 
+            $Tabla="vista_productos_devueltos_acuerdos";
+            $idCambioPagina=6;
+            $Limit=15;
+            $Page=$obCon->normalizar($_REQUEST["Page"]);
+            $NumPage=$obCon->normalizar($_REQUEST["Page"]);
+            $Busqueda=$obCon->normalizar($_REQUEST["Busqueda"]);
+            $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
+            $cmbEstadosAcuerdos=$obCon->normalizar($_REQUEST["cmbEstadosAcuerdos"]);
+            $obCon->CrearVistaProductosDevueltosAcuerdoPago();
+            if($Page==''){
+                $Page=1;
+                $NumPage=1;
+            }
+            $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
+            $FechaInicialRangos=$obCon->normalizar($_REQUEST["FechaInicialRangos"]);
+            $FechaFinalRangos=$obCon->normalizar($_REQUEST["FechaFinalRangos"]);
             
+            $Condicion=" WHERE ID>0 ";
+            
+            if($Busqueda<>''){
+                $Condicion.=" AND (idAcuerdoPago like '$Busqueda%' or Nombre like '%$Busqueda%')";
+            }
+            
+            if($idCliente<>''){
+                //$Condicion.=" AND (Tercero = '$idCliente')";
+            }
+            if($FechaInicialRangos<>''){
+                $Condicion.=" AND (Fecha >= '$FechaInicialRangos')";
+            }
+            if($FechaFinalRangos<>''){
+                $Condicion.=" AND (Fecha <= '$FechaFinalRangos')";
+            }
+                        
+            if($cmbEstadosAcuerdos<>''){
+                //$Condicion.=" AND (EstadoAcuerdo = '$cmbEstadosAcuerdos')";
+            }
+            
+            if($idAcuerdoPago<>''){
+                //$Condicion.=" AND (idAcuerdoPago = '$idAcuerdoPago')";
+            }
+            
+                                    
+            $PuntoInicio = ($Page * $Limit) - $Limit;
+            
+            $sql = "SELECT COUNT(ID) as Items,SUM(ValorDevolucion) as Total
+                   FROM $Tabla t1 $Condicion;";
+            
+            $Consulta=$obCon->Query($sql);
+            $totales = $obCon->FetchAssoc($Consulta);
+            $ResultadosTotales = $totales['Items'];
+            $Total=$totales["Total"];
+            
+            $sql="SELECT *
+                  FROM $Tabla t1 $Condicion LIMIT $PuntoInicio,$Limit;";
+            
+            $Consulta=$obCon->Query($sql);
+            
+            
+            $css->CrearTitulo("Historial de Productos Devueltos en Acuerdos", "verde");
+            
+            $css->CrearTabla();
+                
+            
+            $css->FilaTabla(16);
+                    print("<td style='text-align:center'>");
+                        print("<strong>Registros:</strong> <h4 style=color:green>". number_format($ResultadosTotales)."</h4>");
+                    print("</td>");
+                    
+                    print("<td style='text-align:center'>");
+                        print("<strong>Total:</strong><br>");
+                        print("".number_format($Total));
+                    print("</td>");
+                    
+                    
+                
+                    if($ResultadosTotales>$Limit){
+
+                        //$css->FilaTabla(14);
+                            
+                            $TotalPaginas= ceil($ResultadosTotales/$Limit);
+                            print("<td  style=text-align:center>");
+                            //print("<strong>Página: </strong>");
+                            
+                            print('<div class="input-group" style=width:150px>');
+                            if($NumPage>1){
+                                $NumPage1=$NumPage-1;
+                            print('<span class="input-group-addon" onclick=CambiePagina(`'.$NumPage1.'`,`'.$idCambioPagina.'`) style=cursor:pointer><i class="fa fa-chevron-left"></i></span>');
+                            }
+                            $FuncionJS="onchange=CambiePagina(``,`$idCambioPagina`);";
+                            $css->select("CmbPage", "form-control", "CmbPage", "", "", $FuncionJS, "");
+                            
+                                for($p=1;$p<=$TotalPaginas;$p++){
+                                    if($p==$NumPage){
+                                        $sel=1;
+                                    }else{
+                                        $sel=0;
+                                    }
+                                    
+                                    $css->option("", "", "", $p, "", "",$sel);
+                                        print($p);
+                                    $css->Coption();
+                                    
+                                }
+
+                            $css->Cselect();
+                            if($ResultadosTotales>($PuntoInicio+$Limit)){
+                                $NumPage1=$NumPage+1;
+                            print('<span class="input-group-addon" onclick=CambiePagina(`'.$NumPage1.'`,`'.$idCambioPagina.'`) style=cursor:pointer><i class="fa fa-chevron-right" ></i></span>');
+                            }
+                            print("</div>");
+                            print("</td>");
+                            
+                            
+                          
+                        }
+            
+            $css->FilaTabla(16);
+                
+                
+                //$css->ColTabla("<strong>ID</strong>", 1);                
+                $css->ColTabla("<strong>Fecha</strong>", 1);
+                $css->ColTabla("<strong>Acuerdo</strong>", 1);
+                //$css->ColTabla("<strong>Tercero</strong>", 1);
+                $css->ColTabla("<strong>Referencia</strong>", 1);
+                $css->ColTabla("<strong>Nombre</strong>", 1);
+                $css->ColTabla("<strong>ValorDevolucion</strong>", 1);
+                $css->ColTabla("<strong>Cantidad</strong>", 1);                
+                $css->ColTabla("<strong>Observaciones</strong>", 1);                
+                $css->ColTabla("<strong>idUser</strong>", 1);        
+                
+            $css->CierraFilaTabla();
+
+            
+                while($DatosAcuerdo=$obCon->FetchAssoc($Consulta)){
+                    $idItem=$DatosAcuerdo["ID"];
+                    $idAcuerdo=$DatosAcuerdo["idAcuerdoPago"];
+                    //$css->ColTabla($DatosAcuerdo["ID"], 1);
+                    
+                    $css->ColTabla($DatosAcuerdo["Fecha"], 1);
+                    $css->ColTabla($DatosAcuerdo["ConsecutivoAcuerdo"], 1);                        
+                    //$css->ColTabla($DatosAcuerdo["Tercero"]." ".$DatosAcuerdo["RazonSocial"], 1);
+                    $css->ColTabla($DatosAcuerdo["Referencia"], 1);
+                    $css->ColTabla($DatosAcuerdo["Nombre"], 1);
+                    
+                    $css->ColTabla(number_format($DatosAcuerdo["ValorDevolucion"]), 1);
+                    $css->ColTabla(number_format($DatosAcuerdo["Cantidad"]), 1);
+                    $css->ColTabla(($DatosAcuerdo["Observaciones"]), 1);
+                    $css->ColTabla(($DatosAcuerdo["idUser"]), 1);
+                    
+                    $css->CierraFilaTabla();
+                    
+                }
+            
+            $css->CerrarTabla();
         break; //Fin caso 6 
         
         case 7:// Historial anulacion de abonos 

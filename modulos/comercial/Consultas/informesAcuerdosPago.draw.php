@@ -319,7 +319,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
             $FechaInicialRangos=$obCon->normalizar($_REQUEST["FechaInicialRangos"]);
             $FechaFinalRangos=$obCon->normalizar($_REQUEST["FechaFinalRangos"]);
-            
+            $obCon->CrearVistaAbonosAcuerdoPago();
             $Condicion=" WHERE ID>0 ";
             
             if($idCliente<>''){
@@ -413,7 +413,8 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 $css->ColTabla("<strong>ID</strong>", 1, "C");
                 $css->ColTabla("<strong>Tercero</strong>", 1, "C");
-                $css->ColTabla("<strong>Fecha</strong>", 1, "C");
+                $css->ColTabla("<strong>FechaCuota</strong>", 1, "C");
+                $css->ColTabla("<strong>FechaPago</strong>", 1, "C");
                 $css->ColTabla("<strong>Acuerdo</strong>", 1, "C"); 
                 $css->ColTabla("<strong>Cuota</strong>", 1, "C"); 
                 $css->ColTabla("<strong>Valor Pagado</strong>", 1, "C");
@@ -430,7 +431,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                         $css->ColTabla($RegistrosTabla["ID"], 1, "L");
                         $css->ColTabla($RegistrosTabla["Tercero"], 1, "L");
-                        
+                        $css->ColTabla($RegistrosTabla["FechaCuota"], 1, "L");
                         $css->ColTabla($RegistrosTabla["Created"], 1, "L");
                         $css->ColTabla(($RegistrosTabla["ConsecutivoAcuerdo"]), 1, "L");         
                         $css->ColTabla($RegistrosTabla["NumeroCuota"], 1, "L");

@@ -177,14 +177,29 @@ class Facturacion extends ProcesoVenta{
         $DatosFactura=$this->DevuelveValores("facturas", "idFacturas", $idFactura);
         $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
         $ParametrosAnticipos=$this->DevuelveValores("parametros_contables", "ID", 20);
-        $this->IngreseMovimientoLibroDiario($Fecha, "FACTURA", $idFactura, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDestino, $NombreCuentaDestino, "Cruce de Anticipos", "CR", $ValorAnticipo, "Cruce Anticipos Relaizados por Clientes", $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
-        $this->IngreseMovimientoLibroDiario($Fecha, "FACTURA", $idFactura, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $ParametrosAnticipos["CuentaPUC"], $ParametrosAnticipos["NombreCuenta"], "Cruce de Anticipos", "DB", $ValorAnticipo, "Cruce Anticipos Relaizados por Clientes", $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
+        $this->IngreseMovimientoLibroDiario($Fecha, "FACTURA", $idFactura, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $CuentaDestino, $NombreCuentaDestino, "Cruce de Anticipos", "CR", $ValorAnticipo, "Cruce Anticipos Realizados por Clientes", $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
+        $this->IngreseMovimientoLibroDiario($Fecha, "FACTURA", $idFactura, $DatosFactura["NumeroFactura"], $DatosCliente["Num_Identificacion"], $ParametrosAnticipos["CuentaPUC"], $ParametrosAnticipos["NombreCuenta"], "Cruce de Anticipos", "DB", $ValorAnticipo, "Cruce Anticipos Realizados por Clientes", $DatosFactura["CentroCosto"], $DatosFactura["idSucursal"], "");
         
         $NuevoSaldo=$DatosFactura["SaldoFact"]-$ValorAnticipo;
         $AbonosTotales=$DatosFactura["Total"]-$NuevoSaldo;
         $this->ActualizaRegistro("facturas", "SaldoFact", $NuevoSaldo, "idFacturas", $idFactura);
         $this->ActualizaRegistro("cartera", "Saldo", $NuevoSaldo, "Facturas_idFacturas", $idFactura);
         $this->ActualizaRegistro("cartera", "TotalAbonos", $AbonosTotales, "Facturas_idFacturas", $idFactura);
+        $this->RegistreRelacionCruceAnticipoFactura($idFactura, $Fecha, $ValorAnticipo, $DatosFactura["Clientes_idClientes"], $DatosFactura["CentroCosto"], $CuentaDestino, $DatosFactura["Usuarios_idUsuarios"]);
+    }
+    
+    public function RegistreRelacionCruceAnticipoFactura($idFactura,$Fecha,$ValorAnticipo,$idCliente,$CentroCosto,$CuentaIngreso,$idUser) {
+        $Datos["idFactura"]=$idFactura;
+        $Datos["Fecha"]=$Fecha;
+        $Datos["idCliente"]=$idCliente;
+        $Datos["Valor"]=$ValorAnticipo;
+        $Datos["idUsuario"]=$idUser;
+        $Datos["CentroCosto"]=$CentroCosto;
+        $Datos["CuentaIngreso"]=$CuentaIngreso;
+        $Datos["Estado"]=1;
+        
+        $sql=$this->getSQLInsert("facturas_anticipos", $Datos);
+        $this->Query($sql);
         
     }
     /**
@@ -727,7 +742,7 @@ class Facturacion extends ProcesoVenta{
         //Calculo los egresos
         
         $sql="SELECT SUM(Debito) as Total FROM librodiario 
-                WHERE idUsuario='$idUser' AND idCierre=0 AND (CuentaPUC like '51%' or CuentaPUC LIKE '52%');";
+                WHERE Tipo_Documento_Intero='CompEgreso' AND  idUsuario='$idUser' AND idCierre=0;";
         
         $Consulta=$this->Query($sql);
         $DatosEgresos=$this->FetchArray($Consulta);
@@ -737,7 +752,7 @@ class Facturacion extends ProcesoVenta{
         
         //Calculo los abonos de separados
         
-        $TotalAbonos=$this->Sume("separados_abonos", "Valor", "WHERE idUsuarios='$idUser' AND (idCierre='' or idCierre=0) ");
+        $TotalAbonosSeparados=$this->Sume("separados_abonos", "Valor", "WHERE idUsuarios='$idUser' AND (idCierre='' or idCierre=0) ");
         //Calculo los abonos de Creditos
         
         $TotalAbonosCreditos=$this->Sume("facturas_abonos", "Valor", "WHERE Usuarios_idUsuarios='$idUser' AND idCierre='0'");
@@ -747,13 +762,14 @@ class Facturacion extends ProcesoVenta{
         $sql="SELECT SUM(t1.`ValorPago`) as TotalAbono,MetodoPago,
                 (SELECT Metodo FROM metodos_pago t2 WHERE t1.MetodoPago=t2.ID) as Metodo 
                 FROM `acuerdo_pago_cuotas_pagadas` t1
-                WHERE `idCierre` = '0' AND `idUser` = '3' GROUP BY t1.MetodoPago ";
+                WHERE `idCierre` = '0' AND `idUser` = '$idUser' GROUP BY t1.MetodoPago ";
         
         $Consulta=$this->Query($sql);
         $i=0;
+        $TotalAbonosAcuerdos=0;
         while($DatosConsulta=$this->FetchAssoc($Consulta)){
             if($DatosConsulta["MetodoPago"]==1){
-                $TotalAbonos=$TotalAbonos+$DatosConsulta["TotalAbono"];
+                $TotalAbonosAcuerdos=$TotalAbonosAcuerdos+$DatosConsulta["TotalAbono"];
             }
             
             $AbonosAcuerdos[$i]["MetodoPago"]=$DatosConsulta["MetodoPago"];
@@ -761,11 +777,11 @@ class Facturacion extends ProcesoVenta{
             $AbonosAcuerdos[$i]["Metodo"]=$DatosConsulta["Metodo"];
             
         }
-        
+        $TotalAbonos=$TotalAbonosSeparados+$TotalAbonosAcuerdos;
         //Ingreso datos en tabla cierres
         
         $tab="cajas_aperturas_cierres";
-        $NumRegistros=24;
+        $NumRegistros=26;
         $Columnas[0]="ID";                  $Valores[0]="";
         $Columnas[1]="Fecha";               $Valores[1]=$fecha;
         $Columnas[2]="Hora";                $Valores[2]=$Hora;
@@ -774,7 +790,7 @@ class Facturacion extends ProcesoVenta{
         $Columnas[5]="idCaja";            $Valores[5]=$idCaja;
         $Columnas[6]="TotalVentas";           $Valores[6]=$TotalVentasAcuerdoPago+$TotalVentasContado+$TotalVentasCredito+$TotalVentasSisteCredito-$TotalDevoluciones;
         $Columnas[7]="TotalVentasContado";    $Valores[7]=$TotalVentasContado;
-        $Columnas[8]="TotalVentasCredito";    $Valores[8]=$TotalVentasCredito;
+        $Columnas[8]="TotalVentasCredito";    $Valores[8]=$TotalVentasCredito+$TotalVentasAcuerdoPago;
         $Columnas[9]="TotalAbonos";           $Valores[9]=$TotalAbonos;
         $Columnas[10]="TotalDevoluciones";    $Valores[10]=$TotalDevoluciones;
         $Columnas[11]="TotalEntrega";         $Valores[11]=$TotalVentasContado+$TotalAbonos+$TotalAbonosCreditos+$TotalAbonosSisteCredito-$TotalEgresos;
@@ -790,6 +806,8 @@ class Facturacion extends ProcesoVenta{
         $Columnas[21]="TotalVentasSisteCredito";      $Valores[21]=$TotalVentasSisteCredito;
         $Columnas[22]="TotalRetiroSeparados";      $Valores[22]=$TotalRetiroSeparados;
         $Columnas[23]="EfectivoRecaudado";      $Valores[23]=$TotalRecaudo;
+        $Columnas[24]="TotalAbonosSeparados";      $Valores[24]=$TotalAbonosSeparados;
+        $Columnas[25]="TotalAbonosAcuerdos";      $Valores[25]=$TotalAbonosAcuerdos;
         $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
         $idCierre=$this->ObtenerMAX($tab, "ID", 1, "");
         

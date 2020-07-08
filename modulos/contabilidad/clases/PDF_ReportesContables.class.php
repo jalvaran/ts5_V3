@@ -239,7 +239,7 @@ class PDF_ReportesContables extends Documento{
         $Back="white";
         $Consulta=$this->obCon->Query($sql);
         $html.='<tr align="left" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
-        $html.='<td><strong>FECHA</strong></td><td><strong>TERCERO</strong></td><td><strong>DOCUMENTO</strong></td><td><strong>REFERENCIA</strong></td><td><strong>CUENTA</strong></td><td><strong>NOMBRE</strong></td><td><strong>SALDO ANTERIOR</strong></td><td><strong>DEBITO</strong></td><td><strong>CREDITO</strong></td><td><strong>SALDO MOVIMIENTO</strong></td><td><strong>SALDO FINAL</strong></td>'; 
+        $html.='<td><strong>FECHA</strong></td><td><strong>TERCERO</strong></td><td><strong>DOCUMENTO</strong></td><td><strong>REFERENCIA</strong></td><td><strong>DETALLE</strong></td><td><strong>CUENTA</strong></td><td><strong>NOMBRE</strong></td><td><strong>SALDO ANTERIOR</strong></td><td><strong>DEBITO</strong></td><td><strong>CREDITO</strong></td><td><strong>SALDO MOVIMIENTO</strong></td><td><strong>SALDO FINAL</strong></td>'; 
         
         $html.='</tr>';   
         
@@ -258,6 +258,7 @@ class PDF_ReportesContables extends Documento{
            $html.="<td>".$DatosMayor["Tercero_Razon_Social"]." ".$DatosMayor["Tercero_Identificacion"]."</td>";
            $html.="<td>".$DatosMayor["Tipo_Documento_Intero"]." ".$DatosMayor["Num_Documento_Interno"]."</td>";
            $html.="<td>".$DatosMayor["Num_Documento_Externo"]."</td>";
+           $html.="<td>".$DatosMayor["Detalle"]."</td>";
            $html.="<td>".$DatosMayor["CuentaPUC"]."</td>";
            $html.="<td>".$DatosMayor["NombreCuenta"]."</td>";
            $html.="<td>".number_format($DatosMayor["SaldoInicialCuenta"])."</td>";
@@ -479,6 +480,28 @@ class PDF_ReportesContables extends Documento{
              
         $this->PDF_Output("BalanceComprobacionTerceros_$FechaFinal");
     }
+    
+    
+    public function EstadoSituacionFinaciera_PDF($FechaInicial,$FechaFinal,$idEmpresa,$CentroCosto,$Vector ) {
+        $TipoReporte="Rango";
+        $idEmpresaEncabezado="";
+        if($idEmpresa=="ALL"){
+            $idEmpresaEncabezado=1;
+        }
+        
+        $FechaReporte="Del $FechaInicial al $FechaFinal";
+        
+        
+        $this->PDF_Ini("Estado de Situacion Finaciera", 8, "",1,"../../../");
+        $this->PDF_Encabezado($FechaFinal,$idEmpresaEncabezado, 39, "","","../../../");
+        $TotalClases=$this->ArmeTemporalSubCuentas($TipoReporte,$FechaFinal,$FechaInicial,$CentroCosto,$idEmpresa,$Vector);
+        
+        $html= $this->HTMLBalanceGeneralDetallado($TotalClases,$FechaReporte);
+        $this->PDF_Write($html);
+             
+        $this->PDF_Output("Estado_Situacion_Financiera_$FechaFinal");
+    }
+    
     /**
      * Fin Clase
      */

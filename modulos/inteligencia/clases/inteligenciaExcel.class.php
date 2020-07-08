@@ -57,7 +57,7 @@ class ExcelInteligencia extends ProcesoVenta{
             ->setCellValue($Campos[$z++].$i,"Cumpleaños")
             ->setCellValue($Campos[$z++].$i,"Puntaje")
             ->setCellValue($Campos[$z++].$i,"Creado")
-                                    
+            ->setCellValue($Campos[$z++].$i,"Actualizado")                        
             ;
             
         $sql="SELECT * FROM clientes $Condicion";
@@ -78,7 +78,7 @@ class ExcelInteligencia extends ProcesoVenta{
                 ->setCellValue($Campos[$z++].$i,$DatosVista["DiaNacimiento"]." de ".$DatosVista["MesNacimiento"])
                 ->setCellValue($Campos[$z++].$i,$DatosVista["Puntaje"])
                 ->setCellValue($Campos[$z++].$i,$DatosVista["Created"])
-
+                ->setCellValue($Campos[$z++].$i,$DatosVista["Updated"])
                 ;
             
         }
@@ -94,7 +94,7 @@ class ExcelInteligencia extends ProcesoVenta{
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(7)->setWidth('13');
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(8)->setWidth('10');
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(9)->setWidth('18');
-        
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(10)->setWidth('18');
    //Informacion del excel
    $objPHPExcel->
     getProperties()

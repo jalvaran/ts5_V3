@@ -92,7 +92,7 @@ class AcuerdoPagoPrint extends PrintPos{
                 fwrite($handle,"RECIBIDO POR: ".$DatosPagos["NombreUsuario"]); // ciclo de pagos
                 fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
             }
-            
+            fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
             fwrite($handle,"PAGO DE CUOTAS: "); // ciclo de pagos
             fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
             $sql="SELECT t1.*,(SELECT t2.Metodo FROM metodos_pago t2 WHERE t2.ID=t1.MetodoPago) AS NombreFormaPago,
@@ -100,15 +100,18 @@ class AcuerdoPagoPrint extends PrintPos{
                      FROM acuerdo_pago_cuotas_pagadas t1 WHERE t1.idAcuerdoPago='$idAcuerdo' AND t1.TipoCuota>0 ORDER BY t1.Created ASC";
             $Consulta= $this->Query($sql);
             while($DatosPagos= $this->FetchAssoc($Consulta)){
-                fwrite($handle,"FECHA: ".$DatosPagos["Created"]);
+                
+                fwrite($handle,$DatosPagos["idProyeccion"]." FECHA: ".$DatosPagos["Created"]);
                 fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
                 fwrite($handle,$DatosPagos["NombreFormaPago"]." || Valor: $". number_format($DatosPagos["ValorPago"])); // ciclo de pagos
                 fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
                 fwrite($handle,"RECIBIDO POR: ".$DatosPagos["NombreUsuario"]); // ciclo de pagos
                 fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+                $this->SeparadorHorizontal($handle, "_", $AnchoSeparador);
+                fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
             }
             
-            
+            fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
             fwrite($handle,"PAGOS AGRUPADOS POR FECHA: "); // ciclo de pagos
             fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
             $sql="SELECT t1.FechaPago as Fecha,sum(ValorPago) as TotalPago
@@ -135,11 +138,16 @@ class AcuerdoPagoPrint extends PrintPos{
                 if($DatosProyeccion["Estado"]==4){
                     $TotalCuotasVencidas=$TotalCuotasVencidas+$SaldoCuota;
                 }
-                fwrite($handle,$DatosProyeccion["NombreTipoCuota"]." || ".$DatosProyeccion["Fecha"]." || ". number_format($SaldoCuota)." || ".$DatosProyeccion["NombreEstado"]); 
                 fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+                $this->SeparadorHorizontal($handle, "_", $AnchoSeparador);
+                fwrite($handle,$DatosProyeccion["ID"]." || ".$DatosProyeccion["NombreTipoCuota"]." || ".$DatosProyeccion["Fecha"]); 
+                fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+                fwrite($handle,number_format($SaldoCuota)." || ".$DatosProyeccion["NombreEstado"]); 
+                
             }
             
             if($TotalCuotasVencidas>1){
+                fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
                 fwrite($handle,"TOTAL DE CUOTAS VENCIDAS: ".number_format($TotalCuotasVencidas)); // ciclo de pagos
                 fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
             }

@@ -248,7 +248,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Condicion=" WHERE ID>0 ";
             
             if($Busquedas<>''){
-                $Condicion.=" AND ( RazonSocial Like '%$Busquedas%' or Num_Identificacion = '$Busquedas' )";
+                $Condicion.=" AND ( RazonSocial Like '%$Busquedas%' or Num_Identificacion = '$Busquedas' or Estado like '$Busquedas%')";
             }
             
             if($Estado<>''){

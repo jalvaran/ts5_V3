@@ -31,7 +31,7 @@ class ProcesoVenta extends db_conexion{
 		$this->idUser=$idUserR;
                 $this->TipoUser=$this->fetch['TipoUser'];
                 $this->COMBascula="/dev/ttyUSB0";
-                $this->COMPrinter="COM4";
+                $this->COMPrinter="COM3";
 	}
 	
 	///Totaliza una venta

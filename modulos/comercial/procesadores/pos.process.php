@@ -423,7 +423,7 @@ if( !empty($_REQUEST["Accion"]) ){
             if($DatosImpresora["Habilitado"]=="SI" AND $CmbPrint=='SI'){
                 $Copias=1;
                 if($CmbFormaPago=="Acuerdo"){
-                    $Copias=2;
+                    //$Copias=2;
                 }
                 $obPrint->ImprimeFacturaPOS($idFactura,$DatosImpresora["Puerto"],$Copias);
                 $DatosTikete=$obCon->DevuelveValores("config_tiketes_promocion", "ID", 1);
@@ -662,8 +662,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $idCaja=1;
             $TotalEfectivoRecaudado=$obCon->normalizar($_REQUEST['TotalRecaudadoCierre']);    
             
-            if(!is_numeric($TotalEfectivoRecaudado) or $TotalEfectivoRecaudado<=0){
-                exit("E1;El Valor debe ser un numero positivo mayor a Cero;total_entrega_Format_Number");
+            if(!is_numeric($TotalEfectivoRecaudado) or $TotalEfectivoRecaudado<0){
+                exit("E1;El Valor debe ser un numero positivo mayor o igual a Cero;total_entrega_Format_Number");
             }
             
             $idCierre=$obCon->CierreTurnoPos($idUser,$idCaja,$TotalEfectivoRecaudado);
@@ -985,6 +985,7 @@ if( !empty($_REQUEST["Accion"]) ){
         
         case 24://ingresa un pago de una plataforma
             $obContabilidad = new contabilidad($idUser);
+            $obPrint=new PrintPos($idUser);
             $Fecha=date("Y-m-d");
             $Hora=date("H:i:s");
             $Tercero=$obCon->normalizar($_REQUEST['Tercero']);
@@ -1002,6 +1003,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $idTerceroInteres, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
             
             $obCon->IngresoPlataformasPago($CmbPlataforma,$Fecha, $Hora, $Tercero, $Abono, $idComprobante, $idUser);
+            $obPrint->ComprobanteIngresoPOS($idComprobante, "", 1);
             print("OK;Ingreso registrado en Comprobante $idComprobante");
             
         break;    //Fin caso 24
@@ -1050,6 +1052,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
             
             $obCon->update("anticipos_encargos_abonos", "idComprobanteIngreso", $idComprobante, "WHERE ID='$idAbono'");
+            $obPrint= new PrintPos($idUser);
+            $obPrint->ComprobanteIngresoPOS($idComprobante, "", 1);
             
             print("OK;Anticipo x encargo recibido");
         break;//Fin caso 30    
@@ -1101,6 +1105,7 @@ if( !empty($_REQUEST["Accion"]) ){
                      
             $DatosImpresora=$obCon->DevuelveValores("config_puertos", "ID", 1);
             if($DatosImpresora["Habilitado"]=="SI"){
+                $obPrint=new PrintPos($idUser);
                 $obPrint->ImprimeEgresoPOS($idEgreso, "", "", 2);
             }
             print("OK;Egreso Realizado");

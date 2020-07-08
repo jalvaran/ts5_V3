@@ -335,7 +335,7 @@ if( !empty($_REQUEST["Accion"]) ){
                                     $css->div("", "input-group-addon", "", "", "", "", "");
                                         print('<button id="btn_agregue_anticipos" data-anticipo_cliente="'.$SaldoAnticiposTercero.'" class="btn fa fa-plus-square btn-md btn-primary"></button>');
                                     $css->Cdiv();
-                                        $css->input_number_format("number", "AnticiposCruzados", "form-control input-lg", "AnticiposCruzados", "Cruzar Anticipos", 0, "", "", "", "onkeyup=CalculeDevuelta();");
+                                        $css->input_number_format("number", "AnticiposCruzados", "form-control input-lg", "AnticiposCruzados", "Cruzar Anticipos", 0, "", "", "", "onkeyup=CalculeDevuelta(2);");
                                 $css->Cdiv();    
                             $css->Cdiv();
                         
@@ -544,7 +544,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->FilaTabla(16);
                     print("<td>");
                         $css->select("TipoEgreso", "form-control", "TipoEgreso", "", "", "", "style=width:300px");
-                        $Consulta=$obCon->ConsultarTabla("subcuentas", " WHERE (PUC LIKE '5135%' or PUC LIKE '5105%' or PUC LIKE '5195%') AND LENGTH(PUC)>4 ");
+                        $Consulta=$obCon->ConsultarTabla("subcuentas", " WHERE (PUC LIKE '5135%' or PUC LIKE '5105%' or PUC LIKE '5195%' or PUC LIKE '1105%') AND LENGTH(PUC)>4 ");
                         while($DatosCuenta=$obCon->FetchAssoc($Consulta)){
                                                        
                             $css->option("", "", "", $DatosCuenta["PUC"], "", "", 0);
@@ -884,7 +884,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $TotalPreventa=$Totales["Total"];
             
             $NuevoSaldo=$SaldoActualCliente+$TotalPreventa;
-            $css->CrearTitulo("Crear Acuerdo de Pago para el Cliente <strong>$DatosCliente[RazonSocial] - $DatosCliente[Num_Identificacion]</strong>");
+            $css->CrearTitulo("Crear Acuerdo de Pago para el Cliente <strong>$DatosCliente[RazonSocial] - $DatosCliente[Num_Identificacion] || puntaje: $DatosCliente[Puntaje]</strong>");
             
             $css->CrearDiv("", "col-md-6", "left", 1, 1);
             $css->input("text", "idAcuerdoPago", "form-control", "idAcuerdoPago", "idAcuerdoPago", $idAcuerdo, "id Acuerdo", "off", "", " disabled");

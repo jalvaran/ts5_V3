@@ -87,12 +87,17 @@ $css->PageInit($myTitulo);
     
     
     $css->CrearDiv("", "col-md-5", "center", 1, 1);
-        $css->select("idCliente", "form-control", "idCliente", "", "", "", "style=width:100%");
-            $css->option("", "", "", "1", "", "");
-                print("Clientes Varios");
-            $css->Coption();
-            
-        $css->Cselect();
+        print('<div class="input-group input-group-md">');
+            $css->select("idCliente", "form-control", "idCliente", "", "", "", "style=width:100%");
+                $css->option("", "", "", "1", "", "");
+                    print("Clientes Varios");
+                $css->Coption();
+
+            $css->Cselect();
+        print('<div class="input-group-btn">');                
+                $css->CrearBotonEvento("BtnEditarCliente", "E", 1, "onclick", "AbreModalEditarClientePOS()", "azul");
+            $css->CerrarDiv();
+        $css->CerrarDiv();    
     $css->CerrarDiv();
     
     $css->CrearDiv("", "col-md-2", "right", 1, 1); 

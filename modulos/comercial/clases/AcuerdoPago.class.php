@@ -761,6 +761,22 @@ class AcuerdoPago extends ProcesoVenta{
         $sql=$this->getSQLInsert("acuerdo_pago_anulaciones", $Datos);
         $this->Query($sql);  
     } 
+    
+    public function CrearVistaProductosDevueltosAcuerdoPago() {
+        $sql="DROP VIEW IF EXISTS `vista_productos_devueltos_acuerdos`;";
+        $this->Query($sql);
+        
+        $sql="CREATE VIEW vista_productos_devueltos_acuerdos AS
+            SELECT t1.*,t2.Referencia,t2.Nombre,t3.ID as ConsecutivoAcuerdo
+
+            FROM acuerdo_pago_productos_devueltos t1 
+            INNER JOIN facturas_items t2 ON t1.idFacturasItems=t2.ID 
+            INNER JOIN acuerdo_pago t3 ON t1.idAcuerdoPago=t3.idAcuerdoPago 
+             ORDER BY t1.Created DESC;";
+        $this->Query($sql);
+        
+    }
+    
     /**
      * Fin Clase
      */

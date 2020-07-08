@@ -92,7 +92,7 @@ $css->PageInit($myTitulo);
             $css->CrearDiv("DivContenidoFiltros", "col-md-10", "left", 1, 1);
                       
             $css->CrearDiv("DivMensajes", "col-md-4", "left", 1, 1);
-            
+                print("<strong>Rango de fechas por vencimiento</strong>");
             $css->CerrarDiv();
             
             $css->CrearDiv("", "col-md-2", "right", 1, 1); 

@@ -18,11 +18,7 @@ class PrintPos extends ProcesoVenta{
         fwrite($handle, chr(27). chr(100). chr(0));// SALTO DE CARRO VACIO
         fwrite($handle, chr(27). chr(33). chr(8));// NEGRITA
         fwrite($handle, chr(27). chr(97). chr(1));// CENTRADO
-        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
         $this->SeparadorHorizontal($handle,"*", 37);
-        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
-        fwrite($handle,$Fecha); // ESCRIBO RAZON SOCIAL
-        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
         fwrite($handle,$RazonSocial); // ESCRIBO RAZON SOCIAL
         fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
         fwrite($handle,$NIT);
@@ -487,12 +483,6 @@ class PrintPos extends ProcesoVenta{
     if($DatosFactura["Otros"]>0){
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
         fwrite($handle,"       Otros    ----> $".str_pad(number_format($DatosFactura["Otros"]),10," ",STR_PAD_LEFT));
-    }
-    $sql="SELECT SUM(Valor) as Anticipos FROM facturas_anticipos WHERE idFactura='$idFactura' ";
-    $DatosAnticipos= $this->FetchAssoc($this->Query($sql));
-    if($DatosAnticipos["Anticipos"]>0){
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        fwrite($handle,"Cruce Anticipos ----> $".str_pad(number_format($DatosFactura["Otros"]),10," ",STR_PAD_LEFT));
     }
     if($DatosFactura["Devuelve"]>0){
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
@@ -1165,7 +1155,6 @@ class PrintPos extends ProcesoVenta{
         fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
 
         fwrite($handle,"Cajero:.$DatosUsuario[Nombre] $DatosUsuario[Apellido]");
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
         $this->SeparadorHorizontal($handle,"*", 37);
         
         /////////////////////////////FECHA Y NUM FACTURA
@@ -1224,14 +1213,7 @@ class PrintPos extends ProcesoVenta{
             fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
         }
 
-        fwrite($handle,str_pad("Total Descuentos ".number_format($TotalDescuentos),17," ",STR_PAD_LEFT));
-        
-        //Facturas Negativas
-        $sql="SELECT SUM(Total) as Total FROM facturas WHERE CerradoDiario='$idCierre' AND Total<0";
-        $DatosFacturacionNegativa=$this->FetchAssoc($this->Query($sql));
-        $FacturacionNegativa=$DatosFacturacionNegativa["Total"];
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        fwrite($handle,str_pad("Facturacion Negativa ".number_format($FacturacionNegativa),17," ",STR_PAD_LEFT));
+        fwrite($handle,str_pad("Total Descuentos $TotalDescuentos",10," ",STR_PAD_LEFT));
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     /////////////////////////////TOTALES
     
@@ -1250,124 +1232,15 @@ class PrintPos extends ProcesoVenta{
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"TOTAL VENTAS SISTE CREDITO ".str_pad("$".number_format($DatosCierre["TotalVentasSisteCredito"]),14," ",STR_PAD_LEFT));
+    /*
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    $this->SeparadorHorizontal($handle, "_", 37);
-    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"FORMAS DE PAGO EN FACTURACION: ");
-    
-    $sql="SELECT SUM(Efectivo-Devuelve) as Efectivo,SUM(Cheques) as Cheques,SUM(Otros) as Otros, SUM(Tarjetas) as Tarjetas FROM facturas WHERE CerradoDiario='$idCierre'";
-    
-    $TotalesFormasPagoFactura=$this->FetchAssoc($this->Query($sql));
-    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"EFECTIVO    ".str_pad("$".number_format($TotalesFormasPagoFactura["Efectivo"]),20," ",STR_PAD_LEFT));
-    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"CHEQUES     ".str_pad("$".number_format($TotalesFormasPagoFactura["Cheques"]),20," ",STR_PAD_LEFT));
-    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"BONOS       ".str_pad("$".number_format($TotalesFormasPagoFactura["Otros"]),20," ",STR_PAD_LEFT));
-    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"TARJETAS    ".str_pad("$".number_format($TotalesFormasPagoFactura["Tarjetas"]),20," ",STR_PAD_LEFT));
+    fwrite($handle,"EFECTIVO             ".str_pad("$".number_format($DatosCierre["Efectivo"]),20," ",STR_PAD_LEFT));
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    $this->SeparadorHorizontal($handle, "_", 37);
-    
+    fwrite($handle,"DEVUELTAS            ".str_pad("$".number_format($DatosCierre["Devueltas"]),20," ",STR_PAD_LEFT));
+    */
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    
-    
-    $sql="SELECT SUM(t1.`ValorPago`) as TotalAbono,MetodoPago,TipoCuota,
-                (SELECT NombreTipoCuota FROM acuerdo_pago_tipo_cuota t3 WHERE t1.TipoCuota=t3.ID) as NombreTipoCuota,
-                (SELECT Metodo FROM metodos_pago t2 WHERE t1.MetodoPago=t2.ID) as Metodo 
-                FROM `acuerdo_pago_cuotas_pagadas` t1
-                WHERE `idCierre` = '$idCierre' GROUP BY t1.MetodoPago,t1.TipoCuota ORDER BY MetodoPago,TipoCuota ";
-        
-    $Consulta=$this->Query($sql);
-    //if($this->NumRows($consulta)>0){
-        fwrite($handle,"FORMAS DE PAGO EN ABONOS ACUERDOS: ");
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            
-        while($DatosConsulta= $this->FetchAssoc($Consulta)){
-            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            $Titulo=$DatosConsulta["NombreTipoCuota"]." ".$DatosConsulta["Metodo"];
-            $LongitudTitulo= strlen($Titulo);
-            fwrite($handle,str_pad($Titulo,10," ",STR_PAD_LEFT));
-            fwrite($handle,str_pad("$".number_format($DatosConsulta["TotalAbono"]),40-$LongitudTitulo," ",STR_PAD_LEFT));
-            
-            
-        }
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        $this->SeparadorHorizontal($handle, "_", 37);    
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-       
-    //}    
-    
-      $sql="SELECT SUM(t1.Valor) as Total,(SELECT Metodo FROM metodos_pago t2 WHERE t1.Metodo=t2.ID) as MetodoPago  FROM anticipos_encargos_abonos t1 WHERE idCierre='$idCierre' GROUP BY Metodo";
-      
-    $Consulta=$this->Query($sql);
-    //if($this->NumRows($consulta)>0){
-        fwrite($handle,"ANTICIPOS POR ENCARGOS: ");
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            
-        while($DatosConsulta= $this->FetchAssoc($Consulta)){
-            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            $Titulo=$DatosConsulta["MetodoPago"];
-            $LongitudTitulo= strlen($Titulo);
-            fwrite($handle,str_pad($Titulo,10," ",STR_PAD_LEFT));
-            fwrite($handle,str_pad("$".number_format($DatosConsulta["Total"]),40-$LongitudTitulo," ",STR_PAD_LEFT));
-            
-            
-        }
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        $this->SeparadorHorizontal($handle, "_", 37);    
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-       
-        
-        $sql="SELECT * FROM librodiario 
-                WHERE Tipo_Documento_Intero='FACTURA' AND idCierre='$idCierre' AND Debito>0 AND CuentaPUC=(SELECT CuentaPUC from parametros_contables WHERE ID=20)";
-      
-    $Consulta=$this->Query($sql);
-    //if($this->NumRows($consulta)>0){
-        fwrite($handle,"CRUCE DE ANTICIPOS POR ENCARGOS: ");
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            
-        while($DatosConsulta= $this->FetchAssoc($Consulta)){
-            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            $Titulo="Factura ".$DatosConsulta["Num_Documento_Externo"];
-            $LongitudTitulo= strlen($Titulo);
-            fwrite($handle,str_pad($Titulo,10," ",STR_PAD_LEFT));
-            fwrite($handle,str_pad("$".number_format($DatosConsulta["Debito"]),40-$LongitudTitulo," ",STR_PAD_LEFT));
-            
-            
-        }
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        $this->SeparadorHorizontal($handle, "_", 37);    
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-       
-        
-    //}      
-        
-    $sql="SELECT * FROM librodiario 
-                WHERE Tipo_Documento_Intero='CompEgreso' AND idCierre='$idCierre' AND Debito>0";
-        
-    $Consulta=$this->Query($sql);
-    //if($this->NumRows($consulta)>0){
-        fwrite($handle,"EGRESOS REALIZADOS: ");
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            
-        while($DatosConsulta= $this->FetchAssoc($Consulta)){
-            
-            $Titulo="Egreso ".$DatosConsulta["Num_Documento_Interno"]." ".$DatosConsulta["Concepto"];
-            $LongitudTitulo= strlen($Titulo);            
-            fwrite($handle,str_pad($Titulo,10," ",STR_PAD_LEFT));
-            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            fwrite($handle,str_pad("$".number_format($DatosConsulta["Debito"]),10," ",STR_PAD_LEFT));
-            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            $this->SeparadorHorizontal($handle, "_", 20);    
-            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            
-        }
-        
-    
-    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"ABONOS SEPARADOS     ".str_pad("$".number_format($DatosCierre["TotalAbonosSeparados"]),20," ",STR_PAD_LEFT));
+    fwrite($handle,"ABONOS SEPARADOS     ".str_pad("$".number_format($DatosCierre["TotalAbonos"]),20," ",STR_PAD_LEFT));
     $sql="SELECT SUM(Valor) as Abono, TipoPagoAbono FROM facturas_abonos WHERE idCierre='$idCierre' GROUP BY TipoPagoAbono ";
     $ConsultaAbonos=$this->Query($sql);
     $AbonosCreditoEfectivo=0;
@@ -1389,7 +1262,9 @@ class PrintPos extends ProcesoVenta{
         }
     }
     $TotalInteresesSisteCredito=$this->Sume("facturas_intereses_sistecredito", "Valor", "WHERE idCierre='$idCierre'");
-     
+    $TotalAnticiposRecibidos=$this->Sume("comprobantes_ingreso", "Valor", "WHERE idCierre='$idCierre' AND Estado='ABIERTO' AND Tipo='ANTICIPO'");
+    $TotalAnticiposCruzados=$this->Sume("comprobantes_ingreso", "Valor", "WHERE idCierre='$idCierre' AND Estado='CERRADO' AND Tipo='ANTICIPO'");
+        
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"ABONOS CRED EFECTIVO ".str_pad("$".number_format($AbonosCreditoEfectivo),20," ",STR_PAD_LEFT));
     
@@ -1415,10 +1290,10 @@ class PrintPos extends ProcesoVenta{
     
     if($AbonosAcuerdoEfectivo>0 or $AbonosAcuerdoOtrosMetodos>0){
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        fwrite($handle,"ABONOS ACUERDOS EFECTIVO:  ".str_pad("$".number_format($AbonosAcuerdoEfectivo),14," ",STR_PAD_LEFT));
+        fwrite($handle,"ABONOS ACUERDOS EFECTIVO:  ".str_pad("$".number_format($AbonosAcuerdoEfectivo),20," ",STR_PAD_LEFT));
         
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        fwrite($handle,"ABONOS ACUERDOS NO EFECTIVO:  ".str_pad("$".number_format($AbonosAcuerdoOtrosMetodos),11," ",STR_PAD_LEFT));
+        fwrite($handle,"ABONOS ACUERDOS NO EFECTIVO:  ".str_pad("$".number_format($AbonosAcuerdoOtrosMetodos),17," ",STR_PAD_LEFT));
     
         
     }
@@ -1453,10 +1328,10 @@ class PrintPos extends ProcesoVenta{
     
     if($AbonosAnticiposEncargosEfectivo>0 or $AbonosAnticiposEncargosOtrosMetodos>0){
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        fwrite($handle,"ABONOS ANTICIPOS EFECTIVO:  ".str_pad("$".number_format($AbonosAnticiposEncargosEfectivo),13," ",STR_PAD_LEFT));
+        fwrite($handle,"ABONOS ANTICIPOS EFECTIVO:  ".str_pad("$".number_format($AbonosAnticiposEncargosEfectivo),20," ",STR_PAD_LEFT));
         
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        fwrite($handle,"ABONOS ANTICIPOS NO EFECTIVO:  ".str_pad("$".number_format($AbonosAnticiposEncargosOtrosMetodos),10," ",STR_PAD_LEFT));
+        fwrite($handle,"ABONOS ANTICIPOS NO EFECTIVO:  ".str_pad("$".number_format($AbonosAnticiposEncargosOtrosMetodos),17," ",STR_PAD_LEFT));
     
         
     }
@@ -1464,10 +1339,6 @@ class PrintPos extends ProcesoVenta{
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"INTERESES SISTECREDITO  ".str_pad("$".number_format($TotalInteresesSisteCredito),17," ",STR_PAD_LEFT));
-   
-    $TotalAnticiposRecibidos=$this->Sume("comprobantes_ingreso", "Valor", "WHERE idCierre='$idCierre' AND Estado='ABIERTO' AND Tipo='ANTICIPO'");
-    $TotalAnticiposCruzados=$this->Sume("comprobantes_ingreso", "Valor", "WHERE idCierre='$idCierre' AND Estado='CERRADO' AND Tipo='ANTICIPO'");
-       
     if($TotalAnticiposRecibidos>0){
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
         fwrite($handle,"ANTICIPOS RECIBIDOS  ".str_pad("$".number_format($TotalAnticiposRecibidos),20," ",STR_PAD_LEFT));
@@ -1504,15 +1375,11 @@ class PrintPos extends ProcesoVenta{
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"TOTAL ENTREGA        ".str_pad("$".number_format($DatosCierre["TotalEntrega"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$AbonosAcuerdoOtrosMetodos+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo+$AbonosAnticiposEncargosOtrosMetodos),20," ",STR_PAD_LEFT));
     
-    $SaldoEnCaja=$DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo;
-    $Diferencia=$DatosCierre["EfectivoRecaudado"]-$SaldoEnCaja;
+    
+    
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"EFECTIVO EN CAJA     ".str_pad("$".number_format($DatosCierre["EfectivoRecaudado"]),20," ",STR_PAD_LEFT));
-    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"SALDO EN CAJA        ".str_pad("$".number_format($SaldoEnCaja),20," ",STR_PAD_LEFT));
-    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"DIFERENCIA           ".str_pad("$".number_format($Diferencia),20," ",STR_PAD_LEFT));
-    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+    fwrite($handle,"SALDO EN CAJA        ".str_pad("$".number_format($DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo),20," ",STR_PAD_LEFT));
+    
     $this->SeparadorHorizontal($handle, "_", 37);
 
     $this->Footer($handle);
@@ -1627,7 +1494,7 @@ class PrintPos extends ProcesoVenta{
         }
         
         $idEmpresa=1;
-        $this->EncabezadoComprobantesPos($handle, $DatosIngreso["Fecha"], $idEmpresa);
+        $this->EncabezadoComprobantesPos($handle, $DatosCotizacion["Fecha"], $idEmpresa);
         
         //fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
         fwrite($handle,"$DatosFormato[Nombre] No $idIngreso");
@@ -2733,64 +2600,5 @@ fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
         $salida = shell_exec('lpr $COMPrinter');
     }
     
-    
-    public function ImprimeTraslado($idTraslado,$Copias) {
-        $DatosImpresora=$this->DevuelveValores("config_puertos", "ID", 1);   
-        if($DatosImpresora["Habilitado"]<>"SI"){
-            return;
-        }
-        $COMPrinter= $this->COMPrinter;
-        if(($handle = @fopen("$COMPrinter", "w")) === FALSE){
-            die('ERROR:\nNo se puedo Imprimir, Verifique la conexion de la IMPRESORA');
-        }
-        $Titulo="Traslado No. $idTraslado";
-        $DatosComprobante=$this->DevuelveValores("traslados_mercancia", "ID", $idTraslado);
-        $Fecha=$DatosComprobante["Fecha"];
-             
-        
-        for($i=1; $i<=$Copias;$i++){
-        fwrite($handle,chr(27). chr(64));//REINICIO
-        
-        fwrite($handle, chr(27). chr(100). chr(0));// SALTO DE CARRO VACIO
-        fwrite($handle, chr(27). chr(33). chr(8));// NEGRITA
-        fwrite($handle, chr(27). chr(97). chr(1));// CENTRADO
-        fwrite($handle,"*************************************");
-        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
-        fwrite($handle,$Titulo); // Titulo
-        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
-        fwrite($handle,"*************************************");
-        
-        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
-        fwrite($handle, chr(27). chr(97). chr(0));// IZQUIERDA
-        fwrite($handle,"FECHA: $Fecha");
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        fwrite($handle,"*************************************");
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        fwrite($handle,"Observaciones / ".$DatosComprobante["Descripcion"]);
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea    
-        
-        $sql="SELECT * FROM traslados_items  "
-                . " WHERE idTraslado='$idTraslado'";
-        $Consulta=$this->Query($sql);
-        while($DatosItems=$this->FetchAssoc($Consulta)){
-            fwrite($handle,$DatosItems["Referencia"]." / ");
-            //fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            fwrite($handle,$DatosItems["Cantidad"]." / ".$DatosItems["Nombre"]);
-            fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        }
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea    
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle, chr(29). chr(86). chr(49));//CORTA PAPEL
-    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            
-        
-        
-    }
-    fclose($handle); // cierra el fichero PRN
-    $salida = shell_exec('lpr $COMPrinter');
-    }
     //Fin Clases
 }

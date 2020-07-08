@@ -10,6 +10,8 @@ class Documento{
      * Constructor 
      * @param type $db
      */
+    public $obCon;
+    
     function __construct($db){
         $this->DataBase=$db;
         $this->obCon=new conexion(1);
@@ -1114,7 +1116,11 @@ EOD;
             $Bases[$PorcentajeIVA]["Valor"]=$TotalesFactura["Subtotal"];
         }
         
-
+        $sql="SELECT SUM(Valor) as Anticipos FROM facturas_anticipos WHERE idFactura='$idFactura' ";
+        $DatosAnticipos= $this->obCon->FetchAssoc($this->obCon->Query($sql));
+        if($DatosAnticipos["Anticipos"]>0){
+            $ObservacionesFactura.=$ObservacionesFactura." || Anticipos Cruzados: ".number_format($DatosAnticipos["Anticipos"]);
+        }
     $tbl = '
         <table cellspacing="1" cellpadding="2" border="1">
         <tr>

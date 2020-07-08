@@ -573,4 +573,395 @@ INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`,
 
 
 ALTER TABLE `cajas_aperturas_cierres` ADD `EfectivoRecaudado` DOUBLE NULL AFTER `TotalEntrega`;
+ALTER TABLE `cajas_aperturas_cierres` ADD `TotalAbonosSeparados` DOUBLE NULL AFTER `TotalVentasCredito`;
+ALTER TABLE `cajas_aperturas_cierres` ADD `TotalAbonosAcuerdos` DOUBLE NULL AFTER `TotalVentasCredito`;
+
+-- Adminer 4.7.5 MySQL dump
+
+SET NAMES utf8;
+SET time_zone = '+00:00';
+SET foreign_key_checks = 0;
+SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
+
+CREATE TABLE `acuerdo_pago` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'identificador unico del acuerdo de pago',
+  `idFactura` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Fecha` date NOT NULL COMMENT 'Fecha del acuerdo',
+  `FechaInicialParaPagos` date NOT NULL COMMENT 'Fecha donde se inicia a pagar el credito',
+  `Tercero` bigint(20) NOT NULL COMMENT 'NIT del tercero con el cual se realiza el acuerdo de pago',
+  `ValorCuotaGeneral` double NOT NULL COMMENT 'Valor de la cuota que se elige al crear un acuerdo de pago',
+  `CicloPagos` int(11) NOT NULL COMMENT 'Ciclo de pagos, proviene de la tabla acuerdo_pago_ciclos_pagos, normalmente sera semanal, quincenal o mensual',
+  `NumeroCuotas` int(11) NOT NULL COMMENT 'Cantidad de cuotas para el acuerdo de pago',
+  `SaldoAnterior` double NOT NULL COMMENT 'Saldo anterior del cliente, viene de la sumatoria de la cuenta contable 1305',
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL COMMENT 'observaciones del acuerdo',
+  `SaldoInicial` double NOT NULL COMMENT 'Saldo inicial del acuerdo, sera el valor de la factura a credito mas el saldo anterior',
+  `TotalAbonos` double NOT NULL COMMENT 'Registra el total de abonos realizados al documento',
+  `SaldoFinal` double NOT NULL COMMENT 'Registra el saldo final con el que queda el documento',
+  `Estado` int(11) NOT NULL COMMENT 'Estado en el que se encuentra el documento, relacionado con la tabla acuerdo_pago_estados',
+  `idUser` int(11) NOT NULL COMMENT 'usuario que lo crea',
+  `Created` datetime NOT NULL COMMENT 'Fecha de creacion del registro',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `Tercero` (`Tercero`),
+  KEY `CicloPagos` (`CicloPagos`),
+  KEY `NumeroCuotas` (`NumeroCuotas`),
+  KEY `Estado` (`Estado`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`),
+  KEY `idFactura` (`idFactura`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_abonos_anulaciones` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idAbono` bigint(20) NOT NULL,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
+  `Created` date NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`),
+  KEY `idAbono` (`idAbono`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_anulaciones` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
+  `Created` date NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_ciclos_pagos` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NombreCiclo` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `NumeroDias` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_cuotas_pagadas` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `NumeroCuota` int(11) NOT NULL COMMENT 'Numero de la cuota que se paga, relacionada con la tabla acuerdo_pago_cuotas_planeadas',
+  `idProyeccion` bigint(20) NOT NULL COMMENT 'id de la proyeccion de cuotas que se paga',
+  `TipoCuota` int(11) NOT NULL COMMENT '1 para Inicial, 2 para cuota programada, 3 para cuota normal',
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'id unico del acuerdo de pago',
+  `FechaPago` date NOT NULL COMMENT 'Fecha del pago',
+  `ValorPago` double NOT NULL COMMENT 'Valor que paga el cliente',
+  `MetodoPago` int(11) NOT NULL COMMENT 'Relacion con la tabla metodos_pago, efectivo, tarjetas, cheques, bonos etc',
+  `idUser` int(11) NOT NULL COMMENT 'usuario que recibe la cuota',
+  `Estado` int(11) NOT NULL DEFAULT '1',
+  `idCierre` bigint(20) NOT NULL COMMENT 'id del cierre donde se suma el abono del cliente, relaciona con la tabla cajas_aperturas_cierres',
+  `Created` datetime NOT NULL COMMENT 'Fecha en que se crea el registro',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idCierre` (`idCierre`),
+  KEY `idUser` (`idUser`),
+  KEY `NumeroCuota` (`NumeroCuota`),
+  KEY `TipoCuota` (`TipoCuota`),
+  KEY `MetodoPago` (`MetodoPago`),
+  KEY `idProyeccion` (`idProyeccion`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_cuotas_pagadas_estados` (
+  `ID` int(11) NOT NULL,
+  `NombreEstado` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_cuotas_pagadas_temp` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `NumeroCuota` int(11) NOT NULL COMMENT 'Numero de la cuota que se paga, relacionada con la tabla acuerdo_pago_cuotas_planeadas',
+  `TipoCuota` int(11) NOT NULL COMMENT '1 para Inicial, 2 para cuota programada, 3 para cuota normal',
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'id unico del acuerdo de pago',
+  `FechaPago` date NOT NULL COMMENT 'Fecha del pago',
+  `ValorPago` double NOT NULL COMMENT 'Valor que paga el cliente',
+  `MetodoPago` int(11) NOT NULL COMMENT 'Relacion con la tabla metodos_pago, efectivo, tarjetas, cheques, bonos etc',
+  `Estado` int(11) NOT NULL,
+  `idUser` int(11) NOT NULL COMMENT 'usuario que recibe la cuota',
+  `idCierre` bigint(20) NOT NULL COMMENT 'id del cierre donde se suma el abono del cliente, relaciona con la tabla cajas_aperturas_cierres',
+  `Created` datetime NOT NULL COMMENT 'Fecha en que se crea el registro',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idCierre` (`idCierre`),
+  KEY `idUser` (`idUser`),
+  KEY `NumeroCuota` (`NumeroCuota`),
+  KEY `TipoCuota` (`TipoCuota`),
+  KEY `MetodoPago` (`MetodoPago`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_estados` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NombreEstado` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'Nombre del estado',
+  `Observaciones` tinytext COLLATE utf8_spanish_ci NOT NULL COMMENT 'Observaciones del estado, aplicacion, cuando aplica',
+  `Created` datetime NOT NULL COMMENT 'Fecha de creacion del registro',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `acuerdo_pago_estados` (`ID`, `NombreEstado`, `Observaciones`, `Created`, `Updated`, `Sync`) VALUES
+(1,	'Abierto',	'Documento Activo',	'0000-00-00 00:00:00',	'2020-02-22 19:56:35',	'0000-00-00 00:00:00'),
+(10,	'Anulado por documento nuevo',	'Anulado por un documento nuevo',	'0000-00-00 00:00:00',	'2020-02-22 19:56:35',	'0000-00-00 00:00:00'),
+(11,	'Anulado por Usuario',	'Se anula el documento por un usuario',	'0000-00-00 00:00:00',	'2020-02-22 19:56:35',	'0000-00-00 00:00:00'),
+(2,	'Pagado',	'Documento Pagado por completo',	'0000-00-00 00:00:00',	'2020-02-22 19:56:35',	'0000-00-00 00:00:00'),
+(12,	'Reportado por Usuario',	'Se Reporta y se beta al usuario',	'0000-00-00 00:00:00',	'2020-02-22 19:56:35',	'0000-00-00 00:00:00');
+
+CREATE TABLE `acuerdo_pago_hoja_trabajo_informes` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `ConsecutivoAcuerdo` bigint(20) NOT NULL DEFAULT '0',
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'id del acuerdo de pago',
+  `TipoCuota` int(11) NOT NULL COMMENT 'Tipo de cuota, 1 cuota programable, 2 Cuota Normal',
+  `NumeroCuota` int(11) NOT NULL COMMENT 'Numero de Cuota',
+  `Fecha` date NOT NULL COMMENT 'Fecha proyectada para pago',
+  `ValorCuota` double NOT NULL COMMENT 'Valor de la cuota',
+  `ValorPagado` double NOT NULL,
+  `SaldoCuota` double NOT NULL,
+  `idPago` bigint(20) NOT NULL,
+  `EstadoProyeccion` int(11) NOT NULL COMMENT '0 sin pagar, 1 pago parcial, 2 pago completo',
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL COMMENT 'observaciones del acuerdo',
+  `FechaFinalConstruccion` varchar(10) CHARACTER SET latin1 NOT NULL,
+  `SaldoPendiente` double DEFAULT NULL,
+  `NombreEstadoProyeccion` varchar(20) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `NombreTipoCuota` varchar(15) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `Tercero` bigint(20) NOT NULL COMMENT 'NIT del tercero con el cual se realiza el acuerdo de pago',
+  `RazonSocial` varchar(100) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `idClienteAcuerdo` bigint(11) DEFAULT NULL,
+  `DireccionCliente` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `TelefonoCliente` varchar(100) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `PuntajeCliente` bigint(11) DEFAULT NULL,
+  `SobreNombreCliente` varchar(90) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `ValorCuotaGeneral` double NOT NULL COMMENT 'Valor de la cuota que se elige al crear un acuerdo de pago',
+  `CicloPagos` int(11) NOT NULL COMMENT 'Ciclo de pagos, proviene de la tabla acuerdo_pago_ciclos_pagos, normalmente sera semanal, quincenal o mensual',
+  `NombreCicloPago` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `SaldoAnterior` double(17,0) NOT NULL,
+  `SaldoInicial` double(17,0) NOT NULL,
+  `TotalAbonos` double NOT NULL COMMENT 'Registra el total de abonos realizados al documento',
+  `SaldoFinal` double(17,0) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `ConsecutivoAcuerdo` (`ConsecutivoAcuerdo`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`),
+  KEY `TipoCuota` (`TipoCuota`),
+  KEY `NumeroCuota` (`NumeroCuota`),
+  KEY `EstadoProyeccion` (`EstadoProyeccion`),
+  KEY `Tercero` (`Tercero`),
+  KEY `CicloPagos` (`CicloPagos`),
+  KEY `TelefonoCliente` (`TelefonoCliente`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_productos_devueltos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `idFacturasItems` bigint(20) NOT NULL,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Cantidad` double NOT NULL,
+  `ValorDevolucion` double NOT NULL,
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idFacturasItems` (`idFacturasItems`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_proyeccion_estados` (
+  `ID` int(11) NOT NULL,
+  `NombreEstado` varchar(20) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `acuerdo_pago_proyeccion_estados` (`ID`, `NombreEstado`, `Updated`, `Sync`) VALUES
+(0,	'Pendiente',	'2020-02-22 19:56:35',	'0000-00-00 00:00:00'),
+(1,	'Pagada',	'2020-02-22 19:56:35',	'0000-00-00 00:00:00'),
+(2,	'Pago Parcial',	'2020-02-22 19:56:35',	'0000-00-00 00:00:00'),
+(3,	'Pago Extemporaneo',	'2020-02-22 19:56:35',	'0000-00-00 00:00:00'),
+(4,	'Vencida',	'2020-02-22 19:56:35',	'0000-00-00 00:00:00');
+
+CREATE TABLE `acuerdo_pago_proyeccion_pagos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'id del acuerdo de pago',
+  `TipoCuota` int(11) NOT NULL COMMENT 'Tipo de cuota, 1 cuota programable, 2 Cuota Normal',
+  `NumeroCuota` int(11) NOT NULL COMMENT 'Numero de Cuota',
+  `Fecha` date NOT NULL COMMENT 'Fecha proyectada para pago',
+  `ValorCuota` double NOT NULL COMMENT 'Valor de la cuota',
+  `ValorPagado` double NOT NULL,
+  `idPago` bigint(20) NOT NULL,
+  `Estado` int(11) NOT NULL COMMENT '0 sin pagar, 1 pago parcial, 2 pago completo',
+  `idUser` int(11) NOT NULL COMMENT 'usuario creador',
+  `Created` datetime NOT NULL COMMENT 'Fecha y hora del registro',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`),
+  KEY `Estado` (`Estado`),
+  KEY `idPago` (`idPago`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_proyeccion_pagos_temp` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `TipoCuota` int(11) NOT NULL COMMENT 'Tipo de cuota, 1 cuota programable, 2 Cuota Normal',
+  `NumeroCuota` int(11) NOT NULL COMMENT 'Numero de Cuota',
+  `Fecha` date NOT NULL COMMENT 'Fecha proyectada para pago',
+  `ValorCuota` double NOT NULL COMMENT 'Valor de la cuota',
+  `Estado` int(11) NOT NULL COMMENT '0 sin pagar, 1 pago parcial, 2 pago completo',
+  `idUser` int(11) NOT NULL,
+  `Created` datetime NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idAcuerdoPago` (`idAcuerdoPago`),
+  KEY `Estado` (`Estado`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_rel_abonos_comprobantes` (
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `idComprobante` bigint(20) NOT NULL,
+  `Created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  KEY `idAcuerdoPago` (`idAcuerdoPago`),
+  KEY `idComprobante` (`idComprobante`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_pago_tipo_cuota` (
+  `ID` int(11) NOT NULL,
+  `NombreTipoCuota` varchar(15) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `acuerdo_recargos_intereses` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `idAcuerdoPago` varchar(45) COLLATE utf8_spanish_ci NOT NULL COMMENT 'id unico del acuerdo de pago',
+  `FechaPago` date NOT NULL COMMENT 'Fecha del pago',
+  `ValorRecargoInteres` double NOT NULL COMMENT 'Valor que paga el cliente',
+  `MetodoPago` int(11) NOT NULL COMMENT 'Relacion con la tabla metodos_pago, efectivo, tarjetas, cheques, bonos etc',
+  `idUser` int(11) NOT NULL COMMENT 'usuario que recibe la cuota',
+  `idCierre` bigint(20) NOT NULL COMMENT 'id del cierre donde se suma el abono del cliente, relaciona con la tabla cajas_aperturas_cierres',
+  `Created` datetime NOT NULL COMMENT 'Fecha en que se crea el registro',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idCierre` (`idCierre`),
+  KEY `idUser` (`idUser`),
+  KEY `MetodoPago` (`MetodoPago`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `anticipos_encargos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL COMMENT 'Fecha del anticipo',
+  `Tercero` bigint(20) NOT NULL COMMENT 'Tercero que da el anticipo',
+  `Observaciones` text COLLATE utf8_spanish_ci NOT NULL COMMENT 'Observaciones del anticipo',
+  `idUser` int(11) NOT NULL COMMENT 'Usuario que recibe',
+  `Estado` int(11) NOT NULL,
+  `Created` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP COMMENT 'Fecha de Creacion',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `Tercero` (`Tercero`),
+  KEY `idUser` (`idUser`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `anticipos_encargos_abonos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `idAnticipo` bigint(20) NOT NULL,
+  `Metodo` int(11) NOT NULL,
+  `Valor` double NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `idCierre` bigint(20) NOT NULL,
+  `idComprobanteIngreso` bigint(20) NOT NULL,
+  `Created` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `idAnticipo` (`idAnticipo`),
+  KEY `Metodo` (`Metodo`),
+  KEY `idUser` (`idUser`),
+  KEY `idCierre` (`idCierre`),
+  KEY `idComprobanteIngreso` (`idComprobanteIngreso`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `anticipos_encargos_estados` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NombreEstado` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `anticipos_encargos_estados` (`ID`, `NombreEstado`, `Updated`, `Sync`) VALUES
+(1,	'Abierto',	'2020-03-17 14:04:03',	'0000-00-00 00:00:00'),
+(2,	'Cerrado',	'2020-03-17 14:04:03',	'0000-00-00 00:00:00'),
+(3,	'Anulado',	'2020-03-17 14:04:03',	'0000-00-00 00:00:00');
+
+CREATE TABLE `metodos_pago` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Metodo` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
+  `Estado` int(11) NOT NULL,
+  `SoloAdmin` int(11) NOT NULL,
+  `CuentaPUCIngresos` bigint(20) NOT NULL,
+  `NombreCuentaPUCIngresos` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `CuentaPUCEgresos` bigint(20) NOT NULL,
+  `NombreCuentaPUCEgresos` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `metodos_pago` (`ID`, `Metodo`, `Estado`, `SoloAdmin`, `CuentaPUCIngresos`, `NombreCuentaPUCIngresos`, `CuentaPUCEgresos`, `NombreCuentaPUCEgresos`, `Updated`, `Sync`) VALUES
+(1,	'EFECTIVO',	1,	0,	110505,	'CAJA MENOR',	110505,	'CAJA MENOR',	'2020-03-17 13:44:54',	'0000-00-00 00:00:00'),
+(2,	'TARJETA CREDITO',	1,	0,	11100501,	'BANCOS TARJETA CREDITO',	11100501,	'BANCOS TARJETA CREDITO',	'2020-03-17 13:44:54',	'0000-00-00 00:00:00'),
+(3,	'TARJETA DEBITO',	1,	0,	11100502,	'BANCOS TARJETA DEBITO',	11100502,	'BANCOS TARJETA DEBITO',	'2020-03-17 13:44:54',	'0000-00-00 00:00:00'),
+(4,	'CHEQUE',	1,	0,	11100510,	'BANCOS CHEQUES',	11100510,	'BANCOS CHEQUES',	'2020-03-17 13:44:54',	'0000-00-00 00:00:00'),
+(5,	'BONO',	1,	0,	11050599,	'OTRAS FORMAS DE PAGO',	11050599,	'OTRAS FORMAS DE PAGO',	'2020-03-17 13:44:54',	'0000-00-00 00:00:00'),
+(10,	'SALDO A FAVOR DEL CLIENTE',	1,	1,	28050503,	'SALDO A FAVOR DEL CLIENTE',	28050503,	'SALDO A FAVOR DEL CLIENTE',	'2020-03-17 13:44:54',	'0000-00-00 00:00:00'),
+(11,	'ANTICIPO',	1,	1,	28050502,	'ANTIPOS REALIZADOS POR ENCARGOS',	28050502,	'ANTIPOS REALIZADOS POR ENCARGOS',	'2020-03-17 13:44:54',	'0000-00-00 00:00:00'),
+(6,	'CUENTA DE AHORRO',	1,	0,	11100503,	'CUENTAS DE AHORROS',	11100503,	'CUENTAS DE AHORROS',	'2020-03-17 13:44:54',	'0000-00-00 00:00:00'),
+(12,	'POR DEVOLUCION PRODUCTO',	1,	1,	28050503,	'SALDO A FAVOR DE UN CLIENTE POR DEVOLUCION',	28050503,	'SALDO A FAVOR DE UN CLIENTE POR DEVOLUCION',	'2020-03-17 13:44:54',	'0000-00-00 00:00:00'),
+(13,	'NEGOCIACION INTERNA',	1,	1,	513501,	'NEGOCIACION INTERNA',	513501,	'NEGOCIACION INTERNA',	'2020-03-17 13:44:54',	'0000-00-00 00:00:00');
+
+
+
+ALTER TABLE `facturas_anticipos` ADD `idFactura` VARCHAR(45) NOT NULL AFTER `ID`, ADD INDEX `idFactura` (`idFactura`);
+ALTER TABLE `facturas_anticipos` CHANGE `Valor` `Valor` DOUBLE NOT NULL;
+
+INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `CuerpoFormato`, `NotasPiePagina`, `Updated`, `Sync`) VALUES
+(39,	'ESTADO DE SITUACION FINANCIERA',	'001',	'F-GF-002',	'2017-08-09',	'',	'',	'2019-01-13 09:11:00',	'2019-01-13 09:11:00');
+
+-- 2020-06-23 13:50:54
 

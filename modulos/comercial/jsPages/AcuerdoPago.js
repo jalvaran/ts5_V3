@@ -823,7 +823,8 @@ function CalculeProyeccionPagosAcuerdo(idAcuerdo=''){
 }
 
 function EliminarItemAcuerdo(Tabla,idItem){
-        
+    var idCliente=document.getElementById('idCliente').value; 
+    
     var form_data = new FormData();
         form_data.append('Accion', 26);        
         form_data.append('Tabla', Tabla);
@@ -840,12 +841,16 @@ function EliminarItemAcuerdo(Tabla,idItem){
             var respuestas = data.split(';'); 
             if(respuestas[0]=="OK"){
                 alertify.error(respuestas[1]);
+                if(Tabla == 3){
+                    DibujeRecomendadosCliente(idCliente);
+                }
             }
             if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
             }
-            CalculeProyeccionPagosAcuerdo();
-            
+            if(Tabla != 3){
+                CalculeProyeccionPagosAcuerdo();
+            }
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.status);

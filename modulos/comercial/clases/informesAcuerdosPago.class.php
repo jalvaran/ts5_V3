@@ -54,6 +54,28 @@ class informesAcuerdoPago extends AcuerdoPago{
         $this->Query($sql);
     }
     
+    public function CrearVistaAbonosAcuerdoPago() {
+        $sql="DROP VIEW IF EXISTS `vista_abonos_acuerdo_pago`;";
+        $this->Query($sql);
+        
+        $sql="CREATE VIEW vista_abonos_acuerdo_pago AS
+            SELECT t1.ID,t2.Tercero,t1.NumeroCuota,t1.TipoCuota,
+                (SELECT t3.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t3 WHERE t3.ID=t1.TipoCuota LIMIT 1 ) AS NombreTipoCuota,
+                t1.idAcuerdoPago,t2.ID as ConsecutivoAcuerdo,
+                (SELECT t6.Fecha FROM acuerdo_pago_proyeccion_pagos t6 WHERE t6.ID=t1.idProyeccion LIMIT 1 ) AS FechaCuota,
+                t1.FechaPago AS Fecha,t1.ValorPago,t1.MetodoPago,
+                (SELECT t5.Metodo FROM metodos_pago t5 WHERE t5.ID=t1.MetodoPago) as NombreMetodoPago,
+                t1.idUser,
+                (SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t4 WHERE t4.idUsuarios=t1.idUser ) as NombreUsuario,
+                t1.Created
+
+            FROM acuerdo_pago_cuotas_pagadas t1 
+            INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
+             ORDER BY t2.Tercero,t1.Created DESC;";
+        $this->Query($sql);
+        
+    }
+    
     /**
      * Fin Clase
      */
