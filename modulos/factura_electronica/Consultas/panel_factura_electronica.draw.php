@@ -369,7 +369,7 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             $DatosDocumento=$obCon->DevuelveValores($Tabla, "ID", $idItemFacturasLog);
             $JSONDocumento= json_decode($DatosDocumento["RespuestaCompletaServidor"]);
-            
+            $JSONDocumento=str_replace(PHP_EOL, '', $JSONDocumento);
             if(!is_object($JSONDocumento)){
                 $JSONDocumento=$DatosDocumento["RespuestaCompletaServidor"];
             }
@@ -505,8 +505,8 @@ if( !empty($_REQUEST["Accion"]) ){
             while($DatosItems=$obCon->FetchAssoc($Consulta)){
                 $idItem=$DatosItems["ID"];
                 $Subtotal=$Subtotal+$DatosItems["SubtotalItem"];
-                $Impuestos=$Subtotal+$DatosItems["IVAItem"];
-                $Total=$Subtotal+$DatosItems["TotalItem"];
+                $Impuestos=$Impuestos+$DatosItems["IVAItem"];
+                $Total=$Total+$DatosItems["TotalItem"];
                 $css->FilaTabla(14);
                     $css->ColTabla($DatosItems["Referencia"], 1);
                     $css->ColTabla($DatosItems["Nombre"], 1);

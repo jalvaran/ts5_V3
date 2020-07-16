@@ -50,7 +50,6 @@ if( !empty($_REQUEST["Accion"]) ){
                 }else{
                     $Estado=11;
                 }
-                //$response=str_replace(PHP_EOL, '', $response);
                 $obCon->FacturaElectronica_Registre_Respuesta_Server($idFactura,$response,$Estado);
                 exit("OK;Factura $NumeroFactura Reportada");
             }else{
@@ -65,18 +64,24 @@ if( !empty($_REQUEST["Accion"]) ){
             $DatosLogFactura=$obCon->FetchAssoc($obCon->Query($sql));
             $idFactura=$DatosLogFactura["idFactura"];
             $idLog=$DatosLogFactura["ID"];
-            $DatosLogFactura["RespuestaCompletaServidor"]=str_replace( PHP_EOL, '', $DatosLogFactura["RespuestaCompletaServidor"]);
-            $DatosLogFactura["RespuestaCompletaServidor"]=str_replace( "\n", '', $DatosLogFactura["RespuestaCompletaServidor"]);
+            $RespuestaArray= explode(",", str_replace('"','',$DatosLogFactura["RespuestaCompletaServidor"]));
+            
+            print_r($RespuestaArray);
+            if(isset($RespuestaArray["IsValid:true"])){
+                
+            }
             if($idFactura<>''){
                 if($DatosLogFactura["RespuestaCompletaServidor"]==''){
                     $obCon->ActualizaRegistro("facturas_electronicas_log", "Estado", 20, "ID", $idLog);
                     
                 }else{
                     $JSONFactura= json_decode($DatosLogFactura["RespuestaCompletaServidor"]);
+                    print_r($JSONFactura);
                     if((property_exists($JSONFactura, "uuid"))){
                         $CUFE=$JSONFactura->uuid;
                         $obCon->ActualizaRegistro("facturas_electronicas_log", "UUID", $CUFE, "ID", $idLog);
                     }
+                    
                     
                     
                     if((property_exists($JSONFactura, "responseDian"))){
@@ -116,10 +121,6 @@ if( !empty($_REQUEST["Accion"]) ){
             $idFactura=$DatosLogFactura["idFactura"];
             $idLog=$DatosLogFactura["ID"];
             if($idFactura<>''){
-                $DatosLogFactura["RespuestaCompletaServidor"]=str_replace(PHP_EOL, '', $DatosLogFactura["RespuestaCompletaServidor"]);
-                $DatosLogFactura["RespuestaCompletaServidor"]=str_replace("\n", '', $DatosLogFactura["RespuestaCompletaServidor"]);
-                $DatosLogFactura["RespuestaCompletaServidor"]=str_replace("\r", '', $DatosLogFactura["RespuestaCompletaServidor"]);
-                $DatosLogFactura["RespuestaCompletaServidor"]=str_replace("'", '', $DatosLogFactura["RespuestaCompletaServidor"]);
                 $JSONFactura= json_decode($DatosLogFactura["RespuestaCompletaServidor"]);
                 $NumeroFactura=$JSONFactura->number;
                 $Ruta=$obCon->CrearPDFDesdeBase64($JSONFactura->pdfBase64Bytes,$NumeroFactura);
@@ -134,7 +135,6 @@ if( !empty($_REQUEST["Accion"]) ){
                 $idNota=$DatosNota["ID"];
                 if($idNota<>''){
                     $Ruta="";
-                    $DatosNota["RespuestaCompletaServidor"]=str_replace(PHP_EOL, '', $DatosNota["RespuestaCompletaServidor"]);
                     $JSONFactura= json_decode($DatosNota["RespuestaCompletaServidor"]);
                     if(is_object($JSONFactura)){
                         if(property_exists($JSONFactura, "pdfBase64Bytes")){
@@ -166,10 +166,6 @@ if( !empty($_REQUEST["Accion"]) ){
             $idFactura=$DatosLogFactura["idFactura"];
             $idLog=$DatosLogFactura["ID"];
             if($idFactura<>''){
-                $DatosLogFactura["RespuestaCompletaServidor"]=str_replace(PHP_EOL, '', $DatosLogFactura["RespuestaCompletaServidor"]);
-                $DatosLogFactura["RespuestaCompletaServidor"]=str_replace("\n", '', $DatosLogFactura["RespuestaCompletaServidor"]);
-                $DatosLogFactura["RespuestaCompletaServidor"]=str_replace("\r", '', $DatosLogFactura["RespuestaCompletaServidor"]);
-                $DatosLogFactura["RespuestaCompletaServidor"]=str_replace("'", '', $DatosLogFactura["RespuestaCompletaServidor"]);
                 $JSONFactura= json_decode($DatosLogFactura["RespuestaCompletaServidor"]);
                 $NumeroFactura=$JSONFactura->number;
                 $Ruta=$obCon->CrearZIPDesdeBase64($JSONFactura->zipBase64Bytes,$NumeroFactura);
@@ -308,10 +304,6 @@ if( !empty($_REQUEST["Accion"]) ){
                 if($DatosTotal["TotalItems"]>0){ //Verifico que la factura tenga items
                     $body=$obCon->JSONNotaCredito($idNota);
                     $response = $obCon->callAPI('POST', $url, $body);  
-                    $response=str_replace(PHP_EOL, '', $response);
-                    $response=str_replace("\n", '',$response);
-                    $response=str_replace("\r", '',$response);
-                    $response=str_replace("'", '',$response);
                     $sql="UPDATE notas_credito SET RespuestaCompletaServidor='$response' WHERE ID='$idNota'";
                     $obCon->Query($sql);
                     $JsonRespuesta= json_decode($response);
@@ -363,22 +355,15 @@ if( !empty($_REQUEST["Accion"]) ){
             $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 106); //Ruta para validar los logs de un documento         
             $url=$DatosServidor["IP"];
             if($idDocumento<>''){
-                $sql="SELECT RespuestaCompletaServidor,UUID FROM $Tabla WHERE ID='$idDocumento'";
+                $sql="SELECT RespuestaCompletaServidor FROM $Tabla WHERE ID='$idDocumento'";
                 $DatosConsulta=$obCon->FetchAssoc($obCon->Query($sql));
-                $DatosConsulta["RespuestaCompletaServidor"]=str_replace(PHP_EOL, '', $DatosConsulta["RespuestaCompletaServidor"]);
                 $response=$DatosConsulta["RespuestaCompletaServidor"];
                 $JsonRespuesta= json_decode($response);
-                $UUID2=$DatosConsulta["UUID"];
-                if( $UUID2<>''){
-                    //$uuid=$JsonRespuesta->uuid;
-                    $uuid=$UUID2;
+                if((property_exists($JsonRespuesta, "uuid"))){
+                    $uuid=$JsonRespuesta->uuid;
                     $url=$url.$uuid;
                     $body="";
                     $response = $obCon->callAPI('POST', $url, $body);
-                    $response=str_replace(PHP_EOL, '', $response);
-                    $response=str_replace('\n', '', $response);
-                    $response=str_replace('\r', '', $response);
-                    $response=str_replace("'", '', $response);
                     $sql="UPDATE $Tabla SET LogsDocumento='$response' WHERE ID='$idDocumento'";
                     $obCon->Query($sql);
                     $JsonLogs= json_decode($response);
@@ -404,31 +389,21 @@ if( !empty($_REQUEST["Accion"]) ){
         
         case 10://Validar los acuse de recibo de los documentos 
             $Tabla="facturas_electronicas_log";
-            $sql="SELECT ID,idFactura,RespuestaCompletaServidor as Respuesta,UUID FROM $Tabla WHERE AcuseRecibo=''";
+            $sql="SELECT ID,idFactura,RespuestaCompletaServidor as Respuesta FROM $Tabla WHERE AcuseRecibo=''";
             $Consulta=($obCon->Query($sql));
             while($DatosDocumento=$obCon->FetchAssoc($Consulta)){
                 if($DatosDocumento["Respuesta"]<>''){
                     $idDocumento=$DatosDocumento["ID"];
-                    $DatosDocumento["Respuesta"]=str_replace(PHP_EOL, '', $DatosDocumento["Respuesta"]);
-                    $DatosDocumento["Respuesta"]=str_replace('\n', '', $DatosDocumento["Respuesta"]);
-                    $DatosDocumento["Respuesta"]=str_replace('\r', '', $DatosDocumento["Respuesta"]);
-                    $DatosDocumento["Respuesta"]=str_replace("'", '', $DatosDocumento["Respuesta"]);
                     $response=$DatosDocumento["Respuesta"];
                     $JsonRespuesta= json_decode($response);
-                    $UUID2=$DatosDocumento["UUID"];
-                    if($UUID2<>''){
-                        if($UUID2<>''){
+                    if(is_object($JsonRespuesta)){
+                        if((property_exists($JsonRespuesta, "uuid"))){
                             $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 106); //Ruta para validar los logs de un documento         
                             $url=$DatosServidor["IP"];
-                            //$uuid=$JsonRespuesta->uuid;
-                            $uuid=$UUID2;
+                            $uuid=$JsonRespuesta->uuid;
                             $url=$url.$uuid;
                             $body="";
                             $response2 = $obCon->callAPI('POST', $url, $body);
-                            $response2=str_replace(PHP_EOL, '', $response2);
-                            $response2=str_replace('\n', '', $response2);
-                            $response2=str_replace('\n', '', $response2);
-                            $response2=str_replace("'", '', $response2);
                             $sql="UPDATE $Tabla SET LogsDocumento='$response2' WHERE ID='$idDocumento'";
                             $obCon->Query($sql);
                             $JsonLogs= json_decode($response2);
@@ -463,36 +438,26 @@ if( !empty($_REQUEST["Accion"]) ){
                             
 
                         }  
-                    }else{
-                        //print("No es un objeto");
                     }
                 }    
             }
             
             $Tabla="notas_credito";
-            $sql="SELECT ID,Fecha,RespuestaCompletaServidor as Respuesta,UUID FROM $Tabla WHERE AcuseRecibo=''";
+            $sql="SELECT ID,Fecha,RespuestaCompletaServidor as Respuesta FROM $Tabla WHERE AcuseRecibo=''";
             $Consulta=($obCon->Query($sql));
             while($DatosDocumento=$obCon->FetchAssoc($Consulta)){
                 if($DatosDocumento["Respuesta"]<>''){
                     $idDocumento=$DatosDocumento["ID"];
-                    
-                    $DatosDocumento["Respuesta"]=str_replace(PHP_EOL, '', $DatosDocumento["Respuesta"]);
-                    $DatosDocumento["Respuesta"]=str_replace('\n', '', $DatosDocumento["Respuesta"]);
-                    $DatosDocumento["Respuesta"]=str_replace('\r', '', $DatosDocumento["Respuesta"]);
-                    $DatosDocumento["Respuesta"]=str_replace("'", '', $DatosDocumento["Respuesta"]);
                     $response=$DatosDocumento["Respuesta"];
                     $JsonRespuesta= json_decode($response);
-                    $UUID2=$DatosDocumento["UUID"];
                     if(is_object($JsonRespuesta)){
-                        if((property_exists($JsonRespuesta, "uuid"))){ //No está funcionando
+                        if((property_exists($JsonRespuesta, "uuid"))){
                             $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 106); //Ruta para validar los logs de un documento         
                             $url=$DatosServidor["IP"];
                             $uuid=$JsonRespuesta->uuid;
                             $url=$url.$uuid;
                             $body="";
                             $response2 = $obCon->callAPI('POST', $url, $body);
-                            
-                            
                             $sql="UPDATE $Tabla SET LogsDocumento='$response2' WHERE ID='$idDocumento'";
                             $obCon->Query($sql);
                             $JsonLogs= json_decode($response2);
@@ -524,8 +489,6 @@ if( !empty($_REQUEST["Accion"]) ){
                             }
                             
                         } 
-                    }else{
-                        //print("No es objeto");
                     }
                 }    
             }

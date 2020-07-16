@@ -87,7 +87,8 @@ class VentasRestaurantePOS extends Facturacion{
             $Columnas[18]="Sub5";               $Valores[18]= $DatosProductos["Sub5"];
             $Columnas[19]="Estado";             $Valores[19]= "AB";
             $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
-            
+            $idItem=$this->ObtenerMAX($tab, "ID", 1, "");
+            return($idItem);
             
         }
       
@@ -484,6 +485,15 @@ class VentasRestaurantePOS extends Facturacion{
                '$idUser','$idCierre','$FechaRegistro'
               FROM productosventa t1   
             ";
+        $this->Query($sql);
+    }
+    
+    function agregarComplementoPedido($pedido_item_id,$complemento_id,$complemento_item_id){
+        $tab="restaurante_pedidos_items_complementos";
+        $Datos["pedido_item_id"]=$pedido_item_id;
+        $Datos["complemento_id"]=$complemento_id;
+        $Datos["complemento_item_id"]=$complemento_item_id;
+        $sql=$this->getSQLInsert($tab, $Datos);
         $this->Query($sql);
     }
     

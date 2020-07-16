@@ -418,6 +418,53 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Total editado");
         break;//Fin caso 15
         
+        case 16: //Agrega producto con complementos a un pedido
+            $idPedido=$obCon->normalizar($_REQUEST["idPedido"]); 
+            $idProducto=$obCon->normalizar($_REQUEST["idProducto"]);             
+            $Observaciones=$obCon->normalizar($_REQUEST["Observaciones"]); 
+            $Cantidad=$obCon->normalizar($_REQUEST["Cantidad"]);
+                        
+            $jsonForm= $_REQUEST["jsonComplementos"];
+            parse_str($jsonForm,$DatosFormulario);
+            
+            //print_r($DatosFormulario);
+            //exit();
+            
+            foreach ($DatosFormulario as $key => $value) {
+                $indice= str_replace("rd_", "", $key);
+                $DatosComplementos[$indice]=$obCon->normalizar($value);
+                $Datositem=$obCon->DevuelveValores("productosventa_complementos_items", "ID", $DatosComplementos[$indice]);
+                $Observaciones.=" || ".$Datositem["Nombre"];
+            }
+            
+            if(!isset($DatosComplementos) or count($DatosComplementos)<1){
+                exit("E1;Debe seleccionar al menos un complemento");
+            }
+            if($idPedido=="" or $idPedido==0){
+                exit("E1;No se ha seleccionado un pedido");
+            }
+            if($idProducto=="" or $idProducto==0){
+                exit("E1;El campo Codigo no puede estar vacío");
+            }
+            if(!is_numeric($Cantidad) or $Cantidad<=0){
+                exit("E1;La cantidad debe ser un numero mayor a cero");
+            }
+            
+            $pedido_item_id=$obCon->AgregueProductoAPedido($idPedido,$Cantidad, $idProducto, $Observaciones, $idUser, "");
+            
+            foreach ($DatosComplementos as $key => $value) {
+                
+                $obCon->agregarComplementoPedido($pedido_item_id,$key,$value);
+            }
+            
+            $DatosPedido=$obCon->DevuelveValores("restaurante_pedidos", "ID", $idPedido);
+            if($DatosPedido["Estado"]<>'1' AND $DatosPedido["Estado"]<>'3'){
+                $obCon->ActualizaRegistro("restaurante_pedidos", "Estado", 3, "ID", $idPedido);
+            }
+            print("OK;Producto Agregado");
+            
+        break; //fin caso 16
+        
     }
     
     

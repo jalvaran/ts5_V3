@@ -477,69 +477,93 @@ if( !empty($_REQUEST["Accion"]) ){
         
         case 9:// dibuja el formulario para agregar complementos a un producto
             $idProducto=$obCon->normalizar($_REQUEST["Codigo"]);
-            
-            print('<div class="row"> <div class="col-md-6">
-          <!-- Custom Tabs (Pulled to the right) -->
-          <div class="nav-tabs-custom">
-            <ul class="nav nav-tabs pull-right">
-              <li class=""><a href="#tab_1-1" data-toggle="tab" aria-expanded="false">Tab 1</a></li>
-              <li class=""><a href="#tab_2-2" data-toggle="tab" aria-expanded="false">Tab 2</a></li>
-              <li class="active"><a href="#tab_3-2" data-toggle="tab" aria-expanded="true">Tab 3</a></li>
-              <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                  Dropdown <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
-                  <li role="presentation" class="divider"></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Separated link</a></li>
-                </ul>
-              </li>
-              <li class="pull-left header"><i class="fa fa-th"></i> Custom Tabs</li>
-            </ul>
-            <div class="tab-content">
-              <div class="tab-pane" id="tab_1-1">
-                <b>How to use:</b>
+            //$idPedido=$obCon->normalizar($_REQUEST["idPedido"]);
+            //$css->CrearTitulo("Por favor elija una opción en cada una de las pestañas");
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 3, "", "", "", "");
+            $diaSemana=date("N");
+            $arrayDiaSemana=array("","Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo");
+            $Mensaje="Menú disponible para los días <strong>".$arrayDiaSemana[$diaSemana]."</strong>";
+            $css->CrearTitulo($Mensaje);
+            print('<form id="frm_complementos">');
+               
+                print('<div class="row">');
+                    print('<div class="col-md-9">');    
+                        print('<div class="nav-tabs-custom">');
+                            print('<ul class="nav nav-tabs pull-right">');
 
-                <p>Exactly like the original bootstrap tabs except you should use
-                  the custom wrapper <code>.nav-tabs-custom</code> to achieve this style.</p>
-                A wonderful serenity has taken possession of my entire soul,
-                like these sweet mornings of spring which I enjoy with my whole heart.
-                I am alone, and feel the charm of existence in this spot,
-                which was created for the bliss of souls like mine. I am so happy,
-                my dear friend, so absorbed in the exquisite sense of mere tranquil existence,
-                that I neglect my talents. I should be incapable of drawing a single stroke
-                at the present moment; and yet I feel that I never was a greater artist than now.
-              </div>
-              <!-- /.tab-pane -->
-              <div class="tab-pane" id="tab_2-2">
-                The European languages are members of the same family. Their separate existence is a myth.
-                For science, music, sport, etc, Europe uses the same vocabulary. The languages only differ
-                in their grammar, their pronunciation and their most common words. Everyone realizes why a
-                new common language would be desirable: one could refuse to pay expensive translators. To
-                achieve this, it would be necessary to have uniform grammar, pronunciation and more common
-                words. If several languages coalesce, the grammar of the resulting language is more simple
-                and regular than that of the individual languages.
-              </div>
-              <!-- /.tab-pane -->
-              <div class="tab-pane active" id="tab_3-2">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                Lorem Ipsum has been the industrys standard dummy text ever since the 1500s,
-                when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-                It has survived not only five centuries, but also the leap into electronic typesetting,
-                remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset
-                sheets containing Lorem Ipsum passages, and more recently with desktop publishing software
-                like Aldus PageMaker including versions of Lorem Ipsum.
-              </div>
-              <!-- /.tab-pane -->
-            </div>
-            <!-- /.tab-content -->
-          </div>
-          <!-- nav-tabs-custom -->
-        </div></div>');
-            
+                                $sql="SELECT * FROM productosventa_complementos ORDER BY ID DESC";
+                                $Consulta=$obCon->Query($sql);
+
+                                while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
+                                    $id=$DatosConsulta["ID"];
+                                    $Complementos[$id]["ID"]=$DatosConsulta["ID"];
+                                    
+                                    $expan="false";
+                                    $classli="";
+                                    if($id==1){
+
+                                        $expan="true";
+                                        $classli="active";
+                                    }
+                                    print('<li class="'.$classli.'"><a href="#tab_'.$id.'" data-toggle="tab" aria-expanded="'.$expan.'">'.$DatosConsulta["Nombre"].'</a></li>');
+                                }
+                                print('<li class="pull-left header"><i class="fa fa-spoon"></i> Complementos </li>');
+                            print('</ul>');
+
+                            $sql="SELECT * FROM productosventa_complementos_items WHERE Estado=1 AND (dia_semana_id='$diaSemana' or dia_semana_id='0' )";
+                            $Consulta=$obCon->Query($sql);
+                            while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
+                                $idComplemento=$DatosConsulta["complemento_id"];
+                                $ID=$DatosConsulta["ID"];                         
+                                $ComplementosItems[$idComplemento][$ID]["ID"]=$DatosConsulta["ID"];
+                                $ComplementosItems[$idComplemento][$ID]["Nombre"]=$DatosConsulta["Nombre"];
+                                $ComplementosItems[$idComplemento][$ID]["url_imagen"]=$DatosConsulta["url_imagen"];
+                            }
+                            //print_r($ComplementosItems);
+                            print('<div class="tab-content">');
+
+                                foreach ($Complementos as $key => $value) {
+
+                                    $classli="";
+                                    if($key==1){
+
+                                        $classli="active";
+                                    }
+                                    print('<div class="tab-pane '.$classli.'" id="tab_'.$key.'">');
+                                        $css->CrearTabla();
+                                            $css->FilaTabla(16);
+                                                $css->ColTabla("Agregar", 1);
+                                                $css->ColTabla("Imagen", 1);
+                                                $css->ColTabla("Item", 1);                                        
+                                            $css->CierraFilaTabla();
+
+                                            foreach ($ComplementosItems[$key] as $keyComplementoItem => $valueComplementoItem) {
+                                                $complementoitem_id=$valueComplementoItem["ID"];
+                                                $image_url=$valueComplementoItem["url_imagen"];
+                                                $css->FilaTabla(16);
+                                                    
+                                                    print('<td style="text-align:center;font-size:30px;">');
+                                                
+                                                        print('<input style="-ms-transform: scale(1.5);-webkit-transform: scale(1.5);transform: scale(1.5);" type="radio" id="rd_'.$complementoitem_id.'" name="rd_'.$key.'" value="'.$complementoitem_id.'">');
+                                                        
+                                                    print('</td>');
+                                                    print('<td style="text-align:center;font-size:30px;">');
+                                                        print('<img src="'.$image_url.'" alt="" width="100" height="100"> ');
+                                                    print('</td>');
+                                                    $css->ColTabla($valueComplementoItem["Nombre"], 1);                                        
+                                                $css->CierraFilaTabla();
+                                            }
+
+                                        $css->CerrarTabla();
+                                    print('</div>');
+                                }
+
+
+                            print('</div>');
+                        print('</div>');
+                    print('</div>');
+                print('</div>');
+            print('</form>');            
         break;// fin caso 9
         
         

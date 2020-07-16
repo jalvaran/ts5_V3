@@ -113,6 +113,9 @@ function AccionesPOS(){
     if(Accion==2){
         CerrarTurno();
     }
+    if(Accion==3){
+        AgregarItemComplementos();
+    }
     if(Accion==100){
         CrearTercero('ModalAccionesPOS','BntModalPOS');
     }
@@ -1081,5 +1084,60 @@ function DibujeComplementos(){
       })  
 } 
 
-
+function AgregarItemComplementos(){
+    var idBoton="BtnAgregarItem";
+    document.getElementById(idBoton).disabled=true;
+    var Codigo=document.getElementById("Codigo").value;    
+    var Cantidad = (document.getElementById('Cantidad').value);
+    var Observaciones = document.getElementById('Observaciones').value; 
+    var jsonComplementos=$('#frm_complementos').serialize();
+    //console.log(jsonComplementos);
+    var form_data = new FormData();
+        form_data.append('Accion', '16'); 
+        form_data.append('idProducto', Codigo);
+        form_data.append('idPedido', idPedidoActivo);
+        form_data.append('Cantidad', Cantidad);
+        form_data.append('Observaciones', Observaciones);
+        form_data.append('jsonComplementos', jsonComplementos); 
+        
+        $.ajax({
+        url: './procesadores/restaurantPos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                
+                document.getElementById('Cantidad').value=1;
+                document.getElementById('Codigo').value="";
+                document.getElementById('Observaciones').value="";  
+                alertify.success(respuestas[1]);
+                CierraModal('ModalAccionesPOS');
+                DibujeItemsPedido();
+            }else if(respuestas[0]=="E1"){
+                
+                alertify.alert(respuestas[1]);
+            }else if(respuestas[0]=="E2"){
+                
+                DibujeComplementos();
+                
+            }else{
+                alertify.alert(data);
+                              
+            }
+            document.getElementById(idBoton).disabled=false;
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;
+            alert(xhr.status);
+            alert(thrownError);
+            
+          }
+      });
+}
 DibujeListaPedidos();

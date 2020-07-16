@@ -4326,12 +4326,12 @@ while($DatosItemFactura=$this->obCon->FetchArray($Consulta)){
         $Back="white";
         $h=0;
     }
-    
+    $NombreItem= utf8_encode($DatosItemFactura["Nombre"]);
     $tbl .= <<<EOD
     
     <tr>
         <td align="left" style="border-bottom: 1px solid #ddd;background-color: $Back;">$DatosItemFactura[Referencia]</td>
-        <td align="left" colspan="3" style="border-bottom: 1px solid #ddd;background-color: $Back;">$DatosItemFactura[Nombre]</td>
+        <td align="left" colspan="3" style="border-bottom: 1px solid #ddd;background-color: $Back;">$NombreItem</td>
         <td align="right" style="border-bottom: 1px solid #ddd;background-color: $Back;">$ValorUnitario</td>
         <td align="center" style="border-bottom: 1px solid #ddd;background-color: $Back;">$Multiplicador</td>
         <td align="right" style="border-bottom: 1px solid #ddd;background-color: $Back;">$SubTotalItem</td>

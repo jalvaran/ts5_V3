@@ -137,7 +137,7 @@ if( !empty($_REQUEST["Accion"]) ){
             while($DatosItems=$obCon->FetchAssoc($Consulta)){
                 $idItem=$DatosItems["ID"];
                 $Subtotal=$Subtotal+$DatosItems["SubtotalItem"];
-                $Impuestos=$Subtotal+$DatosItems["IVAItem"];
+                $Impuestos=$Impuestos+$DatosItems["IVAItem"];
                 $Total=$Subtotal+$DatosItems["TotalItem"];
                 $css->FilaTabla(14);
                     $css->ColTabla($DatosItems["Referencia"], 1);

@@ -178,11 +178,12 @@ class Factura_Electronica extends ProcesoVenta{
                 "municipality_id": "'.$municipio_id.'",
                 "merchant_registration": "NA"
             },
-            "payment_form": {
+            "payment_forms": [{
                 "payment_form_id": "'.$idFormaPago.'",
+                "payment_method_id": "10",
                 "payment_due_date": "'.$FechaVencimiento.'",
                 "duration_measure": "30"
-            },
+            }],
             ';
         if($DatosFactura["ObservacionesFact"]<>''){
             $json_factura.=' 
@@ -514,6 +515,10 @@ class Factura_Electronica extends ProcesoVenta{
     }
     
     public function FacturaElectronica_Registre_Respuesta_Server($idFactura,$RespuestaServidor,$Estado) {
+        //$RespuestaServidor=str_replace(PHP_EOL, '', $RespuestaServidor);
+        //$RespuestaServidor=str_replace("\n", '', $RespuestaServidor);
+        //$RespuestaServidor=str_replace("\r", '', $RespuestaServidor);        
+        $RespuestaServidor=str_replace("'", '', $RespuestaServidor);
         $Datos["idFactura"]=$idFactura;
         $Datos["Estado"]=$Estado;
         $Datos["RespuestaCompletaServidor"]=$RespuestaServidor;

@@ -428,10 +428,10 @@ if( !empty($_REQUEST["Accion"]) ){
                 $Condicion.=" AND (Tercero = '$idCliente')";
             }
             if($FechaInicialRangos<>''){
-                $Condicion.=" AND (Fecha >= '$FechaInicialRangos')";
+                $Condicion.=" AND (Created >= '$FechaInicialRangos')";
             }
             if($FechaFinalRangos<>''){
-                $Condicion.=" AND (Fecha <= '$FechaFinalRangos')";
+                $Condicion.=" AND (Created <= '$FechaFinalRangos')";
             }
             if($cmbCicloPagos<>''){
                 $Condicion.=" AND (CicloPagos = '$cmbCicloPagos')";
@@ -530,7 +530,8 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->ColTabla("<strong>Acuerdo</strong>", 1);
                 $css->ColTabla("<strong>Tercero</strong>", 1);  
                 $css->ColTabla("<strong>CicloPagos</strong>", 1);
-                $css->ColTabla("<strong>Fecha</strong>", 1);
+                $css->ColTabla("<strong>Fecha de Abono</strong>", 1);
+                $css->ColTabla("<strong>Fecha de la cuota</strong>", 1);
                 $css->ColTabla("<strong>TipoCuota</strong>", 1);
                 $css->ColTabla("<strong>NumeroCuota</strong>", 1);
                 $css->ColTabla("<strong>ValorCuota</strong>", 1);
@@ -547,6 +548,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla($DatosAcuerdo["ConsecutivoAcuerdo"], 1);                        
                     $css->ColTabla($DatosAcuerdo["Tercero"]." ".$DatosAcuerdo["RazonSocial"], 1);
                     $css->ColTabla($DatosAcuerdo["NombreCicloPagos"], 1);
+                    $css->ColTabla($DatosAcuerdo["Created"], 1);
                     $css->ColTabla($DatosAcuerdo["Fecha"], 1);
                     $css->ColTabla($DatosAcuerdo["NombreTipoCuota"], 1);
                     $css->ColTabla($DatosAcuerdo["NumeroCuota"], 1);
