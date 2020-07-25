@@ -932,14 +932,14 @@ function VerificaNIT(){
                 alertify.error(respuestas[1]);
                 document.getElementById("Num_Identificacion").style.backgroundColor="pink";
                 posiciona('Num_Identificacion');
-                document.getElementById("BntModalPOS").disabled=true;
+                //document.getElementById("BntModalPOS").disabled=true;
             }else if(respuestas[0]=="OK"){
                 alertify.success(respuestas[1]);
                 document.getElementById("Num_Identificacion").style.backgroundColor="white";
-                document.getElementById("BntModalPOS").disabled=false;
+                //document.getElementById("BntModalPOS").disabled=false;
             }else{
                 alertify.alert(data);
-                document.getElementById("BntModalPOS").disabled=false;
+                //document.getElementById("BntModalPOS").disabled=false;
             }
             
             
@@ -976,14 +976,14 @@ function VerificaCodigoTarjeta(){
                 alertify.error(respuestas[1]);
                 document.getElementById("CodigoTarjeta").style.backgroundColor="pink";
                 posiciona('CodigoTarjeta');
-                document.getElementById("BntModalPOS").disabled=true;
+                //document.getElementById("BntModalPOS").disabled=true;
             }else if(respuestas[0]=="OK"){
                 alertify.success(respuestas[1]);
                 document.getElementById("CodigoTarjeta").style.backgroundColor="white";
-                document.getElementById("BntModalPOS").disabled=false;
+                //document.getElementById("BntModalPOS").disabled=false;
             }else{
                 alertify.alert(data);
-                document.getElementById("BntModalPOS").disabled=false;
+                //document.getElementById("BntModalPOS").disabled=false;
             }
             
             

@@ -1,5 +1,5 @@
 <?php
-session_start();
+@session_start();
 
 include("../modelo/php_conexion.php");
     if(empty($_POST["US"])){

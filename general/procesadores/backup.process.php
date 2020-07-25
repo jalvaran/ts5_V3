@@ -54,6 +54,8 @@ if( !empty($_REQUEST["idAccion"]) ){
         $FechaSinc=date("Y-m-d H:i:s");
         $CondicionUpdate="WHERE Sync = '0000-00-00 00:00:00' OR Sync<>Updated LIMIT 5000";
         $sql=$obCon->ArmeSqlReplace($Tabla, DB, $CondicionUpdate,$DatosServer["DataBase"],$FechaSinc, "");
+        //$sql= preg_replace("[\n|\r|\n\r]", "", $sql);
+        $sql= str_replace("\\", '/', $sql);
         //print($sql);
         if($sql==''){
             print("OK;0");

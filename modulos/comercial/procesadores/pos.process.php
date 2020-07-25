@@ -1137,6 +1137,21 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Traslado agregado a la preventa $idPreventa");
             
         break;//fin caso 32    
+        
+        case 33://Insertar una factura al libro diario de acuerdo al listado en la tabla facturas_contabilizar
+            $obFactura = new Facturacion($idUser);
+            $sql="SELECT * FROM facturas_contabilizar WHERE Estado=0";
+            $Consulta=$obCon->Query($sql);
+            
+            while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
+                $idFactura=$DatosConsulta["idFactura"];
+                $obCon->BorraReg("librodiario", "Num_Documento_Interno", $idFactura);
+                $obFactura->InsertarFacturaLibroDiarioV2($idFactura,130505,$idUser);
+                $obCon->ActualizaRegistro("facturas_contabilizar", "Estado", 1, "idFactura", $idFactura);
+            }
+            print("OK;Sentencia ejecutada");
+        break;//Fin caso 33    
+        
     }
     
     
