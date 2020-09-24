@@ -636,7 +636,7 @@ $obPrint=new PrintPos($idUser);
             
             $idPreventa=$obVenta->normalizar($_REQUEST['TxtidPreventa']);
             $sql="UPDATE `preventa` "
-                    . "SET `ValorAcordado`=((`CostoUnitario`)/(`PorcentajeIVA`+1)), "
+                    . "SET `ValorAcordado`=ROUND((`CostoUnitario`)), "
                     . "`Impuestos`=(`PorcentajeIVA`*(`ValorAcordado`*`Cantidad`)),"
                     . "`Subtotal`=(`ValorAcordado`*`Cantidad`), `TotalVenta`=(`Subtotal`+`Impuestos`) "
                     . "WHERE `VestasActivas_idVestasActivas`='$idPreventa' ";

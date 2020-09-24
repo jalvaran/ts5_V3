@@ -126,6 +126,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $CmbCuentaIngresoFactura=$obCon->normalizar($_REQUEST["CmbCuentaIngresoFactura"]);
             $CmbColaboradores=$obCon->normalizar($_REQUEST["CmbColaboradores"]);
             $Observaciones=$obCon->normalizar($_REQUEST["TxtObservacionesFactura"]);
+            $OrdenCompra=$obCon->normalizar($_REQUEST["OrdenCompra"]);
             $AnticiposCruzados=$obCon->normalizar($_REQUEST["AnticiposCruzados"]);
             
             $idEmpresa=$obCon->normalizar($_REQUEST["CmbEmpresa"]);
@@ -138,7 +139,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             
             $Hora=date("H:i:s");
-            $OrdenCompra="";
+            
             $OrdenSalida="";
             $sql="SELECT SUM(Subtotal) AS Subtotal, SUM(IVA) AS IVA, SUM(Total) as Total,SUM(SubtotalCosto) AS TotalCostos "
                     . "FROM cot_itemscotizaciones WHERE NumCotizacion='$idCotizacion'";
@@ -206,6 +207,9 @@ if( !empty($_REQUEST["Accion"]) ){
             
             if($CmbColaboradores>0){
                 $obCon->AgregueVentaColaborador($idFactura,$CmbColaboradores);
+            }
+            if($CmbFrecuente=='SI'){
+                $obCon->RegistreFacturaFrecuente($idCliente,$idFactura);
             }
             $LinkFactura="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=2&ID=$idFactura";
             $Mensaje="<br><strong>Factura $NumFactura Creada Correctamente </strong><a href='$LinkFactura'  target='blank'> Imprimir</a>";

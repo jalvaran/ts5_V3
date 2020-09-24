@@ -8,7 +8,7 @@ class PDF_ReportesContables extends Documento{
     
     public function EstadosResultadosAnio_PDF($FechaInicial,$FechaFinal,$idEmpresa,$CentroCosto,$Vector ) {
         $TipoReporte="Rango";
-        $idEmpresaEncabezado="";
+        $idEmpresaEncabezado=$idEmpresa;
         if($idEmpresa=="ALL"){
             $idEmpresaEncabezado=1;
         }
@@ -468,7 +468,7 @@ class PDF_ReportesContables extends Documento{
     }
     
     public function BalanceComprobacionXTerceros_PDF($FechaInicial,$FechaFinal,$idEmpresa,$CentroCosto) {
-        $idEmpresaEncabezado="";
+        $idEmpresaEncabezado=$idEmpresa;
         if($idEmpresa=="ALL"){
             $idEmpresaEncabezado=1;
         }
@@ -484,7 +484,7 @@ class PDF_ReportesContables extends Documento{
     
     public function EstadoSituacionFinaciera_PDF($FechaInicial,$FechaFinal,$idEmpresa,$CentroCosto,$Vector ) {
         $TipoReporte="Rango";
-        $idEmpresaEncabezado="";
+        $idEmpresaEncabezado=$idEmpresa;
         if($idEmpresa=="ALL"){
             $idEmpresaEncabezado=1;
         }

@@ -214,7 +214,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     $css->ColTabla("<strong>Efectivo</strong>", 1);
                     $css->ColTabla("<strong>Tarjetas</strong>", 1);
-                    $css->ColTabla("<strong>Cheques</strong>", 1);
+                    $css->ColTabla("<strong>Cuenta de ahorros</strong>", 1);
                     $css->ColTabla("<strong>Bonos</strong>", 1);
                     $css->ColTabla("<strong>Devolver</strong>", 1);
                     
@@ -322,6 +322,10 @@ if( !empty($_REQUEST["Accion"]) ){
                             
                             
                         $css->Cselect();
+                        
+                        
+                        $css->input("text", "orden_compra", "form-control", "orden_compra", "Orden de Compra", "", "Orden de compra", "off", "", "");
+                        
                     print("</td>");
                     
                     print("<td>");
@@ -516,7 +520,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CrearDiv("", "col-md-8", "center", 1, 1);
                 print("<strong>Abono</strong><br>");
                 
-                $css->input("number", "TxtAbonoCrearSeparado", "form-control", "TxtAbonoCrearSeparado", "Abono a Separado", "", "Abono a Separado", "off", "", "");
+                $css->input_number_format("number", "TxtAbonoCrearSeparado", "form-control", "TxtAbonoCrearSeparado", "Abono a Separado", "", "Abono a Separado", "off", "", "");
                 
             $css->CerrarDiv();
             
@@ -582,9 +586,9 @@ if( !empty($_REQUEST["Accion"]) ){
                     print("</td>");
                     
                     print("<td>");
-                        $css->input("number", "SubtotalEgreso", "form-control", "SubtotalEgreso", "SubtotalEgreso", "", "Subtotal", "off", "", "", "onkeyup=CalculeTotalEgreso()");                    
-                        $css->input("number", "IVAEgreso", "form-control", "IVAEgreso", "IVAEgreso", 0, "IVA", "off", "", "", "onkeyup=CalculeTotalEgreso()");
-                        $css->input("number", "TotalEgreso", "form-control", "TotalEgreso", "TotalEgreso", "", "Total", "off", "", "", "","disabled");
+                        $css->input_number_format("number", "SubtotalEgreso", "form-control", "SubtotalEgreso", "SubtotalEgreso", "", "Subtotal", "off", "", "", "onkeyup=CalculeTotalEgreso()");                    
+                        $css->input_number_format("number", "IVAEgreso", "form-control", "IVAEgreso", "IVAEgreso", 0, "IVA", "off", "", "", "onkeyup=CalculeTotalEgreso()");
+                        $css->input_number_format("number", "TotalEgreso", "form-control", "TotalEgreso", "TotalEgreso", "", "Total", "off", "", "", "","disabled");
                         
                     print("</td>");
                 $css->CierraFilaTabla();
@@ -727,7 +731,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     print("</td>");
                     
                     print("<td>");
-                        print("<strong>Cheques:</strong>"); 
+                        print("<strong>Cuenta de Ahorros:</strong>"); 
                         $css->input("number", "TxtChequesCredito_$idCartera", "form-control", "TxtChequesCredito_$idCartera", "Cheques", 0, "Cheques: ", "off", "", "", "");
                     print("</td>");
                     
@@ -843,7 +847,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     print("<td>");
                         
-                        $css->input("number", "TxtIngresoPlataforma", "form-control input-md", "TxtIngresoPlataforma", "", 0, "", "", "", "style=width:300px");
+                        $css->input_number_format("number", "TxtIngresoPlataforma", "form-control input-md", "TxtIngresoPlataforma", "", 0, "", "", "", "style=width:300px");
                     print("</td>");
                     
                     

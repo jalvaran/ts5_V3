@@ -410,7 +410,8 @@ function CopiarProductosDesdeServidorExterno(pageProducts,totalProducts,totalBar
             }else if(respuestas[0]=="END"){  
                 alertify.success(respuestas[1]);
                 
-                CopiarCodigoBarrasProductosDesdeServidorExterno(1,totalBars);   
+                CopiarCodigoBarrasProductosDesdeServidorExterno(1,totalBars); 
+                InsertarProductosNuevosDesdeTemporal();
             }else if(respuestas[0]=="E1"){  
                 alertify.error(respuestas[1]);
                 document.getElementById(idBoton).disabled=false;
@@ -433,6 +434,7 @@ function CopiarProductosDesdeServidorExterno(pageProducts,totalProducts,totalBar
 
 function CopiarCodigoBarrasProductosDesdeServidorExterno(pageProducts,totalBars){
     var idBoton="btnDescargarProductos";
+    console.log('Entra a copiar barras');
     var form_data = new FormData();
         form_data.append('Accion', '8'); 
         form_data.append('pageProducts', pageProducts); 
@@ -453,7 +455,8 @@ function CopiarCodigoBarrasProductosDesdeServidorExterno(pageProducts,totalBars)
                 document.getElementById("DivMensajes").innerHTML=respuestas[1]; 
                 var pageProducts=parseInt(respuestas[2]);
                 CopiarCodigoBarrasProductosAServidor(pageProducts,totalBars);                
-                
+                console.log(respuestas[2]);
+                console.log(totalBars);
             }else if(respuestas[0]=="END"){  
                 console.log("FIn");
                 InsertarProductosNuevosDesdeTemporal();
@@ -479,7 +482,7 @@ function CopiarCodigoBarrasProductosDesdeServidorExterno(pageProducts,totalBars)
 }
 
 function InsertarProductosNuevosDesdeTemporal(){
-    document.getElementById("DivMensajes").innerHTML="Insertando Registors"; 
+    document.getElementById("DivMensajes").innerHTML="Insertando Registros"; 
     var idBoton="btnDescargarProductos";
     var form_data = new FormData();
         form_data.append('Accion', '9'); 

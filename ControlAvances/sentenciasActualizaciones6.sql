@@ -965,3 +965,13 @@ INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `C
 
 -- 2020-06-23 13:50:54
 
+
+ALTER TABLE `comercial_plataformas_pago_ingresos` ADD INDEX(`idUser`);
+
+ALTER TABLE `comercial_plataformas_pago_ingresos` ADD `Inicial` INT NOT NULL AFTER `idComprobanteIngreso`, ADD INDEX `Inicial` (`Inicial`);
+
+
+INSERT INTO `parametros_contables` (`ID`, `Descripcion`, `CuentaPUC`, `NombreCuenta`, `Updated`, `Sync`) VALUES
+(39,	'Cuenta para realizar a los clientes de siste credito',	130510,	'CLIENTES NACIONALES',	'2020-09-23 11:04:30',	'2020-07-25 10:05:22');
+
+

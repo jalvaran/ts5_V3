@@ -1,8 +1,8 @@
 <?php
 
-$myTabla="comprobantes_ingreso";
+$myTabla="vista_comprobantes_ingreso";
 $MyID="ID";
-$myPage="comprobantes_ingreso.php";
+$myPage="vista_comprobantes_ingreso.php";
 $myTitulo="Historial Comprobantes de Ingreso";
 
 

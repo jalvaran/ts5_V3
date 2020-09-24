@@ -354,7 +354,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->Cselect();
                     print("</td>");
                     print("<td>");
-                        $css->input("number", "Num_Identificacion", "form-control", "Num_Identificacion", $DatosTercero["Num_Identificacion"], $DatosTercero["Num_Identificacion"], "Identificación", "off", "", "");
+                        $css->input("number", "Num_Identificacion", "form-control", "Num_Identificacion", $DatosTercero["Num_Identificacion"], $DatosTercero["Num_Identificacion"], "Identificación", "off", "", "disabled");
                     print("</td>");
                     print("<td>");
                         $css->select("CodigoMunicipio", "form-control", "CodigoMunicipio", "", "", "", "");

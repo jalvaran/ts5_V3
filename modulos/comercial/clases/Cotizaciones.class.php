@@ -49,7 +49,7 @@ class Cotizaciones extends ProcesoVenta{
             $Porcentaje=$reg["Porcentaje"];
             $Departamento=$reg["Departamento"];
             $FechaDescuento=$reg["Fecha"];
-
+            $fecha=date("Y-m-d");
             $impuesto=$DatosProductoGeneral["IVA"];
             $impuesto=$impuesto+1;
             if($DatosTablaItem["IVAIncluido"]=="SI"){
@@ -163,6 +163,22 @@ class Cotizaciones extends ProcesoVenta{
                     . "WHERE NumCotizacion='$idCotizacionOrigen' ";
             $this->Query($sql);
         }
+        
+        public function RegistreFacturaFrecuente($idCliente,$idFactura) {
+            
+            $Tabla="facturas_frecuentes";
+            
+            $Datos["idCliente"]=$idCliente;
+            $Datos["Periodo"]=1;
+            $Datos["FacturaBase"]=$idFactura;
+            $Datos["UltimaFactura"]=$idFactura;
+            $Datos["Habilitado"]=1;
+            $Datos["Realizada"]=0;
+            $sql=$this->getSQLInsert($Tabla, $Datos);
+            $this->Query($sql);            
+                        
+        }
+        
     
     /**
      * Fin Clase

@@ -88,6 +88,10 @@ class Documento{
         $DatosFormatoCalidad=$this->obCon->DevuelveValores("formatos_calidad", "ID", $idFormatoCalidad);
         
         $RutaLogo=$Patch."$DatosEmpresaPro[RutaImagen]";
+        if(!file_exists($RutaLogo)){
+            $DatosEmpresaPro1=$this->obCon->DevuelveValores("empresapro", "idEmpresaPro", 1);
+            $RutaLogo=$Patch."$DatosEmpresaPro1[RutaImagen]";
+        }
 ///////////////////////////////////////////////////////
 //////////////encabezado//////////////////
 ////////////////////////////////////////////////////////
@@ -791,7 +795,8 @@ $tbl.= "</table>";
         $Consecutivo=$DatosDocumento["Consecutivo"];
         $this->PDF_Ini($Documento, 8, "");
         $idFormato=32;
-        $this->PDF_Encabezado($DatosDocumento["Fecha"],1, $idFormato, "",$Documento);
+        
+        $this->PDF_Encabezado($DatosDocumento["Fecha"],$DatosDocumento["idEmpresa"], $idFormato, "",$Documento);
         $this->PDF_Encabezado_Documento_Contable($DatosDocumento, $DescripcionDocumento, "");
         
         

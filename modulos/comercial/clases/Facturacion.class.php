@@ -637,7 +637,7 @@ class Facturacion extends ProcesoVenta{
         return($sqlFactura);
     }
     
-    public function IngresoPlataformasPago($idPlataforma,$Fecha,$Hora,$Tercero,$Valor,$idComprobanteIngreso,$idUser) {
+    public function IngresoPlataformasPago($idPlataforma,$Fecha,$Hora,$Tercero,$Valor,$idComprobanteIngreso,$idUser,$Inicial=0) {
         
         $Datos["Fecha"]=$Fecha;
         $Datos["Hora"]=$Hora;
@@ -645,6 +645,7 @@ class Facturacion extends ProcesoVenta{
         $Datos["Valor"]=$Valor;
         $Datos["idComprobanteIngreso"]=$idComprobanteIngreso;
         $Datos["idUser"]=$idUser;
+        $Datos["Inicial"]=$Inicial;
         $Datos["idPlataformaPago"]=$idPlataforma;
         
         $sql=$this->getSQLInsert("comercial_plataformas_pago_ingresos", $Datos);
@@ -762,7 +763,7 @@ class Facturacion extends ProcesoVenta{
         $sql="SELECT SUM(t1.`ValorPago`) as TotalAbono,MetodoPago,
                 (SELECT Metodo FROM metodos_pago t2 WHERE t1.MetodoPago=t2.ID) as Metodo 
                 FROM `acuerdo_pago_cuotas_pagadas` t1
-                WHERE `idCierre` = '0' AND `idUser` = '$idUser' GROUP BY t1.MetodoPago ";
+                WHERE `idCierre` = '0' AND `idUser` = '$idUser' AND t1.Estado<10 GROUP BY t1.MetodoPago ";
         
         $Consulta=$this->Query($sql);
         $i=0;

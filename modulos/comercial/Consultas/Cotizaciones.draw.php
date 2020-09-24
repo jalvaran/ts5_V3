@@ -492,7 +492,9 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->FilaTabla(14);
                     
                     $css->ColTabla("<strong>Asignar</strong>", 1);
+                    $css->ColTabla("<strong>Orden de Compra</strong>", 1);
                     $css->ColTabla("<strong>Observaciones</strong>", 1);
+                    $css->ColTabla("<strong>Anticipos</strong>", 1);
                 $css->CierraFilaTabla();
                 
                 $css->FilaTabla(14);
@@ -513,7 +515,11 @@ if( !empty($_REQUEST["Accion"]) ){
 
                         $css->Cselect();
                     print("</td>");
-                    print("<td colspan=2>");
+                    print("<td>");
+                        
+                        $css->input("text", "OrdenCompra", "form-control", "OrdenCompra", "Orden de Compra", "", "Orden de compra", "", "", "");
+                    print("</td>");
+                    print("<td colspan=1>");
                         $css->textarea("TxtObservacionesFactura", "form-control", "TxtObservacionesFactura", "Observaciones", "Observaciones", "", "");
                         $css->Ctextarea();
                     print("</td>"); 

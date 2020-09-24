@@ -26,22 +26,25 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CrearTabla("TblReporteIngresos");
                     $css->FilaTabla(14);
                         $css->ColTabla("<strong>Fecha</strong>", 1,"C");
+                        $css->ColTabla("<strong>Inicial</strong>", 1,"C");
                         $css->ColTabla("<strong>Hora</strong>", 1,"C");
                         $css->ColTabla("<strong>Tercero</strong>", 1,"C");
                         $css->ColTabla("<strong>Valor</strong>", 1,"C");
+                        $css->ColTabla("<strong>Inicial</strong>", 1,"C");
                                                 
                     $css->CierraFilaTabla();
-                    $sql="SELECT Fecha,Hora,Tercero,round(Valor) as Valor FROM comercial_plataformas_pago_ingresos "
+                    $sql="SELECT Fecha,Hora,Inicial,Tercero,round(Valor) as Valor FROM comercial_plataformas_pago_ingresos "
                             . "WHERE Fecha>='$FechaInicial' AND Fecha<='$FechaFinal' AND idPlataformaPago='$Plataforma'";
                     $Consulta=$obCon->Query($sql);
                     
                     while ($DatosIngresos = $obCon->FetchAssoc($Consulta)) {
                         $css->FilaTabla(14);
                             $css->ColTabla($DatosIngresos["Fecha"], 1);
+                            $css->ColTabla($DatosIngresos["Inicial"], 1);
                             $css->ColTabla($DatosIngresos["Hora"], 1);
                             $css->ColTabla($DatosIngresos["Tercero"], 1);
                             $css->ColTabla($DatosIngresos["Valor"], 1);
-                            
+                            $css->ColTabla($DatosIngresos["Inicial"], 1);
                         $css->CierraFilaTabla();
                     }    
                     

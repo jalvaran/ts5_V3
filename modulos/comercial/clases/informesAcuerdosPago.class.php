@@ -32,7 +32,7 @@ class informesAcuerdoPago extends AcuerdoPago{
                 (SELECT t5.SobreNombre FROM clientes_datos_adicionales t5 WHERE t5.idCliente=(SELECT idClienteAcuerdo) LIMIT 1) AS SobreNombreCliente,
                 t2.ValorCuotaGeneral,t2.CicloPagos,
                 (SELECT t7.NombreCiclo FROM acuerdo_pago_ciclos_pagos t7 WHERE t7.ID=t2.CicloPagos LIMIT 1) AS NombreCicloPago,
-                round(t2.SaldoAnterior) as SaldoAnterior,round(t2.SaldoInicial)  as SaldoInicial,t2.TotalAbonos,round(t2.SaldoFinal) as SaldoFinal
+                round(t2.SaldoAnterior) as SaldoAnterior,round(t2.SaldoInicial)  as SaldoInicial,t2.TotalAbonos,round(t2.SaldoFinal) as SaldoFinal,'0000-00-00 00:00:00' as Updated, '0000-00-00 00:00:00' as Sync 
                 FROM acuerdo_pago_proyeccion_pagos t1 
                 INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
                 WHERE t2.Estado=1 AND (t1.Estado=0 OR t1.Estado=2 OR t1.Estado=4) ORDER BY Tercero,Fecha ";
@@ -59,7 +59,9 @@ class informesAcuerdoPago extends AcuerdoPago{
         $this->Query($sql);
         
         $sql="CREATE VIEW vista_abonos_acuerdo_pago AS
-            SELECT t1.ID,t2.Tercero,t1.NumeroCuota,t1.TipoCuota,
+            SELECT t1.ID,t2.Tercero,
+                (SELECT RazonSocial FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero) as RazonSocialCliente,
+                t1.NumeroCuota,t1.TipoCuota,
                 (SELECT t3.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t3 WHERE t3.ID=t1.TipoCuota LIMIT 1 ) AS NombreTipoCuota,
                 t1.idAcuerdoPago,t2.ID as ConsecutivoAcuerdo,
                 (SELECT t6.Fecha FROM acuerdo_pago_proyeccion_pagos t6 WHERE t6.ID=t1.idProyeccion LIMIT 1 ) AS FechaCuota,

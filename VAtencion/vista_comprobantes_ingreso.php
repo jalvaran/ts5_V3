@@ -1,5 +1,5 @@
 <?php
-$myPage="comprobantes_ingreso.php";
+$myPage="vista_comprobantes_ingreso.php";
 include_once("../sesiones/php_control.php");
 
 ////////// Paginacion
@@ -15,7 +15,7 @@ $page = (int) (!isset($_GET["page"]) ? 1 : $_GET["page"]);
         
 include_once ('funciones/function.php');  //En esta funcion está la paginacion
 
-include_once("Configuraciones/Comprobantes_ingreso.ini.php");  //Clases de donde se escribirán las tablas
+include_once("Configuraciones/vista_comprobantes_ingreso.ini.php");  //Clases de donde se escribirán las tablas
 $obTabla = new Tabla($db);
 
 $statement = $obTabla->CreeFiltro($Vector);

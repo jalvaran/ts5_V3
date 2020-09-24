@@ -829,6 +829,7 @@ function ConviertaCotizacionEnFactura(){
     var CmbCuentaIngresoFactura = document.getElementById('CmbCuentaIngresoFactura').value;
     var CmbColaboradores = document.getElementById('CmbColaboradores').value;
     var TxtObservacionesFactura = document.getElementById('TxtObservacionesFactura').value;
+    var OrdenCompra = document.getElementById('OrdenCompra').value;
     var AnticiposCruzados = parseFloat(document.getElementById('AnticiposCruzados').value);
     var TxtTotalFactura = parseFloat(document.getElementById('TxtTotalFactura').value);
     var TxtTotalAnticipos = parseFloat(document.getElementById('TxtTotalAnticiposFactura').value);
@@ -856,7 +857,7 @@ function ConviertaCotizacionEnFactura(){
         document.getElementById("AnticiposCruzados").style.backgroundColor="white";
     }
     
-    if(TxtTotalAnticipos < AnticiposCruzados){
+    if(TxtTotalAnticipos < AnticiposCruzados && AnticiposCruzados!=0){
         
         alertify.alert("El Anticipo no puede ser mayor al total de anticipos realizados por el Cliente");
         document.getElementById("AnticiposCruzados").style.backgroundColor="pink";
@@ -887,6 +888,7 @@ function ConviertaCotizacionEnFactura(){
         form_data.append('CmbCuentaIngresoFactura', CmbCuentaIngresoFactura);
         form_data.append('CmbColaboradores', CmbColaboradores);
         form_data.append('TxtObservacionesFactura', TxtObservacionesFactura);
+        form_data.append('OrdenCompra', OrdenCompra);
         form_data.append('CmbEmpresa', CmbEmpresa);
         form_data.append('CmbSucursal', CmbSucursal);
         form_data.append('AnticiposCruzados', AnticiposCruzados);
@@ -1104,6 +1106,6 @@ $('#idCotizacion').select2({
      cache: true
     }
   });
-
+document.getElementById("BtnMuestraMenuLateral").click();
 //$('#ValorUnitario').mask('1.999.999.##0,00', {reverse: true});
 //$('#Cantidad').mask('9.999.##0,00', {reverse: true});

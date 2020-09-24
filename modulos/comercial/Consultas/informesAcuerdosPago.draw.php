@@ -47,7 +47,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         
             $PuntoInicio = ($Page * $Limit) - $Limit;
             
-            $sql = "SELECT COUNT(ID) as Items,SUM(ValorCuota) as Total
+            $sql = "SELECT COUNT(ID) as Items,SUM(SaldoCuota) as Total
                    FROM acuerdo_pago_hoja_trabajo_informes t1 $Condicion;";
             
             $Consulta=$obCon->Query($sql);
@@ -413,6 +413,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 $css->ColTabla("<strong>ID</strong>", 1, "C");
                 $css->ColTabla("<strong>Tercero</strong>", 1, "C");
+                $css->ColTabla("<strong>RazonSocial</strong>", 1, "C");
                 $css->ColTabla("<strong>FechaCuota</strong>", 1, "C");
                 $css->ColTabla("<strong>FechaPago</strong>", 1, "C");
                 $css->ColTabla("<strong>Acuerdo</strong>", 1, "C"); 
@@ -431,6 +432,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                         $css->ColTabla($RegistrosTabla["ID"], 1, "L");
                         $css->ColTabla($RegistrosTabla["Tercero"], 1, "L");
+                        $css->ColTabla($RegistrosTabla["RazonSocialCliente"], 1, "L");
                         $css->ColTabla($RegistrosTabla["FechaCuota"], 1, "L");
                         $css->ColTabla($RegistrosTabla["Created"], 1, "L");
                         $css->ColTabla(($RegistrosTabla["ConsecutivoAcuerdo"]), 1, "L");         

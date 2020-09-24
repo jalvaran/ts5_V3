@@ -92,7 +92,6 @@ class Factura_Electronica extends ProcesoVenta{
     
     public function JSONFactura($idFactura) {
         $DatosFactura=$this->DevuelveValores("facturas", "idFacturas", $idFactura);
-        
         $idEmpresaPro=$DatosFactura["EmpresaPro_idEmpresaPro"];
         $DatosEmpresaPro=$this->DevuelveValores("empresapro", "idEmpresaPro", $idEmpresaPro);
         $EmpresaTipoCompania=$DatosEmpresaPro["TipoPersona"];
@@ -100,11 +99,6 @@ class Factura_Electronica extends ProcesoVenta{
         $CodigoDane=$DatosCliente["Cod_Dpto"].$DatosCliente["Cod_Mcipio"];
         $DatosMunicipos= $this->DevuelveValores("catalogo_municipios", "CodigoDANE", $CodigoDane);
         $municipio_id=$DatosMunicipos["ID"];
-        $OrdenCompra='NA';
-        if($DatosFactura["OCompra"]<>''){
-            $OrdenCompra=$DatosFactura["OCompra"];
-        }
-        
         if($municipio_id==''){
             $municipio_id=1006;
         }
@@ -183,9 +177,6 @@ class Factura_Electronica extends ProcesoVenta{
                 "email": "'.$AdqContactoMail.'",
                 "municipality_id": "'.$municipio_id.'",
                 "merchant_registration": "NA"
-            },
-            "order_reference": {
-                "id": "'.$OrdenCompra.'" 
             },
             "payment_forms": [{
                 "payment_form_id": "'.$idFormaPago.'",

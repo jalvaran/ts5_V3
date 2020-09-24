@@ -1,7 +1,7 @@
 <?php
 include_once("../../modelo/php_conexion.php");
 include_once("../clases/FacturasFrecuentes.class.php");
-session_start();
+@session_start();
 $idUser=$_SESSION['idUser'];
 $obVenta=new FacturasFrecuentes($idUser);
 if(isset($_REQUEST["idAccion"])){
@@ -135,8 +135,11 @@ if(isset($_REQUEST["idAccion"])){
             }
             $DatosFactura=$obVenta->ValorActual("facturas", "NumeroFactura", "idFacturas='$NumFactura'");
             $NumeroFactura=$DatosFactura["NumeroFactura"];
-            $Page="PDF_Factura.php?ImgPrintFactura=".$NumFactura;
-            $msg="Factura $NumeroFactura Creada <a href='$Page' target='_blank'> Imprimir </a>";
+            
+            $LinkFactura="../general/Consultas/PDF_Documentos.draw.php?idDocumento=2&ID=$NumFactura";
+            $msg="<br><strong>Factura $NumeroFactura Creada Correctamente </strong><a href='$LinkFactura'  target='blank'> Imprimir</a>";
+           
+            
             print("OK;$PorcentajeRealizado;$msg");
         break;
         

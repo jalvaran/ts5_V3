@@ -1,6 +1,6 @@
 <?php
 /* 
- * Clase donde se realizaran la generacion de archivos en excel para el modulo de inteligencia de negocios
+ * Clase donde se realizaran la generacion de archivos en excel general
  * Julian Alvaran 
  * Techno Soluciones SAS
  */

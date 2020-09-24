@@ -718,14 +718,17 @@ class AcuerdoPago extends ProcesoVenta{
         $Datos["Created"]=date("Y-m-d H:i:s");
         $Datos["idUser"]=$idUser;
         $sql=$this->getSQLInsert("acuerdo_pago_anulaciones", $Datos);
-        $this->Query($sql);  
+        $this->Query($sql);
+        
+        
+        
     } 
     
     function AnularAbonoAcuerdo($idAbono,$Observaciones,$idUser) {
         
         $DatosAbono=$this->DevuelveValores("acuerdo_pago_cuotas_pagadas", "ID", $idAbono);
         $DatosAcuerdo=$this->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $DatosAbono["idAcuerdoPago"]);
-        $Parametros=$this->DevuelveValores("parametros_contables", "ID", 6); //Cuenta Clientes
+        $Parametros=$this->DevuelveValores("parametros_contables", "ID", 39); //Cuenta Clientes
         $CuentaCliente=$Parametros["CuentaPUC"];
         $NombreCuentaCliente=$Parametros["NombreCuenta"];
         $Parametros=$this->DevuelveValores("parametros_contables", "ID", 10); //Cuenta caja    
@@ -737,6 +740,12 @@ class AcuerdoPago extends ProcesoVenta{
         $idAcuerdoPago=$DatosAbono["idAcuerdoPago"];
         $sql="UPDATE acuerdo_pago SET TotalAbonos=(TotalAbonos-$ValorAbono),SaldoFinal=SaldoInicial-TotalAbonos WHERE idAcuerdoPago='$idAcuerdoPago'";
         $this->Query($sql);
+        $idProyeccion=$DatosAbono["idProyeccion"];
+        if($idProyeccion>0){
+            $sql="UPDATE acuerdo_pago_proyeccion_pagos SET ValorPagado=(ValorPagado-$ValorAbono),idPago=0,Estado=0 WHERE ID='$idProyeccion'";
+            $this->Query($sql);
+        }
+        
         $this->ActualizaRegistro("acuerdo_pago_cuotas_pagadas", "Estado", 10, "ID", $idAbono);
         $Datos["idAbono"]=$idAbono;
         $Datos["idAcuerdoPago"]=$DatosAbono["idAcuerdoPago"];

@@ -121,8 +121,10 @@ if( !empty($_REQUEST["Accion"]) ){
             $Condicion="LIMIT $PuntoInicio,$Limit; ";
             $DatosServer=$obCon->DevuelveValores("servidores", "ID", 1);
             $sql=$obCon->ArmeSqlReplace("prod_codbarras", $db, $Condicion, $DatosServer["DataBase"], date("Y-m-d H:i:s"), "");                   
-            $obCon->QueryExterno($sql, $DatosServer["IP"], $DatosServer["Usuario"], $DatosServer["Password"], $DatosServer["DataBase"], "");
-            
+            if($sql<>''){
+                
+                $obCon->QueryExterno($sql, $DatosServer["IP"], $DatosServer["Usuario"], $DatosServer["Password"], $DatosServer["DataBase"], "");
+            }
             if($pageProducts>=$TotalPaginas){
                 print("END;$pageProducts Bloques de $TotalPaginas Copiados");
             }else{
@@ -222,6 +224,7 @@ if( !empty($_REQUEST["Accion"]) ){
         break;//Fin caso 8
         
         case 9: //Insertar los productos que no esten pero si en la tabla temporal
+            
             $sql="REPLACE INTO productosventa 
                     SELECT *
                       FROM productosventa_temp t1
@@ -229,7 +232,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     ";
             $obCon->Query($sql);
-            
+            //print("Copiados");
             print("OK;Nuevos productos copiados");
             
         break;//Fin caso 9 

@@ -600,7 +600,12 @@ public function DibujeTabla($Vector){
                     $Ruta=$Vector["NuevaAccion"][$NuevaAccion]["Link"];
                     $ColumnaLink=$Vector["NuevaAccion"][$NuevaAccion]["ColumnaLink"];
                     $Ruta.=$DatosProducto[$ColumnaLink];
-                    $this->css->CrearLink($Ruta,$Target, " // $TituloLink // ");
+                    if($_SESSION["tipouser"]<>'administrador' and ($TituloLink==" Anular Factura " or $TituloLink==" Anular ")){
+                        print("");
+                    }else{
+                        $this->css->CrearLink($Ruta,$Target, " // $TituloLink // ");
+                    }
+                    
                     }
                 }
                 
@@ -3238,6 +3243,10 @@ public function GenerarInformeComprasComparativo($TipoReporte,$FechaInicial,$Fec
         $DatosFormatoCalidad=$this->obCon->DevuelveValores("formatos_calidad", "ID", $idFormatoCalidad);
         
         $RutaLogo="../$DatosEmpresaPro[RutaImagen]";
+        if(!file_exists($RutaLogo)){
+            $DatosEmpresaPro1=$this->obCon->DevuelveValores("empresapro", "idEmpresaPro", 1);
+            $RutaLogo="../$DatosEmpresaPro1[RutaImagen]";
+        }
 ///////////////////////////////////////////////////////
 //////////////encabezado//////////////////
 ////////////////////////////////////////////////////////
@@ -4967,7 +4976,7 @@ EOD;
               <tr> 
                 <th><h3>Departamento</h3></th>
                     <th><h3>Nombre</h3></th>
-                    
+                    <th><h3>Items</h3></th>
                     <th><h3>SubTotal</h3></th>
                     <th><h3>IVA</h3></th>
                     <th><h3>Total</h3></th>
@@ -4999,7 +5008,7 @@ EOD;
                             <tr>
                                 <td>'.$idDepartamentos.'</td>
                                 <td>'.$NombreDep.'</td>
-                                
+                                <td>'.$Items.'</td>
                                 <td>'.$SubtotalUser.'</td>
                                 <td>'.$IVA.'</td>
                                 <td>'.$Total.'</td>
@@ -5016,7 +5025,7 @@ EOD;
              <tr>
               <td align="RIGHT"><h3>SUMATORIA</h3></td>
               <td><h3>NA</h3></td>
-              
+              <td><h3>'.$TotalItems.'</h3></td>
               <td><h3>'.$Subtotal.'</h3></td>
               <td><h3>'.$TotalIVA.'</h3></td>
               <td><h3>'.$TotalVentas.'</h3></td>
@@ -5616,8 +5625,8 @@ EOD;
     public function PDF_Informe_Ventas_Admin($TipoReporte,$FechaCorte,$FechaIni, $FechaFinal,$CentroCostos,$EmpresaPro,$Vector) {
         
         
-        $Condicion=" ori_facturas_items WHERE ";
-        $Condicion2=" ori_facturas WHERE ";
+        $Condicion=" facturas_items WHERE ";
+        $Condicion2=" facturas WHERE ";
         if($TipoReporte=="Corte"){
             $CondicionFecha1=" FechaFactura <= '$FechaCorte' ";
             $CondicionFecha2=" Fecha <= '$FechaCorte' ";
@@ -5633,7 +5642,7 @@ EOD;
         $CondicionItems=$Condicion.$CondicionFecha1;
         $CondicionFacturas=$Condicion2.$CondicionFecha2;
         
-        $CondicionItems=" FROM `ori_facturas_items` fi INNER JOIN facturas f ON fi.`idFactura` = f.idFacturas 
+        $CondicionItems=" FROM `facturas_items` fi INNER JOIN facturas f ON fi.`idFactura` = f.idFacturas 
             WHERE $CondicionFecha1
             ";
         
@@ -5665,7 +5674,7 @@ EOD;
         $html= $this->HTML_Entregas($CondicionFecha1,$CondicionFecha2);
         $this->PDF_Write($html);
         $html= $this->HTML_Ventas_Colaboradores($CondicionFecha2, $CentroCostos, $EmpresaPro, "");
-        $this->PDF_Write($html);
+        $this->PDF_Write(utf8_encode($html));
          
         /*Solo Juan Car
         $this->PDF_Add();

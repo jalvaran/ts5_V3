@@ -106,7 +106,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Tercero=$DatosAcuerdo["Tercero"];
             $Fecha=date("Y-m-d");
             if($ValorAbono>0){
-                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6); //Contrapartida del comprobante de ingreso aqui se aloja la cuenta de clientes
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 39); //Contrapartida del comprobante de ingreso aqui se aloja la cuenta de clientes
                 $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAbono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdo", "CERRADO");
                 $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
 
@@ -246,7 +246,7 @@ if( !empty($_REQUEST["Accion"]) ){
             if($ValorAbono>0){
                 
 
-                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6); //Contrapartida del comprobante de ingreso aqui se aloja la cuenta de clientes
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 39); //Contrapartida del comprobante de ingreso aqui se aloja la cuenta de clientes
                 $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $ValorAbono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdo", "CERRADO");
                 $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $idEmpresa,$idSucursal, $idCentroCostos);
                 
@@ -548,7 +548,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $CentroCosto=1;
             $Tercero=$DatosCliente["Num_Identificacion"];
 
-            $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6);
+            $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 39);
             $Abono=$CuotaInicial;
             $Fecha=date("Y-m-d");
             if($Abono>0){

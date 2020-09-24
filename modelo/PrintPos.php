@@ -1250,6 +1250,11 @@ class PrintPos extends ProcesoVenta{
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"TOTAL VENTAS SISTE CREDITO ".str_pad("$".number_format($DatosCierre["TotalVentasSisteCredito"]),14," ",STR_PAD_LEFT));
+    $sql="SELECT SUM(Valor) as TotalIniciales FROM comercial_plataformas_pago_ingresos WHERE idPlataformaPago=1 AND Inicial=1 AND idCierre='$idCierre'";
+    $DatosInicialSiste=$this->FetchAssoc($this->Query($sql));
+    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+    fwrite($handle,"INICIALES SISTE CREDITO    ".str_pad("$".number_format($DatosInicialSiste["TotalIniciales"]),14," ",STR_PAD_LEFT));
+    
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     $this->SeparadorHorizontal($handle, "_", 37);
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
@@ -1261,7 +1266,7 @@ class PrintPos extends ProcesoVenta{
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"EFECTIVO    ".str_pad("$".number_format($TotalesFormasPagoFactura["Efectivo"]),20," ",STR_PAD_LEFT));
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"CHEQUES     ".str_pad("$".number_format($TotalesFormasPagoFactura["Cheques"]),20," ",STR_PAD_LEFT));
+    fwrite($handle,"CONSIGNAC.  ".str_pad("$".number_format($TotalesFormasPagoFactura["Cheques"]),20," ",STR_PAD_LEFT));
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"BONOS       ".str_pad("$".number_format($TotalesFormasPagoFactura["Otros"]),20," ",STR_PAD_LEFT));
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
@@ -1277,7 +1282,7 @@ class PrintPos extends ProcesoVenta{
                 (SELECT NombreTipoCuota FROM acuerdo_pago_tipo_cuota t3 WHERE t1.TipoCuota=t3.ID) as NombreTipoCuota,
                 (SELECT Metodo FROM metodos_pago t2 WHERE t1.MetodoPago=t2.ID) as Metodo 
                 FROM `acuerdo_pago_cuotas_pagadas` t1
-                WHERE `idCierre` = '$idCierre' GROUP BY t1.MetodoPago,t1.TipoCuota ORDER BY MetodoPago,TipoCuota ";
+                WHERE `idCierre` = '$idCierre' AND t1.Estado<10 GROUP BY t1.MetodoPago,t1.TipoCuota ORDER BY MetodoPago,TipoCuota ";
         
     $Consulta=$this->Query($sql);
     //if($this->NumRows($consulta)>0){
@@ -1327,9 +1332,10 @@ class PrintPos extends ProcesoVenta{
     //if($this->NumRows($consulta)>0){
         fwrite($handle,"CRUCE DE ANTICIPOS POR ENCARGOS: ");
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-            
+        $total_cruce_anticipos=0;
         while($DatosConsulta= $this->FetchAssoc($Consulta)){
             fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            $total_cruce_anticipos=$total_cruce_anticipos+$DatosConsulta["Debito"];
             $Titulo="Factura ".$DatosConsulta["Num_Documento_Externo"];
             $LongitudTitulo= strlen($Titulo);
             fwrite($handle,str_pad($Titulo,10," ",STR_PAD_LEFT));
@@ -1405,11 +1411,11 @@ class PrintPos extends ProcesoVenta{
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"ABONOS SISTECREDITO  ".str_pad("$".number_format($DatosCierre["AbonosSisteCredito"]),20," ",STR_PAD_LEFT));
     
-    $sql="SELECT SUM(ValorPago) as Total FROM acuerdo_pago_cuotas_pagadas WHERE idCierre='$idCierre' AND MetodoPago=1";
+    $sql="SELECT SUM(ValorPago) as Total FROM acuerdo_pago_cuotas_pagadas WHERE idCierre='$idCierre' AND MetodoPago=1 AND Estado<10";
     $DatosPagosAcuerdo= $this->FetchAssoc($this->Query($sql));
     $AbonosAcuerdoEfectivo=$DatosPagosAcuerdo["Total"];
     
-    $sql="SELECT SUM(ValorPago) as Total FROM acuerdo_pago_cuotas_pagadas WHERE idCierre='$idCierre' AND MetodoPago<>1";
+    $sql="SELECT SUM(ValorPago) as Total FROM acuerdo_pago_cuotas_pagadas WHERE idCierre='$idCierre' AND MetodoPago<>1 AND Estado<10";
     $DatosPagosAcuerdo= $this->FetchAssoc($this->Query($sql));
     $AbonosAcuerdoOtrosMetodos=$DatosPagosAcuerdo["Total"];
     
@@ -1485,7 +1491,7 @@ class PrintPos extends ProcesoVenta{
     fwrite($handle,"TOTAL TARJETAS       ".str_pad("$".number_format($DatosCierre["TotalTarjetas"]),20," ",STR_PAD_LEFT));
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"TOTAL CHEQUES        ".str_pad("$".number_format($DatosCierre["TotalCheques"]),20," ",STR_PAD_LEFT));
+    fwrite($handle,"TOTAL CONSIGNAC.     ".str_pad("$".number_format($DatosCierre["TotalCheques"]),20," ",STR_PAD_LEFT));
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"TOTAL OTROS          ".str_pad("$".number_format($DatosCierre["TotalOtros"]),20," ",STR_PAD_LEFT));
@@ -1502,9 +1508,9 @@ class PrintPos extends ProcesoVenta{
     }
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"TOTAL ENTREGA        ".str_pad("$".number_format($DatosCierre["TotalEntrega"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$AbonosAcuerdoOtrosMetodos+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo+$AbonosAnticiposEncargosOtrosMetodos),20," ",STR_PAD_LEFT));
+    fwrite($handle,"TOTAL ENTREGA        ".str_pad("$".number_format($DatosCierre["TotalEntrega"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$total_cruce_anticipos+$AbonosAcuerdoOtrosMetodos+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo+$AbonosAnticiposEncargosOtrosMetodos),20," ",STR_PAD_LEFT));
     
-    $SaldoEnCaja=$DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$TotalAnticiposCruzados+$AbonosAcuerdoEfectivo+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo;
+    $SaldoEnCaja=$DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$total_cruce_anticipos+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo;
     $Diferencia=$DatosCierre["EfectivoRecaudado"]-$SaldoEnCaja;
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"EFECTIVO EN CAJA     ".str_pad("$".number_format($DatosCierre["EfectivoRecaudado"]),20," ",STR_PAD_LEFT));

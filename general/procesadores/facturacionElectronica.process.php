@@ -431,8 +431,15 @@ if( !empty($_REQUEST["Accion"]) ){
                             $response2=str_replace("'", '', $response2);
                             $sql="UPDATE $Tabla SET LogsDocumento='$response2' WHERE ID='$idDocumento'";
                             $obCon->Query($sql);
+                            
                             $JsonLogs= json_decode($response2);
-                            $Acuse=($JsonLogs[0]->acknowledgment_received);
+                            //print_r($JsonLogs);
+                            if(!(is_object($JsonLogs)) ){
+                                $Acuse='';
+                            }else{
+                                $Acuse=($JsonLogs[0]->acknowledgment_received);
+                            }
+                            
                             if($Acuse==''){
                                 $idFactura=$DatosDocumento["idFactura"];
                                 $sql="SELECT Fecha FROM facturas WHERE idFacturas='$idFactura'";

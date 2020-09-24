@@ -235,13 +235,21 @@ if( !empty($_REQUEST["Accion"]) ){
             $idCliente=$obCon->normalizar($_REQUEST["idCliente"]);
             $idEmpresa=$DatosCaja["idEmpresa"];
             $idSucursal=$DatosCaja["idSucursal"];
-            $Devuelta=$obCon->normalizar($_REQUEST["Devuelta"]);
-            $Efectivo=$obCon->normalizar($_REQUEST["Efectivo"]);
-            $Cheques=$obCon->normalizar($_REQUEST["Cheque"]);
-            $Otros=$obCon->normalizar($_REQUEST["Otros"]);
-            $Tarjetas=$obCon->normalizar($_REQUEST["Tarjetas"]);
+            $Devuelta=0;
+            $Efectivo=0;
+            $Cheques=0;
+            $Otros=0;
+            $Tarjetas=0;
+            if($CmbFormaPago=="Contado"){
+                $Devuelta=$obCon->normalizar($_REQUEST["Devuelta"]);
+                $Efectivo=$obCon->normalizar($_REQUEST["Efectivo"]);
+                $Cheques=$obCon->normalizar($_REQUEST["Cheque"]);
+                $Otros=$obCon->normalizar($_REQUEST["Otros"]);
+                $Tarjetas=$obCon->normalizar($_REQUEST["Tarjetas"]);
+            }
             $CmbPrint=$obCon->normalizar($_REQUEST["CmbPrint"]);
             $idCajero=$obCon->normalizar($_REQUEST["idCajero"]);
+            $OrdenCompra=$obCon->normalizar($_REQUEST["orden_compra"]);
             $TxtCuotaInicialCredito=$obCon->normalizar($_REQUEST["TxtCuotaInicialCredito"]);
             
             if($idCajero<>$idUser){
@@ -259,20 +267,29 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $Hora=date("H:i:s");
             
-            $sql="SELECT SUM(ValorAcordado) AS Subtotal, SUM(Impuestos) AS IVA, SUM(TotalVenta) as Total,SUM(CostoUnitario*Cantidad) AS TotalCostos "
+            $sql="SELECT count(*) totalItems,SUM(ValorAcordado) AS Subtotal, SUM(Impuestos) AS IVA, SUM(TotalVenta) as Total,SUM(CostoUnitario*Cantidad) AS TotalCostos "
                     . "FROM preventa WHERE VestasActivas_idVestasActivas='$idPreventa'";
             $Consulta=$obCon->Query($sql);
             $DatosTotalesCotizacion=$obCon->FetchAssoc($Consulta);
+            if($DatosTotalesCotizacion["totalItems"]<=0){
+                exit("E4;La factura no tiene items agregados");
+            }
             $Subtotal=round($DatosTotalesCotizacion["Subtotal"],2);
             $IVA=round($DatosTotalesCotizacion["IVA"],2);
             $Total=round($DatosTotalesCotizacion["Total"],2);
             $TotalCostos=$DatosTotalesCotizacion["TotalCostos"];
             $SaldoFactura=$Total;
-            if($TxtCuotaInicialCredito>$Total){
-                //exit("E4; El valor de la cuota inicial no puede ser superior al valor de la factura");
+            if($TxtCuotaInicialCredito>abs($SaldoFactura)){
+                exit("E4; El valor de la cuota inicial no puede ser superior al valor de la factura;");
+            }
+            if($TxtCuotaInicialCredito<>'' and $TxtCuotaInicialCredito<>'0'){
+                if(!is_numeric($TxtCuotaInicialCredito) or $TxtCuotaInicialCredito<0){
+                    exit("E4; El valor de la cuota inicial debe ser un numero mayor a cero;");
+                }
             }
             $Descuentos=0;
             $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
+            $Tercero=$DatosCliente["Num_Identificacion"];
             if($AnticiposCruzados>0){
                             
                 $NIT=$DatosCliente["Num_Identificacion"];
@@ -303,14 +320,14 @@ if( !empty($_REQUEST["Accion"]) ){
                         AND EXISTS(SELECT 1 FROM contabilidad_parametros_cuentasxcobrar t2 WHERE t2.CuentaPUC like t1.CuentaPUC)";
                 $DatosTotalCreditoCliente=$obCon->FetchAssoc($obCon->Query($sql));
                 $SaldoNuevoCliente=$DatosTotalCreditoCliente["TotalCredito"]+$Total;
-                if($DatosCliente["Cupo"]<$SaldoNuevoCliente){
+                if($DatosCliente["Cupo"]<$SaldoNuevoCliente AND $FormaPagoFactura=='Credito'){
                     exit("E4;El cupo del cliente no es suficiente para realizar la factura");
                 }
             }
             
             $idFactura=$obFactura->idFactura();
                         
-            $NumFactura=$obFactura->CrearFactura($idFactura, $Fecha, $Hora, $CmbResolucion, "", "", $FormaPagoFactura, $Subtotal, $IVA, $Total, $Descuentos, $SaldoFactura, "", $idEmpresa, $idCentroCostos, $idSucursal, $idUser, $idCliente, $TotalCostos, $Observaciones, $Efectivo, $Devuelta, $Cheques, $Otros, $Tarjetas, 0, 0, "");
+            $NumFactura=$obFactura->CrearFactura($idFactura, $Fecha, $Hora, $CmbResolucion, $OrdenCompra, "", $FormaPagoFactura, $Subtotal, $IVA, $Total, $Descuentos, $SaldoFactura, "", $idEmpresa, $idCentroCostos, $idSucursal, $idUser, $idCliente, $TotalCostos, $Observaciones, $Efectivo, $Devuelta, $Cheques, $Otros, $Tarjetas, 0, 0, "");
             if($NumFactura=="E1"){
                 $Mensaje="La Resolucion está completa";
                 print("E1;$Mensaje");
@@ -344,9 +361,16 @@ if( !empty($_REQUEST["Accion"]) ){
                 $CuentaDestino=$CmbCuentaIngresoFactura;
                 $NombreCuentaDestino=$DatosCuenta["Nombre"];
             }else{
-                $DatosCuenta=$obCon->DevuelveValores("parametros_contables", "ID", 6); //Cuenta Clientes
+                if($CmbFormaPago=="Acuerdo"){
+                    $DatosCuenta=$obCon->DevuelveValores("parametros_contables", "ID", 39); //Cuenta Clientes
+                    
+                }else{
+                    $DatosCuenta=$obCon->DevuelveValores("parametros_contables", "ID", 6); //Cuenta Clientes
+                    
+                }
                 $CuentaDestino=$DatosCuenta["CuentaPUC"];
                 $NombreCuentaDestino=$DatosCuenta["NombreCuenta"];
+                
             }
             
             $obFactura->InsertarFacturaLibroDiarioV2($idFactura,$CmbCuentaIngresoFactura,$idUser);
@@ -395,8 +419,8 @@ if( !empty($_REQUEST["Accion"]) ){
                         $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $idTerceroInteres, $Abono, "PlataformasPago", "Ingreso por Plataforma de Pago $CmbPlataforma", "CERRADO");
                         $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $idTerceroInteres, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
 
-                        $obCon->IngresoPlataformasPago($CmbPlataforma,$Fecha, $Hora, $Tercero, $Abono, $idComprobante, $idUser);
-
+                        $obCon->IngresoPlataformasPago($CmbPlataforma,$Fecha, $Hora, $Tercero, $Abono, $idComprobante, $idUser,1);
+                        
                     }
                 }    
             }
@@ -407,7 +431,8 @@ if( !empty($_REQUEST["Accion"]) ){
                 if($CmbFormaPago=='KUPY'){
                     $idPlataforma=2;
                 }
-                $obFactura->PlataformasPagoVentas($idPlataforma,$fecha,$Hora,$DatosCliente["Num_Identificacion"],$idFactura,$Total,$idUser);
+                $TotalVentaPlataforma=$Total-$TxtCuotaInicialCredito;
+                $obFactura->PlataformasPagoVentas($idPlataforma,$fecha,$Hora,$DatosCliente["Num_Identificacion"],$idFactura,$TotalVentaPlataforma,$idUser);
             }
             if($AnticiposCruzados>0){
                 
@@ -459,17 +484,24 @@ if( !empty($_REQUEST["Accion"]) ){
                 $CuotaInicial=$TotalesCuotaInicial["TotalCuotaInicial"];
                 $SaldoInicial=$SaldoFinal;
                 $SaldoFinal=$SaldoInicial-$CuotaInicial;
-                $obAcuerdo->CrearAcuerdoPagoDesdePOS($idAcuerdoPago,$idFactura, $FechaInicialParaPagos, $DatosCliente["Num_Identificacion"],$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$CuotaInicial, $SaldoInicial, $SaldoFinal, 1, $idUser);
                 
-                $CuentaDestino=$DatosCaja["CuentaPUCEfectivo"];
-                $CentroCosto=$DatosCaja["CentroCostos"];
-                $Tercero=$DatosCliente["Num_Identificacion"];
-
-                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6);
-                $Abono=$CuotaInicial;
-                $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $Abono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdoPago", "CERRADO");
-                $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
-                $obAcuerdo->RelacionAbonosComprobantesIngreso($idAcuerdoPago, $idComprobante);
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6);//Cuenta Clientes
+                $sql="SELECT SUM(t1.ValorPago) as TotalCuotaInicial,(SELECT CuentaPUCIngresos FROM metodos_pago t2 WHERE t2.ID=t1.MetodoPago LIMIT 1 ) as CuentaPUCIngresos, (SELECT NombreCuentaPUCIngresos FROM metodos_pago t2 WHERE t2.ID=t1.MetodoPago LIMIT 1 ) as NombreCuentaPUCIngresos  FROM acuerdo_pago_cuotas_pagadas_temp t1 WHERE t1.idAcuerdoPago='$idAcuerdoPago' AND t1.TipoCuota=0 GROUP BY t1.MetodoPago";
+                $ConsultaCuota=$obAcuerdo->Query($sql);
+                
+                while($DatosCuotaInicial=$obAcuerdo->FetchAssoc($ConsultaCuota)){
+                    
+                    $CuentaDestino=$DatosCuotaInicial["CuentaPUCIngresos"];
+                    $CentroCosto=$DatosCaja["CentroCostos"];
+                    
+                    $Abono=$DatosCuotaInicial["TotalCuotaInicial"];
+                    
+                    $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $Tercero, $Abono, "AbonoAcuerdoPago", "Ingreso por Acuerdo de Pago $idAcuerdoPago", "CERRADO");
+                    $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $Tercero, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
+                    $obAcuerdo->RelacionAbonosComprobantesIngreso($idAcuerdoPago, $idComprobante);
+                
+                }
+                $obAcuerdo->CrearAcuerdoPagoDesdePOS($idAcuerdoPago,$idFactura, $FechaInicialParaPagos, $DatosCliente["Num_Identificacion"],$ValorCuotaGeneral, $CicloPagos, $Observaciones,$SaldoAnterior,$CuotaInicial, $SaldoInicial, $SaldoFinal, 1, $idUser);
                 $NuevoIdAcuerdo=$obAcuerdo->getId("ap_");
                 $obAcuerdo->ActualizaRegistro("vestasactivas", "IdentificadorUnico", $NuevoIdAcuerdo, "idVestasActivas", $idPreventa);
                 $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);
@@ -649,6 +681,12 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             $sql="UPDATE `preventa` "
                     . "SET `ValorAcordado`=round((`CostoUnitario`)/(`PorcentajeIVA`+1),2), "
+                    . "`Impuestos`=round(`PorcentajeIVA`*(`ValorAcordado`*`Cantidad`),2),"
+                    . "`Subtotal`=(`ValorAcordado`*`Cantidad`), `TotalVenta`=(`Subtotal`+`Impuestos`) "
+                    . "WHERE `VestasActivas_idVestasActivas`='$idPreventa' ";
+            
+            $sql="UPDATE `preventa` "
+                    . "SET `ValorAcordado`=round((`CostoUnitario`),2), "
                     . "`Impuestos`=round(`PorcentajeIVA`*(`ValorAcordado`*`Cantidad`),2),"
                     . "`Subtotal`=(`ValorAcordado`*`Cantidad`), `TotalVenta`=(`Subtotal`+`Impuestos`) "
                     . "WHERE `VestasActivas_idVestasActivas`='$idPreventa' ";
@@ -1124,7 +1162,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit("E1;Debe digitar un traslado;convert_id");
             }
             
-            $sql="SELECT Cantidad,(SELECT idProductosVenta FROM productosventa t2 WHERE t1.Referencia=t2.Referencia ) as producto_id FROM traslados_items t1 WHERE idTraslado='$traslado_id'";
+            $sql="SELECT Cantidad,(SELECT idProductosVenta FROM productosventa t2 WHERE CONVERT(t1.Referencia USING utf8)=CONVERT(t2.Referencia USING utf8) ) as producto_id FROM traslados_items t1 WHERE idTraslado='$traslado_id'";
             $Consulta=$obCon->Query($sql);
             
             while($DatosConsulta=$obCon->FetchAssoc($Consulta)){

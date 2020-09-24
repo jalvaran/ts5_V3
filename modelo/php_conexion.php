@@ -312,7 +312,7 @@ public function RegFactLibroDiario($NumFact,$CuentaDestino,$CuentaIngresos,$Tabl
                 
                 //Si es factura de un separado
                 if($DatosFactura['FormaPago']=="Separado" ){
-                    $Parametros= $this->DevuelveValores("parametros_contables", "ID", 20);  //parametros de la cuenta para anticipos 
+                    $Parametros= $this->DevuelveValores("parametros_contables", "ID", 31);  //parametros de la cuenta para anticipos 
                     $CuentaPUC=$Parametros["CuentaPUC"];
                     $NombreCuenta=$Parametros["NombreCuenta"];
                     $Valores[15]=$CuentaPUC;
@@ -5889,7 +5889,7 @@ public function VerificaPermisos($VectorPermisos) {
              $sql="DELETE FROM `prod_codbarras` WHERE `ProductosVenta_idProductosVenta`='$idProducto' ORDER BY idCodBarras DESC LIMIT 1 ";
              $this->Query($sql);
              //$this->RegistrarDiferenciaInventarios($idProducto, "");
-             $Respuestas["Creado"]="el codigo $idProducto, $DatosProducto[Nombre] Se ha creado satisfactoriamente con Existencias = $Cantidad";
+             $Respuestas["Creado"]="el codigo $idProducto, $DatosProducto[Nombre] Se ha creado satisfactoriamente con Existencias = $Cantidad, Precio de venta: ".number_format($DatosProducto["PrecioVenta"]);
              return($Respuestas);
          }else{
             $DatosKardex["Cantidad"]=$Cantidad;
@@ -5905,7 +5905,7 @@ public function VerificaPermisos($VectorPermisos) {
             $this->InserteKardex($DatosKardex);
             //$this->RegistrarDiferenciaInventarios($idProducto, "");
             $Saldo=$DatosProductoConteo['Existencias']+$Cantidad;            
-            $Respuestas["Actualizado"]="el codigo $idProducto, $DatosProductoConteo[Nombre], Referencia $DatosProductoConteo[Referencia],  Se ha actualizado satisfactoriamente, existencia anterior = $DatosProductoConteo[Existencias], Cantidad Ingresada=$Cantidad, Nuevo Saldo = $Saldo";
+            $Respuestas["Actualizado"]="el codigo $idProducto, $DatosProductoConteo[Nombre], Referencia $DatosProductoConteo[Referencia], Precio Venta: $DatosProductoConteo[PrecioVenta],  Se ha actualizado satisfactoriamente, existencia anterior = $DatosProductoConteo[Existencias], Cantidad Ingresada=$Cantidad, Nuevo Saldo = $Saldo";
             return($Respuestas);
          }
      }

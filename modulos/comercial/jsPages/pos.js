@@ -1034,6 +1034,7 @@ function GuardarFactura(){
     var TxtTotalFactura = parseFloat(document.getElementById('TxtTotalFactura').value);
     var TxtTotalAnticipos = parseFloat(document.getElementById('TxtTotalAnticiposFactura').value);
     var idCliente = (document.getElementById('idCliente').value);
+    var orden_compra = (document.getElementById('orden_compra').value);
     var TxtCuotaInicialCredito = (document.getElementById('TxtCuotaInicialCredito').value);
     var idCajero = (document.getElementById('idCajero').value);
     
@@ -1132,6 +1133,7 @@ function GuardarFactura(){
         form_data.append('CmbPrint', CmbPrint);
         form_data.append('idCajero', idCajero);
         form_data.append('TxtCuotaInicialCredito', TxtCuotaInicialCredito);
+        form_data.append('orden_compra', orden_compra);
         if(CmbFormaPago=='Acuerdo'){
             form_data.append('idAcuerdoPago', idAcuerdoPago);
             form_data.append('TxtFechaInicialPagos', TxtFechaInicialPagos);
@@ -1766,7 +1768,9 @@ function ModalCrearSeparado(){
         type: 'post',
         success: function(data){
             document.getElementById('DivFrmPOSSmall').innerHTML=data;
-            setTimeout(function(){document.getElementById("TxtAbonoCrearSeparado").select();}, 100);       
+            Number_Format_Input();
+            setTimeout(function(){document.getElementById("TxtAbonoCrearSeparado").select();}, 100);
+            
             
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -1895,6 +1899,8 @@ function ModalCrearEgreso(){
         type: 'post',
         success: function(data){
             document.getElementById('DivFrmPOS').innerHTML=data;
+            Number_Format_Input();
+            $("#TotalEgreso_Format_Number").prop('disabled', true);
             $('#TipoEgreso').select2();
             $('#CmbTerceroEgreso').select2({
 		  
@@ -2041,11 +2047,17 @@ function CrearEgreso(){
  * @returns {undefined}
  */
 function CalculeTotalEgreso(){
+    setTimeout(escriba_total_egreso, 100);    
+}
+
+function escriba_total_egreso(){
+    
+    
     var subtotal=parseFloat(document.getElementById('SubtotalEgreso').value);
     var iva=parseFloat(document.getElementById('IVAEgreso').value);
     
     document.getElementById('TotalEgreso').value=subtotal+iva;
-    
+    document.getElementById('TotalEgreso_Format_Number').value=number_format(subtotal+iva);
 }
 
 /**
@@ -2467,6 +2479,8 @@ function ModalIngresosPlataformas(){
         success: function(data){
             document.getElementById('DivFrmPOS').innerHTML=data;
             
+            Number_Format_Input();
+           
             $('#CmbTerceroIngresoPlataformas').select2({
             
                 placeholder: 'Seleccione un Tercero',
@@ -2483,6 +2497,7 @@ function ModalIngresosPlataformas(){
                  cache: true
                 }
               });
+             
             
         },
         error: function (xhr, ajaxOptions, thrownError) {

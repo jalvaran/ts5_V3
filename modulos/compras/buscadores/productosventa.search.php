@@ -12,8 +12,8 @@ if($idUser==''){
 $obRest=new ProcesoVenta($idUser);
 $key=$obRest->normalizar($_REQUEST['q']);
 
-$sql = "SELECT * FROM productosventa pv INNER JOIN prod_codbarras cod ON cod.ProductosVenta_idProductosVenta=pv.idProductosVenta
-		WHERE pv.Nombre LIKE '%$key%' or pv.idProductosVenta = '$key' OR  pv.Referencia = '$key' OR cod.CodigoBarras like '%$key%'
+$sql = "SELECT * FROM productosventa pv 
+		WHERE pv.Nombre LIKE '%$key%' or pv.idProductosVenta = '$key' OR  pv.Referencia = '$key' 
 		ORDER BY pv.Nombre ASC LIMIT 100"; 
 $result = $obRest->Query($sql);
 $json = [];

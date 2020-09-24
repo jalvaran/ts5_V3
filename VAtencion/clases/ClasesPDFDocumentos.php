@@ -653,7 +653,7 @@ $tbl.= "</table>";
         $Consecutivo=$DatosDocumento["Consecutivo"];
         $this->PDF_Ini($Documento, 8, "");
         $idFormato=32;
-        $this->PDF_Encabezado($DatosDocumento["Fecha"],1, $idFormato, "",$Documento);
+        $this->PDF_Encabezado($DatosDocumento["Fecha"],$DatosDocumento["idEmpresa"], $idFormato, "",$Documento);
         $this->PDF_Encabezado_Documento_Contable($DatosDocumento, $DescripcionDocumento, "");
         
         

@@ -399,17 +399,21 @@ WHERE t2.FormaPago='Acuerdo' ORDER BY t2.Clientes_idClientes,t2.Fecha DESC;
 
 DROP VIEW IF EXISTS `vista_abonos_acuerdo_pago`;
 CREATE VIEW vista_abonos_acuerdo_pago AS
-SELECT t1.ID,t2.Tercero,t1.NumeroCuota,t1.TipoCuota,
-    (SELECT t3.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t3 WHERE t3.ID=t1.TipoCuota LIMIT 1 ) AS NombreTipoCuota,
-    t1.idAcuerdoPago,t2.ID as ConsecutivoAcuerdo,t1.FechaPago AS Fecha,t1.ValorPago,t1.MetodoPago,
-    (SELECT t5.Metodo FROM metodos_pago t5 WHERE t5.ID=t1.MetodoPago) as NombreMetodoPago,
-    t1.idUser,
-    (SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t4 WHERE t4.idUsuarios=t1.idUser ) as NombreUsuario,
-    t1.Created
-    
-FROM acuerdo_pago_cuotas_pagadas t1 
-INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
- ORDER BY t2.Tercero,t1.Created DESC;
+            SELECT t1.ID,t2.Tercero,
+                (SELECT RazonSocial FROM clientes t4 WHERE t4.Num_Identificacion=t2.Tercero) as RazonSocialCliente,
+                t1.NumeroCuota,t1.TipoCuota,
+                (SELECT t3.NombreTipoCuota FROM acuerdo_pago_tipo_cuota t3 WHERE t3.ID=t1.TipoCuota LIMIT 1 ) AS NombreTipoCuota,
+                t1.idAcuerdoPago,t2.ID as ConsecutivoAcuerdo,
+                (SELECT t6.Fecha FROM acuerdo_pago_proyeccion_pagos t6 WHERE t6.ID=t1.idProyeccion LIMIT 1 ) AS FechaCuota,
+                t1.FechaPago AS Fecha,t1.ValorPago,t1.MetodoPago,
+                (SELECT t5.Metodo FROM metodos_pago t5 WHERE t5.ID=t1.MetodoPago) as NombreMetodoPago,
+                t1.idUser,
+                (SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t4 WHERE t4.idUsuarios=t1.idUser ) as NombreUsuario,
+                t1.Created
+
+            FROM acuerdo_pago_cuotas_pagadas t1 
+            INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
+             ORDER BY t2.Tercero,t1.Created DESC;
 
 
 DROP VIEW IF EXISTS `vista_acuerdo_pago`;
@@ -521,4 +525,16 @@ Tercero_Identificacion,Tercero_DV,Tercero_Razon_Social,Detalle,(Concepto) as Con
 Tercero_Direccion,Tercero_Cod_Mcipio, Credito as TotalAnticipo, Debito as CruceAnticipo 
 FROM librodiario WHERE CuentaPUC=(SELECT CuentaPUC FROM parametros_contables WHERE ID=20) 
 ORDER BY idLibroDiario DESC; 
+
+
+DROP VIEW IF EXISTS `vista_comprobantes_ingreso`;
+CREATE VIEW vista_comprobantes_ingreso AS
+
+SELECT t1.ID, t1.Fecha, t1.Clientes_idClientes, t1.Tercero, 
+    (SELECT IF(Clientes_idClientes='0',
+        (SELECT RazonSocial FROM clientes t2 WHERE t1.Tercero= t2.Num_Identificacion LIMIT 1) ,
+        (SELECT RazonSocial FROM clientes t2 WHERE t1.Clientes_idClientes= t2.idClientes LIMIT 1) )) AS RazonSocial,
+        t1.Valor, t1.Tipo, t1.Concepto, t1.Usuarios_idUsuarios, t1.Estado, t1.idCierre, t1.Updated, t1.Sync  
+FROM comprobantes_ingreso t1;
+
 
