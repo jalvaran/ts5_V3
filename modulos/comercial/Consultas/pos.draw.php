@@ -548,7 +548,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->FilaTabla(16);
                     print("<td>");
                         $css->select("TipoEgreso", "form-control", "TipoEgreso", "", "", "", "style=width:300px");
-                        $Consulta=$obCon->ConsultarTabla("subcuentas", " WHERE (PUC LIKE '5135%' or PUC LIKE '5105%' or PUC LIKE '5195%' or PUC LIKE '1105%') AND LENGTH(PUC)>4 ");
+                        $Consulta=$obCon->ConsultarTabla("subcuentas", " WHERE (PUC LIKE '5135%' or PUC LIKE '5105%' or PUC LIKE '5195%' or PUC LIKE '1130%') AND LENGTH(PUC)>4 ");
                         while($DatosCuenta=$obCon->FetchAssoc($Consulta)){
                                                        
                             $css->option("", "", "", $DatosCuenta["PUC"], "", "", 0);

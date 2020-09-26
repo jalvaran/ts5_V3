@@ -3356,8 +3356,114 @@ $tbl.= "</table>";
         return($html);
     }
     
+    public function ReporteMovimientoCaja($FechaInicial,$FechaFinal,$cmbUsuario) {
+        $Fecha=date("Y-m-d H:i:s");
+        $Documento="Reporte de movimiento de caja del $FechaInicial al $FechaFinal";
+        
+        $this->PDF_Ini($Documento, 8, "");
+        $idFormato=40;
+        $Condicion=" WHERE t1.CuentaPUC like '1105%'";
+        if($cmbUsuario<>'ALL'){
+            $Condicion.=" AND t1.idUsuario='$cmbUsuario' ";
+        }
+        if($FechaInicial<>''){
+            $Condicion.=" AND t1.Fecha>='$FechaInicial' ";
+        }
+        if($FechaFinal<>''){
+            $Condicion.=" AND t1.Fecha<='$FechaFinal' ";
+        }
+        
+        $this->PDF_Encabezado($Fecha,1, $idFormato, "",$Documento);
+        
+        $Position=$this->PDF->SetY(65);
+        
+        
+        $sql="SELECT t1.Created,Concepto,(SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t2 WHERE t2.idUsuarios=t1.idUsuario ) as NombreUsuario,t1.Tercero_Identificacion,t1.NombreCuenta,t1.Tercero_Razon_Social ,t1.Num_Documento_Externo,t1.CuentaPUC,t1.Debito,t1.Credito FROM librodiario t1 $Condicion ORDER BY Created,idUsuario ASC";
+        $html=$this->HTML_Movimientos_Resumen_Detallado($sql, "");
+        $this->PDF_Write("<BR><BR><BR><strong>MOVIMIENTOS CONTABLES:</strong><BR>".$html);
+        
+
+        $html=$this->FirmaDocumentos();
+        $this->PDF_Write("<BR>".$html);
+        $this->PDF_Output("ReporteMovimientoCaja");
+    }
     
-    
+    //HTML Movimientos Contables condicionado simple
+    public function HTML_Movimientos_Resumen_Detallado($sql,$Vector) {
+       $Consulta= $this->obCon->Query($sql);
+        //$Consulta=$this->obCon->ConsultarTabla("librodiario", $Condicion);
+        $html = '   
+            <table border="0" cellpadding="2" cellspacing="2" align="left" style="border-radius: 10px;">
+                <tr align="center">
+                    <td><strong>Fecha</strong></td>
+                    <td><strong>Tercero</strong></td>
+                    <td><strong>Referencia</strong></td>
+                    <td><strong>Cuenta PUC</strong></td>
+                    <td><strong>Nombre Cuenta</strong></td>
+                    <td><strong>Concepto</strong></td>
+                    <td><strong>Débitos</strong></td>
+                    <td><strong>Créditos</strong></td>
+                    <td><strong>Usuario</strong></td>
+                </tr>
+
+            
+        ';
+        $h=0;
+        $Debitos=0;
+        $Creditos=0;
+        $TotalMovimiento=0;
+        while($DatosLibro=$this->obCon->FetchArray($Consulta)){
+            $Debitos=$Debitos+$DatosLibro["Debito"];
+            $Creditos=$Creditos+$DatosLibro["Credito"];
+            $TotalMovimiento=$TotalMovimiento+$DatosLibro["Debito"]-$DatosLibro["Credito"];
+            if(!($DatosLibro["Debito"]==0 and $DatosLibro["Credito"]==0)){
+                //$NumeroDocInt=$DatosLibro["Num_Documento_Interno"];
+                //if($DatosLibro["Tipo_Documento_Intero"]=='FACTURA'){
+                  //  $DatosNumeroDocInt=$this->obCon->DevuelveValores("facturas","idFacturas",$DatosLibro["Num_Documento_Interno"]);
+                    //$NumeroDocInt=$DatosNumeroDocInt["NumeroFactura"];
+
+                //}
+                //$DatosDocumentoInterno=$this->obCon->DevuelveValores("documentos_generados","Libro",$DatosLibro["Tipo_Documento_Intero"]);
+                //$DocInt=$DatosDocumentoInterno["Abreviatura"];
+                if($h==0){
+                    $Back="#f2f2f2";
+                    $h=1;
+                }else{
+                    $Back="white";
+                    $h=0;
+                } 
+                $html.= '  
+
+                    <tr align="left">
+                        <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosLibro["Created"].'</td>
+                        <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosLibro["Tercero_Identificacion"].'<br>'.utf8_encode($DatosLibro["Tercero_Razon_Social"]).'</td>
+                        <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosLibro["Num_Documento_Externo"].'</td>
+                        <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosLibro["CuentaPUC"].'</td>
+                        <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.utf8_encode($DatosLibro["NombreCuenta"]).'</td>
+                        <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.utf8_encode($DatosLibro["Concepto"]).'</td>
+                        <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosLibro["Debito"]).'</td>
+                        <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosLibro["Credito"]).'</td>
+                        <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.utf8_encode($DatosLibro["NombreUsuario"]).'</td>
+                    </tr>
+                ';
+
+            }
+        }
+        $Back='#F7F8E0';
+        $html.='<tr > '
+                . '<td align="rigth" colspan="6" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">Movimientos:</td>'
+                . '<td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($Debitos).'</td>
+                   <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($Creditos).'</td>'
+                . '</tr>';
+        
+        $html.='<tr > '
+                . '<td align="rigth" colspan="6" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">Saldo en Caja:</td>'
+                . '<td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($TotalMovimiento).'</td>
+                   <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> </td>'
+                . '</tr>';
+        $html.='</table>';
+        return($html);
+    }
    //Fin Clases
 }
     

@@ -85,7 +85,7 @@ print("<body>");
             $VarSelect["Required"]=1;
             $css->CrearSelectChosen("CmbDestino", $VarSelect);
             $css->CrearOptionSelect("", "Seleccione un destino" , 0);
-            $sql="SELECT * FROM empresa_pro_sucursales WHERE Visible='SI' AND Activo=0";
+            $sql="SELECT * FROM empresa_pro_sucursales WHERE Visible='SI' AND Actual=0";
             $Consulta=$obVenta->Query($sql);
             
                while($DatosSucursales=$obVenta->FetchArray($Consulta)){

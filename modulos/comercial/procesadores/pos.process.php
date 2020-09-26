@@ -416,11 +416,12 @@ if( !empty($_REQUEST["Accion"]) ){
 
                         $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 19);
                         $Abono=$TxtCuotaInicialCredito;
-                        $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $idTerceroInteres, $Abono, "PlataformasPago", "Ingreso por Plataforma de Pago $CmbPlataforma", "CERRADO");
-                        $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $idTerceroInteres, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
+                        if($Abono>0){
+                            $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $idTerceroInteres, $Abono, "PlataformasPago", "Ingreso por Plataforma de Pago $CmbPlataforma", "CERRADO");
+                            $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $idTerceroInteres, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
 
-                        $obCon->IngresoPlataformasPago($CmbPlataforma,$Fecha, $Hora, $Tercero, $Abono, $idComprobante, $idUser,1);
-                        
+                            $obCon->IngresoPlataformasPago($CmbPlataforma,$Fecha, $Hora, $Tercero, $Abono, $idComprobante, $idUser,1);
+                        }
                     }
                 }    
             }
@@ -861,10 +862,18 @@ if( !empty($_REQUEST["Accion"]) ){
             $Concepto=$obCon->normalizar($_REQUEST['TxtConcepto']);
             
             $DatosCaja=$obCon->DevuelveValores("cajas", "idUsuario", $idUser);
-            
             $CuentaOrigen=$DatosCaja["CuentaPUCEfectivo"];
             $CentroCostos=$DatosCaja["CentroCostos"];
             $CuentaPUCIVA=$DatosCaja["CuentaPUCIVAEgresos"];
+            if($DatosCaja["CuentaPUCEfectivo"]==''){
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 10); //Efectivo
+                
+                $CuentaOrigen=$Parametros["CuentaPUC"];
+                $CentroCostos=1;
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 40); //Cuenta IVA
+                $CuentaPUCIVA=$Parametros["CuentaPUC"];
+            }
+            
             $TipoEgreso="VentasRapidas";
             $TipoPago="Contado";
             $Sanciones=0;

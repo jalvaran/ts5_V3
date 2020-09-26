@@ -974,4 +974,20 @@ ALTER TABLE `comercial_plataformas_pago_ingresos` ADD `Inicial` INT NOT NULL AFT
 INSERT INTO `parametros_contables` (`ID`, `Descripcion`, `CuentaPUC`, `NombreCuenta`, `Updated`, `Sync`) VALUES
 (39,	'Cuenta para realizar a los clientes de siste credito',	130510,	'CLIENTES NACIONALES',	'2020-09-23 11:04:30',	'2020-07-25 10:05:22');
 
+ALTER TABLE `librodiario` ADD INDEX(`idUsuario`);
+ALTER TABLE `librodiario` ADD INDEX(`Num_Documento_Externo`);
+
+
+INSERT INTO `subcuentas` (`PUC`, `Nombre`, `Valor`, `SolicitaBase`, `Updated`, `Sync`) VALUES
+(113005,	'Recogidas',	'0',	0,	'2020-07-25 10:06:38',	'2020-07-25 10:06:38');
+
+INSERT INTO `parametros_contables` (`ID`, `Descripcion`, `CuentaPUC`, `NombreCuenta`, `Updated`, `Sync`) VALUES
+(40,	'Cuenta para contabilizar iva en los egresos',	240805,	'IVA ',	'2020-07-25 10:05:22',	'2020-07-25 10:05:22');
+
+INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `CuerpoFormato`, `NotasPiePagina`, `Updated`, `Sync`) VALUES
+(40,	'REPORTE DE MOVIMIENTO DE CAJA',	'001',	'F-GF-003',	'2020-09-25',	'',	'',	'2020-07-25 10:03:57',	'2020-07-25 10:03:57');
+
+ALTER TABLE `librodiario` ADD `Created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `Sync`;
+
+ALTER TABLE `egresos` CHANGE `CerradoDiario` `CerradoDiario` BIGINT NOT NULL;
 

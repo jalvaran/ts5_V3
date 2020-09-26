@@ -84,6 +84,12 @@ if(isset($_REQUEST["idAccion"])){
             break;
         case 4://Elimina un item de un traslado
             $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $DatosItem=$obCon->DevuelveValores("traslados_items", "ID", $idItem);
+            $idTraslado=$DatosItem["idTraslado"];
+            $DatosTraslado=$obCon->DevuelveValores("traslados_mercancia", "ID", $idTraslado);
+            if($DatosTraslado["Estado"]<>'EN DESARROLLO'){
+                exit("El traslado ya fué cerrado");
+            }
             $obCon->BorraReg("traslados_items", "ID", $idItem);
             print("OK");
             break;

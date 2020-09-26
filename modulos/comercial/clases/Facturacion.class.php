@@ -518,8 +518,12 @@ class Facturacion extends ProcesoVenta{
         }
 
         if($DatosFactura["FormaPago"]<>"Contado" and $DatosFactura['FormaPago']<>"Separado"){
-
-            $Parametros=$this->DevuelveValores("parametros_contables", "ID", 6); //Cuenta para clientes
+            if($DatosFactura["FormaPago"]=="Acuerdo"){
+                $Parametros=$this->DevuelveValores("parametros_contables", "ID", 39); //Cuenta para clientes en acuerdos
+            }else{
+                $Parametros=$this->DevuelveValores("parametros_contables", "ID", 6); //Cuenta para clientes
+            }
+            
             $CuentaPUC=$Parametros["CuentaPUC"];
             $NombreCuenta=$Parametros["NombreCuenta"];
             if($Total>=0){

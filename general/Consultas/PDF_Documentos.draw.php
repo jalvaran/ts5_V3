@@ -201,6 +201,14 @@ if(isset($_REQUEST["idDocumento"])){
             
             print("OK;Acuerdo de Pago Enviado");
         break;//Fin caso 39
+        
+        case 40: //PDF del movimiento de caja
+            $FechaInicial=$obCon->normalizar($_REQUEST["FechaInicialRangos"]);
+            $FechaFinal=$obCon->normalizar($_REQUEST["FechaFinalRangos"]);
+            $cmbUsuario=$obCon->normalizar($_REQUEST["cmbUsuario"]);
+                 
+            $obDoc->ReporteMovimientoCaja($FechaInicial,$FechaFinal,$cmbUsuario);            
+        break;//Fin caso 40
     }
 }else{
     print("No se recibió parametro de documento");
