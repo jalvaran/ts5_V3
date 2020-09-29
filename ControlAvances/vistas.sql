@@ -538,3 +538,13 @@ SELECT t1.ID, t1.Fecha, t1.Clientes_idClientes, t1.Tercero,
 FROM comprobantes_ingreso t1;
 
 
+DROP VIEW IF EXISTS `vista_saldos_clientes`;
+CREATE VIEW vista_saldos_clientes AS
+
+SELECT t1.RazonSocial,t1.Num_Identificacion,t1.Telefono,t1.idClientes,
+    (SELECT SaldoFinal FROM acuerdo_pago t3 WHERE t3.Tercero=t1.Num_Identificacion ORDER BY t3.ID DESC LIMIT 1) as SaldoAcuerdos,
+    (SELECT SUM(Neto) FROM librodiario t2 WHERE t2.Tercero_Identificacion=t1.Num_Identificacion 
+    AND EXISTS(SELECT 1 FROM contabilidad_parametros_cuentasxcobrar t3 WHERE t2.CuentaPUC like t3.CuentaPUC)) as TotalCredito 
+    FROM clientes t1 ;
+
+

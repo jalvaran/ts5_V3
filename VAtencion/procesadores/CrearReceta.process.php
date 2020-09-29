@@ -55,6 +55,20 @@ if(isset($_REQUEST["idAccion"])){
                     $css->CierraFilaTabla();
                     
                     $css->FilaTabla(16);
+                        $css->ColTabla("<strong>Clonar esta receta al producto:</strong>", 7);                        
+                        $css->ColTabla("<strong>Clonar</strong>", 1);
+                    $css->CierraFilaTabla();
+                    $css->FilaTabla(16);
+                        print('<td colspan=7>'); 
+                            $css->CrearSelect("idProductoClonar", "",400);
+                                $css->CrearOptionSelect("", "Seleccione un Producto", 0);
+                            $css->CerrarSelect();
+                        print('</td>');  
+                        print('<td>');
+                            $css->CrearBotonEvento("btnClonarReceta", "Clonar", 1, "onclick", "ConfirmeClonarReceta(`$idProducto`)", "rojo", "");
+                        print('</td>');  
+                    $css->CierraFilaTabla();
+                    $css->FilaTabla(16);
                         $css->ColTabla("<strong>Items para producir este producto</strong>", 8,"C");
                         
                     $css->CierraFilaTabla();
@@ -135,7 +149,20 @@ if(isset($_REQUEST["idAccion"])){
             $obReceta->KardexInsumo($Movimiento, $Observaciones, "", $DatosInsumo["Referencia"], $Cantidad, $DatosInsumo["CostoUnitario"], "");
             sleep(2);
             print("OK;Operacion realizada");
-        break;
+        break;//Fin caso 9
+        
+        case 8://Clonar una receta de un producto a otro
+            $idProducto=$obReceta->normalizar($_REQUEST["idProducto"]);  //Producto al que se le clonará la receta
+            $idProductoClonar=$obReceta->normalizar($_REQUEST["idProductoClonar"]); //producto donde se va a clonar   
+            if($idProducto==''){
+                exit("E1;Debe seleccionar el producto al cual desea clonar la receta");
+            }
+            if($idProductoClonar==''){
+                exit("E1;No se recibió el id del producto a clonar la receta");
+            }
+            $obReceta->ClonarReceta($idProductoClonar,$idProducto , $idUser);
+            print("OK;Receta clonada");
+        break;//Fin caso 8
     }
     
 }else{

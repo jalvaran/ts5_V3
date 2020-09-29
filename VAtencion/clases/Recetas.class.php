@@ -165,5 +165,20 @@ class Recetas extends ProcesoVenta{
         
         
     }
+    
+    public function ClonarReceta($idProducto,$idProductoClonar,$idUser) {
+        $DatosProducto=$this->DevuelveValores("productosventa", "idProductosVenta", $idProductoClonar);
+        $ReferenciaProducto=$DatosProducto["Referencia"];
+        $Consulta= $this->ConsultarTabla("recetas_relaciones", " WHERE ReferenciaProducto='$ReferenciaProducto'");
+        while($datosConsulta= $this->FetchAssoc($Consulta)){
+            $idTablaInsumo="idProductosVenta";
+            if($datosConsulta["TablaIngrediente"]=='insumos'){
+                $idTablaInsumo="ID";
+            }
+            $DatosInsumo=$this->DevuelveValores($datosConsulta["TablaIngrediente"], "Referencia", $datosConsulta["ReferenciaIngrediente"]);
+            $this->AgregarItemReceta($idProducto, $datosConsulta["TablaIngrediente"], $idTablaInsumo, $DatosInsumo["$idTablaInsumo"], $datosConsulta["Cantidad"], $idUser, "");
+                
+        }
+    }
     //Fin Clases
 }

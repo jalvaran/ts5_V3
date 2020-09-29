@@ -1,5 +1,5 @@
 <?php
-include_once 'php_serial.class.php';
+//include_once 'php_serial.class.php';
 include_once 'php_mysql_i.php';
         
 //////////////////////////////////////////////////////////////////////////
@@ -1481,7 +1481,7 @@ public function CalculePesoRemision($idCotizacion)
             if($DatosItems["TipoItem"]=="PR"){
                 $Referencia=$DatosItems["Referencia"];
                 $DatosProducto=$this->DevuelveValores($DatosItems["TablaItems"], "Referencia", $Referencia);
-                $DatosKardex["Cantidad"]=$DatosItems['Cantidad']*(-1);
+                $DatosKardex["Cantidad"]=$DatosItems['Cantidad'];
                 $DatosKardex["idProductosVenta"]=$DatosProducto["idProductosVenta"];
                 $DatosKardex["CostoUnitario"]=$DatosItems['PrecioCostoUnitario'];
                 $DatosKardex["Existencias"]=$DatosProducto['Existencias'];

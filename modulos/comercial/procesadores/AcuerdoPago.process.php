@@ -68,6 +68,10 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             
             $DatosAcuerdo=$obCon->DevuelveValores("acuerdo_pago", "idAcuerdoPago", $idAcuerdo);
+            $Saldo=round($DatosAcuerdo["SaldoFinal"]);
+            if($ValorAbono>$Saldo){
+                exit("E1;El valor del Abono supera el saldo del Cliente");
+            }
             $Tercero=$DatosAcuerdo["Tercero"];
             if($MetodoPago==1){
                 $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 10); //Efectivo

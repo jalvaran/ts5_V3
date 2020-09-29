@@ -306,7 +306,21 @@ function DibujeItemsReceta(){
         type: 'POST',
         success: (data) =>{
             document.getElementById('DivItemsRecetas').innerHTML =data;   
-            
+            $('#idProductoClonar').select2({
+
+                placeholder: 'Seleccionar Producto',
+                ajax: {
+                  url: './buscadores/productosventa.php',
+                  dataType: 'json',
+                  delay: 250,
+                  processResults: function (data) {
+                    return {
+                      results: data
+                    };
+                  },
+                  cache: true
+                }
+                });
         },
         error: function(xhr, ajaxOptions, thrownError){
           alert(xhr.status);
@@ -411,3 +425,73 @@ function CrearProductoDesdeReceta(idProducto){
         }
       })
 }
+
+
+function ConfirmeClonarReceta(idProductoClonar){
+    
+    alertify.confirm('Desea Clonar esta receta? ',
+        function (e) {
+            if (e) {
+                
+                ClonarReceta(idProductoClonar);
+            }else{
+                alertify.error("Se canceló el proceso");
+                
+                return;
+            }
+        });
+}
+
+function ClonarReceta(idProducto){
+    document.getElementById('btnClonarReceta').value="Clonando...";
+    document.getElementById('btnClonarReceta').disabled=true;
+    var idProductoClonar = document.getElementById('idProductoClonar').value;
+    
+    var form_data = new FormData();
+        form_data.append('idProducto', idProducto)   
+        form_data.append('idProductoClonar', idProductoClonar)   
+        form_data.append('idAccion', 8)
+        $.ajax({
+        url: 'procesadores/CrearReceta.process.php',
+        //dataType: "json",
+        cache: false,
+        processData: false,
+        contentType: false,
+        data: form_data,
+        type: 'POST',
+        success: (data) =>{
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+                
+                var htmlSelectProducto=document.getElementById('select2-idProductoClonar-container').innerHTML;
+                document.getElementById('idProducto').value=idProducto;
+                document.getElementById('select2-idProducto-container').value=idProducto;
+                
+                document.getElementById('select2-idProducto-container').innerHTML=htmlSelectProducto;
+                DibujeItemsReceta();
+                
+            }else if (respuestas[0]=="E1"){
+                alertify.error(respuestas[1]);
+                document.getElementById('DivMensajes').innerHTML=respuestas[1];               
+                document.getElementById('btnClonarReceta').value="Clonar";
+                document.getElementById('btnClonarReceta').disabled=false;
+            }else{
+                alertify.error(data);
+                
+                document.getElementById('btnClonarReceta').value="Clonar";
+                document.getElementById('btnClonarReceta').disabled=false;
+            }
+            
+            
+            
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+            document.getElementById('btnClonarReceta').value="Clonar";
+            document.getElementById('btnClonarReceta').disabled=false;
+          alert(xhr.status);
+          alert(thrownError);
+        }
+      })
+}
+
