@@ -486,7 +486,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $SaldoInicial=$SaldoFinal;
                 $SaldoFinal=$SaldoInicial-$CuotaInicial;
                 
-                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 6);//Cuenta Clientes
+                $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 39);//Cuenta Clientes
                 $sql="SELECT SUM(t1.ValorPago) as TotalCuotaInicial,(SELECT CuentaPUCIngresos FROM metodos_pago t2 WHERE t2.ID=t1.MetodoPago LIMIT 1 ) as CuentaPUCIngresos, (SELECT NombreCuentaPUCIngresos FROM metodos_pago t2 WHERE t2.ID=t1.MetodoPago LIMIT 1 ) as NombreCuentaPUCIngresos  FROM acuerdo_pago_cuotas_pagadas_temp t1 WHERE t1.idAcuerdoPago='$idAcuerdoPago' AND t1.TipoCuota=0 GROUP BY t1.MetodoPago";
                 $ConsultaCuota=$obAcuerdo->Query($sql);
                 

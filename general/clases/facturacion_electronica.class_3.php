@@ -10,14 +10,6 @@ if(file_exists("../../modelo/php_conexion.php")){
 
 class Factura_Electronica extends ProcesoVenta{
     
-    public function limpiar_cadena($string) {
-        $string = htmlentities($string);
-        $string = preg_replace('/\&(.)[^;]*;/', '', $string);
-        $string = str_replace('\n', ' ', $string);
-        $string = trim(preg_replace('/[\r\n|\n|\r]+/', ' ', $string));
-        return $string;
-    }
-    
     public function EliminarAcentos($cadena) {
          //Codificamos la cadena en formato utf8 en caso de que nos de errores
         $cadena = utf8_encode($cadena);
@@ -209,10 +201,9 @@ class Factura_Electronica extends ProcesoVenta{
             }],
             ';
         if($DatosFactura["ObservacionesFact"]<>''){
-            $observaciones=$this->limpiar_cadena($DatosFactura["ObservacionesFact"]);
             $json_factura.=' 
             "notes": [{
-                "text":"'.$observaciones.'"
+                "text":"'.$DatosFactura["ObservacionesFact"].'"
             }],';
         }
         $json_factura.='"tax_totals": [';

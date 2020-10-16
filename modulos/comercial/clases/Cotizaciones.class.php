@@ -51,6 +51,9 @@ class Cotizaciones extends ProcesoVenta{
             $FechaDescuento=$reg["Fecha"];
             $fecha=date("Y-m-d");
             $impuesto=$DatosProductoGeneral["IVA"];
+            if(!is_numeric($impuesto)){
+                $impuesto=0;
+            }
             $impuesto=$impuesto+1;
             if($DatosTablaItem["IVAIncluido"]=="SI"){
                 $ValorUnitario=round($ValorUnitario/$impuesto,2);

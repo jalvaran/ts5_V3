@@ -991,3 +991,28 @@ ALTER TABLE `librodiario` ADD `Created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMES
 
 ALTER TABLE `egresos` CHANGE `CerradoDiario` `CerradoDiario` BIGINT NOT NULL;
 
+CREATE TABLE `tipo_documento_identificacion` (
+  `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) COLLATE utf8_spanish_ci NOT NULL,
+  `codigo` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  INDEX (`codigo`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `tipo_documento_identificacion` (`ID`, `nombre`, `codigo`, `Updated`, `Sync`) VALUES
+(1,	'Registro civil',	11,	'2020-10-06 16:43:47',	'0000-00-00 00:00:00'),
+(2,	'Tarjeta de identidad',	12,	'2020-10-06 16:43:47',	'0000-00-00 00:00:00'),
+(3,	'Cédula de ciudadanía',	13,	'2020-10-06 16:43:47',	'0000-00-00 00:00:00'),
+(4,	'Tarjeta de extranjería',	21,	'2020-10-06 16:43:47',	'0000-00-00 00:00:00'),
+(5,	'Cédula de extranjería',	22,	'2020-10-06 16:43:47',	'0000-00-00 00:00:00'),
+(6,	'NIT',	31,	'2020-10-06 16:43:47',	'0000-00-00 00:00:00'),
+(7,	'Pasaporte',	41,	'2020-10-06 16:43:47',	'0000-00-00 00:00:00'),
+(8,	'Documento de identificación extranjero',	42,	'2020-10-06 16:43:47',	'0000-00-00 00:00:00'),
+(9,	'NIT de otro país',	50,	'2020-10-06 16:43:47',	'0000-00-00 00:00:00'),
+(10,	'NUIP ',	91,	'2020-10-06 16:43:47',	'0000-00-00 00:00:00');
+
+
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+(206,	'Vista Productos Venta',	22,	3,	0,	'vista_productos_departamentos',	1,	'onclick=\"SeleccioneTablaDB(`vista_productos_departamentos`)\";',	'vista_productos_departamentos.php',	'_SELF',	1,	'productosventa.png',	14,	'2020-07-22 10:05:03',	'2020-07-25 10:05:03');

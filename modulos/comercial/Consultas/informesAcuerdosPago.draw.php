@@ -462,7 +462,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit();
             }
             
-            $sql="SELECT SUM(ValorCuota-ValorPagado) AS Total FROM acuerdo_pago_proyeccion_pagos t1
+            $sql="SELECT SUM(ValorCuota) AS Total FROM acuerdo_pago_proyeccion_pagos t1
                     INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
                     WHERE t2.Estado=1 and  t1.Fecha >= '$FechaInicialRangos' AND t1.Fecha <= '$FechaFinalRangos';";
             $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));
@@ -473,13 +473,13 @@ if( !empty($_REQUEST["Accion"]) ){
             $FechaFinalPlazo=$obCon->SumeDiasAFechaAcuerdo($FechaFinalRangos, $DiasPlazo);
             $FechaInicialPlazo=$obCon->ResteDiasAFechaAcuerdo($FechaFinalRangos, $DiasPlazo);
             
-            $sql="SELECT SUM(ValorCuota-ValorPagado) AS Total FROM acuerdo_pago_proyeccion_pagos t1
+            $sql="SELECT SUM(ValorCuota) AS Total FROM acuerdo_pago_proyeccion_pagos t1
                     INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
                     WHERE t2.Estado=1 and  t1.Fecha < '$FechaInicialRangos';";
             $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));
             $TotalCarteraVencida=$DatoConsulta["Total"];
             
-            $sql="SELECT SUM(ValorCuota-ValorPagado) AS Total FROM acuerdo_pago_proyeccion_pagos t1
+            $sql="SELECT SUM(ValorCuota) AS Total FROM acuerdo_pago_proyeccion_pagos t1
                     INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
                     WHERE t2.Estado=1 and  t1.Fecha > '$FechaFinalRangos';";
             $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));

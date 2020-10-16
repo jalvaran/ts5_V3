@@ -48,12 +48,20 @@ WHERE (SELECT IFNULL((SELECT Cantidad FROM inventarios_conteo_selectivo WHERE pr
 
 DROP VIEW IF EXISTS `vista_diferencia_inventarios`;
 CREATE VIEW vista_diferencia_inventarios AS
-SELECT idProductosVenta,`Referencia`,`Nombre`,`Existencias` as ExistenciaActual ,
-(SELECT IFNULL((SELECT Existencias FROM inventarios_temporal WHERE productosventa.Referencia = inventarios_temporal.Referencia),0)) as ExistenciaAnterior,
-(SELECT ExistenciaActual) - (SELECT ExistenciaAnterior) as Diferencia,PrecioVenta,CostoUnitario,
-(SELECT Diferencia)*CostoUnitario AS TotalCostosDiferencia,Departamento,Sub1,Sub2,Sub3,Sub4,Sub5
-  FROM `productosventa` 
-WHERE (SELECT IFNULL((SELECT Existencias FROM inventarios_temporal WHERE productosventa.Referencia = inventarios_temporal.Referencia),0))-Existencias<>0;
+SELECT t1.idProductosVenta,t1.`Referencia`,t1.`Nombre`,t1.`Existencias` as ExistenciaActual ,
+(SELECT IFNULL((SELECT t2.Existencias FROM inventarios_temporal t2 WHERE t1.Referencia = t2.Referencia limit 1),0)) as ExistenciaAnterior,
+(SELECT ExistenciaActual) - (SELECT ExistenciaAnterior) as Diferencia,t1.PrecioVenta,t1.CostoUnitario,
+(SELECT Diferencia)*CostoUnitario AS TotalCostosDiferencia,
+(SELECT Nombre FROM prod_departamentos t2 WHERE t1.Departamento=t2.idDepartamentos) as Departamento,
+        (SELECT NombreSub1 FROM prod_sub1 t2 WHERE t1.Sub1=t2.idSub1) as Sub1,
+        (SELECT NombreSub2 FROM prod_sub2 t2 WHERE t1.Sub2=t2.idSub2) as Sub2,
+        (SELECT NombreSub3 FROM prod_sub3 t2 WHERE t1.Sub3=t2.idSub3) as Sub3,
+        (SELECT NombreSub4 FROM prod_sub4 t2 WHERE t1.Sub4=t2.idSub4) as Sub4,
+        (SELECT NombreSub5 FROM prod_sub5 t2 WHERE t1.Sub5=t2.idSub5) as Sub5 
+        
+
+  FROM `productosventa` t1 
+WHERE (SELECT IFNULL((SELECT t3.Existencias FROM inventarios_temporal t3 WHERE t1.Referencia = t3.Referencia limit 1),0))-t1.Existencias<>0;
 
 
 DROP VIEW IF EXISTS `vista_facturacion_detalles`;
@@ -548,3 +556,20 @@ SELECT t1.RazonSocial,t1.Num_Identificacion,t1.Telefono,t1.idClientes,
     FROM clientes t1 ;
 
 
+DROP VIEW IF EXISTS `vista_productos_departamentos`;
+CREATE VIEW vista_productos_departamentos AS 
+SELECT t1.idProductosVenta,t1.Referencia,t1.Nombre,t1.Existencias,t1.PrecioVenta,t1.PrecioMayorista,
+        round(t1.CostoUnitario) as CostoUnitario,
+        round(t1.CostoTotal) as CostoTotal,
+        round(t1.CostoUnitarioPromedio) as CostoUnitarioPromedio,
+        round(t1.CostoTotalPromedio) as CostoTotalPromedio,
+        t1.IVA,
+        (SELECT Nombre FROM prod_departamentos t2 WHERE t1.Departamento=t2.idDepartamentos) as Departamento,
+        (SELECT NombreSub1 FROM prod_sub1 t2 WHERE t1.Sub1=t2.idSub1) as Sub1,
+        (SELECT NombreSub2 FROM prod_sub2 t2 WHERE t1.Sub2=t2.idSub2) as Sub2,
+        (SELECT NombreSub3 FROM prod_sub3 t2 WHERE t1.Sub3=t2.idSub3) as Sub3,
+        (SELECT NombreSub4 FROM prod_sub4 t2 WHERE t1.Sub4=t2.idSub4) as Sub4,
+        (SELECT NombreSub5 FROM prod_sub5 t2 WHERE t1.Sub5=t2.idSub5) as Sub5,
+        (SELECT NombreSub6 FROM prod_sub6 t2 WHERE t1.Sub6=t2.idSub6) as Sub6,
+        CuentaPUC 
+        FROM productosventa t1;
