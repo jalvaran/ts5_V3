@@ -318,6 +318,16 @@ class PrintPos extends ProcesoVenta{
         $DatosEmpresa=$this->DevuelveValores("empresapro", "idEmpresaPro", $DatosFactura["EmpresaPro_idEmpresaPro"]);
         $DatosResolucion=$this->DevuelveValores("empresapro_resoluciones_facturacion", "ID", $DatosFactura["idResolucion"]);
         $idUsuario=$DatosFactura["Usuarios_idUsuarios"];
+        $DatosColaboradorVenta=$this->DevuelveValores("colaboradores_ventas", "idFactura", $idFactura);
+        $nombre_colaborador="";
+        if($DatosColaboradorVenta["ID"]>0){
+            $colaborador_identificador=$DatosColaboradorVenta["idColaborador"];
+            $sql="SELECT Nombre FROM colaboradores WHERE Identificacion='$colaborador_identificador'";
+            $datos_colaborador=$this->FetchAssoc($this->Query($sql));
+            $nombre_colaborador=$datos_colaborador["Nombre"];
+            
+        }
+        
         $DatosUsuario=$this->ValorActual("usuarios", " Nombre , Apellido ", " idUsuarios='$idUsuario'");
         
         $DatosCliente=$this->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
@@ -375,6 +385,12 @@ class PrintPos extends ProcesoVenta{
 
         fwrite($handle,"Cajero:.$DatosUsuario[Nombre] $DatosUsuario[Apellido]");
         fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        
+        if($nombre_colaborador<>''){
+            fwrite($handle,"Colaborador: $nombre_colaborador");
+            fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        }
+        
         $this->SeparadorHorizontal($handle, "*", 36);
         fwrite($handle,"Cliente: $DatosCliente[RazonSocial]");
         fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA

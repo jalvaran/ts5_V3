@@ -1397,7 +1397,7 @@ function DescuentoPorcentaje(){
     }else{
         document.getElementById("TxtPorcentajeDescuento").style.backgroundColor="white";
     }
-    
+    /* 
     if(TxtAutorizaciones==''){        
         alertify.alert("Debe escribir una Clave");
         document.getElementById("TxtAutorizaciones").style.backgroundColor="pink";   
@@ -1406,7 +1406,7 @@ function DescuentoPorcentaje(){
     }else{
         document.getElementById("TxtAutorizaciones").style.backgroundColor="white";
     }
-    
+    */
     
     var form_data = new FormData();
         
@@ -2930,3 +2930,125 @@ function AbreModalEditarClientePOS(){
     }
     ModalEditarTercero(`ModalAccionesPOS`,`DivFrmPOS`,idCliente,`clientes`);
 }
+
+
+function pregunta_editar_precio_x_porcentaje(item_id){
+    alertify.prompt('Escriba el porcentaje de descuento:',
+    
+    function(evt, value) { 
+        if(value==undefined){
+            alertify.error("Accion cancelada");
+        }else{
+            editar_precio_x_porcentaje(item_id,value);
+            
+        }
+    }
+            
+            
+    );
+}
+
+
+function editar_precio_x_porcentaje(item_id,porcentaje){    
+    
+      
+    var idPreventa = document.getElementById('idPreventa').value;    
+    
+       
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 34);        
+        form_data.append('item_id', item_id);        
+        form_data.append('idPreventa', idPreventa);
+        form_data.append('porcentaje', porcentaje);
+        $.ajax({
+        url: './procesadores/pos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+                DibujePreventa();
+            }else if(respuestas[0]=="E1"){
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                alertify.alert(data);
+                
+            }
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+
+function pregunta_editar_x_proporcion(item_id){
+    alertify.prompt('Escriba el precio:',
+    
+    function(evt, value) { 
+        if(value==undefined){
+            alertify.error("Accion cancelada");
+        }else{
+            editar_cantidad_x_proporcion(item_id,value);
+            
+        }
+    }
+            
+            
+    );
+}
+
+
+function editar_cantidad_x_proporcion(item_id,precio){    
+    
+      
+    var idPreventa = document.getElementById('idPreventa').value;    
+    
+       
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 35);        
+        form_data.append('item_id', item_id);        
+        form_data.append('idPreventa', idPreventa);
+        form_data.append('precio', precio);
+        $.ajax({
+        url: './procesadores/pos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+                DibujePreventa();
+            }else if(respuestas[0]=="E1"){
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                alertify.alert(data);
+                
+            }
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  

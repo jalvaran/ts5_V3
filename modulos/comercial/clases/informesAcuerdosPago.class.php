@@ -69,7 +69,7 @@ class informesAcuerdoPago extends AcuerdoPago{
                 (SELECT t5.Metodo FROM metodos_pago t5 WHERE t5.ID=t1.MetodoPago) as NombreMetodoPago,
                 t1.idUser,
                 (SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t4 WHERE t4.idUsuarios=t1.idUser ) as NombreUsuario,
-                t1.Created
+                t1.Created,t1.idCierre 
 
             FROM acuerdo_pago_cuotas_pagadas t1 
             INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 

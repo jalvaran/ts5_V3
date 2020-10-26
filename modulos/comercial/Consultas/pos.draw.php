@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+@session_start();
 if (!isset($_SESSION['username'])){
   exit("<a href='../../index.php' ><img src='../images/401.png'>Iniciar Sesion </a>");
   
@@ -77,7 +77,9 @@ if( !empty($_REQUEST["Accion"]) ){
                                     <ul class="dropdown-menu">');
                             
                             print('<li><a href="#" onclick="EditarPrecioVenta(`'.$idItem.'`,`0`)" title="Valor Libre">Valor Libre</a></li>');
-                            print('<li><a href="#" onclick="EditarPrecioVenta(`'.$idItem.'`,`1`)" title="Precio Mayorista">Mayorista</a></li>');            
+                            print('<li><a href="#" onclick="EditarPrecioVenta(`'.$idItem.'`,`1`)" title="Precio Mayorista">Mayorista</a></li>'); 
+                            print('<li><a href="#" onclick="pregunta_editar_precio_x_porcentaje(`'.$idItem.'`)" title="Porcentaje">Porcentaje</a></li>');
+                            print('<li><a href="#" onclick="pregunta_editar_x_proporcion(`'.$idItem.'`)" title="Proporcion">Proporcion</a></li>');
 
                             print('</ul></div></div>');
                                 

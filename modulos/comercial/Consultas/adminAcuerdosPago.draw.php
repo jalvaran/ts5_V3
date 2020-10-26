@@ -538,6 +538,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->ColTabla("<strong>ValorPagado</strong>", 1);
                 $css->ColTabla("<strong>Saldo Cuota</strong>", 1);                
                 $css->ColTabla("<strong>EstadoAcuerdo</strong>", 1);
+                $css->ColTabla("<strong>Cierre</strong>", 1);
                 
             $css->CierraFilaTabla();
 
@@ -557,6 +558,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla(number_format($DatosAcuerdo["SaldoCuota"]), 1);
                     
                     $css->ColTabla($DatosAcuerdo["NombreEstadoAcuerdo"], 1);
+                    $css->ColTabla($DatosAcuerdo["idCierre"], 1);
 
                     $css->CierraFilaTabla();
                     

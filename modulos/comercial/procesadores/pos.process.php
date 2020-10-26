@@ -592,8 +592,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $DatosAutorizacion=$obCon->FetchArray($Datos);
 
             if($DatosAutorizacion["Identificacion"]==''){
-                print("E1;Clave incorrecta");
-                exit();
+                //print("E1;Clave incorrecta");
+                //exit();
             }
             $DatosGeneral=$obCon->DevuelveValores("configuracion_general", "ID", 6);
             $DescuentoMaximo=$DatosGeneral["Valor"];
@@ -1198,6 +1198,45 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             print("OK;Sentencia ejecutada");
         break;//Fin caso 33    
+        
+        case 34://editar el valor de un articulo de acuerdo a un porcentaje
+            
+            $item_id=$obCon->normalizar($_REQUEST["item_id"]);
+            $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);
+            $porcentaje=$obCon->normalizar($_REQUEST["porcentaje"]);
+            
+            if(!is_numeric($porcentaje) or $porcentaje<=0 or $porcentaje>100){
+                exit("E1;El Porcentaje debe ser un numero del 1 al 100");
+            }
+            
+            $porcentaje=100-$porcentaje;
+            $factor=($porcentaje/100);
+            $sql="UPDATE preventa SET Subtotal=round(Subtotal*$factor,2), ValorAcordado=round(ValorAcordado*$factor,2), Impuestos=round(Impuestos*$factor,2), TotalVenta=round(TotalVenta*$factor,2),Descuento=round((ValorUnitario*Cantidad*(PorcentajeIVA+1)-TotalVenta),2) WHERE idPrecotizacion='$item_id';";
+            $obCon->Query($sql);
+            
+            print("OK;$porcentaje % de descuento aplicado");
+            
+        break;//Fin caso 34
+        
+        case 35://editar el valor de un articulo de acuerdo a un porcentaje
+            
+            $item_id=$obCon->normalizar($_REQUEST["item_id"]);
+            $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);
+            $precio=$obCon->normalizar($_REQUEST["precio"]);
+            
+            if(!is_numeric($precio) or $precio<=0){
+                exit("E1;El Valor debe ser un valor numerico mayor a cero");
+            }
+            $datos_preventa=$obCon->DevuelveValores("preventa", "idPrecotizacion", $item_id);
+            $datos_producto=$obCon->DevuelveValores("productosventa", "idProductosVenta", $datos_preventa["ProductosVenta_idProductosVenta"]);
+            $cantidad_proporcion=round((1/$datos_producto["PrecioVenta"])*$precio,4);
+            
+            $sql="UPDATE preventa SET ValorUnitario=round($precio/(PorcentajeIVA+1),2), ValorAcordado='$precio', Impuestos=ValorAcordado-ValorUnitario, TotalVenta='$precio',Cantidad='$cantidad_proporcion' WHERE idPrecotizacion='$item_id';";
+            $obCon->Query($sql);
+            
+            print("OK;Cantidad ajustada de acuerdo a proporcion");
+            
+        break;//Fin caso 35
         
     }
     

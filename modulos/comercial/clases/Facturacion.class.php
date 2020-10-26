@@ -269,7 +269,7 @@ class Facturacion extends ProcesoVenta{
             $Subtotal=round($DatosProduto["ValorAcordado"]*$Cantidad);
             $Impuestos=round($DatosProductoGeneral["IVA"]*$Subtotal+$DatosImpuestosAdicionales["ValorImpuesto"]);
             $TotalVenta=$Subtotal+$Impuestos;
-            $sql="UPDATE preventa SET Subtotal='$Subtotal', Impuestos='$Impuestos', TotalVenta='$TotalVenta', Cantidad='$Cantidad' WHERE idPrecotizacion='$DatosProduto[idPrecotizacion]'";
+            $sql="UPDATE preventa SET Subtotal='$Subtotal', Impuestos='$Impuestos', TotalVenta='$TotalVenta', Cantidad='$Cantidad',Descuento=round((ValorUnitario*Cantidad*(PorcentajeIVA+1)-TotalVenta),2) WHERE idPrecotizacion='$DatosProduto[idPrecotizacion]'";
             
             $this->Query($sql);
         }else{

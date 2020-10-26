@@ -421,6 +421,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->ColTabla("<strong>Valor Pagado</strong>", 1, "C");
                 $css->ColTabla("<strong>Metodo</strong>", 1, "C");                
                 $css->ColTabla("<strong>Recibe</strong>", 1, "C"); 
+                $css->ColTabla("<strong>Cierre</strong>", 1, "C"); 
                               
             $css->CierraFilaTabla();
 
@@ -440,6 +441,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla(number_format($RegistrosTabla["ValorPago"]), 1, "L");
                         $css->ColTabla($RegistrosTabla["NombreMetodoPago"], 1, "L");
                         $css->ColTabla($RegistrosTabla["NombreUsuario"], 1, "L");
+                        $css->ColTabla($RegistrosTabla["idCierre"], 1, "L");
                                                 
                     $css->CierraFilaTabla();
                     
@@ -464,7 +466,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $sql="SELECT SUM(ValorCuota) AS Total FROM acuerdo_pago_proyeccion_pagos t1
                     INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
-                    WHERE t2.Estado=1 and  t1.Fecha >= '$FechaInicialRangos' AND t1.Fecha <= '$FechaFinalRangos';";
+                    WHERE (t2.Estado=1 or t2.Estado=2 ) and  t1.Fecha >= '$FechaInicialRangos' AND t1.Fecha <= '$FechaFinalRangos';";
             $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));
             $TotalCarteraActual=$DatoConsulta["Total"];
             
@@ -475,13 +477,13 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $sql="SELECT SUM(ValorCuota) AS Total FROM acuerdo_pago_proyeccion_pagos t1
                     INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
-                    WHERE t2.Estado=1 and  t1.Fecha < '$FechaInicialRangos';";
+                    WHERE (t2.Estado=1 or t2.Estado=2 ) and  t1.Fecha < '$FechaInicialRangos';";
             $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));
             $TotalCarteraVencida=$DatoConsulta["Total"];
             
             $sql="SELECT SUM(ValorCuota) AS Total FROM acuerdo_pago_proyeccion_pagos t1
                     INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
-                    WHERE t2.Estado=1 and  t1.Fecha > '$FechaFinalRangos';";
+                    WHERE (t2.Estado=1 or t2.Estado=2 ) and  t1.Fecha > '$FechaFinalRangos';";
             $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));
             $TotalCarteraFutura=$DatoConsulta["Total"];
             
@@ -503,7 +505,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>SALDO CARTERA</strong>", 1); 
                 $css->CierraFilaTabla();
                 $sql="SELECT SUM(ValorPago) AS Total,t1.idUser FROM acuerdo_pago_cuotas_pagadas t1 
-                    WHERE FechaPago>='$FechaInicialRangos' AND FechaPago<='$FechaFinalPlazo' AND
+                    WHERE FechaPago>='$FechaInicialRangos' AND FechaPago<='$FechaFinalRangos' AND
                      EXISTS 
                     (SELECT 1 FROM acuerdo_pago_proyeccion_pagos t2 WHERE t2.ID=t1.idProyeccion 
                     AND Fecha>='$FechaInicialRangos' AND Fecha<='$FechaFinalRangos') GROUP BY t1.idUser;";
@@ -543,10 +545,10 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CierraFilaTabla();
                 
                 $sql="SELECT SUM(ValorPago) AS Total,t1.idUser FROM acuerdo_pago_cuotas_pagadas t1 
-                    WHERE FechaPago>='$FechaInicialRangos' AND FechaPago<='$FechaFinalPlazo' AND
+                    WHERE FechaPago>='$FechaInicialRangos' AND FechaPago<='$FechaFinalRangos' AND
                      EXISTS 
                     (SELECT 1 FROM acuerdo_pago_proyeccion_pagos t2 WHERE t2.ID=t1.idProyeccion 
-                    AND Fecha<'$FechaInicialPlazo') GROUP BY t1.idUser;";
+                    AND Fecha<'$FechaInicialRangos') GROUP BY t1.idUser;";
                 $Consulta=($obCon->Query($sql));
                 $TotalRecaudoUsuarios=0;
                 $PorcentajeTotal=0;
@@ -589,10 +591,10 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CierraFilaTabla();
                 
                 $sql="SELECT SUM(ValorPago) AS Total,t1.idUser FROM acuerdo_pago_cuotas_pagadas t1 
-                    WHERE FechaPago>='$FechaInicialRangos' AND FechaPago<='$FechaFinalPlazo' AND
+                    WHERE FechaPago>='$FechaInicialRangos' AND FechaPago<='$FechaFinalRangos' AND
                      EXISTS 
                     (SELECT 1 FROM acuerdo_pago_proyeccion_pagos t2 WHERE t2.ID=t1.idProyeccion 
-                    AND Fecha>'$FechaFinalPlazo') GROUP BY t1.idUser;";
+                    AND Fecha>'$FechaFinalRangos') GROUP BY t1.idUser;";
                 $Consulta=($obCon->Query($sql));
                 $TotalRecaudoCarteraPosterior=$DatoConsulta["Total"];
                 $TotalRecaudoUsuarios=0;

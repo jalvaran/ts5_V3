@@ -1,5 +1,5 @@
 <?php 
-session_start();
+@session_start();
 if (!isset($_SESSION['username'])){
   exit("<a href='../../index.php' ><img src='../images/401.png'>Iniciar Sesion </a>");
   
@@ -90,7 +90,7 @@ if(isset($_REQUEST["Opcion"])){
             $Condicion="";
             if($_REQUEST["c"]){
                 $Condicion= base64_decode($_REQUEST["c"]);
-                $Condicion=$obCon->normalizar($Condicion);
+                ////$Condicion=$obCon->normalizar($Condicion);
             }          
             
             
@@ -110,6 +110,7 @@ if(isset($_REQUEST["Opcion"])){
             $sqlColumnas.=" UNION ALL ";
             
             $sql=$sqlColumnas." SELECT * FROM $Tabla $Condicion";
+            //print($sql);
             $Fecha=date("Ymd_His");
             
             $Consulta=$obCon->Query($sql);
