@@ -1016,3 +1016,10 @@ INSERT INTO `tipo_documento_identificacion` (`ID`, `nombre`, `codigo`, `Updated`
 
 INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
 (206,	'Vista Productos Venta',	22,	3,	0,	'vista_productos_departamentos',	1,	'onclick=\"SeleccioneTablaDB(`vista_productos_departamentos`)\";',	'vista_productos_departamentos.php',	'_SELF',	1,	'productosventa.png',	14,	'2020-07-22 10:05:03',	'2020-07-25 10:05:03');
+
+
+ALTER TABLE `comprobantes_ingreso` ADD `Created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `Updated`;
+
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(36,	'Muestra la opcion en el pos de ver las ventas en el turno',	'0',	'2020-11-09 15:08:16',	'2020-07-25 09:59:30');
+

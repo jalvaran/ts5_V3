@@ -85,12 +85,21 @@ if( !empty($_REQUEST["Accion"]) ){
                 }
             }
             $obPrint->ComprobanteIngresoPOS($idComprobante, "", 1);
-            $LinkFactura="../../VAtencion/PDF_Documentos.php?idDocumento=4&idIngreso=$idComprobante";
-            $Mensaje="<br><strong>Comprobande de ingreso No. $idComprobante Creado Correctamente </strong><a href='$LinkFactura'  target='blank'> Imprimir</a>";
+            $LinkComprobante="procesadores/recaudo.process.php?Accion=2&comprobante_id=$idComprobante";
+            $Mensaje="<br><strong>Comprobande de ingreso No. $idComprobante Creado Correctamente </strong><a href='$LinkComprobante'  target='blank'> Imprimir</a>";
             
             print("OK;Pago Ingresado, Nuevo saldo del Tercero <strong>$Tercero</strong>: <h2><strong>". number_format($NuevoSaldo)."</h2></strong>;$Mensaje");
         break; //fin caso 1
         
+        case 2://Genera el PDF del comprobante
+            $comprobante_id=$obCon->normalizar($_REQUEST["comprobante_id"]);
+            
+            include_once("../clases/PDF_Comercial.class.php");
+            $obPDF = new PDF_Comercial($db);
+            $obPDF->PDF_ComprobanteIngresoPOS($comprobante_id);
+            
+            
+        break;//Fin caso 2    
           
         
     }

@@ -18,6 +18,20 @@ class Inteligencia extends ProcesoVenta{
                 WHERE FechaFactura>='$FechaInicial' AND FechaFactura<='$FechaFinal' GROUP BY Referencia;
                     
            ";
+        
+        $sql="CREATE VIEW vista_productos_x_cliente AS 
+                SELECT t1.ID,t1.Referencia,t1.Nombre,t1.FechaFactura,SUM(t1.Cantidad) as Cantidad, SUM(t1.TotalItem) as TotalItem,
+                (SELECT Clientes_idClientes FROM facturas t2 WHERE t2.idFacturas=t1.idFactura LIMIT 1) AS idCliente,
+                (SELECT FormaPago FROM facturas t2 WHERE t2.idFacturas=t1.idFactura LIMIT 1) AS FormaPago,
+                (SELECT RazonSocial FROM clientes t3 WHERE t3.idClientes=(SELECT idCliente) LIMIT 1) AS RazonSocial,
+                (SELECT Num_Identificacion FROM clientes t3 WHERE t3.idClientes=(SELECT idCliente) LIMIT 1) AS Num_Identificacion 
+                     
+                
+                FROM facturas_items t1  
+                
+                WHERE FechaFactura>='$FechaInicial' AND FechaFactura<='$FechaFinal' GROUP BY FormaPago,Referencia,idCliente;
+                    
+           ";
         $this->Query($sql);
     }
     /**

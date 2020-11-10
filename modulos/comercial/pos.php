@@ -36,13 +36,26 @@ $css->PageInit($myTitulo);
     
     $css->input("hidden", "idCajero", "", "idCajero", "", $idUser, "", "", "", "");
     $css->CrearDiv("", "col-md-12", "left", $Habilita, 1); 
-        $css->fieldset("", "", "FieldDatosCotizacion", "DatosCotizacion", "", "");
-            $css->legend("", "");
-                print("<a href='#'>POS TS5,<span id='SpEstadoCaja'> Usted está asignad@ a la caja No. $DatosCaja[ID]</span></a>");
-                
-            $css->Clegend(); 
          
-    
+            $css->fieldset("", "", "FieldDatosCotizacion", "DatosCotizacion", "", "");
+                $css->legend("", "");
+                    $css->CrearDiv("", "row", "left", 1, 1);
+                        $css->CrearDiv("", "col-md-6", "left", 1, 1); 
+                            print("<a href='#'>POS TS5,<span id='SpEstadoCaja'> Usted está asignad@ a la caja No. $DatosCaja[ID]</span></a>");
+                    
+                        $css->Cdiv();
+                        $datos_configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 36); //Contiene si está habilitado para ver el total de ventas en el pos
+                        
+                        $css->CrearDiv("", "col-md-3", "right", $datos_configuracion["Valor"], $datos_configuracion["Valor"]); 
+                            print("<a href='#'>Este Turno: <span id='spTotalVentaTurnoPOS' style='color:red'></span></a>");
+
+                        $css->Cdiv();
+                    
+                        
+                    $css->Cdiv();    
+                $css->Clegend(); 
+         
+        
 
     
     $css->CrearDiv("", "col-md-2", "center", 1, 1);

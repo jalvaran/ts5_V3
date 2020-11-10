@@ -435,7 +435,7 @@ if( !empty($_REQUEST["Accion"]) ){
                             $css->CierraFilaTabla();
                             $css->FilaTabla(16);    
                                                                 
-                                //$css->ColTabla("<strong>Fecha</strong>", 1,"C");                                
+                                $css->ColTabla("<strong>Tipo Factura</strong>", 1,"C");                                
                                 $css->ColTabla("<strong>Referencia</strong>", 1,"C");
                                 $css->ColTabla("<strong>Nombre</strong>", 1,"C");
                                 $css->ColTabla("<strong>Cantidad</strong>", 1,"C");
@@ -452,7 +452,9 @@ if( !empty($_REQUEST["Accion"]) ){
                                 
                                 print('<tr>');
                                     
-                                    
+                                    print("<td class='mailbox-subject'>");
+                                        print($RegistrosTabla["FormaPago"]);
+                                    print("</td>");
                                     print("<td class='mailbox-subject'>");
                                         print($RegistrosTabla["Referencia"]);
                                     print("</td>");

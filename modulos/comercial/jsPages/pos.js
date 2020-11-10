@@ -1169,6 +1169,7 @@ function GuardarFactura(){
                 DibujePreventa();
                 document.getElementById("DivOpcionesPagoManta").innerHTML='';
                 posiciona('Codigo');
+                actualiza_total_venta_turno_pos();
                 
             }else if(respuestas[0]=="E1"){
                 alertify.error("Error: La Resolución seleccionada ya está Completada",0);
@@ -3052,3 +3053,43 @@ function editar_cantidad_x_proporcion(item_id,precio){
           }
       })  
 }  
+
+
+function actualiza_total_venta_turno_pos(){    
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 36);        
+        
+        $.ajax({
+        url: './procesadores/pos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){
+                document.getElementById('spTotalVentaTurnoPOS').innerHTML=respuestas[1];
+            }else if(respuestas[0]=="E1"){
+                alertify.error(respuestas[1]);
+                
+                
+            }else{
+                alertify.alert(data);
+                
+            }
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
+
+
+actualiza_total_venta_turno_pos();

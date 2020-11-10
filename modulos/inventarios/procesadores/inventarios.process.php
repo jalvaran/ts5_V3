@@ -225,8 +225,8 @@ if( !empty($_REQUEST["Accion"]) ){
         
         case 9: //Insertar los productos que no esten pero si en la tabla temporal
             
-            $sql="REPLACE INTO productosventa 
-                    SELECT *
+            $sql="INSERT INTO productosventa (`idProductosVenta`,`CodigoBarras`,`Referencia`,`Nombre`,`Existencias`,`PrecioVenta`,`PrecioMayorista`,`CostoUnitario`,`CostoTotal`,`CostoUnitarioPromedio`,`CostoTotalPromedio`,`IVA`,`Bodega_idBodega`,`Departamento`,`Sub1`,`Sub2`,`Sub3`,`Sub4`,`Sub5`,`Sub6`,`Kit`,`Especial`,`CuentaPUC`,`ValorComision1`,`ValorComision2`,`ValorComision3`,`ValorComision4` )
+                    SELECT `idProductosVenta`,`CodigoBarras`,`Referencia`,`Nombre`,'0',`PrecioVenta`,`PrecioMayorista`,`CostoUnitario`,'0',`CostoUnitario`,'0',`IVA`,`Bodega_idBodega`,`Departamento`,`Sub1`,`Sub2`,`Sub3`,`Sub4`,`Sub5`,`Sub6`,`Kit`,`Especial`,`CuentaPUC`,`ValorComision1`,`ValorComision2`,`ValorComision3`,`ValorComision4` 
                       FROM productosventa_temp t1
                      WHERE NOT EXISTS (SELECT NULL FROM productosventa t2 WHERE t2.Referencia = t1.Referencia)
                     

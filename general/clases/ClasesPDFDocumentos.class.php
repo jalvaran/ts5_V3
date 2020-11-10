@@ -30,13 +30,17 @@ class Documento{
         //require_once('../../librerias/tcpdf/examples/config/tcpdf_config_alt.php');
         $tcpdf_include_dirs = array(realpath($Patch.'librerias/tcpdf/tcpdf.php'), '/usr/share/php/tcpdf/tcpdf.php', '/usr/share/tcpdf/tcpdf.php', '/usr/share/php-tcpdf/tcpdf.php', '/var/www/tcpdf/tcpdf.php', '/var/www/html/tcpdf/tcpdf.php', '/usr/local/apache2/htdocs/tcpdf/tcpdf.php');
         foreach ($tcpdf_include_dirs as $tcpdf_include_path) {
-                if (@file_exists($tcpdf_include_path)) {
-                        require_once($tcpdf_include_path);
-                        break;
-                }
+            if (@file_exists($tcpdf_include_path)) {
+                    require_once($tcpdf_include_path);
+                    break;
+            }
+        }
+        $custom_layout= PDF_PAGE_FORMAT;
+        if(isset($VectorPDF["ancho"])){
+           $custom_layout= array($VectorPDF["ancho"], $VectorPDF["alto"]);
         }
         // create new PDF document
-        $this->PDF = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'ISO 8859-1', false);
+        $this->PDF = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, $custom_layout, true, 'ISO 8859-1', false);
         // set document information
         $this->PDF->SetCreator(PDF_CREATOR);
         $this->PDF->SetAuthor('Techno Soluciones');

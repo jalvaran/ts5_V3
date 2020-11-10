@@ -152,6 +152,7 @@ class ExcelInteligencia extends ProcesoVenta{
             ->setCellValue($Campos[$z++].$i,"Total")
             ->setCellValue($Campos[$z++].$i,"Cliente")
             ->setCellValue($Campos[$z++].$i,"Identificacion")
+            ->setCellValue($Campos[$z++].$i,"FormaPago")
                                                 
             ;
             
@@ -170,20 +171,21 @@ class ExcelInteligencia extends ProcesoVenta{
                 ->setCellValue($Campos[$z++].$i,$DatosVista["TotalItem"])
                 ->setCellValue($Campos[$z++].$i,utf8_encode($DatosVista["RazonSocial"]))
                 ->setCellValue($Campos[$z++].$i,$DatosVista["Num_Identificacion"])
-                
+                ->setCellValue($Campos[$z++].$i,$DatosVista["FormaPago"])
 
                 ;
             
         }
         
         
-        $objPHPExcel->getActiveSheet()->getStyle("A3:F3")->getAlignment()->setWrapText(true);
+        $objPHPExcel->getActiveSheet()->getStyle("A3:G3")->getAlignment()->setWrapText(true);
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(1)->setWidth('15');
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(2)->setWidth('70');
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(3)->setWidth('10');
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(4)->setWidth('14');
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(5)->setWidth('40');
         $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(6)->setWidth('14');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(6)->setWidth('30');
         
         
    //Informacion del excel
