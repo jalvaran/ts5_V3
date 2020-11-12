@@ -1414,6 +1414,30 @@ if( !empty($_REQUEST["Accion"]) ){
         break;// Fin caso 19
         
         case 20:// formulario para cerrar turno
+            
+            $datos_configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 37);//Determina si se deben consultar los traslados para poder cerrar turno
+            if($datos_configuracion["Valor"]==1){
+                $datos_sucursal=$obCon->DevuelveValores("empresa_pro_sucursales", "Actual", 1);
+                $sucursal_id=$datos_sucursal["ID"];
+                $sql="SELECT * FROM traslados_mercancia WHERE Destino='$sucursal_id' and Estado<>'VERIFICADO'";
+                $consulta=$obCon->Query($sql);
+                $entra=0;
+                while($datos_traslados=$obCon->FetchAssoc($consulta)){
+                    $entra=1;
+                    $css->Notificacion("Error", "El traslado $datos_traslados[ID] se encuentra sin verificar", "rojo", "", "");
+                }
+                if($entra==1){
+                    exit();
+                }
+                
+                $DatosServer=$obCon->DevuelveValores("servidores", "ID", 1);
+                $sql="SELECT * FROM traslados_mercancia WHERE DestinoSincronizado ='0000-00-00 00:00:00' AND Destino='$sucursal_id' LIMIT 1";
+                $Consulta=$obCon->QueryExterno($sql, $DatosServer["IP"], $DatosServer["Usuario"], $DatosServer["Password"], $DatosServer["DataBase"], "");
+                $datos_consulta=$obCon->FetchAssoc($Consulta);
+                if($datos_consulta["ID"]<>''){
+                    $css->Notificacion("Error", "hay traslados pendientes por descargar", "rojo", "", "");
+                }
+            }
             $css->input("hidden", "idFormulario", "", "idFormulario", "", 7, "", "", "", "");
             $css->div("", "row", "", "", "", "", "");
                 $css->div("", "col-md-4", "", "", "", "", "");

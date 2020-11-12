@@ -508,7 +508,7 @@ class PrintPos extends ProcesoVenta{
     $DatosAnticipos= $this->FetchAssoc($this->Query($sql));
     if($DatosAnticipos["Anticipos"]>0){
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-        fwrite($handle,"Cruce Anticipos ----> $".str_pad(number_format($DatosFactura["Otros"]),10," ",STR_PAD_LEFT));
+        fwrite($handle,"Cruce Anticipos ----> $".str_pad(number_format($DatosAnticipos["Anticipos"]),10," ",STR_PAD_LEFT));
     }
     if($DatosFactura["Devuelve"]>0){
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
@@ -568,13 +568,19 @@ class PrintPos extends ProcesoVenta{
         $DatosCotizacion= $this->DevuelveValores("cotizacionesv5", "ID", $idCotizacion);
         $idUsuario=$DatosCotizacion["Usuarios_idUsuarios"];
         $DatosUsuario=$this->ValorActual("usuarios", " Nombre , Apellido ", " idUsuarios='$idUsuario'");
+        $idTercero=$DatosCotizacion["Clientes_idClientes"];
+        $DatosTercero=$this->ValorActual("clientes", " RazonSocial,Num_Identificacion ", " idClientes='$idTercero'");
         $idEmpresa=1;
         $this->EncabezadoComprobantesPos($handle, $DatosCotizacion["Fecha"], $idEmpresa);
         
         //fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
         fwrite($handle,"$DatosFormato[Nombre] No $idCotizacion");
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"CLIENTE: $DatosTercero[RazonSocial] $DatosTercero[Num_Identificacion]");
+        
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
         fwrite($handle,"ATIENDE: $DatosUsuario[Nombre] $DatosUsuario[Apellido]");
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
         $this->SeparadorHorizontal($handle, "*", 37);
 
         /////////////////////////////ITEMS COTIZADOS

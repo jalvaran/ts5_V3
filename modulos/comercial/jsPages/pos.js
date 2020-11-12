@@ -2206,6 +2206,8 @@ function FacturarItemSeparado(idItemSeparado,TotalAbonos,CantidadMaxima,ValorUni
         form_data.append('Accion', 22);
         form_data.append('Cantidad', Cantidad); 
         form_data.append('idItemSeparado', idItemSeparado); 
+        form_data.append('TotalAbonos', TotalAbonos); 
+        form_data.append('CantidadMaxima', CantidadMaxima); 
                 
         $.ajax({
         url: './procesadores/pos.process.php',

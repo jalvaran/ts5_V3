@@ -949,14 +949,19 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;$MensajeComprobante;$MensajeFactura");
         break;//Fin caso 21
         
-        case 22://Factura un item
+        case 22://Factura un item de un separado
             $obPrint=new PrintPos($idUser);
             $idItemSeparado=$obCon->normalizar($_REQUEST['idItemSeparado']);
             $Cantidad=$obCon->normalizar($_REQUEST['Cantidad']);
+            $TotalAbonos=$obCon->normalizar($_REQUEST['TotalAbonos']);
             $DatosItem=$obCon->DevuelveValores("separados_items", "ID", $idItemSeparado);
             if($Cantidad>$DatosItem["Cantidad"]){
                 print("E1;La cantidad no puede ser mayor a ".$DatosItem["Cantidad"]);
                 exit();
+            }
+            $TotalAFacturar=$DatosItem["TotalItem"]/$Cantidad;
+            if($TotalAbonos<$TotalAFacturar){
+                exit("E1;El total de los abonos es inferior al valor del Producto ". number_format($TotalAFacturar));
             }
             $NumFactura=$obCon->FacturarItemSeparado($idItemSeparado,$Cantidad,$idUser,"");
             $obPrint->ImprimeFacturaPOS($NumFactura, "", 1);

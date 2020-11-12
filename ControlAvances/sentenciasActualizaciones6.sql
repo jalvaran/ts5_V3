@@ -283,6 +283,7 @@ CREATE TABLE `notas_credito_items` (
 
 
 
+
 ALTER TABLE `clientes` ADD `TipoOrganizacion` INT(5) UNSIGNED  NOT NULL AFTER `CIUU`;
 ALTER TABLE `proveedores` ADD `TipoOrganizacion` INT(5) UNSIGNED  NOT NULL AFTER `CIUU`;
 
@@ -1022,4 +1023,7 @@ ALTER TABLE `comprobantes_ingreso` ADD `Created` TIMESTAMP NOT NULL DEFAULT CURR
 
 INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
 (36,	'Muestra la opcion en el pos de ver las ventas en el turno',	'0',	'2020-11-09 15:08:16',	'2020-07-25 09:59:30');
+
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(37,	'Verifica si no se han registrado los traslados al momento de hacer el cierre',	'0',	'2020-11-09 15:33:49',	'2020-07-25 09:59:30');
 

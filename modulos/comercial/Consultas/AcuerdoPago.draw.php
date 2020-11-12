@@ -28,7 +28,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     (SELECT RazonSocial FROM clientes t4 WHERE t4.Num_Identificacion=t1.Tercero LIMIT 1) as NombreTercero
                     FROM acuerdo_pago t1 
                     WHERE t1.Tercero = 
-                    (SELECT t2.Num_Identificacion FROM clientes t2 WHERE t2.RazonSocial LIKE '%$key%' or Num_Identificacion='$key' LIMIT 1) AND Estado=1";
+                    (SELECT t2.Num_Identificacion FROM clientes t2 WHERE t2.RazonSocial LIKE '%$key%' or Num_Identificacion='$key' LIMIT 1) AND (Estado=1 or Estado=12)";
             $Consulta=$obAcuerdo->Query($sql);
             print("<br><br>");
             $css->CrearTabla();
@@ -1007,6 +1007,11 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 if($NuevoSaldo>$Cupo){
                     $css->CrearTitulo("El Cliente no tiene cupo suficiente para realizar esta compra a credito", "rojo");
+                    $css->CerrarTabla();
+                    exit();
+                }
+                if($DatosCliente["Puntaje"]<1){
+                    $css->CrearTitulo("El Cliente no tiene un buen puntaje, no puedes realizar este acuerdo", "rojo");
                     $css->CerrarTabla();
                     exit();
                 }
