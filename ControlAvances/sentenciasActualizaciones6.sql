@@ -1027,3 +1027,17 @@ INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `S
 INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
 (37,	'Verifica si no se han registrado los traslados al momento de hacer el cierre',	'0',	'2020-11-09 15:33:49',	'2020-07-25 09:59:30');
 
+ALTER TABLE `comercial_plataformas_pago_ingresos` ADD `metodo_pago_id` int NOT NULL DEFAULT '1' AFTER `Valor`;
+
+ALTER TABLE `comercial_plataformas_pago_ingresos` ADD INDEX `metodo_pago_id` (`metodo_pago_id`);
+
+
+ALTER TABLE `facturas_items`
+ADD INDEX `Departamento` (`Departamento`);
+
+ALTER TABLE `ori_facturas_items`
+ADD INDEX `Departamento` (`Departamento`);
+
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+('',	'Informe Administrador 2',	7,	11,	0,	'',	0,	'',	'informes_administracion.php',	'_BLANK',	1,	'informes5.png',	1,	'2019-01-13 09:12:44',	'2019-01-13 09:12:44');
+

@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+@session_start();
 if (!isset($_SESSION['username'])){
   exit("<a href='../../index.php' ><img src='../images/401.png'>Iniciar Sesion </a>");
   
@@ -477,7 +477,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     print("</td>");
                     
                     print("<td style='text-align:center'>");
-                        $Ruta="../../general/procesadores/GeneradorCSV.process.php?Opcion=2&Tabla=$Tabla&c=". base64_encode($Condicion);
+                        $Ruta="../../general/procesadores/GeneradorCSV.process.php?Opcion=3&Tabla=$Tabla&c=". base64_encode(urlencode($Condicion));
                         print('<a href="'.$Ruta.'" target="_blank"><button type="button" id="BtnExportarExcelCuentas" class="btn btn-success btn-flat"><i class="fa fa-file-excel-o"></i></button></a>');
                     print("</td>");
                    

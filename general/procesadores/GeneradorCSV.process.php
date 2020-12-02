@@ -143,6 +143,73 @@ if(isset($_REQUEST["Opcion"])){
             $NombreArchivo=$Tabla;
             print("<div id='DivImagenDescargarTablaDB'><a href='$Link' download='$NombreArchivo.csv' target='_top' ><h1>Descargar</h1></a></div>");
             break;//Fin caso 2
+            
+            case 3: //Exportar CSV directamente
+            
+            $Tabla=$obCon->normalizar($_REQUEST["Tabla"]);
+            $FileName=$Tabla."_".$idUser.".csv";
+            $Link.= $FileName;
+            $OuputFile.=$FileName;
+            
+            if(file_exists($Link)){
+                unlink($Link);
+            }
+            $Condicion="";
+            if($_REQUEST["c"]){
+                $Condicion= urldecode(base64_decode($_REQUEST["c"]));
+                ////$Condicion=$obCon->normalizar($Condicion);
+            }          
+            
+            
+            $Separador=";";
+            $NumPage="";
+            $limit="";
+            $startpoint="";
+            
+            
+            $sqlColumnas="SELECT  ";
+            $Columnas=$obCon->ShowColums($Tabla);
+            //print_r($Columnas);
+            foreach ($Columnas["Field"] as $key => $value) {
+                $sqlColumnas.="'$value',";
+            }
+            $sqlColumnas=substr($sqlColumnas, 0, -1);
+            $sqlColumnas.=" UNION ALL ";
+            
+            $sql=$sqlColumnas." SELECT * FROM $Tabla $Condicion";
+            //print($sql);
+            $Fecha=date("Ymd_His");
+            
+            $Consulta=$obCon->Query($sql);
+            
+            if($archivo = fopen($Link, "a")){
+                
+                $mensaje="";
+                $r=0;
+                while($DatosExportacion= $obCon->FetchAssoc($Consulta)){
+                    $r++;
+                    foreach ($Columnas["Field"] as $NombreColumna){
+                        $Dato="";
+                        if(isset($DatosExportacion[$NombreColumna])){
+                            $Dato=$DatosExportacion[$NombreColumna];
+                        }
+                        $mensaje.='"'.str_replace(";", "", $Dato).'";'; 
+                    }
+                    $mensaje=substr($mensaje, 0, -1);
+                    $mensaje.="\r\n";
+                    if($r==1000){
+                        $r=0;
+                        fwrite($archivo, $mensaje);
+                        $mensaje="";
+                    }
+                }
+                fwrite($archivo, $mensaje);
+                fclose($archivo);
+            }
+            
+            $NombreArchivo=$Tabla;
+            print("<div id='DivImagenDescargarTablaDB'><a href='$Link' download='$NombreArchivo.csv' target='_top' ><h1>Descargar</h1></a></div>");
+            break;//Fin caso 3
         
         }
 }else{

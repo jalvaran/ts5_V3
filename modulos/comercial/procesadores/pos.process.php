@@ -240,6 +240,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $Cheques=0;
             $Otros=0;
             $Tarjetas=0;
+            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
+            $Tercero=$DatosCliente["Num_Identificacion"];
             if($CmbFormaPago=="Contado"){
                 $Devuelta=$obCon->normalizar($_REQUEST["Devuelta"]);
                 $Efectivo=$obCon->normalizar($_REQUEST["Efectivo"]);
@@ -288,8 +290,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 }
             }
             $Descuentos=0;
-            $DatosCliente=$obCon->DevuelveValores("clientes", "idClientes", $idCliente);
-            $Tercero=$DatosCliente["Num_Identificacion"];
+            
             if($AnticiposCruzados>0){
                             
                 $NIT=$DatosCliente["Num_Identificacion"];
@@ -516,6 +517,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $MensajeDevuelta="<br><h3>Devuelta: ".number_format($Devuelta)."</h3>";
             $LinkProcessMail="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=38&idFactura=$idFactura";
             $MensajeMail="<br><a href='$LinkProcessMail'  target='blank'><strong>Click para enviar Factura por Email</strong></a>";
+            $obCon->ActualizaRegistro("clientes", "Updated", date("Y-m-d"), "Num_Identificacion", $Tercero);
             $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);
             print("OK;$Mensaje.$Mensaje2.$MensajeDevuelta.$MensajeMail");
             
@@ -1043,14 +1045,23 @@ if( !empty($_REQUEST["Accion"]) ){
             $Tercero=$obCon->normalizar($_REQUEST['Tercero']);
             $CmbPlataforma=$obCon->normalizar($_REQUEST['CmbPlataforma']);            
             $Abono=$obCon->normalizar($_REQUEST["Abono"]);
+            $cmb_metodo_pago=$obCon->normalizar($_REQUEST["cmb_metodo_pago"]);
             
             $DatosPlataforma=$obCon->DevuelveValores("comercial_plataformas_pago", "ID", $CmbPlataforma);
             $DatosCaja=$obCon->DevuelveValores("cajas", "idUsuario", $idUser);
-            $CuentaDestino=$DatosCaja["CuentaPUCEfectivo"];
             $CentroCosto=$DatosCaja["CentroCostos"];
+            if($cmb_metodo_pago==1){
+                
+                $CuentaDestino=$DatosCaja["CuentaPUCEfectivo"];
+                
+            }else{
+                $datos_metodo_pago=$obCon->DevuelveValores("metodos_pago", "ID", $cmb_metodo_pago);
+                $CuentaDestino=$datos_metodo_pago["CuentaPUCIngresos"];
+            }
+            
             $idTerceroInteres=$DatosPlataforma["NIT"];
             
-            $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 19);
+            $Parametros=$obCon->DevuelveValores("parametros_contables", "ID", 19); //Cuenta por pagar a siste credito
             $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $idTerceroInteres, $Abono, "PlataformasPago", "Ingreso por Plataforma de Pago $CmbPlataforma", "CERRADO");
             $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $idTerceroInteres, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
             

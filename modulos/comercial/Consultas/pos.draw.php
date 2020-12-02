@@ -813,6 +813,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     $css->ColTabla("<strong>Plataforma</strong>", 1);
                     $css->ColTabla("<strong>Tercero</strong>", 3);
+                    $css->ColTabla("<strong>Forma de Pago</strong>", 1);
                     $css->ColTabla("<strong>Valor</strong>", 1);
                                         
                 $css->CierraFilaTabla();
@@ -846,6 +847,29 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->Cselect();
                     print("</td>");
                     
+                    print("<td>");
+                        $css->select("cmb_metodo_pago", "form-control", "cmb_metodo_pago", "", "", "", "");
+
+                            $sql="SELECT * FROM metodos_pago WHERE Estado=1";
+                            $Consulta=$obCon->Query($sql);
+                            
+                            while($DatosFormaPago=$obCon->FetchAssoc($Consulta)){
+                                if($DatosFormaPago["ID"]<>1 and $DatosFormaPago["ID"]<>2 and $DatosFormaPago["ID"]<>3 and $DatosFormaPago["ID"]<>6){
+                                    continue;
+                                }
+                                $Sel=0;
+                                if($DatosFormaPago["ID"]==1){
+                                    $Sel=1;
+                                }
+                                $css->option("", "",'' , $DatosFormaPago["ID"], "", "", "", $Sel);
+                                    print($DatosFormaPago["Metodo"]);
+                                $css->Coption();
+                                
+                            }
+
+
+                        $css->Cselect();
+                    print("</td>");
                     
                     print("<td>");
                         

@@ -2516,6 +2516,7 @@ function GuardarIngresoPlataformasPago(){
     var Abono = parseFloat(document.getElementById("TxtIngresoPlataforma").value);
     var Tercero = (document.getElementById("CmbTerceroIngresoPlataformas").value);
     var CmbPlataforma = (document.getElementById("CmbPlataforma").value);
+    var cmb_metodo_pago = (document.getElementById("cmb_metodo_pago").value);
         
          
     if(!$.isNumeric(Abono) ||  Abono<=0){
@@ -2550,6 +2551,7 @@ function GuardarIngresoPlataformasPago(){
         form_data.append('Tercero', Tercero); 
         form_data.append('CmbPlataforma', CmbPlataforma); 
         form_data.append('Abono', Abono);
+        form_data.append('cmb_metodo_pago', cmb_metodo_pago);
         document.getElementById("TxtIngresoPlataforma").value="";              
         $.ajax({
         url: './procesadores/pos.process.php',

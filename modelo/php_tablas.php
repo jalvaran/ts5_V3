@@ -4963,10 +4963,10 @@ EOD;
     //HTML Ventas discriminadas por departamentos
     public function HTML_VentasXDepartamentos($CondicionItems) {
         $html="";
-        $sql="SELECT Departamento as idDepartamento, SUM(SubtotalItem) as Subtotal, SUM(IVAItem) as IVA, SUM(TotalItem) as Total, SUM(Cantidad) as Items"
+        $sql="SELECT Departamento as idDepartamento,(SELECT Nombre FROM prod_departamentos WHERE prod_departamentos.idDepartamentos=fi.Departamento LIMIT 1) AS NombreDepartamento, SUM(SubtotalItem) as Subtotal, SUM(IVAItem) as IVA, SUM(TotalItem) as Total, SUM(Cantidad) as Items"
         . " $CondicionItems GROUP BY Departamento";
         $Datos=$this->obCon->Query($sql);
-        
+        ////print($sql);
         if($this->obCon->NumRows($Datos)){
             $html='<span style="color:RED;font-family:`Bookman Old Style`;font-size:12px;"><strong><em>Total de Ventas Discriminadas por Departamento:
             </em></strong></span><BR><BR>
@@ -4996,8 +4996,8 @@ EOD;
                 $IVA=number_format($DatosVentas["IVA"]);
                 $Total=number_format($DatosVentas["Total"]);
                 $Items=number_format($DatosVentas["Items"]);
-                $DatosDepartamento=$this->obCon->DevuelveValores("prod_departamentos", "idDepartamentos", $DatosVentas["idDepartamento"]);
-                $NombreDep=$DatosDepartamento["Nombre"];
+                //$DatosDepartamento=$this->obCon->DevuelveValores("prod_departamentos", "idDepartamentos", $DatosVentas["idDepartamento"]);
+                $NombreDep=$DatosVentas["NombreDepartamento"];
 
                 $Subtotal=$Subtotal+$DatosVentas["Subtotal"];
                 $TotalIVA=$TotalIVA+$DatosVentas["IVA"];
@@ -5657,7 +5657,7 @@ EOD;
                
         $html= $this->HTML_VentasXDepartamentos($CondicionItems);
         $this->PDF_Write($html);
-        
+       
         $html= $this->HTML_VentasXUsuario($CondicionItems,$CondicionFecha1,$CondicionFecha3);
         $this->PDF_Write($html);
         
@@ -5675,6 +5675,7 @@ EOD;
         $this->PDF_Write($html);
         $html= $this->HTML_Ventas_Colaboradores($CondicionFecha2, $CentroCostos, $EmpresaPro, "");
         $this->PDF_Write(utf8_encode($html));
+        
          
         /*Solo Juan Car
         $this->PDF_Add();

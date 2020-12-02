@@ -30,10 +30,10 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->ColTabla("<strong>Hora</strong>", 1,"C");
                         $css->ColTabla("<strong>Tercero</strong>", 1,"C");
                         $css->ColTabla("<strong>Valor</strong>", 1,"C");
-                        $css->ColTabla("<strong>Inicial</strong>", 1,"C");
+                        $css->ColTabla("<strong>Metodo Pago</strong>", 1,"C");
                                                 
                     $css->CierraFilaTabla();
-                    $sql="SELECT Fecha,Hora,Inicial,Tercero,round(Valor) as Valor FROM comercial_plataformas_pago_ingresos "
+                    $sql="SELECT Fecha,Hora,Inicial,Tercero,round(Valor) as Valor,(SELECT Metodo FROM metodos_pago t2 where t2.ID=comercial_plataformas_pago_ingresos.metodo_pago_id LIMIT 1 ) as nombre_metodo_pago FROM comercial_plataformas_pago_ingresos "
                             . "WHERE Fecha>='$FechaInicial' AND Fecha<='$FechaFinal' AND idPlataformaPago='$Plataforma'";
                     $Consulta=$obCon->Query($sql);
                     
@@ -44,7 +44,7 @@ if( !empty($_REQUEST["Accion"]) ){
                             $css->ColTabla($DatosIngresos["Hora"], 1);
                             $css->ColTabla($DatosIngresos["Tercero"], 1);
                             $css->ColTabla($DatosIngresos["Valor"], 1);
-                            $css->ColTabla($DatosIngresos["Inicial"], 1);
+                            $css->ColTabla($DatosIngresos["nombre_metodo_pago"], 1);
                         $css->CierraFilaTabla();
                     }    
                     
