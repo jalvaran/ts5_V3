@@ -10,6 +10,12 @@ INSERT INTO `acuerdo_pago_ciclos_pagos` (`ID`, `NombreCiclo`, `NumeroDias`, `Upd
 (2,	'QUINCENAL',	15,	'2020-07-25 14:34:41',	'2020-07-25 09:34:41'),
 (3,	'MENSUAL',	30,	'2020-07-25 14:34:41',	'2020-07-25 09:34:41');
 
+INSERT INTO `acuerdo_pago_cuotas_pagadas_estados` (`ID`, `NombreEstado`, `Updated`, `Sync`) VALUES
+(0,	'Sin Pagar',	'2020-07-25 14:34:42',	'2020-07-25 09:34:42'),
+(1,	'Paga',	'2020-07-25 14:34:42',	'2020-07-25 09:34:42'),
+(3,	'Pago Parcial',	'2020-07-25 14:34:42',	'2020-07-25 09:34:42'),
+(10,	'Anulada',	'2020-07-25 14:34:42',	'2020-07-25 09:34:42');
+
 INSERT INTO `acuerdo_pago_estados` (`ID`, `NombreEstado`, `Observaciones`, `Created`, `Updated`, `Sync`) VALUES
 (1,	'Abierto',	'Documento Activo',	'0000-00-00 00:00:00',	'2020-07-25 14:34:44',	'2020-07-25 09:34:44'),
 (10,	'Anulado por documento nuevo',	'Anulado por un documento nuevo',	'0000-00-00 00:00:00',	'2020-07-25 14:34:44',	'2020-07-25 09:34:44'),
@@ -33,6 +39,18 @@ INSERT INTO `anticipos_encargos_estados` (`ID`, `NombreEstado`, `Updated`, `Sync
 (1,	'Abierto',	'2020-07-25 14:34:51',	'2020-07-25 09:34:51'),
 (2,	'Cerrado',	'2020-07-25 14:34:51',	'2020-07-25 09:34:51'),
 (3,	'Anulado',	'2020-07-25 14:34:51',	'2020-07-25 09:34:51');
+
+INSERT INTO `bodega` (`idBodega`, `Nombre`, `Direccion`, `Ciudad`, `Telefono`, `idServidor`, `Updated`, `Sync`) VALUES
+(1,	'BODEGA LOCAL ',	'',	'BUGA',	'',	2,	'2020-07-25 14:34:52',	'2020-07-25 09:34:52'),
+(2,	'BODEGA YOTOCO',	'',	'YOTOCO',	'',	4,	'2020-07-25 14:34:52',	'2020-07-25 09:34:52'),
+(3,	'BODEGA BUGA',	'',	'BUGA',	'',	3,	'2020-07-25 14:34:52',	'2020-07-25 09:34:52'),
+(4,	'BODEGA GINEBRA',	'',	'GINEBRA',	'',	5,	'2020-07-25 14:34:52',	'2020-07-25 09:34:52'),
+(5,	'BODEGA SAN PEDRO',	'',	'SAN PEDRO',	'',	6,	'2020-07-25 14:34:52',	'2020-07-25 09:34:52');
+
+INSERT INTO `cajas` (`ID`, `Nombre`, `Base`, `idUsuario`, `Estado`, `CuentaPUCEfectivo`, `CuentaPUCCheques`, `CuentaPUCOtros`, `CuentaPUCIVAEgresos`, `idTerceroIntereses`, `idEmpresa`, `idSucursal`, `CentroCostos`, `idResolucionDian`, `idBascula`, `Updated`, `Sync`) VALUES
+(1,	'CAJA 1',	'200000',	3,	'ABIERTA',	110505,	11100502,	11100503,	240801,	900833180,	1,	1,	1,	2,	1,	'2020-09-25 16:45:36',	'2020-07-25 09:34:52'),
+(2,	'CAJA 2',	'200000',	1,	'ABIERTA',	11051002,	11100502,	11100503,	240801,	900833180,	1,	1,	1,	2,	0,	'2020-07-25 14:34:52',	'2020-07-25 09:34:52'),
+(3,	'CAJA 3',	'150000',	0,	'ABIERTA',	11051002,	11100502,	11100503,	240801,	900833180,	1,	1,	1,	1,	0,	'2020-07-25 14:34:52',	'2020-07-25 09:34:52');
 
 INSERT INTO `catalogo_departamentos` (`ID`, `country_id`, `Nombre`, `CodigoDANE`, `Updated`, `Sync`) VALUES
 (1,	46,	'Amazonas',	'91',	'2020-07-25 14:34:54',	'2020-07-25 14:34:54'),
@@ -1947,7 +1965,7 @@ INSERT INTO `clasecuenta` (`PUC`, `Clase`, `Valor`, `Updated`, `Sync`) VALUES
 ('4',	'Ingresos',	'0',	'2020-07-25 14:34:58',	'2020-07-25 09:34:58'),
 ('5',	'Gastos',	'0',	'2020-07-25 14:34:58',	'2020-07-25 09:34:58'),
 ('6',	'Costos de Venta',	'0',	'2020-07-25 14:34:58',	'2020-07-25 09:34:58'),
-('7',	'Costos de transformacion',	'0',	'2020-07-25 14:34:58',	'2020-07-25 09:34:58'),
+('7',	'Costos de produccion u operacion',	'0',	'2020-10-16 02:05:09',	'2020-07-25 09:34:58'),
 ('8',	'Cuentas de Orden Deudoras',	'0',	'2020-07-25 14:34:58',	'2020-07-25 09:34:58'),
 ('9',	'Cuentas de orden Acreedoras',	'0',	'2020-07-25 14:34:58',	'2020-07-25 09:34:58');
 
@@ -3377,6 +3395,7 @@ INSERT INTO `comercial_plataformas_pago` (`ID`, `Nombre`, `NIT`, `Activa`, `Upda
 (1,	'SisteCredito',	811007713,	1,	'2020-07-25 14:35:06',	'2020-07-25 09:35:06'),
 (2,	'KUPY',	0,	1,	'2020-07-25 14:35:06',	'2020-07-25 09:35:06');
 
+
 INSERT INTO `configuracion_campos_asociados` (`ID`, `TablaOrigen`, `CampoTablaOrigen`, `TablaAsociada`, `CampoAsociado`, `IDCampoAsociado`, `Updated`, `Sync`) VALUES
 (1,	'empresapro',	'Ciudad',	'cod_municipios_dptos',	'Ciudad',	'Ciudad',	'2020-07-25 14:35:13',	'2020-07-25 09:35:13'),
 (2,	'empresapro',	'Regimen',	'empresapro_regimenes',	'Regimen',	'Regimen',	'2020-07-25 14:35:13',	'2020-07-25 09:35:13'),
@@ -3408,12 +3427,15 @@ INSERT INTO `configuracion_control_tablas` (`ID`, `TablaDB`, `Agregar`, `Editar`
 (11,	'ordenesdecompra',	0,	0,	1,	'PDF_Documentos.draw.php?idDocumento=5&ID=',	1,	1,	0,	'2020-07-25 14:35:14',	'2020-07-25 09:35:14'),
 (12,	'vista_factura_compra_totales',	0,	0,	1,	'PDF_Documentos.draw.php?idDocumento=23&ID=',	1,	1,	0,	'2020-07-25 14:35:14',	'2020-07-25 09:35:14');
 
+INSERT INTO `configuracion_correos_smtp` (`ID`, `SMTPSecure`, `Host`, `Port`, `Username`, `Password`, `Updated`, `Sync`) VALUES
+(1,	'ssl',	'smtp.gmail.com',	465,	'technosolucionesfe@gmail.com',	'pirlo1985',	'2020-07-25 14:35:14',	'2020-07-25 09:35:14');
+
 INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
 (1,	'RUTA PARA EXPORTAR TABLAS EN CSV',	'../../htdocs/ts5/exports/tabla.csv',	'2020-07-25 14:59:30',	'2020-07-25 09:59:30'),
 (2,	'Valor por defecto si se imprime o no al momento de realizar una factura pos',	'1',	'2020-07-25 14:59:30',	'2020-07-25 09:59:30'),
 (3,	'Determina si se debe pedir autorizacion para retornar un item en pos',	'1',	'2020-07-25 14:59:30',	'2020-07-25 09:59:30'),
 (4,	'Determina si se debe pedir autorizacion para elimininar un item en pos',	'0',	'2020-07-25 14:59:30',	'2020-07-25 09:59:30'),
-(5,	'Determina si se debe pedir autorizacion para cambiar el precio de venta de un item en pos',	'1',	'2020-07-25 14:59:30',	'2020-07-25 09:59:30'),
+(5,	'Determina si se debe pedir autorizacion para cambiar el precio de venta de un item en pos',	'0',	'2020-10-22 20:36:36',	'2020-07-25 09:59:30'),
 (6,	'Determina el valor maximo que se puede aplicar al descuento general',	'50',	'2020-07-25 14:59:30',	'2020-07-25 09:59:30'),
 (7,	'Determina si se pueden realizar descuentos a precio de costo',	'1',	'2020-08-04 14:20:27',	'2020-08-04 09:20:27'),
 (8,	'Determina cuantas copias saldran del separado al crearse',	'2',	'2020-07-25 14:59:30',	'2020-07-25 09:59:30'),
@@ -3444,6 +3466,8 @@ INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `S
 (33,	'Determina si se verifica que un cliente tenga datos adicionales para guardar un acuerdo de pago',	'1',	'2020-07-25 14:59:30',	'2020-07-25 09:59:30'),
 (34,	'Determina si debe verificarse que el cliente tenga un recomendado para guardar un acuerdo de pago',	'1',	'2020-07-25 14:59:30',	'2020-07-25 09:59:30'),
 (35,	'Determina si una factura negativa debe llevarse a una ganancia ocasional y no devolver el dinero al cliente en el POS',	'1',	'2020-07-25 14:59:30',	'2020-07-25 09:59:30'),
+(36,	'Muestra la opcion en el pos de ver las ventas en el turno',	'1',	'2020-11-09 20:33:49',	'2020-07-25 09:59:30'),
+(37,	'Verifica si no se han registrado los traslados al momento de hacer el cierre',	'1',	'2020-11-11 15:12:59',	'2020-07-25 09:59:30'),
 (2000,	'Ruta para Guardar los Fondos de los locales de la plataforma DOMI',	'../../../../domibuga/domi_images/locales/',	'2020-07-25 14:59:30',	'2020-07-25 09:59:30'),
 (2001,	'Ruta para Guardar las imagenes de los productos de la plataforma DOMI',	'../../../../domibuga/domi_images/productos/',	'2020-07-25 14:59:30',	'2020-07-25 09:59:30');
 
@@ -3847,7 +3871,6 @@ INSERT INTO `cuentasfrecuentes` (`CuentaPUC`, `Nombre`, `ClaseCuenta`, `UsoFutur
 ('11100501',	'CUENTA DE AHORROS DAVIVIENDA',	'ACTIVOS',	'_',	'2020-07-25 14:59:53',	'2020-07-25 09:59:53'),
 ('523505',	'Aseo y vigilacia',	'EGRESOS',	'',	'2020-07-25 14:59:53',	'2020-07-25 09:59:53');
 
-
 INSERT INTO `documentos_contables` (`ID`, `Prefijo`, `Nombre`, `Descripcion`, `Updated`, `Sync`) VALUES
 (1,	'CC-1',	'AJUSTE CONTABLE',	'Documento para generar ajustes a la contabilidad',	'2020-07-25 14:59:54',	'2020-07-25 09:59:54'),
 (2,	'CC-2',	'MOVIMIENTO DE CUENTAS',	'',	'2020-07-25 14:59:54',	'2020-07-25 09:59:54'),
@@ -3863,6 +3886,9 @@ INSERT INTO `documentos_contables` (`ID`, `Prefijo`, `Nombre`, `Descripcion`, `U
 (12,	'CC-12',	'COMPROBANTE DE EGRESO',	'Para realizar egresos de dinero',	'2020-07-25 14:59:54',	'2020-07-25 09:59:54'),
 (13,	'CC-13',	'COMPROBANTE DE INGRESO',	'Para realizar ingresos de dinero',	'2020-07-25 14:59:54',	'2020-07-25 09:59:54');
 
+
+INSERT INTO `domi_usuarios_as_locales` (`ID`, `idUsuario`, `idLocal`, `Updated`, `Sync`) VALUES
+(1,	3,	1,	'2020-07-25 14:59:59',	'2020-07-25 09:59:59');
 
 INSERT INTO `egresos_tipo` (`id`, `Nombre`, `Cuentas_idCuentas`, `Visible`, `Updated`, `Sync`) VALUES
 (1,	'Gastos de Personal',	5105,	1,	'2020-07-25 15:00:00',	'2020-07-25 10:00:00'),
@@ -3890,6 +3916,13 @@ INSERT INTO `empresapro_regimenes` (`ID`, `Regimen`, `Updated`, `Sync`) VALUES
 (1,	'COMUN',	'2020-07-25 15:00:01',	'2020-07-25 10:00:01'),
 (2,	'SIMPLIFICADO',	'2020-07-25 15:00:01',	'2020-07-25 10:00:01');
 
+INSERT INTO `empresapro_resoluciones_facturacion` (`ID`, `NombreInterno`, `NumResolucion`, `Fecha`, `NumSolicitud`, `Tipo`, `Factura`, `FacturaElectronica`, `Prefijo`, `Desde`, `Hasta`, `FechaDesde`, `FechaVencimiento`, `technical_key`, `idEmpresaPro`, `Estado`, `Completada`, `Updated`, `Sync`) VALUES
+(1,	'Facturas por computador',	'150000055430',	'2015-03-26',	'242',	'02',	'Computador',	0,	'A',	1,	300000000,	'0000-00-00',	'2017-03-26',	'',	1,	'',	'NO',	'2020-09-24 13:50:31',	'2020-07-25 10:00:02'),
+(2,	'Facturas por POS',	'1555431',	'2016-03-28',	'248',	'03',	'POS',	0,	'B',	1001,	2000000000,	'0000-00-00',	'2017-03-27',	'',	1,	'',	'NO',	'2020-11-11 14:56:57',	'2020-08-05 07:42:00'),
+(3,	'Factura pruebas electronica',	'18760000001',	'0001-01-01',	'NA',	'FE',	'FE',	1,	'SETP',	990000000,	995000000,	'2019-01-19',	'2030-01-19',	'fc8eac422eba16e22ffd8c6f94b3f40a6e38162c',	1,	'',	'NO',	'2020-07-25 15:00:02',	'2020-07-25 10:00:02');
+
+
+
 INSERT INTO `empresa_pro_sucursales` (`ID`, `Nombre`, `Ciudad`, `Direccion`, `idEmpresaPro`, `Visible`, `Actual`, `idServidor`, `Updated`, `Sync`) VALUES
 (1,	'TECHNO YOTOCO',	'YOTOCO',	'',	1,	'SI',	'0',	0,	'2020-07-25 15:00:00',	'2020-07-25 10:00:00'),
 (2,	'TECHNO BUGA',	'BUGA',	'',	1,	'SI',	'0',	3,	'2020-07-25 15:00:00',	'2020-07-25 10:00:00'),
@@ -3901,16 +3934,6 @@ INSERT INTO `facturas_electronicas_estados_acuse` (`ID`, `NombreEstadoAcuse`, `U
 ('1',	'Aceptado',	'2020-07-25 15:03:43',	'2020-07-25 10:03:43'),
 ('11',	'Aceptacion Automatica',	'2020-07-25 15:03:43',	'2020-07-25 10:03:43'),
 ('',	'Esperando Acuse',	'2020-07-25 15:03:43',	'2020-07-25 10:03:43');
-
-INSERT INTO `facturas_electronicas_log_estados` (`ID`, `NombreEstado`, `Updated`, `Sync`) VALUES
-(1,	'Verificada',	'2020-07-25 15:03:44',	'2020-07-25 10:03:44'),
-(2,	'Completada',	'2020-07-25 15:03:44',	'2020-07-25 10:03:44'),
-(10,	'Error',	'2020-07-25 15:03:44',	'2020-07-25 10:03:44'),
-(11,	'Factura Sin Items',	'2020-07-25 15:03:44',	'2020-07-25 10:03:44'),
-(12,	'No hubo respuesta del API',	'2020-07-25 15:03:44',	'2020-07-25 10:03:44'),
-(13,	'Error de estructura o de datos',	'2020-07-25 15:03:44',	'2020-07-25 10:03:44'),
-(20,	'No hay respuesta, debe intentarse de nuevo',	'2020-07-25 15:03:44',	'2020-07-25 10:03:44'),
-(30,	'Documento Corregido',	'2020-07-25 15:03:44',	'2020-07-25 10:03:44');
 
 INSERT INTO `facturas_electronicas_parametros` (`ID`, `Recurso`, `Valor`, `Clave`, `Funcion`, `Updated`, `Sync`) VALUES
 (1,	'Certificado Digital',	'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',	'thET5qHgup',	'Certificado digital para la generacion de facturas',	'2020-07-25 15:03:45',	'2020-07-25 10:03:45'),
@@ -4344,7 +4367,9 @@ INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`,
 (201,	'Preparacion',	30,	13,	0,	'',	0,	'',	'pos2.php',	'_BLANK',	1,	'listado.png',	1,	'2020-07-25 15:05:03',	'2020-07-25 10:05:03'),
 (202,	'Registrar Pago',	49,	3,	23,	'vista_comprobantes_ingreso',	1,	'onclick=\"SeleccioneTablaDB(`comprobantes_ingreso`)\";',	'RegistrarIngreso.php',	'_SELF',	1,	'pago.jpg',	1,	'2020-08-26 13:59:47',	'2020-07-25 10:05:03'),
 (203,	'Registrar Ingreso',	49,	3,	23,	'vista_comprobantes_ingreso',	1,	'onclick=\"SeleccioneTablaDB(`comprobantes_ingreso`)\";',	'ComprobantesIngreso.php',	'_SELF',	1,	'ingreso.jpg',	3,	'2020-08-26 13:59:47',	'2020-07-25 10:05:03'),
-(204,	'Anticipos',	49,	3,	23,	'vista_comprobantes_ingreso',	1,	'onclick=\"SeleccioneTablaDB(`comprobantes_ingreso`)\";',	'RegistrarAnticipos.php',	'_SELF',	1,	'Anticipos.png',	1,	'2020-08-26 13:59:47',	'2020-07-25 10:05:03');
+(204,	'Anticipos',	49,	3,	23,	'vista_comprobantes_ingreso',	1,	'onclick=\"SeleccioneTablaDB(`comprobantes_ingreso`)\";',	'RegistrarAnticipos.php',	'_SELF',	1,	'Anticipos.png',	1,	'2020-08-26 13:59:47',	'2020-07-25 10:05:03'),
+(205,	'Recaudo',	9,	8,	0,	'',	0,	'',	'recaudo.php',	'_BLANK',	1,	'tesoreria.png',	8,	'2020-07-25 15:05:03',	'2020-07-25 10:05:03'),
+(206,	'Vista Productos Venta',	22,	3,	0,	'vista_productos_departamentos',	1,	'onclick=\"SeleccioneTablaDB(`vista_productos_departamentos`)\";',	'vista_productos_departamentos.php',	'_SELF',	1,	'productosventa.png',	14,	'2020-07-22 15:05:03',	'2020-07-25 10:05:03');
 
 INSERT INTO `metodos_pago` (`ID`, `Metodo`, `Estado`, `SoloAdmin`, `CuentaPUCIngresos`, `NombreCuentaPUCIngresos`, `CuentaPUCEgresos`, `NombreCuentaPUCEgresos`, `Updated`, `Sync`) VALUES
 (1,	'EFECTIVO',	1,	0,	110505,	'CAJA MENOR',	110505,	'CAJA MENOR',	'2020-07-25 15:05:03',	'2020-07-25 10:05:03'),
@@ -4357,32 +4382,6 @@ INSERT INTO `metodos_pago` (`ID`, `Metodo`, `Estado`, `SoloAdmin`, `CuentaPUCIng
 (6,	'CUENTA DE AHORRO',	1,	0,	11100503,	'CUENTAS DE AHORROS',	11100503,	'CUENTAS DE AHORROS',	'2020-07-25 15:05:03',	'2020-07-25 10:05:03'),
 (12,	'POR DEVOLUCION PRODUCTO',	1,	1,	28050503,	'SALDO A FAVOR DE UN CLIENTE POR DEVOLUCION',	28050503,	'SALDO A FAVOR DE UN CLIENTE POR DEVOLUCION',	'2020-07-25 15:05:03',	'2020-07-25 10:05:03'),
 (13,	'NEGOCIACION KLAM',	1,	1,	513501,	'NEGOCIACION KLAM',	513501,	'NEGOCIACION KLAM',	'2020-07-25 15:05:03',	'2020-07-25 10:05:03');
-
-INSERT INTO `nomina_parametros_contables` (`ID`, `CuentaPUC`, `NombreCuenta`, `Updated`, `Sync`) VALUES
-(1,	'523510',	'Servicios Temporales',	'2020-07-25 15:05:06',	'2020-07-25 10:05:06'),
-(2,	'236540',	'RETEFUENTE',	'2020-07-25 15:05:06',	'2020-07-25 10:05:06'),
-(3,	'233525',	'CUENTA POR PAGAR',	'2020-07-25 15:05:06',	'2020-07-25 10:05:06'),
-(4,	'236805',	'RETENCION DE INDUSTRIA Y COMERCIO',	'2020-07-25 15:05:06',	'2020-07-25 10:05:06');
-
-INSERT INTO `nomina_parametros_generales` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
-(1,	'RETENCION DE ICA',	0.0066,	'2020-07-25 15:05:06',	'2020-07-25 10:05:06'),
-(2,	'Tope para realizar retencion de ICA',	99000,	'2020-07-25 15:05:06',	'2020-07-25 10:05:06'),
-(3,	'Retefuente por servicios para personas naturales',	0.06,	'2020-07-25 15:05:06',	'2020-07-25 10:05:06'),
-(4,	'Tope en servicios para personas naturales',	133000,	'2020-07-25 15:05:06',	'2020-07-25 10:05:06');
-
-SET NAMES utf8mb4;
-
-INSERT INTO `notas_credito_conceptos` (`ID`, `TipoDocumento`, `Nombre`, `Codigo`, `Created`, `Updated`, `Sync`) VALUES
-(1,	5,	'Devolución de parte de los bienes; no aceptación de partes del servicio',	'1',	'2019-12-13 02:23:51',	'2020-07-25 15:05:07',	'2020-07-25 10:05:07'),
-(2,	5,	'Anulación de factura electrónica',	'2',	'2019-12-13 02:23:51',	'2020-07-25 15:05:07',	'2020-07-25 10:05:07'),
-(3,	5,	'Rebaja total aplicada',	'3',	'2019-12-13 02:23:51',	'2020-07-25 15:05:07',	'2020-07-25 10:05:07'),
-(4,	5,	'Descuento total aplicado',	'4',	'2019-12-13 02:23:51',	'2020-07-25 15:05:07',	'2020-07-25 10:05:07'),
-(5,	5,	'Rescisión: nulidad por falta de requisitos',	'5',	'2019-12-13 02:23:51',	'2020-07-25 15:05:07',	'2020-07-25 10:05:07'),
-(6,	5,	'Otros',	'6',	'2019-12-13 02:23:51',	'2020-07-25 15:05:07',	'2020-07-25 10:05:07'),
-(7,	6,	'Intereses',	'1',	'2019-12-13 02:23:51',	'2020-07-25 15:05:07',	'2020-07-25 10:05:07'),
-(8,	6,	'Gastos por cobrar',	'2',	'2019-12-13 02:23:51',	'2020-07-25 15:05:07',	'2020-07-25 10:05:07'),
-(9,	6,	'Cambio del valor',	'3',	'2019-12-13 02:23:51',	'2020-07-25 15:05:07',	'2020-07-25 10:05:07'),
-(10,	6,	'Otros',	'4',	'2019-12-13 02:23:51',	'2020-07-25 15:05:07',	'2020-07-25 10:05:07');
 
 INSERT INTO `paginas` (`ID`, `Nombre`, `TipoPagina`, `Visible`, `Updated`, `Sync`) VALUES
 (1,	'Admin.php',	'Menu',	1,	'2020-07-25 15:05:21',	'2020-07-25 10:05:21'),
@@ -4620,6 +4619,19 @@ INSERT INTO `respuestas_tipo_item` (`ID`, `Valor`, `Updated`, `Sync`) VALUES
 (1,	'PR',	'2020-07-25 15:06:11',	'2020-07-25 10:06:11'),
 (2,	'MO',	'2020-07-25 15:06:11',	'2020-07-25 10:06:11'),
 (3,	'AQ',	'2020-07-25 15:06:11',	'2020-07-25 10:06:11');
+
+INSERT INTO `servidores` (`ID`, `IP`, `Nombre`, `Usuario`, `Password`, `DataBase`, `Puerto`, `TipoServidor`, `Observaciones`, `Updated`, `Sync`) VALUES
+(1,	'35.188.53.194',	'SERVIDOR GENERAL',	'jalvaran',	'pirlo1985',	'techno_tecnimaco_general',	0,	'MYSQL',	'centralizacion de la informacio',	'2020-07-26 15:08:23',	'2020-07-26 10:08:23'),
+(2,	'35.188.53.194',	'SERVIDOR PARA BACKUPS',	'jalvaran',	'pirlo1985',	'techno_ts5_test',	0,	'MYSQL',	'Backups de la base de datos principal',	'2020-07-25 15:06:36',	'2020-07-25 10:06:36'),
+(100,	'http://35.238.236.240/api/ubl2.1/config/',	'SERVIDOR FACTURACION ELECTRONICA',	'',	'',	'',	0,	'REST',	'Ruta para la creacion de una empresa en el servidor de Facturacion electronica, ver: http://35.238.236.240/api/ubl2.1/documentation',	'2020-07-25 15:06:36',	'2020-07-25 10:06:36'),
+(101,	'http://35.238.236.240/api/ubl2.1/config/software',	'SERVIDOR FACTURACION ELECTRONICA',	'',	'',	'',	0,	'REST',	'Ruta para la configuracion del software en el servidor de Facturacion electronica, ver: http://35.238.236.240/api/ubl2.1/documentation',	'2020-07-25 15:06:36',	'2020-07-25 10:06:36'),
+(102,	'http://35.238.236.240/api/ubl2.1/config/certificate',	'SERVIDOR FACTURACION ELECTRONICA',	'',	'',	'',	0,	'REST',	'Ruta para la configuracion del certificado digital en el servidor de Facturacion electronica, ver: http://35.238.236.240/api/ubl2.1/documentation',	'2020-07-25 15:06:36',	'2020-07-25 10:06:36'),
+(103,	'http://35.238.236.240/api/ubl2.1/config/resolution',	'SERVIDOR FACTURACION ELECTRONICA',	'',	'',	'',	0,	'REST',	'Ruta para la configuracion de la resolucion de facturacion electronica en el servidor de Facturacion electronica, ver: http://35.238.236.240/api/ubl2.1/documentation',	'2020-07-25 15:06:36',	'2020-07-25 10:06:36'),
+(104,	'http://35.238.236.240/api/ubl2.1/invoice/6ce20f05-a1e4-4188-ab56-8d8e366746e6',	'SERVIDOR FACTURACION ELECTRONICA',	'',	'',	'',	0,	'REST',	'Ruta para la el envío de una factura electronica, para habilitar el servidor real dejar la ruta solo hasta invoice  ver: http://35.238.236.240/api/ubl2.1/documentation',	'2020-07-25 15:06:36',	'2020-07-25 10:06:36'),
+(105,	'http://35.238.236.240/api/ubl2.1/credit-note/662be8f7-6f1a-4b34-894c-1e1f0e2f43eb',	'SERVIDOR NOTAS CREDITO ELECTRONICAS',	'',	'',	'',	0,	'REST',	'Ruta para la el envío de una nota credito electronica, para habilitar el servidor real dejar la ruta solo hasta invoice  ver: http://35.238.236.240/api/ubl2.1/documentation',	'2020-07-25 15:06:36',	'2020-07-25 10:06:36'),
+(106,	'http://35.238.236.240/api/ubl2.1/logs/',	'VALIDAR LOGS DE UN DOCUMENTO ELECTRONICO',	'',	'',	'',	0,	'REST',	'Esta ruta devuelve el log de un documento, debe acompañarse por el uuid, ver documentacion: http://35.238.236.240/api/ubl2.1/documentation',	'2020-07-25 15:06:36',	'2020-07-25 10:06:36'),
+(200,	'172.16.26.192',	'SERVIDOR PARA REGISTRO DE GLOSAS',	'admin',	'pirlo1985',	'',	21,	'FTP',	'Servidor FTP para Uso General',	'2020-07-25 15:06:36',	'2020-07-25 10:06:36'),
+(1000,	'35.226.201.57',	'SERVIDOR PARA PLATAFORMA DOMI',	'root',	'pirlo1985',	'ts_domi',	0,	'MYSQL',	'Administrar la plataforma DOMI',	'2020-07-25 15:06:36',	'2020-07-25 10:06:36');
 
 INSERT INTO `subcuentas` (`PUC`, `Nombre`, `Valor`, `SolicitaBase`, `Updated`, `Sync`) VALUES
 (1435,	'Mercancias no fabricadas por la empresa',	'0',	0,	'2020-07-25 15:06:38',	'2020-07-25 10:06:38'),
@@ -6214,6 +6226,7 @@ INSERT INTO `subcuentas` (`PUC`, `Nombre`, `Valor`, `SolicitaBase`, `Updated`, `
 (47057002,	'INGRESOS NO OPERACIONALES POR RECARGOS O INTE',	'0',	0,	'2020-07-25 15:06:38',	'2020-07-25 10:06:38'),
 (51950101,	'Peajes',	'0',	0,	'2020-07-25 15:06:38',	'2020-07-25 10:06:38');
 
+
 INSERT INTO `tablas_campos_control` (`ID`, `NombreTabla`, `Campo`, `Visible`, `Editable`, `Habilitado`, `TipoUser`, `idUser`, `Updated`, `Sync`) VALUES
 (1,	'usuarios',	'Password',	0,	1,	0,	'administrador',	3,	'2020-07-25 15:06:39',	'2020-07-25 10:06:39'),
 (3,	'usuarios',	'Nombre',	1,	1,	1,	'administrador',	3,	'2020-07-25 15:06:39',	'2020-07-25 10:06:39'),
@@ -6314,25 +6327,27 @@ INSERT INTO `tablas_campos_control` (`ID`, `NombreTabla`, `Campo`, `Visible`, `E
 (99,	'facturas',	'NumeroFactura',	1,	1,	1,	'administrador',	3,	'2020-07-25 15:06:39',	'2020-07-25 10:06:39'),
 (100,	'facturas',	'Fecha',	0,	1,	1,	'administrador',	3,	'2020-07-25 15:06:39',	'2020-07-25 10:06:39');
 
-INSERT INTO `tablas_ventas` (`ID`, `NombreTabla`, `idTabla`, `TipoVenta`, `IVAIncluido`, `CuentaPUCDefecto`, `Updated`, `Sync`) VALUES
-(1,	'productosventa',	'idProductosVenta',	'PRODUCTOS',	'SI',	'4135',	'2020-07-25 15:06:39',	'2020-07-25 10:06:39'),
-(2,	'servicios',	'idProductosVenta',	'SERVICIOS',	'SI',	'412060',	'2020-07-25 15:06:39',	'2020-07-25 10:06:39'),
-(3,	'productosalquiler',	'idProductosVenta',	'ALQUILER DE SERVICIOS',	'SI',	'4135',	'2020-07-25 15:06:39',	'2020-07-25 10:06:39');
-
 INSERT INTO `tarjetas_forma_pago` (`ID`, `Tipo`, `Nombre`, `PorcentajeComision`, `CuentaPUC`, `NombreCuenta`, `Updated`, `Sync`) VALUES
 (1,	'CREDITO',	'AMERICAN EXPRESS',	0.03,	11100501,	'CUENTA DE AHORROS DAVIVIENDA',	'2020-07-25 15:06:40',	'2020-07-25 10:06:40'),
 (2,	'CREDITO',	'VISA',	0.04,	11100501,	'CUENTA DE AHORROS DAVIVIENDA',	'2020-07-25 15:06:40',	'2020-07-25 10:06:40'),
 (3,	'DEBITO',	'TARJETAS DEBITO',	0,	11100501,	'CUENTA DE AHORROS DAVIVIENDA',	'2020-07-25 15:06:40',	'2020-07-25 10:06:40');
 
-INSERT INTO `tickets_estados` (`ID`, `Estado`, `Updated`, `Sync`) VALUES
-(1,	'ABIERTO',	'2020-07-25 15:06:41',	'2020-07-25 10:06:41'),
-(2,	'EN ANALISIS',	'2020-07-25 15:06:41',	'2020-07-25 10:06:41'),
-(3,	'RESPONDIDO',	'2020-07-25 15:06:41',	'2020-07-25 10:06:41'),
-(11,	'ARCHIVADO',	'2020-07-25 15:06:41',	'2020-07-25 10:06:41'),
-(10,	'CERRADO',	'2020-07-25 15:06:41',	'2020-07-25 10:06:41'),
-(12,	'ELIMINADO',	'2020-07-25 15:06:41',	'2020-07-25 10:06:41'),
-(4,	'EN DESARROLLO',	'2020-07-25 15:06:41',	'2020-07-25 10:06:41'),
-(5,	'EN PRUEBAS',	'2020-07-25 15:06:41',	'2020-07-25 10:06:41');
+INSERT INTO `tiposretenciones` (`ID`, `Nombre`, `CuentaPasivo`, `NombreCuentaPasivo`, `CuentaActivo`, `NombreCuentaActivo`, `Updated`, `Sync`) VALUES
+(1,	'RETENCION EN LA FUENTE',	'236540',	'Rete Fuente x compras',	'135515',	'Anticipo de Impuestos Retefuente',	'2020-07-25 15:06:44',	'2020-07-25 10:06:44'),
+(2,	'RETEIVA',	'236701',	'IVA retenido',	'135517',	'Anticipo de Impuestos ReteIVA',	'2020-07-25 15:06:44',	'2020-07-25 10:06:44'),
+(3,	'RETE-ICA',	'2368',	'Rete Fuente x ICA',	'135518',	'Anticipo de Impuestos ReteICA',	'2020-07-25 15:06:44',	'2020-07-25 10:06:44');
+
+INSERT INTO `tipo_documento_identificacion` (`ID`, `nombre`, `codigo`, `Updated`, `Sync`) VALUES
+(1,	'Registro civil',	11,	'2020-10-06 21:43:47',	'0000-00-00 00:00:00'),
+(2,	'Tarjeta de identidad',	12,	'2020-10-06 21:43:47',	'0000-00-00 00:00:00'),
+(3,	'Cédula de ciudadanía',	13,	'2020-10-06 21:43:47',	'0000-00-00 00:00:00'),
+(4,	'Tarjeta de extranjería',	21,	'2020-10-06 21:43:47',	'0000-00-00 00:00:00'),
+(5,	'Cédula de extranjería',	22,	'2020-10-06 21:43:47',	'0000-00-00 00:00:00'),
+(6,	'NIT',	31,	'2020-10-06 21:43:47',	'0000-00-00 00:00:00'),
+(7,	'Pasaporte',	41,	'2020-10-06 21:43:47',	'0000-00-00 00:00:00'),
+(8,	'Documento de identificación extranjero',	42,	'2020-10-06 21:43:47',	'0000-00-00 00:00:00'),
+(9,	'NIT de otro país',	50,	'2020-10-06 21:43:47',	'0000-00-00 00:00:00'),
+(10,	'NUIP ',	91,	'2020-10-06 21:43:47',	'0000-00-00 00:00:00');
 
 
 INSERT INTO `usuarios` (`idUsuarios`, `Nombre`, `Apellido`, `Identificacion`, `Telefono`, `Login`, `Password`, `TipoUser`, `Cargo`, `Proceso`, `Email`, `Role`, `Habilitado`, `Updated`, `Sync`) VALUES
@@ -6341,11 +6356,4 @@ INSERT INTO `usuarios` (`idUsuarios`, `Nombre`, `Apellido`, `Identificacion`, `T
 (3,	'JULIAN ANDRES',	'ALVARAN',	'94481747',	'3177740609',	'jalvaran',	'pirlo1985',	'administrador',	00000,	00000,	'jalvaran@gmail.com',	'SUPERVISOR',	'SI',	'2020-07-25 15:06:47',	'2020-07-25 10:06:47'),
 (4,	'WILSON',	'ALBERTO MOSQUERA',	'1',	'318 5658225',	'wamc',	'f5dc2d19e23c69e58e398ea72ae06fd4',	'comercial',	00000,	00000,	'no',	'ADMINISTRADOR',	'SI',	'2020-07-25 15:06:47',	'2020-07-25 10:06:47');
 
-INSERT INTO `usuarios_tipo` (`ID`, `Tipo`, `Updated`, `Sync`) VALUES
-(1,	'administrador',	'2020-07-25 15:06:47',	'2020-07-25 10:06:47'),
-(2,	'operador',	'2020-07-25 15:06:47',	'2020-07-25 10:06:47'),
-(3,	'comercial',	'2020-07-25 15:06:47',	'2020-07-25 10:06:47'),
-(4,	'cajero',	'2020-07-25 15:06:47',	'2020-07-25 10:06:47'),
-(5,	'bodega',	'2020-07-25 15:06:47',	'2020-07-25 10:06:47');
-
--- 2020-09-26 13:10:14
+-- 2021-01-07 16:09:59

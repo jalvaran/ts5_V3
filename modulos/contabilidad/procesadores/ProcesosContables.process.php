@@ -235,21 +235,27 @@ if( !empty($_REQUEST["Accion"]) ){
                     if(!isset($Flags[$CuentaPUC]) and isset($CuentasTraslados["CmbTercero"][$CuentaPUC]) and $CuentasTraslados["CmbTercero"][$CuentaPUC]<>''){
                         $Flags[$CuentaPUC]=1;
                         $TipoMovimiento="DB";
+                        $TipoMovimientoMes13="CR";
                         if($CuentasTraslados["SaldoCuenta"][$CuentaPUC]<0){
                             $TipoMovimiento="CR";
+                            $TipoMovimientoMes13="DB";
                         }
                         
                         $obCon->AgregaMovimientoDocumentoContable($idDocumento, $CuentasTraslados["CmbTercero"][$CuentaPUC], $CuentaPUC, $TipoMovimiento, abs($CuentasTraslados["SaldoCuenta"][$CuentaPUC]), "Cierre Contable Año $Anio","Cierre $Anio",  "",$FechaTraslado);
+                        $obCon->AgregaMovimientoDocumentoContable($idDocumento, $CuentasTraslados["CmbTercero"][$CuentaPUC], $CuentaPUC, $TipoMovimientoMes13, abs($CuentasTraslados["SaldoCuenta"][$CuentaPUC]), "Cierre Contable Año $Anio","Cierre $Anio",  "",$FechaMes13);
                         continue;
                     }
                     if(!isset($Flags[$CuentaPUC])){
                         $TipoMovimiento="DB";
+                        $TipoMovimientoMes13="CR";
                         if($Saldo<0){
                             $TipoMovimiento="CR";
+                            $TipoMovimientoMes13="DB";
                         }
 
                         $obCon->AgregaMovimientoDocumentoContable($idDocumento, $Tercero, $CuentaPUC, $TipoMovimiento, abs($Saldo), "Cierre Contable Año $Anio","Cierre $Anio",  "",$FechaTraslado);
-                
+                        $obCon->AgregaMovimientoDocumentoContable($idDocumento, $Tercero, $CuentaPUC, $TipoMovimientoMes13, abs($Saldo), "Cierre Contable Año $Anio","Cierre $Anio",  "",$FechaMes13);
+                        
                     }    
                 }
                 

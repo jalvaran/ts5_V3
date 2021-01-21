@@ -3416,7 +3416,9 @@ $tbl.= "</table>";
         $Debitos=0;
         $Creditos=0;
         $TotalMovimiento=0;
+        $TotalRegistros=0;
         while($DatosLibro=$this->obCon->FetchArray($Consulta)){
+            $TotalRegistros++;
             $Debitos=$Debitos+$DatosLibro["Debito"];
             $Creditos=$Creditos+$DatosLibro["Credito"];
             $TotalMovimiento=$TotalMovimiento+$DatosLibro["Debito"]-$DatosLibro["Credito"];
@@ -3454,6 +3456,11 @@ $tbl.= "</table>";
             }
         }
         $Back='#F7F8E0';
+        $html.='<tr > '
+                . '<td align="rigth" colspan="6" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">Total Registros:</td>'
+                . '<td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($TotalRegistros).'</td>
+                   <td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> </td>'
+                . '</tr>';
         $html.='<tr > '
                 . '<td align="rigth" colspan="6" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">Movimientos:</td>'
                 . '<td style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($Debitos).'</td>

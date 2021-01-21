@@ -430,6 +430,7 @@ class AcuerdoPago extends ProcesoVenta{
         $Tercero=$DatosAcuerdo["Tercero"];
         $DatosTercero=$this->DevuelveValores("clientes", "Num_Identificacion", $Tercero);
         $Puntaje=$DatosTercero["Puntaje"];
+        $Puntaje=80;
         if($ValorAbono>$Saldo){
             exit("E1;El valor del Abono supera el saldo del Cliente");
         }
@@ -535,6 +536,7 @@ class AcuerdoPago extends ProcesoVenta{
         $Tercero=$DatosAcuerdo["Tercero"];
         $DatosTercero=$this->DevuelveValores("clientes", "Num_Identificacion", $Tercero);
         $Puntaje=$DatosTercero["Puntaje"];
+        $Puntaje=80;
         if($ValorAbono>$SaldoAPagarCuota){
             exit("E1;El valor del Abono supera el saldo de la Cuota");
         }

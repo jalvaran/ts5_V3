@@ -1041,3 +1041,6 @@ ADD INDEX `Departamento` (`Departamento`);
 INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
 ('',	'Informe Administrador 2',	7,	11,	0,	'',	0,	'',	'informes_administracion.php',	'_BLANK',	1,	'informes5.png',	1,	'2019-01-13 09:12:44',	'2019-01-13 09:12:44');
 
+ALTER TABLE `facturas_electronicas_estados_acuse`
+CHANGE `ID` `ID` varchar(2) COLLATE 'utf8_spanish_ci' NOT NULL FIRST;
+

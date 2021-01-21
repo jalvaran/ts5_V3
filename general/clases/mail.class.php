@@ -113,7 +113,7 @@ class TS_Mail extends ProcesoVenta{
         $mail->IsHTML(true);
         $mail->Subject = $asunto;
         $mail->Body = $mensajeHTML;
-        if($Adjuntos[0]<>''){
+        if(isset($Adjuntos[0]) and $Adjuntos[0]<>''){
             foreach ($Adjuntos as $value) {
                 $Vector=explode('/',$value);
                 $Total=count($Vector);

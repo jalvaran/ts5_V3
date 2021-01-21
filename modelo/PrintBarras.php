@@ -148,7 +148,7 @@ class Barras extends ProcesoVenta{
         
 
         fwrite($handle,"SIZE 4,1.1".$enter);
-        fwrite($handle,"GAP 4 mm,0".$enter);
+        fwrite($handle,"GAP 1 mm,0".$enter);
         fwrite($handle,"DIRECTION 1".$enter);
         fwrite($handle,"CLS".$enter);
         fwrite($handle,'TEXT '.$L1.','.$AL1.',"2",0,1,1,"'.$RazonSocial.'"'.$enter);

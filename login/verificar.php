@@ -32,6 +32,7 @@ include("../modelo/php_conexion.php");
 			$_SESSION['apellido'] = $sesion["Apellido"];
 			$_SESSION['tipouser'] = $sesion["TipoUser"];
 			$_SESSION['idUser'] = $sesion["idUsuarios"];
+                        $_SESSION['Role'] = $sesion["Role"];
 	        if($_POST["US"] == "techno" and $_POST["PA"] == "technosoluciones"){
 				$_SESSION['nombre'] = "Techno";
 				$_SESSION['apellido'] = "Soluciones";

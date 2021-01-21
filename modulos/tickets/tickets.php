@@ -132,7 +132,7 @@ $css->PageInit($myTitulo);
             
             $css->select("CmbFiltroUsuario", "form-control", "CmbFiltroUsuario", "", "", "onchange=VerListadoTickets()", "");
                 
-                if($_SESSION["Role"]=='SUPERVISOR'){
+                if($_SESSION["Role"]=='SUPERVISOR' or $_SESSION["Role"]=='ADMINISTRADOR'){
                     $css->option("", "", "", 1, "", "");
                         print("De Todos los Usuarios");
                     $css->Coption();

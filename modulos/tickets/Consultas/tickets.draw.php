@@ -26,15 +26,15 @@ if( !empty($_REQUEST["Accion"]) ){
             
             if($CmbEstadoTicketsListado==0){
                 $Condicional=" WHERE Estado>9 ";
-                $OrderBy=" ORDER BY Prioridad DESC,FechaActualizacion DESC";
+                $OrderBy=" ORDER BY FechaActualizacion DESC";
             }
             if($CmbEstadoTicketsListado==1){
                 $Condicional=" WHERE Estado<=9 ";
-                $OrderBy=" ORDER BY Prioridad DESC,FechaActualizacion ASC";
+                $OrderBy=" ORDER BY FechaActualizacion DESC";
             }
             if($CmbEstadoTicketsListado==3){
                 $Condicional=" WHERE Estado>0 ";
-                $OrderBy=" ORDER BY Prioridad DESC,FechaActualizacion DESC";
+                $OrderBy=" ORDER BY FechaActualizacion DESC";
             }
             if($CmbFiltroUsuario==2){
                 $Condicional.=" AND (idUsuarioSolicitante='$idUser' or idUsuarioAsignado='$idUser') ";

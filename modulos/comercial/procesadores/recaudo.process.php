@@ -10,6 +10,7 @@ $fecha=date("Y-m-d");
 include_once("../../../modelo/php_conexion.php");
 include_once("../../../modelo/PrintPos.php");
 include_once("../../../general/clases/contabilidad.class.php");
+include_once("../../../general/clases/sms_cobros_pradera.php");
 
 if( !empty($_REQUEST["Accion"]) ){
     
@@ -87,6 +88,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $obPrint->ComprobanteIngresoPOS($idComprobante, "", 1);
             $LinkComprobante="procesadores/recaudo.process.php?Accion=2&comprobante_id=$idComprobante";
             $Mensaje="<br><strong>Comprobande de ingreso No. $idComprobante Creado Correctamente </strong><a href='$LinkComprobante'  target='blank'> Imprimir</a>";
+            $datos_tercero=$obCon->DevuelveValores("clientes", "Num_Identificacion", $Tercero);
+            $msg="Estimado(a) ".$datos_tercero["RazonSocial"].", S.A TELECOMUNICACIONES te informa que tu pago por un valor de $". number_format($ValorAbono)." ha sido recibido y procesado con la referencia CI ".$idComprobante.", tu nuevo saldo es: $". number_format($NuevoSaldo).", Gracias por preferirnos.";
+            $respuesta=enviarsms(str_ireplace(" ", "", $datos_tercero["Telefono"]), $msg, " ");
             
             print("OK;Pago Ingresado, Nuevo saldo del Tercero <strong>$Tercero</strong>: <h2><strong>". number_format($NuevoSaldo)."</h2></strong>;$Mensaje");
         break; //fin caso 1
@@ -101,7 +105,18 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;//Fin caso 2    
           
-        
+        case 3://Prueba un sms
+            
+            $respuesta=enviarsms("3177740609", "Hola, este es un mensaje de prueba", "Referencia de Prueba");
+            
+            if($respuesta==1){
+                print("OK;Mensaje enviado");
+            }else{
+                print("E1;Error $respuesta");
+            }
+         
+            
+        break;//fin caso 3    
     }
     
     

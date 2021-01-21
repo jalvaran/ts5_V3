@@ -150,7 +150,10 @@ class Factura_Electronica extends ProcesoVenta{
             $adq_tipo_documento=$DatosTiposDocumento["ID"];
         }
         if($DatosCliente["TipoOrganizacion"]==0){
-            $AdqTipoOrganizacion=2;  //Juridico
+            $AdqTipoOrganizacion=2;  //no responsable
+        }
+        if($DatosCliente["TipoOrganizacion"]==1 or $AdqTipoPersona==1){
+            $AdqTipoOrganizacion=1;  //responsable
         }
         if($AdqDireccion==''){
             $AdqDireccion="CALLE 1 1 106";
@@ -166,8 +169,10 @@ class Factura_Electronica extends ProcesoVenta{
             $AdqContactoMail='no@gmail.com';
         }
         $idFormaPago=2;
+        $dias_vencimiento=30;
         if($DatosFactura["FormaPago"]=="Contado"){
             $idFormaPago=1;
+            $dias_vencimiento=1;
         }
         $Sinc="false";
         if($MetodoEnvio==1){
@@ -188,7 +193,7 @@ class Factura_Electronica extends ProcesoVenta{
             "type_regime_id": '.$EmpresaTipoCompania.', 
             "customer": {
                 "identification_number": '.$AdqNit.',
-                "type_organization_id": '.$AdqTipoOrganizacion.',
+                "type_organization_id": '.$AdqTipoPersona.',
                 "type_document_identification_id": '.$adq_tipo_documento.',    
                 "type_regime_id": '.$AdqTipoOrganizacion.',     
                 "name": "'.$AdqRazonSocial.'",
@@ -205,7 +210,7 @@ class Factura_Electronica extends ProcesoVenta{
                 "payment_form_id": "'.$idFormaPago.'",
                 "payment_method_id": "10",
                 "payment_due_date": "'.$FechaVencimiento.'",
-                "duration_measure": "30"
+                "duration_measure": "'.$dias_vencimiento.'"
             }],
             ';
         if($DatosFactura["ObservacionesFact"]<>''){
@@ -401,6 +406,7 @@ class Factura_Electronica extends ProcesoVenta{
                 "discrepancy_response": {
                     "correction_concept_id": 1
                 },';
+        
         $Sinc="false";
         if($MetodoEnvio==1){
             $Sinc="true";
@@ -425,6 +431,14 @@ class Factura_Electronica extends ProcesoVenta{
             },
             
             ';
+        
+        if($DatosNota["Observaciones"]<>''){
+            $observaciones=$this->limpiar_cadena($DatosNota["Observaciones"]);
+            $json_factura.=' 
+            "notes": [{
+                "text":"'.$observaciones.'"
+            }],';
+        }
         
         $json_factura.='"tax_totals": [';
         $sql="SELECT SUM(SubtotalItem) as Subtotal, SUM(IVAItem) as IVA, SUM(TotalItem) as Total,PorcentajeIVA FROM notas_credito_items 
