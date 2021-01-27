@@ -9,6 +9,7 @@ $idUser=$_SESSION['idUser'];
 
 include_once("../clases/inteligencia.class.php");
 include_once("../clases/inteligenciaExcel.class.php");
+include_once("../clases/pdf_inteligencia.class.php");
 include_once("../../../general/clases/mail.class.php");
 if( !empty($_REQUEST["Accion"]) ){
     $obCon = new Inteligencia($idUser);
@@ -53,7 +54,14 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $obMail->EnviarMailXPHPNativo($Destinatario, "klam@gmail.com", "Klam", $Asunto, $Mensaje);
             print("OK;Mensaje Enviado");
-        break;//Fin caso 4    
+        break;//Fin caso 4  
+    
+        case 5://Generar el informe de inteligencia de negocio
+            $fecha_inicial=$obCon->normalizar($_REQUEST['fecha_inicial']);
+            $fecha_final=$obCon->normalizar($_REQUEST['fecha_final']);
+            $obPDF=new PDF_Inteligencia(DB);
+            $obPDF->pdf_inteligencia_negocio($fecha_inicial, $fecha_final, 1);
+        break;//Fin caso 5
         
             
     }

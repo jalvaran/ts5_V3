@@ -1044,3 +1044,31 @@ INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`,
 ALTER TABLE `facturas_electronicas_estados_acuse`
 CHANGE `ID` `ID` varchar(2) COLLATE 'utf8_spanish_ci' NOT NULL FIRST;
 
+ALTER TABLE `clientes`
+ADD `Responsabilidad` int(11) NOT NULL DEFAULT '29' COMMENT 'responsabilidad segun camara de comercio' AFTER `Puntaje`;
+
+ALTER TABLE `proveedores`
+ADD `Responsabilidad` int(11) NOT NULL DEFAULT '29' COMMENT 'responsabilidad segun camara de comercio' AFTER `Puntaje`;
+
+DROP TABLE IF EXISTS `terceros_responsabilidades`;
+CREATE TABLE `terceros_responsabilidades` (
+  `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255)  NOT NULL,
+  `code` char(255)  NOT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `terceros_responsabilidades` (`ID`, `name`, `code`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(5,	'Gran contribuyente',	'O-13',	NULL,	'2019-09-26 23:54:06',	'2019-12-12 20:08:11'),
+(7,	'Autorretenedor',	'O-15',	NULL,	'2019-09-26 23:54:06',	'2019-12-12 20:08:11'),
+(12,	'Agente de retención IVA',	'O-23',	NULL,	'2019-09-26 23:54:06',	'2020-07-23 23:12:15'),
+(20,	'Régimen simple de tributación',	'O-47',	NULL,	'2019-09-26 23:54:06',	'2020-07-23 23:12:15'),
+(29,	'No responsable',	'R-99-PN',	NULL,	'2019-09-26 23:54:06',	'2020-07-13 20:01:29');
+
+INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `CuerpoFormato`, `NotasPiePagina`, `Updated`, `Sync`) VALUES
+(40,	'INFORME DE INTELIGENCIA DEL NEGOCIO',	'001',	'F-GF-002',	'2021-01-27',	'',	'',	'2017-10-13 14:10:40',	'2017-10-13 14:10:40');
+
+

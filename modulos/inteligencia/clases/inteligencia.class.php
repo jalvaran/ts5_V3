@@ -8,10 +8,12 @@ class Inteligencia extends ProcesoVenta{
     function crearVistaProductosPorCliente($FechaInicial,$FechaFinal){
         $sql="DROP VIEW IF EXISTS `vista_productos_x_cliente`;";
         $this->Query($sql);
+        $sql="DROP VIEW IF EXISTS `vista_facturas_x_cliente`;";
+        $this->Query($sql);
         
         $sql="CREATE VIEW vista_productos_x_cliente AS 
                 SELECT t1.ID,t1.Referencia,t1.Nombre,t1.FechaFactura,SUM(t1.Cantidad) as Cantidad, SUM(t1.TotalItem) as TotalItem,
-                t2.Clientes_idClientes as idCliente, t3.RazonSocial,t3.Num_Identificacion             
+                t2.Clientes_idClientes as idCliente, t3.RazonSocial,t3.Num_Identificacion,t3.created as fecha_creacion_cliente              
                 
                 FROM facturas_items t1 INNER JOIN facturas t2 ON t1.idFactura=t2.idFacturas INNER JOIN clientes t3 ON t2.Clientes_idClientes=t3.idClientes 
                 
@@ -24,12 +26,25 @@ class Inteligencia extends ProcesoVenta{
                 (SELECT Clientes_idClientes FROM facturas t2 WHERE t2.idFacturas=t1.idFactura LIMIT 1) AS idCliente,
                 (SELECT FormaPago FROM facturas t2 WHERE t2.idFacturas=t1.idFactura LIMIT 1) AS FormaPago,
                 (SELECT RazonSocial FROM clientes t3 WHERE t3.idClientes=(SELECT idCliente) LIMIT 1) AS RazonSocial,
-                (SELECT Num_Identificacion FROM clientes t3 WHERE t3.idClientes=(SELECT idCliente) LIMIT 1) AS Num_Identificacion 
-                     
+                (SELECT Num_Identificacion FROM clientes t3 WHERE t3.idClientes=(SELECT idCliente) LIMIT 1) AS Num_Identificacion, 
+                (SELECT created FROM clientes t3 WHERE t3.idClientes=(SELECT idCliente) LIMIT 1) AS fecha_creacion_cliente       
                 
                 FROM facturas_items t1  
                 
                 WHERE FechaFactura>='$FechaInicial' AND FechaFactura<='$FechaFinal' GROUP BY FormaPago,Referencia,idCliente;
+                    
+           ";
+        $this->Query($sql);
+        
+        $sql="CREATE VIEW vista_facturas_x_cliente AS 
+                SELECT t1.*,
+                (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=t1.Clientes_idClientes LIMIT 1) AS RazonSocial,
+                (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=t1.Clientes_idClientes LIMIT 1) AS Num_Identificacion,
+                (SELECT Created FROM clientes t2 WHERE t2.idClientes=t1.Clientes_idClientes LIMIT 1) AS fecha_creacion_cliente 
+                
+                FROM facturas t1  
+                
+                WHERE t1.Fecha>='$FechaInicial' AND t1.Fecha<='$FechaFinal' ;
                     
            ";
         $this->Query($sql);

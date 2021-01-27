@@ -44,7 +44,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $Datos["CodigoTarjeta"]=$obCon->normalizar($_REQUEST['CodigoTarjeta']); 
             $Datos["DiaNacimiento"]=$obCon->normalizar($_REQUEST['DiaNacimiento']); 
             $Datos["MesNacimiento"]=$obCon->normalizar($_REQUEST['MesNacimiento']); 
-            
+            if(isset($_REQUEST['Responsabilidad'])){
+                $Datos["Responsabilidad"]=$obCon->normalizar($_REQUEST['Responsabilidad']); 
+            }
             $sqlClientes=$obCon->getSQLInsert("clientes", $Datos);
             $sqlProveedores=$obCon->getSQLInsert("proveedores", $Datos);
             $obCon->Query($sqlClientes);
@@ -106,6 +108,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $Datos["MesNacimiento"]=$obCon->normalizar($_REQUEST['MesNacimiento']); 
             if(!filter_var($Datos["Email"], FILTER_VALIDATE_EMAIL)){
                 exit("E1;El campo Email debe ser del tipo Correo Electronico;Email");
+            }
+            if(isset($_REQUEST['Responsabilidad'])){
+                $Datos["Responsabilidad"]=$obCon->normalizar($_REQUEST['Responsabilidad']); 
             }
             $sqlUpdate=$obCon->getSQLUpdate($Tabla, $Datos);
             $idTabla="idClientes";

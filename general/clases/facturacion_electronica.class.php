@@ -158,6 +158,7 @@ class Factura_Electronica extends ProcesoVenta{
         if($AdqDireccion==''){
             $AdqDireccion="CALLE 1 1 106";
         }
+        $AddResponsabilidad=$DatosCliente["Responsabilidad"];
         $DatosMunicipio=$this->DevuelveValores("catalogo_municipios", "CodigoDANE", $DatosCliente["Cod_Dpto"].$DatosCliente["Cod_Mcipio"]);
         $AdqCiudad=$DatosMunicipio["ID"];
         $AdqContactoTelefono=$DatosCliente["Telefono"];
@@ -201,6 +202,7 @@ class Factura_Electronica extends ProcesoVenta{
                 "address": "'.$AdqDireccion.'",
                 "email": "'.$AdqContactoMail.'",
                 "municipality_id": "'.$municipio_id.'",
+                "type_liability_id": "'.$AddResponsabilidad.'",
                 "merchant_registration": "NA"
             },
             "order_reference": {

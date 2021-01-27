@@ -223,7 +223,7 @@ function EditarTercero(idModal,idBotonModal,idTercero,Tabla){
     var CodigoTarjeta=document.getElementById('CodigoTarjeta').value;
     var cmbDiaCumple=document.getElementById('cmbDiaCumple').value;
     var cmbMesCumple=document.getElementById('cmbMesCumple').value;
-    
+    var Responsabilidad=document.getElementById('Responsabilidad').value;
     if(!$.isNumeric(Num_Identificacion) || Num_Identificacion <= 0){
         alertify.error("El Campo Identificacion debe ser un número mayor a Cero y no puede estar en blanco");
         document.getElementById("Num_Identificacion").style.backgroundColor="pink";
@@ -300,6 +300,7 @@ function EditarTercero(idModal,idBotonModal,idTercero,Tabla){
         form_data.append('Tabla', Tabla);
         form_data.append('DiaNacimiento', cmbDiaCumple);
         form_data.append('MesNacimiento', cmbMesCumple);
+        form_data.append('Responsabilidad', Responsabilidad);
         
         //document.getElementById("RazonSocial").value='';
         

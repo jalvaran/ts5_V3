@@ -126,7 +126,11 @@ while($DatosVentas=$obVenta->FetchArray($Datos)){
         $TipoIva=$DatosVentas["PorcentajeIVA"];
         
             $PIVA= str_replace("%", "", $TipoIva);
-            $PIVA=$PIVA/100;
+            if(is_numeric($PIVA)){
+                    $PIVA=$PIVA/100;
+            }else{
+                    $PIVA=0;
+            }
             
         
         $Total=round($DatosVentas["Total"],-2);

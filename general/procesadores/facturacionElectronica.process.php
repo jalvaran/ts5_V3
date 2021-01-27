@@ -403,10 +403,12 @@ if( !empty($_REQUEST["Accion"]) ){
         break;//Fin caso 9    
         
         case 10://Validar los acuse de recibo de los documentos 
+            
             $Tabla="facturas_electronicas_log";
             $sql="SELECT ID,idFactura,RespuestaCompletaServidor as Respuesta,UUID FROM $Tabla WHERE AcuseRecibo=''";
             $Consulta=($obCon->Query($sql));
             while($DatosDocumento=$obCon->FetchAssoc($Consulta)){
+                
                 if($DatosDocumento["Respuesta"]<>''){
                     $idDocumento=$DatosDocumento["ID"];
                     $DatosDocumento["Respuesta"]=str_replace(PHP_EOL, '', $DatosDocumento["Respuesta"]);
@@ -415,6 +417,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $DatosDocumento["Respuesta"]=str_replace("'", '', $DatosDocumento["Respuesta"]);
                     $response=$DatosDocumento["Respuesta"];
                     $JsonRespuesta= json_decode($response);
+                    //print_r($JsonRespuesta);
                     $UUID2=$DatosDocumento["UUID"];
                     if($UUID2<>''){
                         if($UUID2<>''){
@@ -425,21 +428,29 @@ if( !empty($_REQUEST["Accion"]) ){
                             $url=$url.$uuid;
                             $body="";
                             $response2 = $obCon->callAPI('POST', $url, $body);
-                            $response2=str_replace(PHP_EOL, '', $response2);
-                            $response2=str_replace('\n', '', $response2);
-                            $response2=str_replace('\n', '', $response2);
-                            $response2=str_replace("'", '', $response2);
+                            //$response2=str_replace(PHP_EOL, '', $response2);
+                            //$response2=str_replace('\n', '', $response2);
+                            //$response2=str_replace('\n', '', $response2);
+                            //$response2=str_replace("'", '', $response2);
                             $sql="UPDATE $Tabla SET LogsDocumento='$response2' WHERE ID='$idDocumento'";
                             $obCon->Query($sql);
                             
-                            $JsonLogs= json_decode($response2);
+                            $JsonLogs= json_decode($response2,1);
                             //print_r($JsonLogs);
+                            if(isset($JsonLogs[0]["acknowledgment_received"])){
+                                $Acuse=$JsonLogs[0]["acknowledgment_received"];
+                                
+                            }else{
+                                
+                                $Acuse='';
+                            }
+                            /*
                             if(!(is_object($JsonLogs)) ){
                                 $Acuse='';
                             }else{
                                 $Acuse=($JsonLogs[0]->acknowledgment_received);
                             }
-                            
+                            */
                             if($Acuse==''){
                                 $idFactura=$DatosDocumento["idFactura"];
                                 $sql="SELECT Fecha FROM facturas WHERE idFacturas='$idFactura'";

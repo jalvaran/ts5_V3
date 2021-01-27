@@ -791,6 +791,8 @@ function CrearTercero(){
     var cmbDiaCumple=document.getElementById('cmbDiaCumple').value;
     var cmbMesCumple=document.getElementById('cmbMesCumple').value;
     
+    var Responsabilidad=document.getElementById('Responsabilidad').value;
+    
     if(!$.isNumeric(Num_Identificacion) || Num_Identificacion <= 0){
         alertify.error("El Campo Identificacion debe ser un número mayor a Cero y no puede estar en blanco");
         document.getElementById("Num_Identificacion").style.backgroundColor="pink";
@@ -865,6 +867,7 @@ function CrearTercero(){
         form_data.append('CodigoTarjeta', CodigoTarjeta);
         form_data.append('cmbDiaCumple', cmbDiaCumple);
         form_data.append('cmbMesCumple', cmbMesCumple);
+        form_data.append('Responsabilidad', Responsabilidad);
         
         document.getElementById("RazonSocial").value='';
         

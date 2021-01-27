@@ -140,6 +140,28 @@ if( !empty($_REQUEST["Accion"]) ){
                     print("</td>");
                 $css->CierraFilaTabla();
                 
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Responsabilidad</strong>", 1);
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                
+                
+                    print("<td>");
+                        $css->select("Responsabilidad", "form-control", "Responsabilidad", "", "", "", "");
+                            $Consulta=$obCon->ConsultarTabla("terceros_responsabilidades", "");
+                            while($DatosResponsabilidad=$obCon->FetchAssoc($Consulta)){
+                                $sel=0;
+                                if($DatosResponsabilidad["ID"]==29){
+                                    $sel=1;
+                                }
+                                $css->option("", "", "", $DatosResponsabilidad["ID"], "", "", $sel);
+                                    print($DatosResponsabilidad["ID"]." ".$DatosResponsabilidad["name"]." ".$DatosResponsabilidad["code"]);
+                                $css->Coption();
+                            }    
+                        $css->Cselect();
+                    print("</td>");
+                $css->CierraFilaTabla();
             $css->CerrarTabla();
         break;//Fin caso 1
         
@@ -458,6 +480,29 @@ if( !empty($_REQUEST["Accion"]) ){
                                 $css->Coption();
                             }
                             
+                        $css->Cselect();
+                    print("</td>");
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Responsabilidad</strong>", 1);
+                $css->CierraFilaTabla();
+                
+                $css->FilaTabla(16);
+                
+                
+                    print("<td>");
+                        $css->select("Responsabilidad", "form-control", "Responsabilidad", "", "", "", "");
+                            $Consulta=$obCon->ConsultarTabla("terceros_responsabilidades", "");
+                            while($DatosResponsabilidad=$obCon->FetchAssoc($Consulta)){
+                                $sel=0;
+                                if($DatosResponsabilidad["ID"]==$DatosTercero["Responsabilidad"]){
+                                    $sel=1;
+                                }
+                                $css->option("", "", "", $DatosResponsabilidad["ID"], "", "", $sel);
+                                    print(utf8_encode($DatosResponsabilidad["ID"]." ".$DatosResponsabilidad["name"]." ".$DatosResponsabilidad["code"]));
+                                $css->Coption();
+                            }    
                         $css->Cselect();
                     print("</td>");
                 $css->CierraFilaTabla();

@@ -342,7 +342,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->div("", "box-body no-padding", "", "", "", "", "");
                 $css->div("", "mailbox-controls", "", "", "", "", "");
                     $css->CrearDiv("", "row", "left", 1, 1);
-                        print('<div class="col-lg-4 col-xs-6">
+                        print('<div class="col-lg-3 col-xs-6">
                                 <!-- small box -->
                                 <div class="small-box bg-aqua">
                                   <div class="inner">
@@ -357,7 +357,7 @@ if( !empty($_REQUEST["Accion"]) ){
                                 </div>
                               </div>');
                         
-                        print('<div class="col-lg-4 col-xs-6">
+                        print('<div class="col-lg-3 col-xs-6">
                                 <!-- small box -->
                                 <div class="small-box bg-orange">
                                   <div class="inner">
@@ -373,7 +373,7 @@ if( !empty($_REQUEST["Accion"]) ){
                               </div>');
                         $CondicionBase64= base64_encode(urlencode($Condicion));
                         $Link="procesadores/inteligencia.process.php?Accion=3&c=$CondicionBase64";
-                        print('<div class="col-lg-4 col-xs-6">
+                        print('<div class="col-lg-3 col-xs-6">
                                 <!-- small box -->
                                 <div class="small-box bg-green">
                                   <div class="inner">
@@ -387,6 +387,23 @@ if( !empty($_REQUEST["Accion"]) ){
                                   
                                 </div>
                               </div>');
+                        
+                        $Link="procesadores/inteligencia.process.php?Accion=5&fecha_inicial=$FechaInicialRangos&fecha_final=$FechaFinalRangos";
+                        print('<div class="col-lg-3 col-xs-6">
+                                <!-- small box -->
+                                <div class="small-box bg-blue">
+                                  <div class="inner">
+                                    <h3>Informe</h3>
+
+                                    <p>Inteligencia de Negocio</p>
+                                  </div>
+                                  <div class="icon">
+                                    <a href="'.$Link.'" target="_blank" class="fa fa-file-pdf-o" style="cursor:pointer" ></a>
+                                  </div>
+                                  
+                                </div>
+                              </div>');
+                        
                     $css->Cdiv();
                      
                                        
