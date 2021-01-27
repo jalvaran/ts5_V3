@@ -1072,3 +1072,9 @@ INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `C
 (40,	'INFORME DE INTELIGENCIA DEL NEGOCIO',	'001',	'F-GF-002',	'2021-01-27',	'',	'',	'2017-10-13 14:10:40',	'2017-10-13 14:10:40');
 
 
+ALTER TABLE `comercial_plataformas_pago_ingresos`
+ADD `fecha_anulacion` datetime NOT NULL AFTER `idUser`,
+ADD `usuario_anulacion` int NOT NULL AFTER `fecha_anulacion`;
+
+ALTER TABLE `comercial_plataformas_pago_ingresos`
+ADD `valor_anulado` double NOT NULL AFTER `usuario_anulacion`;

@@ -136,5 +136,53 @@ function ExportarTablaToExcel(idTabla){
     excel.generate();
 }
 
+function confirma_anular_abono(abono_id){
+    alertify.confirm('Está seguro que desea anular este abono? ',
+        function (e) {
+            if (e) {
+                
+                anular_abono(abono_id);
+            }else{
+                alertify.error("Se canceló el proceso");
+                
+                return;
+            }
+        });
+}
+
+function anular_abono(abono_id){
+      
+    var form_data = new FormData();
+        form_data.append('Accion', 1);
+        form_data.append('abono_id', abono_id);       
+                
+        $.ajax({
+        url: './procesadores/ReportesPlataformas.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+          
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+                CrearReporteIngresos();
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+            }else{
+                alertify.alert(data);
+            }
+         
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })        
+}  
+
 
 document.getElementById('BtnMuestraMenuLateral').click();
