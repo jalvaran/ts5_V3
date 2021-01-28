@@ -463,36 +463,31 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CrearTitulo("Debe seleccionar una fecha final", "rojo");
                 exit();
             }
-                     
-            $sql="SELECT SUM(t1.ValorCuota-t1.ValorPagado) AS Total FROM acuerdo_pago_proyeccion_pagos t1
-                    INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
-                    WHERE (t2.Estado=1 or t2.Estado=2 ) and  t1.Fecha > '$FechaFinalRangos';";
-            $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));
-            $TotalCarteraPosterior=$DatoConsulta["Total"];
             
-            $sql="SELECT SUM(t1.ValorCuota-t1.ValorPagado) AS Total FROM acuerdo_pago_proyeccion_pagos t1
+            $sql="SELECT SUM(ValorCuota) AS Total FROM acuerdo_pago_proyeccion_pagos t1
+                    INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
+                    WHERE (t2.Estado=1 or t2.Estado=2 ) and  t1.Fecha >= '$FechaInicialRangos' AND t1.Fecha <= '$FechaFinalRangos';";
+            
+            
+            $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));
+            $TotalCarteraActual=$DatoConsulta["Total"];
+            
+            $DatosGenerales= $obCon->DevuelveValores("configuracion_general", "ID", 30);//Verifico cuantos dias de plazo tiene un cliente para pagar
+            $DiasPlazo=$DatosGenerales["Valor"];
+            $FechaFinalPlazo=$obCon->SumeDiasAFechaAcuerdo($FechaFinalRangos, $DiasPlazo);
+            $FechaInicialPlazo=$obCon->ResteDiasAFechaAcuerdo($FechaFinalRangos, $DiasPlazo);
+            
+            $sql="SELECT SUM(ValorCuota-ValorPagado) AS Total FROM acuerdo_pago_proyeccion_pagos t1
                     INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
                     WHERE (t2.Estado=1 or t2.Estado=2 ) and  t1.Fecha < '$FechaInicialRangos';";
             $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));
             $TotalCarteraVencida=$DatoConsulta["Total"];
             
-            $sql="SELECT SUM(t1.ValorPago) AS TotalPagado,
-                    SUM(t2.ValorCuota) AS TotalXRecaudar,t1.idUser, 
-                    (SELECT CONCAT(Nombre,' ',Apellido ) FROM usuarios t3 WHERE t3.idUsuarios=t1.idUser) as nombre_usuario 
-                    FROM acuerdo_pago_cuotas_pagadas t1 
-                    INNER JOIN acuerdo_pago_proyeccion_pagos t2 ON t1.idProyeccion =t2.ID 
-                    WHERE t1.FechaPago>='$FechaInicialRangos' AND t1.FechaPago<='$FechaFinalRangos' AND t1.Estado<10 
-                    AND t2.Fecha>= '$FechaInicialRangos' AND t2.Fecha<='$FechaFinalRangos' group by t1.idUser ORDER BY TotalPagado DESC;
-                    ";
-            $consulta=$obCon->Query($sql);
-            $TotalCarteraActual=0;
-            $datos_gestion_cartera=[];
-            while($datos_consulta=$obCon->FetchAssoc($consulta)){
-                $user_id=$datos_consulta["idUser"];
-                $TotalCarteraActual=$TotalCarteraActual+$datos_consulta["TotalXRecaudar"];                
-                $datos_gestion_cartera["Actual"][$user_id]["Total"]=$datos_consulta["TotalPagado"];
-                $datos_gestion_cartera["Actual"][$user_id]["nombre_usuario"]=$datos_consulta["nombre_usuario"];
-            }
+            $sql="SELECT SUM(ValorCuota) AS Total FROM acuerdo_pago_proyeccion_pagos t1
+                    INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
+                    WHERE (t2.Estado=1 or t2.Estado=2 ) and  t1.Fecha > '$FechaFinalRangos';";
+            $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));
+            $TotalCarteraFutura=$DatoConsulta["Total"];
             
             $css->CrearTabla("TablaCumplimiento");
                 $css->FilaTabla(16);
@@ -511,165 +506,6 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>CUMPLIMIENTO</strong>", 1); 
                     $css->ColTabla("<strong>SALDO CARTERA</strong>", 1); 
                 $css->CierraFilaTabla();
-                $total_recaudo_usuarios=0;
-                $porcentaje_total=0;
-                foreach ($datos_gestion_cartera["Actual"] as $key => $value) {
-                    
-                    $recaudo_x_usuario=$datos_gestion_cartera["Actual"][$key]["Total"];
-                    $total_recaudo_usuarios=$total_recaudo_usuarios+$recaudo_x_usuario;
-                    $divisor=$recaudo_x_usuario;
-                    if($recaudo_x_usuario==0){
-                        $divisor=1;
-                    }
-                    $porcentaje=round((100/$TotalCarteraActual)*$recaudo_x_usuario,2);
-                    $porcentaje_total=$porcentaje_total+$porcentaje;
-                    $css->FilaTabla(16);
-                        $css->ColTabla($datos_gestion_cartera["Actual"][$key]["nombre_usuario"], 1); 
-                        $css->ColTabla("<strong>". number_format($recaudo_x_usuario)."</strong>", 1,"R");
-                        $css->ColTabla($porcentaje."%", 1,"R"); 
-                        $css->ColTabla("", 1); 
-                    $css->CierraFilaTabla();
-                }
-                
-                $css->FilaTabla(16);
-                    $css->ColTabla("", 1); 
-                    $css->ColTabla("<strong>". number_format($total_recaudo_usuarios)."</strong>", 1,"R");
-                    $css->ColTabla("<strong>". number_format($porcentaje_total,2)."%</strong>", 1,"R"); 
-                    $css->ColTabla("<strong>". number_format($TotalCarteraActual-$total_recaudo_usuarios)."</strong>", 1,"R"); 
-                $css->CierraFilaTabla();
-                
-             /*
-              * Recaudo cartera vencida
-              */   
-                $sql="SELECT SUM(t1.ValorPago) AS TotalPagado,
-                    SUM(t2.ValorCuota) AS TotalXRecaudar,t1.idUser, 
-                    (SELECT CONCAT(Nombre,' ',Apellido ) FROM usuarios t3 WHERE t3.idUsuarios=t1.idUser) as nombre_usuario 
-                    FROM acuerdo_pago_cuotas_pagadas t1 
-                    INNER JOIN acuerdo_pago_proyeccion_pagos t2 ON t1.idProyeccion =t2.ID 
-                    WHERE t1.FechaPago>='$FechaInicialRangos' AND t1.FechaPago<='$FechaFinalRangos' AND t1.Estado<10 
-                    AND t2.Fecha < '$FechaInicialRangos' group by t1.idUser ORDER BY TotalPagado DESC;
-                    ";
-            $consulta=$obCon->Query($sql);
-            $total_recaudos_vencidos=0;
-            $datos_gestion_cartera=[];
-            while($datos_consulta=$obCon->FetchAssoc($consulta)){
-                $user_id=$datos_consulta["idUser"];
-                $total_recaudos_vencidos=$total_recaudos_vencidos+$datos_consulta["TotalPagado"];       
-                $datos_gestion_cartera["Vencida"][$user_id]["Total"]=$datos_consulta["TotalPagado"];
-                $datos_gestion_cartera["Vencida"][$user_id]["nombre_usuario"]=$datos_consulta["nombre_usuario"];
-            }
-            
-            $TotalCarteraVencida=$TotalCarteraVencida+$total_recaudos_vencidos;
-                $css->FilaTabla(16);
-                    $css->ColTabla("<strong>CARTERA VENCIDA MENOR A $FechaInicialRangos </strong>", 3,'C');
-                    $css->ColTabla("<strong>".number_format($TotalCarteraVencida)."</strong>", 1,'R');
-                $css->CierraFilaTabla();
-                $css->FilaTabla(16);
-                    $css->ColTabla("<strong>USUARIO</strong>", 1); 
-                    $css->ColTabla("<strong>RECAUDO</strong>", 1);
-                    $css->ColTabla("<strong>CUMPLIMIENTO</strong>", 1); 
-                    $css->ColTabla("<strong>SALDO CARTERA</strong>", 1); 
-                $css->CierraFilaTabla();
-                $total_recaudo_usuarios=0;
-                $porcentaje_total=0;
-                foreach ($datos_gestion_cartera["Vencida"] as $key => $value) {
-                    
-                    $recaudo_x_usuario=$datos_gestion_cartera["Vencida"][$key]["Total"];
-                    $total_recaudo_usuarios=$total_recaudo_usuarios+$recaudo_x_usuario;
-                    $divisor=$recaudo_x_usuario;
-                    if($recaudo_x_usuario==0){
-                        $divisor=1;
-                    }
-                    $porcentaje=round((100/$TotalCarteraVencida)*$recaudo_x_usuario,2);
-                    $porcentaje_total=$porcentaje_total+$porcentaje;
-                    $css->FilaTabla(16);
-                        $css->ColTabla($datos_gestion_cartera["Vencida"][$key]["nombre_usuario"], 1); 
-                        $css->ColTabla("<strong>". number_format($recaudo_x_usuario)."</strong>", 1,"R");
-                        $css->ColTabla($porcentaje."%", 1,"R"); 
-                        $css->ColTabla("", 1); 
-                    $css->CierraFilaTabla();
-                }
-                
-                $css->FilaTabla(16);
-                    $css->ColTabla("", 1); 
-                    $css->ColTabla("<strong>". number_format($total_recaudo_usuarios)."</strong>", 1,"R");
-                    $css->ColTabla("<strong>". number_format($porcentaje_total,2)."%</strong>", 1,"R"); 
-                    $css->ColTabla("<strong>". number_format($TotalCarteraVencida-$total_recaudo_usuarios)."</strong>", 1,"R"); 
-                $css->CierraFilaTabla();
-                
-                /*
-              * Recaudo cartera posterior
-              */   
-                $sql="SELECT SUM(t1.ValorPago) AS TotalPagado,
-                    SUM(t2.ValorCuota) AS TotalXRecaudar,t1.idUser, 
-                    (SELECT CONCAT(Nombre,' ',Apellido ) FROM usuarios t3 WHERE t3.idUsuarios=t1.idUser) as nombre_usuario 
-                    FROM acuerdo_pago_cuotas_pagadas t1 
-                    INNER JOIN acuerdo_pago_proyeccion_pagos t2 ON t1.idProyeccion =t2.ID 
-                    WHERE t1.FechaPago>='$FechaInicialRangos' AND t1.FechaPago<='$FechaFinalRangos' AND t1.Estado<10 
-                    AND t2.Fecha > '$FechaFinalRangos' group by t1.idUser ORDER BY TotalPagado DESC;
-                    ";
-            $consulta=$obCon->Query($sql);
-            
-            $datos_gestion_cartera=[];
-            while($datos_consulta=$obCon->FetchAssoc($consulta)){
-                $user_id=$datos_consulta["idUser"];
-                           
-                $datos_gestion_cartera["Posterior"][$user_id]["Total"]=$datos_consulta["TotalPagado"];
-                $datos_gestion_cartera["Posterior"][$user_id]["nombre_usuario"]=$datos_consulta["nombre_usuario"];
-            }
-            
-            
-                $css->FilaTabla(16);
-                    $css->ColTabla("<strong>CARTERA POSTERIOR A $FechaFinalRangos </strong>", 3,'C');
-                    $css->ColTabla("<strong>".number_format($TotalCarteraPosterior)."</strong>", 1,'R');
-                $css->CierraFilaTabla();
-                $css->FilaTabla(16);
-                    $css->ColTabla("<strong>USUARIO</strong>", 1); 
-                    $css->ColTabla("<strong>RECAUDO</strong>", 1);
-                    $css->ColTabla("<strong>CUMPLIMIENTO</strong>", 1); 
-                    $css->ColTabla("<strong>SALDO CARTERA</strong>", 1); 
-                $css->CierraFilaTabla();
-                $total_recaudo_usuarios=0;
-                $porcentaje_total=0;
-                foreach ($datos_gestion_cartera["Posterior"] as $key => $value) {
-                    
-                    $recaudo_x_usuario=$datos_gestion_cartera["Posterior"][$key]["Total"];
-                    $total_recaudo_usuarios=$total_recaudo_usuarios+$recaudo_x_usuario;
-                    $divisor=$recaudo_x_usuario;
-                    if($recaudo_x_usuario==0){
-                        $divisor=1;
-                    }
-                    $porcentaje=round((100/$TotalCarteraPosterior)*$recaudo_x_usuario,2);
-                    $porcentaje_total=$porcentaje_total+$porcentaje;
-                    $css->FilaTabla(16);
-                        $css->ColTabla($datos_gestion_cartera["Posterior"][$key]["nombre_usuario"], 1); 
-                        $css->ColTabla("<strong>". number_format($recaudo_x_usuario)."</strong>", 1,"R");
-                        $css->ColTabla($porcentaje."%", 1,"R"); 
-                        $css->ColTabla("", 1); 
-                    $css->CierraFilaTabla();
-                }
-                
-                $css->FilaTabla(16);
-                    $css->ColTabla("", 1); 
-                    $css->ColTabla("<strong>". number_format($total_recaudo_usuarios)."</strong>", 1,"R");
-                    $css->ColTabla("<strong>". number_format($porcentaje_total,2)."%</strong>", 1,"R"); 
-                    $css->ColTabla("<strong>". number_format($TotalCarteraPosterior-$total_recaudo_usuarios)."</strong>", 1,"R"); 
-                $css->CierraFilaTabla();
-            
-            /*
-            $sql="SELECT SUM(ValorCuota-ValorPagado) AS Total FROM acuerdo_pago_proyeccion_pagos t1
-                    INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
-                    WHERE (t2.Estado=1 or t2.Estado=2 ) and  t1.Fecha < '$FechaInicialRangos';";
-            $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));
-            $TotalCarteraVencida=$DatoConsulta["Total"];
-            
-            $sql="SELECT SUM(ValorCuota) AS Total FROM acuerdo_pago_proyeccion_pagos t1
-                    INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
-                    WHERE (t2.Estado=1 or t2.Estado=2 ) and  t1.Fecha > '$FechaFinalRangos';";
-            $DatoConsulta=$obCon->FetchAssoc($obCon->Query($sql));
-            $TotalCarteraFutura=$DatoConsulta["Total"];
-            
-            
                 $sql="SELECT SUM(ValorPago) AS Total,t1.idUser FROM acuerdo_pago_cuotas_pagadas t1 
                     WHERE FechaPago>='$FechaInicialRangos' AND FechaPago<='$FechaFinalRangos' AND t1.Estado<10 AND 
                      EXISTS 
@@ -795,8 +631,6 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>". number_format($PorcentajeTotal,2)."</strong>", 1,'R');
                     $css->ColTabla("<strong>". number_format($TotalCarteraFutura-$TotalRecaudoUsuarios)."</strong>", 1,'R');
                 $css->CierraFilaTabla();
-             * 
-             */
             $css->CerrarTabla();
             
         break;//fin caso 4    

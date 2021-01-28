@@ -418,7 +418,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $FechaFinalRangos=$obCon->normalizar($_REQUEST["FechaFinalRangos"]);
             $cmbCicloPagos=$obCon->normalizar($_REQUEST["cmbCicloPagos"]);
             $cmbTiposCuota=$obCon->normalizar($_REQUEST["cmbTiposCuota"]);
-            $Condicion=" WHERE ID>0 ";
+            $Condicion=" WHERE estado_cuota<10 ";
             
             if($Busqueda<>''){
                 $Condicion.=" AND (ID = '$Busqueda' or idAcuerdoPago like '$Busqueda%')";
@@ -428,10 +428,10 @@ if( !empty($_REQUEST["Accion"]) ){
                 $Condicion.=" AND (Tercero = '$idCliente')";
             }
             if($FechaInicialRangos<>''){
-                $Condicion.=" AND (Created >= '$FechaInicialRangos')";
+                $Condicion.=" AND (Fecha >= '$FechaInicialRangos')";
             }
             if($FechaFinalRangos<>''){
-                $Condicion.=" AND (Created <= '$FechaFinalRangos')";
+                $Condicion.=" AND (Fecha <= '$FechaFinalRangos')";
             }
             if($cmbCicloPagos<>''){
                 $Condicion.=" AND (CicloPagos = '$cmbCicloPagos')";

@@ -1069,7 +1069,7 @@ INSERT INTO `terceros_responsabilidades` (`ID`, `name`, `code`, `deleted_at`, `c
 (29,	'No responsable',	'R-99-PN',	NULL,	'2019-09-26 23:54:06',	'2020-07-13 20:01:29');
 
 INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `CuerpoFormato`, `NotasPiePagina`, `Updated`, `Sync`) VALUES
-(40,	'INFORME DE INTELIGENCIA DEL NEGOCIO',	'001',	'F-GF-002',	'2021-01-27',	'',	'',	'2017-10-13 14:10:40',	'2017-10-13 14:10:40');
+(41,	'INFORME DE INTELIGENCIA DEL NEGOCIO',	'001',	'F-GF-002',	'2021-01-27',	'',	'',	'2017-10-13 14:10:40',	'2017-10-13 14:10:40');
 
 
 ALTER TABLE `comercial_plataformas_pago_ingresos`
@@ -1078,3 +1078,8 @@ ADD `usuario_anulacion` int NOT NULL AFTER `fecha_anulacion`;
 
 ALTER TABLE `comercial_plataformas_pago_ingresos`
 ADD `valor_anulado` double NOT NULL AFTER `usuario_anulacion`;
+
+ALTER TABLE `acuerdo_pago_cuotas_pagadas`
+ADD INDEX `Estado` (`Estado`);
+
+

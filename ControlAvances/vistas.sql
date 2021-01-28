@@ -483,7 +483,7 @@ t2.CicloPagos,
 (SELECT t8.NombreCiclo FROM acuerdo_pago_ciclos_pagos t8 WHERE t8.ID=t2.CicloPagos LIMIT 1 ) AS NombreCicloPagos,
 t2.Estado as EstadoAcuerdo,
 (SELECT t7.NombreEstado FROM acuerdo_pago_estados t7 WHERE t7.ID=t2.Estado) as NombreEstadoAcuerdo,t1.idCierre,
-t1.Created 
+t1.Created,t1.Estado as estado_cuota  
 FROM acuerdo_pago_cuotas_pagadas t1 
 INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
 ORDER BY Tercero,t1.Created DESC;

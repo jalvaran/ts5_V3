@@ -17,7 +17,7 @@ class PDF_Inteligencia extends Documento{
         
         
         $this->PDF_Ini("Informe de Inteligencia de Negocio", 8, "",1,"../../../");
-        $this->PDF_Encabezado($fecha_final,$idEmpresaEncabezado, 40, "","","../../../");
+        $this->PDF_Encabezado($fecha_final,$idEmpresaEncabezado, 41, "","","../../../");
         $html='<center><strong>INTELIGENCIA DEL NEGOCIO '.$FechaReporte.' </strong></center><br>';
         $this->PDF_Write($html);
         $html=$this->get_clientes_atendidos($fecha_inicial, $fecha_final) ;
