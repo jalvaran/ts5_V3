@@ -42,7 +42,7 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             
             if($idCliente<>''){
-                $Order="ORDER BY Fecha ASC";
+                $Order="ORDER BY Fecha DESC";
                 $Condicion.=" AND (Tercero = '$idCliente')";
             }
             if($FechaInicialRangos<>''){

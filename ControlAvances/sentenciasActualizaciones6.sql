@@ -1083,3 +1083,7 @@ ALTER TABLE `acuerdo_pago_cuotas_pagadas`
 ADD INDEX `Estado` (`Estado`);
 
 
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+('',	'Historial de descuentos pos',	9,	3,	0,	'Descuentos pos',	1,	'onclick=\"SeleccioneTablaDB(`vista_pos_registro_descuentos`)\";',	'vista_pos_registro_descuentos.php',	'_SELF',	1,	'historial3.png',	3,	'2020-07-25 10:05:03',	'2020-07-25 10:05:03');
+
+

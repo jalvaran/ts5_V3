@@ -47,6 +47,7 @@ class PageConstruct extends html_estruct_class{
                 print("<link rel='stylesheet' href='../../componentes/alertify/themes/alertify.core.css' />");
                 print("<link rel='stylesheet' href='../../componentes/alertify/themes/alertify.default.css' id='toggleCSS' />");
                 print('<link rel="stylesheet" href="../../componentes/select2/dist/css/select2.min.css">');       
+                print('<link rel="stylesheet" href="../../componentes/dropzone/dropzone.min.css">');       
 
             $this->Chead();
             $this->body("", "hold-transition skin-blue sidebar-mini");
@@ -719,6 +720,7 @@ class PageConstruct extends html_estruct_class{
         print('<script src="../../dist/js/adminlte.min.js"></script>');
         print('<script src="../../dist/js/admintss.js"></script>');
         print('<script src="../../componentes/select2/dist/js/select2.full.min.js"></script>');
+        print('<script src="../../componentes/dropzone/dropzone.min.js"></script>');
         print('<script src="../../general/js/tablas.js"></script>');  //script genrral de la pagina
         print('<script src="../../general/js/formularios.js"></script>');  //script genrral de la pagina
         print('<script src="../../general/js/number_format.js"></script>');  //script genrral de la pagina

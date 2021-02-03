@@ -428,10 +428,10 @@ if( !empty($_REQUEST["Accion"]) ){
                             $url=$url.$uuid;
                             $body="";
                             $response2 = $obCon->callAPI('POST', $url, $body);
-                            //$response2=str_replace(PHP_EOL, '', $response2);
-                            //$response2=str_replace('\n', '', $response2);
-                            //$response2=str_replace('\n', '', $response2);
-                            //$response2=str_replace("'", '', $response2);
+                            $response2=str_replace(PHP_EOL, '', $response2);
+                            $response2=str_replace('\n', '', $response2);
+                            $response2=str_replace('\n', '', $response2);
+                            $response2=str_replace("'", '', $response2);
                             $sql="UPDATE $Tabla SET LogsDocumento='$response2' WHERE ID='$idDocumento'";
                             $obCon->Query($sql);
                             
