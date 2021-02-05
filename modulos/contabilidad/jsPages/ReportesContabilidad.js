@@ -144,6 +144,9 @@ function DibujeOpcionesReporte(){
     if(Reporte==6){//Balance x terceros
         var Accion=9;
     }
+    if(Reporte==7){//Reportes Fiscales
+        var Accion=10;
+    }
     
     var form_data = new FormData();
         form_data.append('Accion', Accion);
@@ -649,6 +652,50 @@ function GenereHTMLBalanceComprobacionXTerceros(Page=""){
         type: 'post',
         success: function(data){
             //console.log("respuesta "+data);
+            document.getElementById("DivOpcionesReportes").innerHTML="";
+            document.getElementById("DivReportesContables").innerHTML=data;
+            document.getElementById("DivPDFReportes").style.display="none";
+          
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })        
+}
+
+
+function GenereHTMLReportesFiscales(){    
+    document.getElementById("DivReportesContables").innerHTML='<div id="GifProcess">Procesando...<br><img   src="../../images/process.gif" alt="Cargando" height="100" width="100"></div>';
+    var TxtFechaInicial = document.getElementById('TxtFechaInicial').value;
+    var TxtFechaFinal = document.getElementById('TxtFechaFinal').value;
+    var CmbCentroCosto = document.getElementById('CmbCentroCosto').value;
+    var CmbEmpresa = document.getElementById('CmbEmpresa').value;
+    
+    var CmbTercero = document.getElementById('CmbTercero').value; 
+    var TxtCuentaContable = document.getElementById('TxtCuentaContable').value; 
+    
+    var form_data = new FormData();
+        form_data.append('idDocumento', 8);
+        
+        form_data.append('TxtFechaInicial', TxtFechaInicial);
+        form_data.append('TxtFechaFinal', TxtFechaFinal);
+        form_data.append('CmbCentroCosto', CmbCentroCosto);
+        form_data.append('CmbEmpresa', CmbEmpresa);
+        
+        form_data.append('CmbTercero', CmbTercero);
+        form_data.append('TxtCuentaContable', TxtCuentaContable);
+          
+        $.ajax({
+        url: './Consultas/PDF_ReportesContables.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            console.log(data);
             document.getElementById("DivOpcionesReportes").innerHTML="";
             document.getElementById("DivReportesContables").innerHTML=data;
             document.getElementById("DivPDFReportes").style.display="none";

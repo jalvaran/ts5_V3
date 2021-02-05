@@ -51,28 +51,86 @@ $css->PageInit($myTitulo);
             <div class="box-body no-padding" style="">
               <ul class="nav nav-pills nav-stacked">
                 <li>
-                    <a href="#" onclick="idListado=1;Filtro=``;MostrarListadoSegunID();">
+                    <a href="#" onclick="idListado=1;MostrarListadoSegunID();">
                         <i class="fa fa-list-ol"></i>Proyectos</a>
+                </li>
+                
+                <li>
+                    <a href="#" onclick="idListado=2;MostrarListadoSegunID();">
+                        <i class="fa fa-list-alt"></i>Tareas</a>
+                </li>
+                
+                <li>
+                    <a href="#" onclick="idListado=3;MostrarListadoSegunID();">
+                        <i class="fa fa-indent"></i>Actividades</a>
                 </li>
                                
                                                
               </ul>
+              
+         
             </div>
             <!-- /.box-body -->
           </div>
+          ');
+        
+     $css->CrearDiv("", "box-header with-border", "left", 1, 1);   
+        print('<h3 class="box-title">Filtros</h3>');
+    $css->CrearDiv("", "box-tools", "left", 1, 1);    
+    print('  
+              </div>
+            </div>
+            <div class="box-body no-padding" style="">
+                            
+              <ul class="nav nav-pills nav-stacked">');
+        
+              $css->select("cmb_filtro_proyectos", "form-control", "cmb_filtro_proyectos", "Proyectos:", "", "", "onchange=MostrarListadoSegunID();");
+                    $sql="SELECT * FROM proyectos_estados";
+                    $Consulta=$obCon->Query($sql);
+                    $css->option("", "", "", "", "", "");
+                        print("Todos los proyectos");
+                    $css->Coption();
+                    while($datos_consulta=$obCon->FetchAssoc($Consulta)){
+                        $css->option("", "", "", $datos_consulta["ID"], "", "");
+                            print($datos_consulta["nombre_estado"]);
+                        $css->Coption();
+                    }
+
+
+                $css->Cselect();
+                print("<br>");
+                $css->select("cmb_filtro_tareas", "form-control", "cmb_filtro_tareas", "Tareas:", "", "", "onchange=MostrarListadoSegunID();");
+                    $sql="SELECT * FROM proyectos_tareas_estados";
+                    $Consulta=$obCon->Query($sql);
+                    $css->option("", "", "", "", "", "");
+                        print("Todas las tareas");
+                    $css->Coption();
+                    while($datos_consulta=$obCon->FetchAssoc($Consulta)){
+                        $css->option("", "", "", $datos_consulta["ID"], "", "");
+                            print($datos_consulta["estado_tarea"]);
+                        $css->Coption();
+                    }
+
+
+                $css->Cselect();
+                    
+        print('</ul>
+            </div>
+            <!-- /.box-body -->
+          
           <!-- /. box -->
           ');
                     
                                
                 
-            $css->Cdiv();
+        $css->Cdiv();
         
             
             $css->CrearDiv("DivContenidoFiltros", "col-md-10", "left", 1, 1);
                       
             
             
-            $css->CrearDiv("DivClientes", "col-md-2", "left", 1, 1);
+            $css->CrearDiv("DivClientes", "col-md-4", "left", 1, 1);
                     $css->select("empresa_id", "form-control", "empresa_id", "", "", "", "onchange=MostrarListadoSegunID();");
                         $sql="SELECT * FROM empresapro";
                         $Consulta=$obCon->Query($sql);
@@ -85,22 +143,7 @@ $css->PageInit($myTitulo);
                     $css->Cselect();
                 $css->CerrarDiv();
                 
-                $css->CrearDiv("DivFiltros", "col-md-2", "left", 1, 1);
-                    $css->select("cmb_filtro_proyectos", "form-control", "cmb_filtro_proyectos", "", "", "", "onchange=MostrarListadoSegunID();");
-                        $sql="SELECT * FROM proyectos_estados";
-                        $Consulta=$obCon->Query($sql);
-                        $css->option("", "", "", "", "", "");
-                            print("Todos");
-                        $css->Coption();
-                        while($datos_consulta=$obCon->FetchAssoc($Consulta)){
-                            $css->option("", "", "", $datos_consulta["ID"], "", "");
-                                print($datos_consulta["nombre_estado"]);
-                            $css->Coption();
-                        }
-                        
-                        
-                    $css->Cselect();
-                $css->CerrarDiv();
+                
                 
                 $css->CrearDiv("", "col-md-2", "right", 1, 1); 
 
@@ -118,7 +161,7 @@ $css->PageInit($myTitulo);
                 
                 $css->CrearDiv("", "col-md-1", "right", 1, 1); 
                     
-                    print("<button id='btn_actualizar_listados' class='btn btn-success' onclick='MostrarListadoSegunID()'><li class='fa fa-search'></li></button>");
+                    print("<button id='btn_actualizar_listados' class='btn btn-success' onclick='MostrarListadoSegunID();'><li class='fa fa-search'></li></button>");
                 $css->CerrarDiv();   
             
             $css->CrearDiv("DivContenidoListado", "col-md-12", "left", 1, 1);

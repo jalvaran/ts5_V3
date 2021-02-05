@@ -281,12 +281,12 @@ FROM vista_cuentasxtercerosdocumentos_v2 t1 WHERE (t1.Total<-1 or t1.Total>1) AN
 DROP VIEW IF EXISTS `vista_cuentasxcobrar`;
 CREATE VIEW vista_cuentasxcobrar AS
 SELECT *
-FROM vista_cuentasxterceros_v2 t1 WHERE t1.Total<>0 AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxcobrar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Total DESC;
+FROM vista_cuentasxterceros_v2 t1 WHERE (t1.Total<-1 or t1.Total>1) AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxcobrar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Total DESC;
 
 DROP VIEW IF EXISTS `vista_cuentasxcobrardetallado`;
 CREATE VIEW vista_cuentasxcobrardetallado AS
 SELECT *
-FROM vista_cuentasxtercerosdocumentos_v2 t1 WHERE t1.Total<>0 AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxcobrar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Fecha;
+FROM vista_cuentasxtercerosdocumentos_v2 t1 WHERE (t1.Total<-1 or t1.Total>1) AND EXISTS (SELECT 1 FROM contabilidad_parametros_cuentasxcobrar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) ORDER BY Fecha;
 
 DROP VIEW IF EXISTS `vista_pedidos_restaurante`;
 CREATE VIEW vista_pedidos_restaurante AS
@@ -582,4 +582,24 @@ SELECT t1.ID,t1.Fecha,t2.NumeroFactura, t3.Referencia,t3.Nombre,t1.Cantidad,t1.V
   FROM `pos_registro_descuentos` t1 INNER JOIN facturas t2 ON t1.idFactura=t2.idFacturas 
     INNER JOIN productosventa t3 ON t1.idProducto= t3.idProductosVenta 
     INNER JOIN clientes t4 ON t4.idClientes=t2.Clientes_idClientes ;
+
+
+DROP VIEW IF EXISTS `vista_cuentasxcobrar_documentos`;
+CREATE VIEW vista_cuentasxcobrar_documentos AS
+SELECT idLibroDiario as ID,Fecha,CuentaPUC,NombreCuenta,Num_Documento_Externo as NumeroDocumentoExterno,Tercero_Identificacion,Tercero_Razon_Social,SUM(Debito) as Debitos,SUM(Credito) as Creditos,SUM(Debito-Credito) AS Total
+FROM librodiario t1 WHERE 
+EXISTS 
+(SELECT 1 FROM contabilidad_parametros_cuentasxcobrar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) 
+ GROUP BY Tercero_Identificacion,Num_Documento_Externo,CuentaPUC ORDER BY Tercero_Razon_Social,Total DESC;
+
+DROP VIEW IF EXISTS `vista_cuentasxpagar_documentos`;
+CREATE VIEW vista_cuentasxpagar_documentos AS
+SELECT idLibroDiario as ID,Fecha,CuentaPUC,NombreCuenta,Num_Documento_Externo as NumeroDocumentoExterno,Tercero_Identificacion,Tercero_Razon_Social,SUM(Debito) as Debitos,SUM(Credito) as Creditos,SUM(Debito-Credito) AS Total,
+( DATE_ADD(t1.Fecha,INTERVAL (SELECT t2.Plazo FROM proveedores t2 WHERE t2.Num_Identificacion=t1.Tercero_Identificacion LIMIT 1 ) DAY) ) AS PlazoPago 
+FROM librodiario t1 WHERE 
+EXISTS 
+(SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE t1.CuentaPUC LIKE t2.CuentaPUC) 
+ GROUP BY Tercero_Identificacion,Num_Documento_Externo,CuentaPUC ORDER BY Tercero_Identificacion,Total DESC;
+
+
 

@@ -29,7 +29,7 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Fecha Excluida Agregada");
         break;//Fin caso 1
         
-        case 2://eliminar una fecha excluida
+        case 2://eliminar un registro
             $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
             $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
             $db=$datos_empresa["db"];
@@ -40,6 +40,13 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             if($tabla_id==1){
                 $tabla="$db.proyectos_fechas_excluidas";
+            }
+            if($tabla_id==2){
+                $tabla=$db.".proyectos_adjuntos";
+                $DatosAdjunto=$obCon->DevuelveValores("$db.proyectos_adjuntos", "ID", $item_id);
+                if(file_exists($DatosAdjunto["Ruta"])){
+                    unlink($DatosAdjunto["Ruta"]);
+                }
             }
             $obCon->BorraReg($tabla, "ID", $item_id);
             print("OK;Fecha Eliminada");

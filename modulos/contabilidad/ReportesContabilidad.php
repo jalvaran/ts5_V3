@@ -52,6 +52,10 @@ $css->PageInit($myTitulo);
                     print("Movimientos de cuenta");
                 $css->Coption();
                 
+                $css->option("", "", "Reporte Fiscales", 7, "", "");
+                    print("Reporte Fiscales");
+                $css->Coption();
+                
                 $css->option("", "", "Certificados de retencion", 2, "", "");
                     print("Certificados de retención");
                 $css->Coption();

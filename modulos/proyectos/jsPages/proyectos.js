@@ -10,29 +10,33 @@
  */
 var varMenuListados=1;
 var idListado=1;
-
+var idModal="ModalAcciones";
 document.getElementById("BtnMuestraMenuLateral").click(); //da click sobre el boton que esconde el menu izquierdo de la pagina principal
 /*
  * Funciones generales
  */
 function MostrarMenuListados(){
     
-    document.getElementById("DivMenuLateral").style.display = "block";
-    document.getElementById("DivMenuLateral").style.width = "18%";
-    document.getElementById("DivContenidoListado").style.width = "100%";
-    document.getElementById("DivContenidoFiltros").style.width = "80%";
-    document.getElementById("DivGeneralDraw").style.width = "100%";
-    document.getElementById("DivGeneralDrawBox").style.width = "100%";
+    $("#DivMenuLateral").show('slow');
+    $("#DivMenuLateral").animate({width:"18%"},'slow');
+    
+    $("#DivContenidoListado").animate({width:"100%"},'slow');
+    $("#DivContenidoFiltros").animate({width:"80%"},'slow');
+    $("#DivGeneralDraw").animate({width:"100%"},'slow');
+    $("#DivGeneralDrawBox").animate({width:"100%"},'slow');
+    
     
 }
 
 function OcultarMenuListados(){
     
-    document.getElementById("DivMenuLateral").style.display = "none";
-    document.getElementById("DivContenidoListado").style.width = "100%";
-    document.getElementById("DivContenidoFiltros").style.width = "100%";
-    document.getElementById("DivGeneralDraw").style.width = "100%";
-    document.getElementById("DivGeneralDrawBox").style.width = "100%";
+    $("#DivMenuLateral").hide('slow');
+    //document.getElementById("DivMenuLateral").style.display = "none";
+    $("#DivContenidoListado").animate({width:"100%"},'slow');
+    $("#DivContenidoFiltros").animate({width:"100%"},'slow');
+    $("#DivGeneralDraw").animate({width:"100%"},'slow');
+    $("#DivGeneralDrawBox").animate({width:"100%"},'slow');
+    
     
 }
 
@@ -45,9 +49,15 @@ function MostrarOcultarMenuListados(){
     }
 }
 
-function MostrarListadoSegunID(){
+function MostrarListadoSegunID(Page=1){
     if(idListado==1){
-        listar_proyectos();
+        listar_proyectos(Page);
+    }
+    if(idListado==2){
+        listar_tareas(Page);
+    }
+    if(idListado==3){
+        listar_actividades(Page);
     }
     
 }
@@ -62,7 +72,7 @@ function CambiePagina(Funcion,Page=""){
         }
     }
     idListado=Funcion;
-    MostrarListadoSegunID();
+    MostrarListadoSegunID(Page);
     
         
 }
@@ -160,8 +170,10 @@ function terceros_select2(){
  * @param {type} Page
  * @returns {undefined}
  */
-function frm_crear_editar_proyecto(proyecto_id=''){
-    var idDiv="DivGeneralDraw";
+function frm_crear_editar_proyecto(proyecto_id='',Page){
+    var idDiv="DivFrmModalAcciones";
+   
+    $("#"+idModal).modal();
     //document.getElementById(idDiv).innerHTML='<div id="GifProcess">procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
     
     var empresa_id =document.getElementById("empresa_id").value;
@@ -171,6 +183,7 @@ function frm_crear_editar_proyecto(proyecto_id=''){
         
         form_data.append('empresa_id', empresa_id);
         form_data.append('proyecto_id', proyecto_id);
+        form_data.append('Page', Page);
                         
        $.ajax({// se arma un objecto por medio de ajax  
         url: 'Consultas/proyectos.draw.php',// se indica donde llegara la informacion del objecto
@@ -264,7 +277,13 @@ function EliminarItem(tabla_id,item_id,proyecto_id){
             var respuestas = data.split(';');
             if(respuestas[0]=="OK"){
                 alertify.success(respuestas[1]);
-                dibuje_fechas_excluidas(proyecto_id);
+                if(tabla_id==1){
+                    dibuje_fechas_excluidas(proyecto_id);
+                }
+                if(tabla_id==2){
+                    listar_adjuntos_proyecto(proyecto_id);
+                }
+                
                 
             }else if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
@@ -465,5 +484,96 @@ function add_events_dropzone_proyecto(){
           }
       });
 }
+
+
+/**
+ * Lista los proyectos
+ * @param {type} Page
+ * @returns {undefined}
+ */
+function listar_tareas(Page=1,proyecto_id=''){
+    var idDiv="DivGeneralDraw";
+    //document.getElementById(idDiv).innerHTML='<div id="GifProcess">procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var empresa_id =document.getElementById("empresa_id").value;
+    var cmb_filtro_tareas =document.getElementById("cmb_filtro_tareas").value;
+    var FechaInicialRangos =document.getElementById("FechaInicialRangos").value;
+    var FechaFinalRangos =document.getElementById("FechaFinalRangos").value;
+    var busqueda_general =document.getElementById("busqueda_general").value;
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 5);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        
+        form_data.append('cmb_filtro_tareas', cmb_filtro_tareas);
+        form_data.append('empresa_id', empresa_id);
+        form_data.append('Page', Page);
+        form_data.append('proyecto_id', proyecto_id);
+        form_data.append('FechaInicialRangos', FechaInicialRangos);
+        form_data.append('FechaFinalRangos', FechaFinalRangos);
+        form_data.append('busqueda_general', busqueda_general);
+                
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/proyectos.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+                        
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+/**
+ * formulario para crear un proyecto
+ * @param {type} Page
+ * @returns {undefined}
+ */
+function frm_crear_editar_proyecto_tarea(tarea_id='',Page=1,proyecto_id=''){
+    var idDiv="DivGeneralDraw";
+    
+    var empresa_id =document.getElementById("empresa_id").value;
+        
+    var form_data = new FormData();
+        form_data.append('Accion', 6);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        
+        form_data.append('empresa_id', empresa_id);
+        form_data.append('tarea_id', tarea_id);
+        form_data.append('proyecto_id', proyecto_id);
+        form_data.append('Page', Page);
+                        
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/proyectos.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+            terceros_select2();
+            dibuje_fechas_excluidas(proyecto_id);
+            add_events_dropzone_proyecto();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
 
 MostrarListadoSegunID();

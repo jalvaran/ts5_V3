@@ -155,7 +155,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $NumPage=1;
             }
             
-            $Condicional=" WHERE Total<>0 ";
+            $Condicional=" WHERE (Total>=1 or Total<=-1) ";
             $Tercero="";
             if(isset($_REQUEST['Tercero'])){
                 $Tercero=$obCon->normalizar($_REQUEST['Tercero']);
@@ -177,7 +177,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $statement=" librodiario 
                    WHERE Tercero_Identificacion='$Tercero' AND EXISTS "
                     . "(SELECT 1 FROM contabilidad_parametros_cuentasxpagar as t2 WHERE librodiario.CuentaPUC LIKE t2.CuentaPUC)  GROUP BY CuentaPUC,Num_Documento_Externo ORDER BY Fecha DESC ";
-            $statement=" `vista_cuentasxpagardetallado_v2` $Condicional ";
+           
+            $statement=" `vista_cuentasxpagar_documentos` $Condicional ";
             if(isset($_REQUEST['st'])){
 
                 $statement= urldecode($_REQUEST['st']);
@@ -359,7 +360,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $NumPage=1;
             }
             
-            $Condicional=" WHERE Total<>0 ";
+            $Condicional=" WHERE (Total>=1 or Total<=-1) ";
             
             if(isset($_REQUEST['Busqueda'])){
                 $Busqueda=$obCon->normalizar($_REQUEST['Busqueda']);
@@ -369,7 +370,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 
             }
             
-            $statement=" `vista_cuentasxpagardetallado_v2` $Condicional ";
+            $statement=" `vista_cuentasxpagar_documentos` $Condicional ";
             if(isset($_REQUEST['st'])){
 
                 $statement= urldecode($_REQUEST['st']);
@@ -392,9 +393,16 @@ if( !empty($_REQUEST["Accion"]) ){
             $Consulta=$obCon->Query("$query FROM $statement $Limit");
             
             $css->CrearTabla();
-            
+                $css->FilaTabla(16);
+                    print("<td colspan='2' style='text-align:center'>");
+                        $link="../../general/procesadores/GeneradorCSV.process.php?Opcion=4&Tabla=vista_cuentasxpagar_documentos&c=";
+                        print("<a href='$link' target='_blank'><button class='btn btn-info' value='Exportar'>Exportar</button></a>");
+                        
+                    print("</td>");
+                $css->CierraFilaTabla();
             
                 $css->FilaTabla(16);
+                    
                     print("<td style='text-align:center'>");
                         print("<strong>Registros:</strong> <h4 style=color:green>". number_format($ResultadosTotales)."</h4>");
                     print("</td>");
@@ -406,11 +414,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     print("<td style='text-align:center'>");
                         print("<strong>Total:</strong> <h4 style=color:red>". number_format($Total)."</h4>");
                     print("</td>");
-                    print("<td colspan='2' style='text-align:center'>");
-                        $link="../../general/procesadores/GeneradorCSV.process.php?Opcion=2&Tabla=vista_cuentasxpagardetallado_v2";
-                        print("<a href='$link' target='_blank'><button class='btn btn-info' value='Exportar'>Exportar</button></a>");
-                        
-                    print("</td>");
+                    
                 $css->CierraFilaTabla();
                 
                 $st= urlencode($st_reporte);
@@ -428,7 +432,7 @@ if( !empty($_REQUEST["Accion"]) ){
                             }
                             print("</td>");
                             $TotalPaginas= ceil($ResultadosTotales/$limit);
-                            print("<td colspan=4 style=text-align:center>");
+                            print("<td colspan=2 style=text-align:center>");
                             print("<strong>Página: </strong>");
 
                             
@@ -467,10 +471,11 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 $css->FilaTabla(16);
                     $css->ColTabla("<strong>Fecha</strong>", 1);
+                    $css->ColTabla("<strong>RazonSocial</strong>", 1);
                     $css->ColTabla("<strong>Plazo Pago</strong>", 1);
                     $css->ColTabla("<strong>Referencia</strong>", 1);
-                    $css->ColTabla("<strong>Cuenta</strong>", 1);
-                    $css->ColTabla("<strong>Nombre Cuenta</strong>", 1);                    
+                   // $css->ColTabla("<strong>Cuenta</strong>", 1);
+                   // $css->ColTabla("<strong>Nombre Cuenta</strong>", 1);                    
                     $css->ColTabla("<strong>Total</strong>", 1);
                     $css->ColTabla("<strong>Acciones</strong>", 1);
                 $css->CierraFilaTabla();
@@ -480,13 +485,14 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->FilaTabla(14);
                         $idItem=$DatosCuentasXPagar["ID"];
                         $css->ColTabla($DatosCuentasXPagar["Fecha"], 1);
+                        $css->ColTabla($DatosCuentasXPagar["Tercero_Razon_Social"]." ".$DatosCuentasXPagar["Tercero_Identificacion"], 1);
                         $css->ColTabla($DatosCuentasXPagar["PlazoPago"], 1);
                         print("<td style='text-align:center'>");
                             print('<a href="#" onclick="VerMovimientosCuentaXPagar('.$idItem.');">'.$DatosCuentasXPagar["NumeroDocumentoExterno"].' <i class="fa fa-eye"></i></a>');
                         print("</td>");
                         //$css->ColTabla($DatosCuentasXPagar["NumeroDocumentoExterno"], 1);
-                        $css->ColTabla($DatosCuentasXPagar["CuentaPUC"], 1);
-                        $css->ColTabla($DatosCuentasXPagar["NombreCuenta"], 1);                        
+                        //$css->ColTabla($DatosCuentasXPagar["CuentaPUC"], 1);
+                        //$css->ColTabla($DatosCuentasXPagar["NombreCuenta"], 1);                        
                         $css->ColTabla(number_format($DatosCuentasXPagar["Total"]), 1);
                         print("<td style='text-align:center'>");
                             print('<a href="#" onclick="AgregueMovimientoDesdeCuentaXPagar(`'.$idItem.'`,`'.$DatosCuentasXPagar["NumeroDocumentoExterno"].'`,`'.$DatosCuentasXPagar["Total"].'`,`'.$DatosCuentasXPagar["CuentaPUC"].'`,`'.$DatosCuentasXPagar["NombreCuenta"].'`,`'.$DatosCuentasXPagar["Tercero_Identificacion"].'`);"><i class="fa fa-plus"></i></a>');

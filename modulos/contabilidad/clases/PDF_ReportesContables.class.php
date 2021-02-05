@@ -502,6 +502,53 @@ class PDF_ReportesContables extends Documento{
         $this->PDF_Output("Estado_Situacion_Financiera_$FechaFinal");
     }
     
+    //Armar el html para el estado de resultados
+    public function HTMLReporteFiscal($sql) {
+        $Back="#CEE3F6";
+        $html='<table id="ReporteFiscal" class="table table-bordered table table-hover" cellspacing="1" cellpadding="2" border="0"  align="center" >';
+                
+        ///Se dibujan los ingresos
+        $h=0;  
+        $Back="white";
+        $Consulta=$this->obCon->Query($sql);
+        $html.='<tr align="left" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+        $html.='<td><strong>DOCUMENTO</strong></td><td><strong>CUENTA</strong></td><td><strong>NOMBRE</strong></td><td><strong>DEBITOS</strong></td><td><strong>CREDITOS</strong></td><td><strong>TOTAL</strong></td></td>'; 
+        
+        $html.='</tr>';   
+        $Total=0;
+        while($DatosMayor=$this->obCon->FetchArray($Consulta)){
+            $Total=$Total+$DatosMayor["Total"];
+            if($h==0){
+                $Back="#f2f2f2";
+                $h=1;
+            }else{
+                $Back="white";
+                $h=0;
+            }
+                      
+           $html.='<tr align="left" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+           $html.="<td>".$DatosMayor["TipoDocumento"]."</td>";
+           
+           $html.="<td>".$DatosMayor["CuentaPUC"]."</td>";
+           $html.="<td>".$DatosMayor["NombreCuenta"]."</td>";
+           
+           $html.="<td align='right'>".number_format($DatosMayor["Debitos"])."</td>";
+           $html.="<td align='right'>".number_format($DatosMayor["Creditos"])."</td>";
+           $html.="<td align='right'>".number_format($DatosMayor["Total"])."</td>";
+           
+           $html.='</tr>'; 
+        }
+        
+        $html.='<tr align="right" border="0" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"> ';
+        $html.='<td></td><td></td><td></td><td></td><td align="right"><strong>TOTAL:</strong></td><td><strong>'. number_format($Total).'</strong></td>'; 
+        
+        $html.='</tr>';   
+        
+        $html.='</table>'; 
+        
+        return($html);
+    }
+    
     /**
      * Fin Clase
      */

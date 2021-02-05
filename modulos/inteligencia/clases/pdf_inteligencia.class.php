@@ -481,7 +481,7 @@ class PDF_Inteligencia extends Documento{
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago='SisteCredito' 
             GROUP BY Clientes_idClientes,FormaPago
-            ORDER BY TotalFacturas DESC limit 10 ;
+            ORDER BY total_comprado DESC limit 10 ;
             ";
         $consulta=($this->obCon->Query($sql));
         
@@ -515,7 +515,7 @@ class PDF_Inteligencia extends Documento{
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago LIKE 'Acuerdo%' 
             GROUP BY Clientes_idClientes,FormaPago
-            ORDER BY TotalFacturas DESC limit 10 ;
+            ORDER BY total_comprado DESC limit 10 ;
             ";
         $consulta=($this->obCon->Query($sql));
         
@@ -548,8 +548,8 @@ class PDF_Inteligencia extends Documento{
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago LIKE 'Credito%' 
-            GROUP BY Clientes_idClientes,FormaPago
-            ORDER BY TotalFacturas DESC limit 10 ;
+            GROUP BY Clientes_idClientes,SUBSTRING(FormaPago,1,5) 
+            ORDER BY total_comprado DESC limit 10 ;
             ";
         $consulta=($this->obCon->Query($sql));
         
@@ -584,7 +584,7 @@ class PDF_Inteligencia extends Documento{
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago LIKE 'Separado' 
             GROUP BY Clientes_idClientes,FormaPago
-            ORDER BY TotalFacturas DESC limit 10 ;
+            ORDER BY total_comprado DESC limit 10 ;
             ";
         $consulta=($this->obCon->Query($sql));
         
