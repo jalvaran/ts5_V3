@@ -199,15 +199,16 @@ if( !empty($_REQUEST["Accion"]) ){
                                 $idItem=$RegistrosTabla["proyecto_id"];
                                 
                                 print('<tr>');
+
                                     print("<td>");
                                         print('<button title="Editar" type="button" class="btn btn-primary btn-flat" onclick=frm_crear_editar_proyecto(`'.$idItem.'`,`'.$Page.'`)><i class="fa fa-edit"></i></button>');
-                                        print('<button title="Tareas" type="button" class="btn btn-success btn-flat" onclick=listar_tareas(`1`,`'.$idItem.'`)><i class="fa fa-list-alt"></i></button>');
+                                        print('<button title="Tareas" type="button" class="btn btn-warning btn-flat" onclick=mostrar_calendario_proyecto(`'.$idItem.'`)><i class="fa fa-calendar"></i></button>');
                                     print("</td>");
-                                                                        
+
                                     print("<td class='mailbox-subject'>");
                                         print("<strong>".$RegistrosTabla["ID"]."</strong>");
                                     print("</td>");
-                                    
+
                                     print("<td >");
                                         print("<strong>".($RegistrosTabla["nombre"])."</strong>");
                                     print("</td>");
@@ -226,30 +227,30 @@ if( !empty($_REQUEST["Accion"]) ){
                                     print("<td class='mailbox-subject'>");
                                         print("".($RegistrosTabla["fecha_final_ejecucion"])."");
                                     print("</td>");
-                                    
+
                                     print("<td class='mailbox-subject'>");
                                         print("".number_format($RegistrosTabla["costos_mano_obra_planeacion"])."");
                                     print("</td>");
                                     print("<td class='mailbox-subject'>");
                                         print("".number_format($RegistrosTabla["costos_mano_obra_ejecucion"])."");
                                     print("</td>");
-                                    
+
                                     print("<td class='mailbox-subject'>");
                                         print("".number_format($RegistrosTabla["costos_productos_planeacion"])."");
                                     print("</td>");
                                     print("<td class='mailbox-subject'>");
                                         print("".number_format($RegistrosTabla["costos_productos_ejecucion"])."");
                                     print("</td>");
-                                    
+
                                     print("<td class='mailbox-subject'>");
                                         print("".number_format($RegistrosTabla["gastos_fijos_planeados"])."");
                                     print("</td>");
                                     print("<td class='mailbox-subject'>");
                                         print("".number_format($RegistrosTabla["gastos_fijos_ejecutados"])."");
                                     print("</td>");
-                                    
-                                    
-                                    
+
+
+
                                     print("<td class='mailbox-subject'>");
                                         print("".number_format($RegistrosTabla["total_costos_planeacion"])."");
                                     print("</td>");
@@ -259,28 +260,35 @@ if( !empty($_REQUEST["Accion"]) ){
                                     print("<td class='mailbox-subject'>");
                                         print("".number_format($RegistrosTabla["diferencia_costos_planeacion_ejecucion"])."");
                                     print("</td>");
-                                    
+
                                     print("<td class='mailbox-subject'>");
                                         print("".($RegistrosTabla["horas_x_dia"])."");
                                     print("</td>");
-                                    
+
                                     print("<td class='mailbox-subject'>");
                                         print("".($RegistrosTabla["excluir_sabados"])."");
                                     print("</td>");
-                                    
+
                                     print("<td class='mailbox-subject'>");
                                         print("".($RegistrosTabla["excluir_domingos"])."");
                                     print("</td>");
-                                    
+
                                     print("<td class='mailbox-subject'>");
                                         print("".($RegistrosTabla["nombre_estado"])."");
                                     print("</td>");
-                                    
+
                                     print("<td class='mailbox-subject'>");
                                         print($RegistrosTabla["proyecto_id"]);
                                     print("</td>");
-                                                                                                            
+
                                 print('</tr>');
+                                /*
+                                print('<tr >');
+                                    print('<td colspan="22" id="fila_proyecto_'.$idItem.'" >');
+                                    print('</td>');
+                                print('</tr>');
+                                 * 
+                                 */
 
                             }
 
@@ -296,6 +304,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
             $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
             $db=$datos_empresa["db"];
+            
             $proyecto_id=$obCon->normalizar($_REQUEST["proyecto_id"]);
             $datos_proyecto=$obCon->DevuelveValores("$db.proyectos", "proyecto_id", $proyecto_id);
             $Page=$obCon->normalizar($_REQUEST["Page"]);
@@ -313,6 +322,7 @@ if( !empty($_REQUEST["Accion"]) ){
              * 
              */
             $css->input("hidden", "proyecto_id", "", "proyecto_id", "", $proyecto_id, "", "", "", "");
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 1, "", "", "", "");
             $css->CrearDiv("div_row", "row", "left", 1, 1);
                 $css->CrearDiv("", "col-md-5", "center", 1, 1);
                     print("<strong>Cliente:</strong><br>");
@@ -417,6 +427,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->CerrarDiv();
                 
             $css->Cdiv();
+            /*
             print("<br><br>");
             $css->CrearDiv("", "row", "center", 1, 1);
                 $css->CrearDiv("", "col-md-9", "center", 1, 1);
@@ -426,6 +437,8 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->CrearBotonEvento("btn_crear_editar_proyecto", "Guardar", 1, "onclick", "confirma_crear_editar_proyecto()", "azul", "");
                 $css->CerrarDiv();
             $css->Cdiv();
+             * 
+             */
         break;//Fin caso 2    
         
         case 3://Dibuja las fechas excluidas de un proyecto
@@ -525,6 +538,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $Page=$obCon->normalizar($_REQUEST["Page"]);
             $cmb_filtro_tareas=$obCon->normalizar($_REQUEST["cmb_filtro_tareas"]);
             $proyecto_id=$obCon->normalizar($_REQUEST["proyecto_id"]);
+            
             $busqueda_general=$obCon->normalizar($_REQUEST["busqueda_general"]);
             $FechaInicialRangos=$obCon->normalizar($_REQUEST["FechaInicialRangos"]);
             $FechaFinalRangos=$obCon->normalizar($_REQUEST["FechaFinalRangos"]);
@@ -543,6 +557,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             if($proyecto_id<>''){
                 $Condicion.=" AND proyecto_id = '$proyecto_id' ";
+                $Limit=1000;
             }
             
             if($FechaInicialRangos<>''){
@@ -566,8 +581,13 @@ if( !empty($_REQUEST["Accion"]) ){
                   FROM $tabla $Condicion ORDER BY ID DESC LIMIT $PuntoInicio,$Limit;";
             $Consulta=$obCon->Query($sql);
             
+            if($proyecto_id ==''){
+                $css->CrearTitulo("<strong>Tareas:</strong>", "verde");
+            }else{
+                $datos_proyecto=$obCon->DevuelveValores("$db.proyectos", "proyecto_id", $proyecto_id);
+                $css->CrearTitulo("<strong>Tareas del proyecto $datos_proyecto[ID], $datos_proyecto[nombre]:</strong>", "verde");
+            }
             
-            $css->CrearTitulo("<strong>Tareas:</strong>", "verde");
             
             $css->div("", "box-body no-padding", "", "", "", "", "");
                 $css->div("", "mailbox-controls", "", "", "", "", "");
@@ -581,7 +601,7 @@ if( !empty($_REQUEST["Accion"]) ){
                                     <p>Tareas</p>
                                   </div>
                                   <div class="icon">
-                                    <a class="fa fa-plus-square" style="cursor:pointer" onclick=frm_crear_editar_proyecto_tarea(``,`'.$Page.'`,`'.$proyecto_id.'`); return false;></a>
+                                    <a class="fa fa-plus-square" style="cursor:pointer" onclick=frm_crear_editar_proyecto_tarea(`'.$tarea_id.'`,`'.$proyecto_id.'`); return false;></a>
                                   </div>
                                   
                                 </div>
@@ -759,6 +779,367 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->Cdiv();
             
         break; //Fin caso 5
+        
+        case 6: //dibuja el calendario de un proyecto
+            
+            $Limit=50;
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];
+            
+            $proyecto_id=$obCon->normalizar($_REQUEST["proyecto_id"]);
+            
+            $datos_proyecto=$obCon->DevuelveValores("$db.proyectos", "proyecto_id", $proyecto_id);
+            
+            $css->div("", "row", "", "", "", "", "");
+                $css->CrearTitulo("<strong>Calendario de planeación del proyecto $datos_proyecto[ID], $datos_proyecto[nombre]</strong>", "azul");
+                $css->div("div_lista_tareas", "col-md-3", "", "", "", "", "");
+                    
+                    
+                $css->Cdiv(); 
+                
+                $css->div("", "col-md-9","", "", "", "", "");
+                    $css->div("", "col-md-5","", "", "", "", "style='text-align:right'");
+                        
+                    $css->Cdiv();
+                    $css->div("", "col-md-3","", "", "", "", "style='text-align:right'");
+                        print("<strong>Ir a la fecha:</strong>");
+                    $css->Cdiv();
+                    $css->div("", "col-md-4","", "", "", "", "");
+                        $css->input("date", "date_goto", "form-control", "date_goto", "Fecha", "", "ir a", "off", "", "","style='line-height: 15px;'");
+                    $css->Cdiv();
+                    $css->div("calendar-wrap", "", "", "", "", "", "");
+                        $css->div("calendar", "col-md-12", "", "", "", "", "");
+                        
+                        $css->Cdiv();
+                    $css->Cdiv();
+                $css->Cdiv();
+                
+            $css->Cdiv();
+            
+        break; //Fin caso 6   
+        
+    
+        case 7:  //formulario para crear o editar una tarea de un proyecto
+                
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];
+            
+            $proyecto_id=$obCon->normalizar($_REQUEST["proyecto_id"]);
+            $tarea_id=$obCon->normalizar($_REQUEST["tarea_id"]);
+            $datos_tarea=$obCon->DevuelveValores("$db.proyectos_tareas", "tarea_id", $tarea_id);
+            
+            if($tarea_id==''){
+                $tarea_id=$obCon->getUniqId("");
+            }
+            $css->div("", "col-md-12", "", "", "", "", "");
+                $css->CrearTitulo("Crear o Editar una tarea","azul");
+            $css->Cdiv(); 
+            
+            $css->input("hidden", "proyecto_tarea_id", "", "proyecto_tarea_id", "", $proyecto_id, "", "", "", "");
+            $css->input("hidden", "tarea_id", "", "tarea_id", "", $tarea_id, "", "", "", "");
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 2, "", "", "", "");
+            $css->CrearDiv("div_row", "row", "left", 1, 1);
+                $css->CrearDiv("", "col-md-6", "center", 1, 1);
+                    $css->CrearDiv("", "col-md-8", "center", 1, 1);
+                        print("<strong>Título de la Tarea:</strong><br>");
+                        $css->input("text", "titulo_tarea", "form-control", "titulo_tarea", "Título de la tarea", $datos_tarea["titulo_tarea"], "Título de la tarea", "off", "", "");
+                    $css->Cdiv();
+
+                    $css->CrearDiv("", "col-md-4", "center", 1, 1);
+                        $color="#3041c2";
+                        if($datos_tarea["color"]<>""){
+                            $color=$datos_tarea["color"];
+                        }
+                        print("<strong>Color:</strong><br>");
+                        $css->input("color", "color_tarea", "form-control", "color_tarea", "Color para esta tarea", $color, "Color para esta tarea", "off", "", "");
+                    $css->Cdiv();    
+                    print("<br><br><br>");
+                    $css->CrearDiv("", "row", "center", 1, 1);
+                        
+                        $css->CrearDiv("", "col-md-12", "center", 1, 1);
+                            $css->CrearTitulo("<strong>Subir adjuntos a esta tarea</strong>", "verde");
+                            print('<div class="panel">
+
+                                        <div class="panel-body">
+                                            <form data-proyecto_id="'.$proyecto_id.'" data-tarea_id="'.$tarea_id.'" action="/" class="dropzone dz-clickable" id="tarea_adjuntos"><div class="dz-default dz-message"><span><i class="icon-plus"></i>Arrastre archivos aquí o de click para subir.<br> Suba cualquier tipo de archivos.</span></div></form>
+                                        </div>
+                                    </div>
+                                ');
+                        $css->Cdiv();
+                    $css->Cdiv();
+                $css->Cdiv();
+                
+                $css->CrearDiv("", "col-md-6", "center", 1, 1);
+                    $css->CrearDiv("div_adjuntos_tareas", "col-md-12", "center", 1, 1);
+                    
+                    $css->CerrarDiv();
+                $css->Cdiv();
+                
+            $css->Cdiv();
+            
+            
+        break;//Fin caso 7
+        
+        case 8: //Dibuja los adjuntos de una tarea
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $tarea_id=$obCon->normalizar($_REQUEST["tarea_id"]);
+            
+            $DatosEmpresa=$obCon->ValorActual("empresapro", "db", " idEmpresaPro='$empresa_id'");
+            $db=$DatosEmpresa["db"];
+            
+            $css->CrearTitulo("Adjuntos de esta tarea");
+            $css->CrearTabla();
+                
+                $css->FilaTabla(16);
+                
+                    $css->ColTabla("ID", 1);
+                    $css->ColTabla("Nombre de Archivo", 1);
+                    
+                    $css->ColTabla("Eliminar", 1);
+                    
+                $css->CierraFilaTabla();
+                
+                $sql="SELECT t1.*
+                        FROM $db.proyectos_tareas_adjuntos t1 
+                        WHERE t1.tarea_id='$tarea_id' 
+                            ";
+                $Consulta=$obCon->Query($sql);
+                while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
+                    $idItem=$DatosConsulta["ID"];
+                    $Nombre=$DatosConsulta["NombreArchivo"];
+                    $css->FilaTabla(14);
+                
+                        $css->ColTabla($idItem, 1);
+                       
+                        print('<td style="text-align:center;color:blue;font-size:18px;">');
+                            $Ruta= "../../".str_replace("../", "", $DatosConsulta["Ruta"]);
+                            print('<a href="'.$Ruta.'" target="blank">'.$Nombre.' <li class="fa fa-paperclip"></li></a>');
+                        print('</td>');
+                        
+                        print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");   
+                            
+                            $css->li("", "fa  fa-remove", "", "onclick=EliminarItem(`3`,`$idItem`,`$tarea_id`) style=font-size:16px;cursor:pointer;text-align:center;color:red");
+                            $css->Cli();
+                        print("</td>");
+                          
+                    $css->CierraFilaTabla();
+                }
+            $css->CerrarTabla();
+            
+            
+        break; //Fin caso 8
+        
+        case 9:// lista de tareas y actividades de un proyecto
+            
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];            
+            $proyecto_id=$obCon->normalizar($_REQUEST["proyecto_id"]);
+            $sql="SELECT COUNT(ID) as total_items FROM $db.proyectos_tareas WHERE proyecto_id='$proyecto_id'";
+            $datos_totales=$obCon->FetchAssoc($obCon->Query($sql));
+            
+            
+            $css->div("external-events", "row", "", "", "", "", "");
+
+                $css->div("", "box box-solid", "", "", "", "", "");
+                    $css->div("", "box box-solid", "", "", "", "", "");
+                        print('<strong class="box-title">Listado de Tareas</strong><br>');
+                        print('<a class="btn btn-app" style="background-color:#282c4b;color:white;" onclick="frm_crear_editar_proyecto_tarea(``,`'.$proyecto_id.'`)">
+                                    <span class="badge bg-blue" style="font-size:14px">'.$datos_totales["total_items"].'</span>
+                                    <i class="fa fa-plus-circle"></i> Agregar Tarea 
+                                  </a>');
+                    $css->Cdiv();
+                $css->Cdiv();
+                
+                $css->div("", "box-body", "", "", "", "", "");
+                    $css->div("external-events-list", "", "", "", "", "", "");
+                        $css->div("accordion", "box-group", "", "", "", "", "");
+                            $sql="SELECT * FROM $db.proyectos_tareas WHERE proyecto_id='$proyecto_id'";
+                            $Consulta=$obCon->Query($sql);
+                            $i=0;
+                            while($datos_consulta=$obCon->FetchAssoc($Consulta)){
+                                $i++;
+                                $css->div("", "row", "", "", "", "", "");
+                                $css->div("", "panel box box-primary", "", "", "", "", "");
+                                    
+                                    $css->div("", "col-md-8", "", "", "", "", "");
+                                        $css->div("", "box-header with-border", "", "", "", "", "");
+                                            print('<h4 class="box-title">
+                                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse_'.$datos_consulta["ID"].'" aria-expanded="false" class="collapsed">
+                                                          '.$datos_consulta["titulo_tarea"].'
+                                                        </a>
+                                                      </h4><br>');
+                                            print('<small id="sp_horas_'.$datos_consulta["tarea_id"].'" class="label label-danger"><i class="fa fa-clock-o"></i> 2 Horas</small>');
+                                            print('<div id="collapse_'.$datos_consulta["ID"].'" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">');
+
+                                                $css->div("", "box-body", "", "", "", "", "");
+
+                                                    
+                                                    print("<h4>Actividades</h4>");
+                                                    $css->div("evento_".$i++, "fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event", "", "", "", "", "data-actividad_id='act_1'");
+                                                       $css->div('', 'fc-event-main', "", "", "", "", "");
+                                                            print("My Event 1");
+                                                       $css->Cdiv();
+                                                    $css->Cdiv(); 
+                                                    $css->div("evento_".$i++, "fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event", "", "", "", "", "");
+                                                       $css->div("", 'fc-event-main', "", "", "", "", "");
+                                                            print("My Event 2");
+                                                       $css->Cdiv();
+                                                    $css->Cdiv(); 
+                                                    $css->div("evento_".$i++, "fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event", "", "", "", "", "");
+                                                       $css->div("", 'fc-event-main', "", "", "", "", "");
+                                                            print("My Event 3");
+                                                       $css->Cdiv();
+                                                    $css->Cdiv(); 
+                                                    $css->div("evento_".$i++, "fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event", "", "", "", "", "");
+                                                       $css->div("", 'fc-event-main', "", "", "", "", "");
+                                                            print("My Event 4");
+                                                       $css->Cdiv();
+                                                    $css->Cdiv(); 
+                                                    $css->div("evento_".$i++, "fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event", "", "", "", "", "");
+                                                       $css->div("", 'fc-event-main', "", "", "", "", "");
+                                                            print("My Event 5");
+                                                       $css->Cdiv();
+                                                    $css->Cdiv();
+                                                $css->Cdiv();   
+                                            $css->Cdiv();
+                                        $css->Cdiv();
+                                    $css->Cdiv();
+                                    $css->div("", "col-md-4", "", "", "", "", "");
+                                        print('<div style="text-align:right">
+                                                <i class="fa fa-plus-square-o" style="color:green;cursor:pointer;" onclick="frm_crear_editar_proyecto_tarea_actividad(``,`'.$datos_consulta["tarea_id"].'`,`'.$datos_consulta["proyecto_id"].'`)" ></i>                                                
+                                                <i class="fa fa-edit" style="color:orange;cursor:pointer;" onclick="frm_crear_editar_proyecto_tarea(`'.$datos_consulta["tarea_id"].'`,`'.$datos_consulta["proyecto_id"].'`)"  ></i>
+                                                <i class="fa fa-trash-o" style="color:red;cursor:pointer;"></i>
+                                              </div>');
+                                    $css->Cdiv();
+                                $css->Cdiv();
+                                $css->Cdiv();
+                                
+                            }
+
+                        $css->Cdiv();
+                    $css->Cdiv();
+                $css->Cdiv();
+
+            $css->Cdiv();
+            
+        break;//Fin caso 9
+        
+        
+        case 10:  //formulario para crear o editar una actividad de una tarea en un proyecto
+                
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];
+            
+            $proyecto_id=$obCon->normalizar($_REQUEST["proyecto_id"]);
+            $tarea_id=$obCon->normalizar($_REQUEST["tarea_id"]);
+            $actividad_id=$obCon->normalizar($_REQUEST["actividad_id"]);
+            $datos_tarea=$obCon->DevuelveValores("$db.proyectos_tareas", "tarea_id", $tarea_id);
+            $datos_actividad=$obCon->DevuelveValores("$db.proyectos_actividades", "actividad_id", $actividad_id);
+            if($actividad_id==''){
+                $actividad_id=$obCon->getUniqId("");
+            }
+            $css->div("", "col-md-12", "", "", "", "", "");
+                $css->CrearTitulo("Crear o Editar una actividad para la tarea <strong>$datos_tarea[titulo_tarea]<strong>","rojo");
+            $css->Cdiv(); 
+            
+            $css->input("hidden", "proyecto_tarea_id", "", "proyecto_tarea_id", "", $proyecto_id, "", "", "", "");
+            $css->input("hidden", "tarea_id", "", "tarea_id", "", $tarea_id, "", "", "", "");
+            $css->input("hidden", "actividad_id", "", "actividad_id", "", $actividad_id, "", "", "", "");
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 3, "", "", "", "");
+            $css->CrearDiv("div_row", "row", "left", 1, 1);
+                $css->CrearDiv("", "col-md-6", "center", 1, 1);
+                    $css->CrearDiv("", "col-md-8", "center", 1, 1);
+                        print("<strong>Título de la Actividad:</strong><br>");
+                        $css->input("text", "titulo_actividad", "form-control", "titulo_actividad", "Título de la actividad", $datos_actividad["titulo_actividad"], "Título de la actividad", "off", "", "");
+                    $css->Cdiv();
+
+                    $css->CrearDiv("", "col-md-4", "center", 1, 1);
+                        $color="#3041c2";
+                        if($datos_actividad["color"]<>""){
+                            $color=$datos_actividad["color"];
+                        }
+                        print("<strong>Color:</strong><br>");
+                        $css->input("color", "color_actividad", "form-control", "color_actividad", "Color para esta actividad", $color, "Color para esta actividad", "off", "", "");
+                    $css->Cdiv();    
+                    print("<br><br><br>");
+                    $css->CrearDiv("", "row", "center", 1, 1);
+                        
+                        $css->CrearDiv("", "col-md-12", "center", 1, 1);
+                            $css->CrearTitulo("<strong>Subir adjuntos a esta actividad</strong>", "verde");
+                            print('<div class="panel">
+
+                                        <div class="panel-body">
+                                            <form data-actividad_id="'.$actividad_id.'" data-proyecto_id="'.$proyecto_id.'" data-tarea_id="'.$tarea_id.'" action="/" class="dropzone dz-clickable" id="actividad_adjuntos"><div class="dz-default dz-message"><span><i class="icon-plus"></i>Arrastre archivos aquí o de click para subir.<br> Suba cualquier tipo de archivos.</span></div></form>
+                                        </div>
+                                    </div>
+                                ');
+                        $css->Cdiv();
+                    $css->Cdiv();
+                $css->Cdiv();
+                
+                $css->CrearDiv("", "col-md-6", "center", 1, 1);
+                    $css->CrearDiv("div_adjuntos_actividades", "col-md-12", "center", 1, 1);
+                    
+                    $css->CerrarDiv();
+                $css->Cdiv();
+                
+            $css->Cdiv();
+            
+            
+        break;//Fin caso 10
+        
+        case 11: //Dibuja los adjuntos en una actividad
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $actividad_id=$obCon->normalizar($_REQUEST["actividad_id"]);
+            
+            $DatosEmpresa=$obCon->ValorActual("empresapro", "db", " idEmpresaPro='$empresa_id'");
+            $db=$DatosEmpresa["db"];
+            $datos_proyecto=$obCon->DevuelveValores("$db.proyectos_actividades", "actividad_id", $actividad_id);
+            $css->CrearTitulo("Adjuntos de esta actividad");
+            $css->CrearTabla();
+                
+                $css->FilaTabla(16);
+                
+                    $css->ColTabla("ID", 1);
+                    $css->ColTabla("Nombre de Archivo", 1);
+                    
+                    $css->ColTabla("Eliminar", 1);
+                    
+                $css->CierraFilaTabla();
+                
+                $sql="SELECT t1.*
+                        FROM $db.proyectos_actividades_adjuntos t1 
+                        WHERE t1.actividad_id='$actividad_id' 
+                            ";
+                $Consulta=$obCon->Query($sql);
+                while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
+                    $idItem=$DatosConsulta["ID"];
+                    $Nombre=$DatosConsulta["NombreArchivo"];
+                    $css->FilaTabla(14);
+                
+                        $css->ColTabla($idItem, 1);
+                       
+                        print('<td style="text-align:center;color:blue;font-size:18px;">');
+                            $Ruta= "../../".str_replace("../", "", $DatosConsulta["Ruta"]);
+                            print('<a href="'.$Ruta.'" target="blank">'.$Nombre.' <li class="fa fa-paperclip"></li></a>');
+                        print('</td>');
+                        
+                        print("<td style='font-size:16px;text-align:center;color:red' title='Borrar'>");   
+                            
+                            $css->li("", "fa  fa-remove", "", "onclick=EliminarItem(`4`,`$idItem`,`$actividad_id`) style=font-size:16px;cursor:pointer;text-align:center;color:red");
+                            $css->Cli();
+                        print("</td>");
+                          
+                    $css->CierraFilaTabla();
+                }
+            $css->CerrarTabla();
+            
+            
+        break; //Fin caso 11
     }
     
     

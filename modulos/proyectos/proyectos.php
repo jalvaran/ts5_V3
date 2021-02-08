@@ -182,7 +182,7 @@ $css->PageInit($myTitulo);
          */
         
 $css->PageFin();
-
+$css->agregar_full_calendar();
 print('<script src="jsPages/proyectos.js"></script>');  //script propio de la pagina
 
 $css->Cbody();

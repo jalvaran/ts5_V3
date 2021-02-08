@@ -731,6 +731,15 @@ class PageConstruct extends html_estruct_class{
     public function AgregaAngular(){
         print('<script src="../../componentes/angularjs/angular.min.js"></script>');
     }
+    public function agregar_full_calendar(){
+        print("<link href='../../componentes/fullcalendar/lib/main.css' rel='stylesheet'/>");
+        print("<script src='../../componentes/fullcalendar/lib/main.js'></script>");
+        print("<script src='../../componentes/fullcalendar/lib/locales-all.js'></script>");
+        print("<script src='../../componentes/moment/moment.js'></script>");
+        print("<script src='../../general/js/uuid.min.js'></script>");
+        
+       
+    }
     /**
      * Crea una barra de progreso
      * @param type $NombreBarra -> Nombre

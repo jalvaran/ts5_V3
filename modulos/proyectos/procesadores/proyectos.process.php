@@ -48,8 +48,22 @@ if( !empty($_REQUEST["Accion"]) ){
                     unlink($DatosAdjunto["Ruta"]);
                 }
             }
+            if($tabla_id==3){
+                $tabla=$db.".proyectos_tareas_adjuntos";
+                $DatosAdjunto=$obCon->DevuelveValores("$db.proyectos_tareas_adjuntos", "ID", $item_id);
+                if(file_exists($DatosAdjunto["Ruta"])){
+                    unlink($DatosAdjunto["Ruta"]);
+                }
+            }
+            if($tabla_id==4){
+                $tabla=$db.".proyectos_actividades_adjuntos";
+                $DatosAdjunto=$obCon->DevuelveValores("$db.proyectos_actividades_adjuntos", "ID", $item_id);
+                if(file_exists($DatosAdjunto["Ruta"])){
+                    unlink($DatosAdjunto["Ruta"]);
+                }
+            }
             $obCon->BorraReg($tabla, "ID", $item_id);
-            print("OK;Fecha Eliminada");
+            print("OK;Registro Eliminado");
         break;//Fin caso 2
         
         case 3://crear o editar un proyecto
@@ -124,8 +138,166 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Archivo adjuntado");
            
         break;//Fin caso 4
-       
         
+        case 5://Recibir un adjunto para una tarea
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]); 
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];
+            $proyecto_id=$obCon->normalizar($_REQUEST["proyecto_id"]);
+            $tarea_id=$obCon->normalizar($_REQUEST["tarea_id"]);
+            
+            $Extension="";
+            if(!empty($_FILES['adjunto_tarea']['name'])){
+                
+                $info = new SplFileInfo($_FILES['adjunto_tarea']['name']);
+                $Extension=($info->getExtension()); 
+                
+                $Tamano=filesize($_FILES['adjunto_tarea']['tmp_name']);
+                $DatosConfiguracion=$obCon->DevuelveValores("configuracion_general", "ID", 38);
+                
+                $carpeta=$DatosConfiguracion["Valor"];
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                
+                $carpeta.=$empresa_id."/";
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                $carpeta.="Proyectos/";
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                
+                $carpeta.=$proyecto_id."/";
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                
+                $carpeta.="tareas/";
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                $carpeta.=$tarea_id."/";
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                
+                opendir($carpeta);
+                $idAdjunto=$obCon->getUniqId("tr_");
+                $destino=$carpeta.$idAdjunto.".".$Extension;
+                
+                move_uploaded_file($_FILES['adjunto_tarea']['tmp_name'],$destino);
+                $obCon->RegistreAdjuntoTarea($db,$proyecto_id,$tarea_id, $destino, $Tamano, $_FILES['adjunto_tarea']['name'], $Extension, $idUser);
+            }else{
+                exit("E1;No se recibió el archivo");
+            }
+            print("OK;Archivo adjuntado");
+           
+        break;//Fin caso 5
+       
+        case 6://crear o editar una tarea de un proyecto
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];
+            $datos_tarea["proyecto_id"]=$obCon->normalizar($_REQUEST["proyecto_id"]);
+            $datos_tarea["tarea_id"]=$obCon->normalizar($_REQUEST["tarea_id"]);
+            $datos_tarea["titulo_tarea"]=$obCon->normalizar($_REQUEST["titulo_tarea"]);
+            $datos_tarea["color"]=$obCon->normalizar($_REQUEST["color_tarea"]);
+            
+            foreach ($datos_tarea as $key => $value) {
+                if($value==''){
+                    exit("E1;El campo $key no puede estar vacío;$key");
+                }
+                
+            }
+            $datos_tarea["usuario_id"]=$idUser;
+            
+            $obCon->crear_editar_proyecto_tarea($db, $datos_tarea);
+            
+            print("OK;Datos Guardados");
+        break;//Fin caso 6
+        
+        case 7://Recibir un adjunto para una actividad
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]); 
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];
+            $proyecto_id=$obCon->normalizar($_REQUEST["proyecto_id"]);
+            $tarea_id=$obCon->normalizar($_REQUEST["tarea_id"]);
+            $actividad_id=$obCon->normalizar($_REQUEST["actividad_id"]);
+            
+            $Extension="";
+            if(!empty($_FILES['adjunto_actividad']['name'])){
+                
+                $info = new SplFileInfo($_FILES['adjunto_actividad']['name']);
+                $Extension=($info->getExtension()); 
+                
+                $Tamano=filesize($_FILES['adjunto_actividad']['tmp_name']);
+                $DatosConfiguracion=$obCon->DevuelveValores("configuracion_general", "ID", 38);
+                
+                $carpeta=$DatosConfiguracion["Valor"];
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                
+                $carpeta.=$empresa_id."/";
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                $carpeta.="Proyectos/";
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                
+                $carpeta.=$proyecto_id."/";
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                
+                $carpeta.="actividades/";
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                $carpeta.=$actividad_id."/";
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                
+                opendir($carpeta);
+                $idAdjunto=$obCon->getUniqId("ac_");
+                $destino=$carpeta.$idAdjunto.".".$Extension;
+                
+                move_uploaded_file($_FILES['adjunto_actividad']['tmp_name'],$destino);
+                $obCon->RegistreAdjuntoActividad($db,$proyecto_id,$tarea_id,$actividad_id, $destino, $Tamano, $_FILES['adjunto_actividad']['name'], $Extension, $idUser);
+            }else{
+                exit("E1;No se recibió el archivo");
+            }
+            print("OK;Archivo adjuntado");
+           
+        break;//Fin caso 7
+        
+        case 8://crear o editar una actividad de una tarea de un proyecto
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];
+            $datos_actividad["proyecto_id"]=$obCon->normalizar($_REQUEST["proyecto_id"]);
+            $datos_actividad["tarea_id"]=$obCon->normalizar($_REQUEST["tarea_id"]);
+            $datos_actividad["actividad_id"]=$obCon->normalizar($_REQUEST["actividad_id"]);
+            $datos_actividad["titulo_actividad"]=$obCon->normalizar($_REQUEST["titulo_actividad"]);
+            $datos_actividad["color"]=$obCon->normalizar($_REQUEST["color_actividad"]);
+            
+            foreach ($datos_actividad as $key => $value) {
+                if($value==''){
+                    exit("E1;El campo $key no puede estar vacío;$key");
+                }
+                
+            }
+            $datos_tarea["usuario_id"]=$idUser;
+            
+            $obCon->crear_editar_proyecto_tarea_actividad($db, $datos_actividad);
+            
+            print("OK;Datos Guardados");
+        break;//Fin caso 8
             
     }
     
