@@ -125,6 +125,20 @@ class Proyectos extends ProcesoVenta{
         $this->Query($sql);
     }
     
+    public function crear_editar_evento($db,$datos_tarea){
+        $evento_id=$datos_tarea["evento_id"];
+        $Tabla="$db.proyectos_actividades_eventos";
+        $sql="SELECT ID FROM $Tabla WHERE evento_id='$evento_id'";
+        $valida=$this->FetchAssoc($this->Query($sql));
+        if($valida["ID"]>0){
+            $sql=$this->getSQLUpdate($Tabla, $datos_tarea);
+            $sql.=" WHERE evento_id='$evento_id'";
+        }else{
+            $sql=$this->getSQLInsert($Tabla, $datos_tarea);
+        }
+        $this->Query($sql);
+    }
+    
     /**
      * Fin Clase
      */

@@ -655,20 +655,27 @@ function agrega_eventos_actividades(){
       eventData: function(eventEl) {
         //Aqui puedo colocar el id de la actividad        
           actividad_id=eventEl.id;
+          var bg_color = $('#'+actividad_id).css('background-color');
+          
           var event_id=actividad_id+"_"+uuid.v4();
           return {
             title: eventEl.innerText.trim(),
-            id: event_id            
+            id: event_id,
+            color:bg_color
           }
         }
         
       
     });
+    
+    $('.fc-event').on('click',function (){//Click para editar la actividad            
+        frm_crear_editar_proyecto_tarea_actividad($(this).data("actividad_id"),$(this).data("tarea_id"),$(this).data("proyecto_id"));
+    });
 }
 
 function init_calendar(proyecto_id){
     listar_tareas_proyecto(proyecto_id);
-    
+    var empresa_id = document.getElementById('empresa_id').value;
     //agrega_eventos_actividades();
     
 
@@ -682,12 +689,17 @@ function init_calendar(proyecto_id){
       locale: 'es',
       editable: true,
       droppable: true, // this allows things to be dropped onto the calendar
-      
+      events: {
+        url: 'procesadores/proyectos.process.php?Accion=10&empresa_id='+empresa_id+'&proyecto_id='+proyecto_id,
+        failure: function() {
+          alertify.error("No se pudo cargar los eventos");
+        }
+      },
       eventReceive: function(e) {
-            console.log(e.event.id);
+            //console.log(e.event.id);
             
             var todo_el_dia=0;
-            horas_sumar="01:00:00";
+            var horas_sumar="01:00:00";
             if(e.event.allDay){
                 horas_sumar="23:59:59";
                 todo_el_dia=1;                
@@ -704,24 +716,34 @@ function init_calendar(proyecto_id){
             }
             
             
-            console.log(fecha_inicial+" "+fecha_final);
+            //console.log(fecha_inicial+" "+fecha_final);
+            var evento_id=e.event.id;
+            var titulo=e.event.title;
+            var color=e.event.backgroundColor;
+            agrega_evento_actividad(evento_id,titulo,color,fecha_inicial,fecha_final,todo_el_dia);
+            
       },
       eventResize: function(e) {
-            console.log(e.event.id);
             
+            var todo_el_dia=0;            
+            if(e.event.allDay==true){                
+                todo_el_dia=1;
+                //fecha_final=moment(e.event.end).format("YYYY-MM-DD 23:59:59");
+            }
             var fecha_inicial=moment(e.event.start).format("YYYY-MM-DD HH:mm:ss");
-            var fecha_final=moment(e.event.end).format("YYYY-MM-DD HH:mm:ss");
-            console.log(fecha_inicial+" "+fecha_final);      
-          
-        
+            var fecha_final=moment(e.event.end).format("YYYY-MM-DD HH:mm:ss");   
+            var evento_id=e.event.id;
+            var titulo=e.event.title;
+            var color=e.event.backgroundColor;
+            agrega_evento_actividad(evento_id,titulo,color,fecha_inicial,fecha_final,todo_el_dia);
       },
       
       eventDrop: function(e ) { //Cuando está en otra fecha del mes y se arrastra a una nueva
             
-            console.log(e.event.id);
+            //console.log(e.event.id);
            
             var todo_el_dia=0;
-            horas_sumar="01:00:00";
+            var horas_sumar="01:00:00";
             if(e.event.allDay){
                 horas_sumar="23:59:59";
                 todo_el_dia=1;                
@@ -737,7 +759,11 @@ function init_calendar(proyecto_id){
                 var fecha_final=moment(m1).format("YYYY-MM-DD HH:mm:ss");
             }
             
-            console.log(fecha_inicial+" "+fecha_final);
+            //console.log(fecha_inicial+" "+fecha_final);
+            var evento_id=e.event.id;
+            var titulo=e.event.title;
+            var color=e.event.backgroundColor;
+            agrega_evento_actividad(evento_id,titulo,color,fecha_inicial,fecha_final,todo_el_dia);
         
       },
       eventClick: function(e) {
@@ -1063,7 +1089,7 @@ function crear_editar_proyecto_tarea_actividad(){
             var respuestas = data.split(';');
             if(respuestas[0]=="OK"){
                 alertify.success(respuestas[1]);
-                //listar_actividades_tarea(tarea_id);
+                listar_actividades_tarea(tarea_id);
                 CierraModal(idModal);
                 
             }else if(respuestas[0]=="E1"){
@@ -1085,5 +1111,82 @@ function crear_editar_proyecto_tarea_actividad(){
       })  
 }  
 
+function listar_actividades_tarea(tarea_id){
+    var idDiv="div_actividades_"+tarea_id;
+    
+    var empresa_id =document.getElementById("empresa_id").value;
+        
+    var form_data = new FormData();
+        form_data.append('Accion', 12);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        
+        form_data.append('empresa_id', empresa_id);
+        form_data.append('tarea_id', tarea_id);
+                        
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/proyectos.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
 
+function agrega_evento_actividad(evento_id,titulo,color,fecha_inicial,fecha_final,todo_el_dia){
+    
+    var empresa_id =document.getElementById("empresa_id").value;
+                 
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 9);
+        form_data.append('empresa_id', empresa_id);  
+        form_data.append('evento_id', evento_id);  
+        form_data.append('titulo', titulo);        
+        form_data.append('color', color);
+        form_data.append('fecha_inicial', fecha_inicial);
+        form_data.append('fecha_final', fecha_final);
+        form_data.append('todo_el_dia', todo_el_dia);
+       
+                                
+        $.ajax({
+        url: 'procesadores/proyectos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){
+                //alertify.success(respuestas[1]);
+                
+                
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+                
+            
+            }else{
+                alertify.alert(data);
+            }
+               
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}  
 MostrarListadoSegunID();

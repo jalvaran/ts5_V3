@@ -292,12 +292,71 @@ if( !empty($_REQUEST["Accion"]) ){
                 }
                 
             }
-            $datos_tarea["usuario_id"]=$idUser;
+            $datos_actividad["usuario_id"]=$idUser;
             
             $obCon->crear_editar_proyecto_tarea_actividad($db, $datos_actividad);
             
             print("OK;Datos Guardados");
         break;//Fin caso 8
+        
+        case 9://crear o editar evento de una actividad de una tarea de un proyecto
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $evento_id=$obCon->normalizar($_REQUEST["evento_id"]);
+            $array_evento_id= explode("_", $evento_id);
+            $db=$datos_empresa["db"];
+            
+            $datos_evento["evento_id"]=$array_evento_id[1];
+            $datos_evento["fecha_inicial"]=$obCon->normalizar($_REQUEST["fecha_inicial"]);
+            $datos_evento["fecha_final"]=$obCon->normalizar($_REQUEST["fecha_final"]);
+            $datos_evento["todo_el_dia"]=$obCon->normalizar($_REQUEST["todo_el_dia"]);
+            $datos_evento["actividad_id"]=$array_evento_id[0];
+            $datos_actividad=$obCon->DevuelveValores("$db.proyectos_actividades", "actividad_id", $datos_evento["actividad_id"]);
+            $datos_evento["proyecto_id"]=$datos_actividad["proyecto_id"];
+            $datos_evento["titulo"]=$datos_actividad["titulo_actividad"];
+            $datos_evento["color"]=$datos_actividad["color"];
+            $datos_evento["tarea_id"]=$datos_actividad["tarea_id"];
+            foreach ($datos_evento as $key => $value) {
+                if($value==''){
+                    exit("E1;El campo $key no puede estar vacío;$key");
+                }
+                
+            }
+            $datos_evento["usuario_id"]=$idUser;
+            
+            $obCon->crear_editar_evento($db, $datos_evento);
+            
+            print("OK;Evento Registrado");
+        break;//Fin caso 9
+        
+        case 10://obtengo los eventos
+         
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];
+            $proyecto_id=$obCon->normalizar($_REQUEST["proyecto_id"]);
+            $sql="SELECT * FROM $db.proyectos_actividades_eventos WHERE proyecto_id='$proyecto_id' AND estado<=9";
+            $Consulta=$obCon->Query($sql);
+            $array_json_eventos=[];
+            $i=0;
+            while($datos_consulta=$obCon->FetchAssoc($Consulta)){
+                $array_json_eventos[$i]["id"]=$datos_consulta["actividad_id"]."_".$datos_consulta["evento_id"];
+                $array_json_eventos[$i]["title"]=$datos_consulta["titulo"];
+                $array_json_eventos[$i]["start"]=($datos_consulta["fecha_inicial"]);
+                $array_json_eventos[$i]["end"]=($datos_consulta["fecha_final"]);
+                $array_json_eventos[$i]["color"]=$datos_consulta["color"];
+                $todo_el_dia=false;
+                if($datos_consulta["todo_el_dia"]==1){
+                    $todo_el_dia=true;
+                }
+                $array_json_eventos[$i]["allDay"]=$todo_el_dia;
+                
+                $i=$i+1;
+            }
+            
+            print(json_encode($array_json_eventos));
+        break;//Fin caso 10
+            
             
     }
     
