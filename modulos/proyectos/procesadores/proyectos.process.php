@@ -62,6 +62,9 @@ if( !empty($_REQUEST["Accion"]) ){
                     unlink($DatosAdjunto["Ruta"]);
                 }
             }
+            if($tabla_id==5){
+                $tabla="$db.proyectos_actividades_recursos";
+            }
             $obCon->BorraReg($tabla, "ID", $item_id);
             print("OK;Registro Eliminado");
         break;//Fin caso 2
@@ -316,6 +319,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $datos_evento["titulo"]=$datos_actividad["titulo_actividad"];
             $datos_evento["color"]=$datos_actividad["color"];
             $datos_evento["tarea_id"]=$datos_actividad["tarea_id"];
+            
+            $datos_evento["horas"]=$obCon->calcular_horas($datos_evento["fecha_inicial"], $datos_evento["fecha_final"]);
             foreach ($datos_evento as $key => $value) {
                 if($value==''){
                     exit("E1;El campo $key no puede estar vacío;$key");
@@ -325,6 +330,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $datos_evento["usuario_id"]=$idUser;
             
             $obCon->crear_editar_evento($db, $datos_evento);
+            $proyecto_id=$datos_evento["proyecto_id"];
+            $obCon->actualizar_totales_proyecto($db, $proyecto_id);
             
             print("OK;Evento Registrado");
         break;//Fin caso 9
@@ -357,7 +364,106 @@ if( !empty($_REQUEST["Accion"]) ){
             print(json_encode($array_json_eventos));
         break;//Fin caso 10
             
+        case 11://cambiar el estado a una tabla para eliminar una actividad o tarea
+         
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];
+            $tabla_id=$obCon->normalizar($_REQUEST["tabla_id"]);
+            $item_id=$obCon->normalizar($_REQUEST["cambiar_id"]);
             
+            if($tabla_id==1){
+                $array_evento_id= explode("_", $item_id);
+                $item_id=$array_evento_id[1];
+                $tab="$db.proyectos_actividades_eventos";
+                $sql="UPDATE $tab SET estado=10 WHERE evento_id='$item_id'";
+                $obCon->Query($sql); 
+                exit("OK;Evento eliminado ");
+            }
+            
+            if($tabla_id==2){
+                
+                $tab="$db.proyectos_tareas";
+                $sql="UPDATE $tab SET estado=10 WHERE tarea_id='$item_id'";
+                $obCon->Query($sql);
+                $tab="$db.proyectos_actividades_eventos";
+                $sql="UPDATE $tab SET estado=10 WHERE tarea_id='$item_id'";
+                $obCon->Query($sql);
+                $tab="$db.proyectos_actividades";
+                $sql="UPDATE $tab SET estado=10 WHERE tarea_id='$item_id'";
+                $obCon->Query($sql);    
+                exit("OK;Tarea Eliminada ");
+            }
+            if($tabla_id==3){
+                
+                
+                $tab="$db.proyectos_actividades_eventos";
+                $sql="UPDATE $tab SET estado=10 WHERE actividad_id='$item_id'";
+                $obCon->Query($sql);
+                $tab="$db.proyectos_actividades";
+                $datos_actividad=$obCon->DevuelveValores($tab, "actividad_id", $item_id);
+                $sql="UPDATE $tab SET estado=10 WHERE actividad_id='$item_id'";
+                $obCon->Query($sql);
+                exit("OK;Actividad eliminada;".$datos_actividad["tarea_id"]);
+            }
+            
+            
+        break;//Fin caso 11
+    
+        case 12://agregar un recurso a una actividad
+         
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];
+            
+            $recurso_id=$obCon->normalizar($_REQUEST["recurso_id"]);
+            $proyecto_id=$obCon->normalizar($_REQUEST["proyecto_id"]);
+            $tarea_id=$obCon->normalizar($_REQUEST["tarea_id"]);
+            $actividad_id=$obCon->normalizar($_REQUEST["actividad_id"]);
+            
+            $nombre_recurso=$obCon->normalizar($_REQUEST["recurso_tarea"]);
+            $cantidad_recurso=$obCon->normalizar($_REQUEST["cantidad_recurso"]);
+            $costo_unitario_recurso=$obCon->normalizar($_REQUEST["costo_unitario_recurso"]);
+            $utilidad_recurso=$obCon->normalizar($_REQUEST["utilidad_recurso"]);
+            $precio_venta=$obCon->normalizar($_REQUEST["precio_venta"]);
+            $hora_o_fijo=$obCon->normalizar($_REQUEST["recurso_hora_fijo"]);
+            $tipo_recurso=$obCon->normalizar($_REQUEST["tipo_recurso"]);
+            
+            if($nombre_recurso==''){
+                exit("E1;Debe seleccionar el tipo de recurso;tipo_recurso");
+            }
+            
+            if($nombre_recurso==''){
+                exit("E1;El campo nombre del recurso no puede estar vacío;recurso_tarea");
+            }
+            if(!is_numeric($cantidad_recurso) or $cantidad_recurso<=0){
+                exit("E1;El campo cantidad del recurso debe ser un numero mayor a cero;cantidad_recursos");
+            }
+            if(!is_numeric($costo_unitario_recurso) or $costo_unitario_recurso<=0){
+                exit("E1;El campo costo unitario del recurso debe ser un numero mayor a cero;costo_unitario_recurso");
+            }
+            if(!is_numeric($utilidad_recurso) or $utilidad_recurso<0){
+                exit("E1;El campo utilidad del recurso debe ser un numero mayor a cero;utilidad_recurso");
+            }
+            if(!is_numeric($precio_venta) or $precio_venta<0){
+                exit("E1;El campo precio de venta del recurso debe ser un numero mayor a cero;precio_venta");
+            }
+                  
+            $tab="$db.proyectos_recursos";
+            $sql="SELECT ID,recurso_id FROM $tab WHERE nombre_recurso LIKE '$nombre_recurso' and tipo='$tipo_recurso'";
+            $valida=$obCon->FetchAssoc($obCon->Query($sql));
+            
+            if($valida["ID"]>0){
+                $recurso_id=$valida["recurso_id"];
+            }else{
+                $recurso_id=$obCon->getUniqId("rec_");
+                $obCon->crear_recurso_proyecto($db, $recurso_id, $nombre_recurso, $hora_o_fijo,$tipo_recurso, $idUser);
+            
+            }
+             
+            $obCon->agregar_recurso_actividad($db, $proyecto_id, $tarea_id, $actividad_id,$tipo_recurso,$nombre_recurso, "", $hora_o_fijo, $recurso_id, $cantidad_recurso, $costo_unitario_recurso, $utilidad_recurso, $precio_venta, $precio_venta*$cantidad_recurso, $idUser);
+            print("OK;Recurso Agregado");
+        break;//Fin caso 12
     }
     
     

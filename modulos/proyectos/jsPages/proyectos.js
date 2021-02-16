@@ -291,6 +291,9 @@ function EliminarItem(tabla_id,item_id,proyecto_id){
                 if(tabla_id==4){
                     listar_adjuntos_actividades(proyecto_id);
                 }
+                if(tabla_id==5){
+                    listar_recursos_actividad(proyecto_id);
+                }
                 
                 
             }else if(respuestas[0]=="E1"){
@@ -602,6 +605,9 @@ function SeleccioneAccionFormularios(){
     if(idFormulario==3){
         crear_editar_proyecto_tarea_actividad();
     }
+    if(idFormulario==4){
+        CierraModal(idModal);
+    }
     
 }
 
@@ -667,18 +673,20 @@ function agrega_eventos_actividades(){
         
       
     });
-    
+    /*
     $('.fc-event').on('click',function (){//Click para editar la actividad            
         frm_crear_editar_proyecto_tarea_actividad($(this).data("actividad_id"),$(this).data("tarea_id"),$(this).data("proyecto_id"));
     });
+    */
 }
 
-function init_calendar(proyecto_id){
-    listar_tareas_proyecto(proyecto_id);
-    var empresa_id = document.getElementById('empresa_id').value;
-    //agrega_eventos_actividades();
+function init_calendar(proyecto_id,listar_tareas=1){
+    if(listar_tareas==1){
+        listar_tareas_proyecto(proyecto_id);
+    }
     
-
+    var empresa_id = document.getElementById('empresa_id').value;
+    
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
       headerToolbar: {
@@ -735,7 +743,10 @@ function init_calendar(proyecto_id){
             var evento_id=e.event.id;
             var titulo=e.event.title;
             var color=e.event.backgroundColor;
+            console.log(fecha_inicial);
+            console.log(fecha_final);
             agrega_evento_actividad(evento_id,titulo,color,fecha_inicial,fecha_final,todo_el_dia);
+            
       },
       
       eventDrop: function(e ) { //Cuando está en otra fecha del mes y se arrastra a una nueva
@@ -767,9 +778,11 @@ function init_calendar(proyecto_id){
         
       },
       eventClick: function(e) {
-        if (confirm('Está seguro que desea eliminar esta actividad?' + e.event.id)) {
+        if (confirm('Está seguro que desea eliminar este evento?')) {
             var event_id=e.event.id;
+            cambiar_estado(1,event_id,proyecto_id);
             e.event.remove();
+            
         }
       }
       
@@ -974,6 +987,7 @@ function frm_crear_editar_proyecto_tarea_actividad(actividad_id='',tarea_id='',p
             document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
             
             add_events_dropzone_actividades();
+            //listar_recursos_actividad(actividad_id);
         },
         error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
             
@@ -1132,7 +1146,7 @@ function listar_actividades_tarea(tarea_id){
         type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
         success: function(data){            
             document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
-            
+            //agrega_eventos_actividades();
         },
         error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
             
@@ -1169,8 +1183,7 @@ function agrega_evento_actividad(evento_id,titulo,color,fecha_inicial,fecha_fina
         success: function(data){
             var respuestas = data.split(';');
             if(respuestas[0]=="OK"){
-                //alertify.success(respuestas[1]);
-                
+                //alertify.success(respuestas[1]);               
                 
             }else if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
@@ -1189,4 +1202,239 @@ function agrega_evento_actividad(evento_id,titulo,color,fecha_inicial,fecha_fina
           }
       })  
 }  
+
+function cambiar_estado(tabla_id,cambiar_id,proyecto_id){
+    
+    var empresa_id =document.getElementById("empresa_id").value;
+                 
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 11);
+        form_data.append('empresa_id', empresa_id);  
+        form_data.append('tabla_id', tabla_id);  
+        form_data.append('cambiar_id', cambiar_id);        
+                                
+        $.ajax({
+        url: 'procesadores/proyectos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);  
+                if(tabla_id==2){
+                    
+                    init_calendar(proyecto_id);
+                }
+                if(tabla_id==3){
+                    init_calendar(proyecto_id,0);
+                    listar_actividades_tarea(respuestas[2]);
+                }
+                
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+                
+            
+            }else{
+                alertify.alert(data);
+            }
+               
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+
+function agregar_recurso_actividad(proyecto_id,tarea_id,actividad_id){
+    
+    var empresa_id =document.getElementById("empresa_id").value;
+    var recurso_tarea =document.getElementById("recurso_tarea").value;
+    var cantidad_recurso =document.getElementById("cantidad_recurso").value;
+    var costo_unitario_recurso =document.getElementById("costo_unitario_recurso").value;
+    var utilidad_recurso =document.getElementById("utilidad_recurso").value;
+    var precio_venta =document.getElementById("precio_venta").value;
+    var recurso_hora_fijo =document.getElementById("recurso_hora_fijo").value;
+    var tipo_recurso =document.getElementById("tipo_recurso").value;
+    var recurso_id = $('#recurso_tarea').attr('data-id');
+                 
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 12);
+        form_data.append('empresa_id', empresa_id);  
+        form_data.append('recurso_id', recurso_id);  
+        form_data.append('proyecto_id', proyecto_id); 
+        form_data.append('tarea_id', tarea_id); 
+        form_data.append('actividad_id', actividad_id); 
+        
+        form_data.append('recurso_tarea', recurso_tarea);  
+        form_data.append('cantidad_recurso', cantidad_recurso);  
+        form_data.append('costo_unitario_recurso', costo_unitario_recurso); 
+        form_data.append('utilidad_recurso', utilidad_recurso); 
+        form_data.append('precio_venta', precio_venta); 
+        form_data.append('recurso_hora_fijo', recurso_hora_fijo); 
+        form_data.append('tipo_recurso', tipo_recurso); 
+                              
+        $.ajax({
+        url: 'procesadores/proyectos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);               
+                $("#recurso_tarea").attr('data-id','');
+                $("#recurso_tarea").val('');
+                listar_recursos_actividad(actividad_id);
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+                
+            
+            }else{
+                alertify.alert(data);
+            }
+               
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+
+function autocomplete_campo_recurso(campo_id){
+    var key = $("#"+campo_id).val();	
+    var tipo_recurso = $("#tipo_recurso").val();	
+    var dataString = 'key='+key+'&tipo_recurso='+tipo_recurso;
+    //$("#"+campo_id).attr('data-id','');
+    $.ajax({
+        type: "POST",
+        url: "buscadores/proyectos_recursos.search.php",
+        data: dataString,
+        success: function(data) {
+            //Escribimos las sugerencias que nos manda la consulta
+            $('#suggestions').fadeIn(1000).html(data);
+            //Al hacer click en alguna de las sugerencias
+            $('.suggest-element').on('click', function(){
+                    //Obtenemos la id unica de la sugerencia pulsada
+                    var id = $(this).attr('data-recurso_id');
+                    console.log("id:"+id);
+                    //Editamos el valor del input con data de la sugerencia pulsada
+                    $("#"+campo_id).val($(this).data("recurso_nombre"));
+                    $("#"+campo_id).attr('data-id',id);
+                    //Hacemos desaparecer el resto de sugerencias
+                    $('#suggestions').fadeOut(1000);
+                    
+                    return false;
+            });
+        }
+    });
+}
+
+
+function listar_recursos_actividad(actividad_id){
+    var idDiv="div_recursos_actividades";
+    
+    var empresa_id =document.getElementById("empresa_id").value;
+        
+    var form_data = new FormData();
+        form_data.append('Accion', 13);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        
+        form_data.append('empresa_id', empresa_id);
+        form_data.append('actividad_id', actividad_id);
+                        
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/proyectos.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function calcule_precio_venta_recurso(invoca){
+    var costo_unitario_recurso= parseFloat($("#costo_unitario_recurso").val());
+    var utilidad_recurso= parseFloat($("#utilidad_recurso").val());
+    var precio_venta= parseFloat($("#precio_venta").val());
+    
+    if(invoca==1){//Invoca costo unitario o utilidad
+        
+        precio_venta=costo_unitario_recurso+(costo_unitario_recurso*(utilidad_recurso/100));
+        $("#precio_venta").val(Math.round(precio_venta,2));
+    }
+    if(invoca==2){//Invoca precio venta
+        
+        var utilidad=(100/costo_unitario_recurso * precio_venta);
+        
+        $("#utilidad_recurso").val(Math.round(utilidad,2));
+    }
+    
+}
+
+function frm_agregar_editar_recursos_actividad(actividad_id){
+    var idDiv="DivFrmModalAcciones";
+   
+    $("#"+idModal).modal();
+    //document.getElementById(idDiv).innerHTML='<div id="GifProcess">procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var empresa_id =document.getElementById("empresa_id").value;
+        
+    var form_data = new FormData();
+        form_data.append('Accion', 14);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        
+        form_data.append('empresa_id', empresa_id);
+        form_data.append('actividad_id', actividad_id);
+        
+                        
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/proyectos.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+            listar_recursos_actividad(actividad_id);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function inicialice_nombre_recurso(){
+    $("#recurso_tarea").attr('data-id','');
+    $("#recurso_tarea").val('');
+}
+
 MostrarListadoSegunID();
