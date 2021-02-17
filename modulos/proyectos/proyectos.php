@@ -54,7 +54,7 @@ $css->PageInit($myTitulo);
                     <a href="#" onclick="idListado=1;MostrarListadoSegunID();">
                         <i class="fa fa-list-ol"></i>Proyectos</a>
                 </li>
-                
+                <!--
                 <li>
                     <a href="#" onclick="idListado=2;MostrarListadoSegunID();">
                         <i class="fa fa-list-alt"></i>Tareas</a>
@@ -64,7 +64,7 @@ $css->PageInit($myTitulo);
                     <a href="#" onclick="idListado=3;MostrarListadoSegunID();">
                         <i class="fa fa-indent"></i>Actividades</a>
                 </li>
-                               
+                -->               
                                                
               </ul>
               
@@ -99,6 +99,7 @@ $css->PageInit($myTitulo);
 
                 $css->Cselect();
                 print("<br>");
+                /*
                 $css->select("cmb_filtro_tareas", "form-control", "cmb_filtro_tareas", "Tareas:", "", "", "onchange=MostrarListadoSegunID();");
                     $sql="SELECT * FROM proyectos_tareas_estados";
                     $Consulta=$obCon->Query($sql);
@@ -114,6 +115,8 @@ $css->PageInit($myTitulo);
 
                 $css->Cselect();
                     
+                 * 
+                 */
         print('</ul>
             </div>
             <!-- /.box-body -->

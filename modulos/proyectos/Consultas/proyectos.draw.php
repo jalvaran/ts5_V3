@@ -103,22 +103,7 @@ if( !empty($_REQUEST["Accion"]) ){
                                     </div>
                                   </div>');
                         }
-                        /*
-                        print('<div class="col-lg-3 col-xs-6">
-                                <!-- small box -->
-                                <div class="small-box bg-blue">
-                                  <div class="inner">
-                                   
-                                    <h3>Mensajería</h3>
-                                    <p>Enviar un correo</p>
-                                  </div>
-                                  <div class="icon">
-                                    <i class="fa fa-send" style="cursor:pointer" onclick=DibujeRedactarCorreoClientes(`'.$CondicionBase64.'`); return false></i>
-                                  </div>
-                                  
-                                </div>
-                              </div>');
-                        */
+                        
                     $css->Cdiv();
                      
                                        
@@ -176,18 +161,15 @@ if( !empty($_REQUEST["Accion"]) ){
                                 $css->ColTabla("<strong>Fecha Final Planeada</strong>", 1,"C");
                                 $css->ColTabla("<strong>Fecha Inicio Ejecutada</strong>", 1,"C");
                                 $css->ColTabla("<strong>Fecha Final Ejecutada</strong>", 1,"C");
-                                $css->ColTabla("<strong>Costos Mano de Obra Planeada</strong>", 1,"C");
-                                $css->ColTabla("<strong>Costos Mano de Obra Ejecutada</strong>", 1,"C");
-                                $css->ColTabla("<strong>Costos Productos Planeados</strong>", 1,"C");
-                                $css->ColTabla("<strong>Costos Productos Ejecutados</strong>", 1,"C");                                
-                                $css->ColTabla("<strong>Gastos Fijos Planeados</strong>", 1,"C");
-                                $css->ColTabla("<strong>Gastos Fijos Ejecutados</strong>", 1,"C");
-                                $css->ColTabla("<strong>Costo Total del proyecto planeado</strong>", 1,"C");
-                                $css->ColTabla("<strong>Costo Total del proyecto ejecutado</strong>", 1,"C");
+                                $css->ColTabla("<strong>Horas planeadas</strong>", 1,"C");
+                                $css->ColTabla("<strong>Horas ejecutadas</strong>", 1,"C");
+                                $css->ColTabla("<strong>Costos Planeados</strong>", 1,"C");
+                                $css->ColTabla("<strong>Costos Ejecutados</strong>", 1,"C");
                                 $css->ColTabla("<strong>Diferencia Costos</strong>", 1,"C");
-                                $css->ColTabla("<strong>Horas por Día</strong>", 1,"C");
-                                $css->ColTabla("<strong>Excluir Sabados</strong>", 1,"C");
-                                $css->ColTabla("<strong>Excluir Domingos</strong>", 1,"C");
+                                $css->ColTabla("<strong>Venta Planeado</strong>", 1,"C");
+                                $css->ColTabla("<strong>Venta Ejecutada</strong>", 1,"C");
+                                $css->ColTabla("<strong>Utilidad Planeada</strong>", 1,"C");
+                                $css->ColTabla("<strong>Utilidad Ejecutada</strong>", 1,"C");
                                 $css->ColTabla("<strong>Estado</strong>", 1,"C");
                                 $css->ColTabla("<strong>Identificador</strong>", 1,"C");
                                 
@@ -201,8 +183,10 @@ if( !empty($_REQUEST["Accion"]) ){
                                 print('<tr>');
 
                                     print("<td>");
-                                        print('<button title="Editar" type="button" class="btn btn-primary btn-flat" onclick=frm_crear_editar_proyecto(`'.$idItem.'`,`'.$Page.'`)><i class="fa fa-edit"></i></button>');
-                                        print('<button title="Tareas" type="button" class="btn btn-warning btn-flat" onclick=mostrar_calendario_proyecto(`'.$idItem.'`)><i class="fa fa-calendar"></i></button>');
+                                        print('<button title="Editar" type="button" class="btn btn-warning btn-flat" onclick=frm_crear_editar_proyecto(`'.$idItem.'`,`'.$Page.'`)><i class="fa fa-edit"></i></button>');
+                                        print('<button title="Tareas" type="button" class="btn btn-primary btn-flat" onclick=mostrar_calendario_proyecto(`'.$idItem.'`)><i class="fa fa-calendar"></i></button>');
+                                        $link="procesadores/proyectos.process.php?Accion=14&empresa_id=$empresa_id&proyecto_id=$idItem";
+                                        print('<a href="'.$link.'" title="Informe" class="btn btn-danger btn-flat" target="_blank"><i class="fa fa-file-pdf-o"></i></a>');
                                     print("</td>");
 
                                     print("<td class='mailbox-subject'>");
@@ -229,49 +213,36 @@ if( !empty($_REQUEST["Accion"]) ){
                                     print("</td>");
 
                                     print("<td class='mailbox-subject'>");
-                                        print("".number_format($RegistrosTabla["costos_mano_obra_planeacion"])."");
+                                        print("".number_format($RegistrosTabla["total_horas_planeadas"])."");
                                     print("</td>");
                                     print("<td class='mailbox-subject'>");
-                                        print("".number_format($RegistrosTabla["costos_mano_obra_ejecucion"])."");
+                                        print("".number_format($RegistrosTabla["total_horas_ejecutadas"])."");
                                     print("</td>");
 
                                     print("<td class='mailbox-subject'>");
-                                        print("".number_format($RegistrosTabla["costos_productos_planeacion"])."");
+                                        print("".number_format($RegistrosTabla["costos_planeacion"])."");
                                     print("</td>");
                                     print("<td class='mailbox-subject'>");
-                                        print("".number_format($RegistrosTabla["costos_productos_ejecucion"])."");
+                                        print("".number_format($RegistrosTabla["costos_ejecucion"])."");
                                     print("</td>");
 
-                                    print("<td class='mailbox-subject'>");
-                                        print("".number_format($RegistrosTabla["gastos_fijos_planeados"])."");
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print("".number_format($RegistrosTabla["gastos_fijos_ejecutados"])."");
-                                    print("</td>");
-
-
-
-                                    print("<td class='mailbox-subject'>");
-                                        print("".number_format($RegistrosTabla["total_costos_planeacion"])."");
-                                    print("</td>");
-                                    print("<td class='mailbox-subject'>");
-                                        print("".number_format($RegistrosTabla["total_costos_ejecucion"])."");
-                                    print("</td>");
                                     print("<td class='mailbox-subject'>");
                                         print("".number_format($RegistrosTabla["diferencia_costos_planeacion_ejecucion"])."");
                                     print("</td>");
-
                                     print("<td class='mailbox-subject'>");
-                                        print("".($RegistrosTabla["horas_x_dia"])."");
+                                        print("".number_format($RegistrosTabla["valor_facturar"])."");
                                     print("</td>");
 
                                     print("<td class='mailbox-subject'>");
-                                        print("".($RegistrosTabla["excluir_sabados"])."");
+                                        print("".number_format($RegistrosTabla["valor_facturado"])."");
+                                    print("</td>");
+                                    print("<td class='mailbox-subject'>");
+                                        print("".number_format($RegistrosTabla["utilidad_planeada"],2)."%");
+                                    print("</td>");
+                                    print("<td class='mailbox-subject'>");
+                                        print("".number_format($RegistrosTabla["utilidad_ejecutada"],2)."%");
                                     print("</td>");
 
-                                    print("<td class='mailbox-subject'>");
-                                        print("".($RegistrosTabla["excluir_domingos"])."");
-                                    print("</td>");
 
                                     print("<td class='mailbox-subject'>");
                                         print("".($RegistrosTabla["nombre_estado"])."");
@@ -314,19 +285,13 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->div("", "col-md-12", "", "", "", "", "");
                 $css->CrearTitulo("Crear o Editar un proyecto","azul");
             $css->Cdiv(); 
-            /*
-            $css->CrearDiv("", "col-md-1", "right", 1, 1); 
-                    
-                    print("<button id='btn_home_proyectos' class='btn btn-primary fa fa-mail-reply' onclick='MostrarListadoSegunID(`$Page`);'></button>");
-                $css->CerrarDiv(); 
-             * 
-             */
+            
             $css->input("hidden", "proyecto_id", "", "proyecto_id", "", $proyecto_id, "", "", "", "");
             $css->input("hidden", "idFormulario", "", "idFormulario", "", 1, "", "", "", "");
             $css->CrearDiv("div_row", "row", "left", 1, 1);
-                $css->CrearDiv("", "col-md-5", "center", 1, 1);
+                $css->CrearDiv("", "col-md-6", "center", 1, 1);
                     print("<strong>Cliente:</strong><br>");
-                    $css->select("cliente_id", "form-control", "cliente_id", "", "", "", "");
+                    $css->select("cliente_id", "form-control", "cliente_id", "", "", "", "style=width:100%");
                         if($datos_proyecto["cliente_id"]<>''){
                             $css->option("", "", "", $datos_proyecto["cliente_id"], "", "");
                                 $datos_cliente=$obCon->DevuelveValores($db.".clientes", "idClientes", $datos_proyecto["cliente_id"]);
@@ -341,75 +306,13 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->Cselect();
                 $css->Cdiv();
                 
-                $css->CrearDiv("", "col-md-4", "center", 1, 1);
+                $css->CrearDiv("", "col-md-6", "center", 1, 1);
                     print("<strong>Nombre del Proyecto:</strong><br>");
                     $css->input("text", "nombre_proyecto", "form-control", "nombre_proyecto", "Nombre del proyecto", $datos_proyecto["nombre"], "Nombre del proyecto", "off", "", "");
                 $css->Cdiv();
-                
-                $css->CrearDiv("", "col-md-3", "center", 1, 1);
-                    print("<strong>Horas de Trabajo por día:</strong><br>");
-                    $css->input("text", "horas_x_dia", "form-control", "horas_x_dia", "Horas de trabajo por día", $datos_proyecto["horas_x_dia"], "Horas", "off", "", "");
-                $css->Cdiv();
-                
-                
-                
+                           
             $css->Cdiv();
-            print("<br><br>");
-            $css->CrearDiv("div_row2", "row", "left", 1, 1);
-                $css->CrearDiv("", "col-md-2", "center", 1, 1);
-                    print("<strong>Excluir Sábados:</strong><br>");
-                    $css->select("excluir_sabados", "form-control", "excluir_sabados", "", "", "", "");
-                        $sel=0;
-                        if($datos_proyecto["excluir_sabados"]==1){
-                            $sel=1;
-                        }
-                        $css->option("", "", "", "0", "", "",$sel);
-                            print("NO");
-                        $css->Coption();
-                        $sel=0;
-                        if($datos_proyecto["excluir_sabados"]==1){
-                            $sel=1;
-                        }
-                        $css->option("", "", "", "1", "", "",$sel);
-                            print("SI");
-                        $css->Coption();
-                    $css->Cselect();
-                $css->Cdiv();
-                
-                $css->CrearDiv("", "col-md-2", "center", 1, 1);
-                    print("<strong>Excluir Domingos:</strong><br>");
-                    $css->select("excluir_domingos", "form-control", "excluir_domingos", "", "", "", "");
-                        $sel=0;
-                        if($datos_proyecto["excluir_domingos"]==1){
-                            $sel=1;
-                        }
-                        $css->option("", "", "", "0", "", "",$sel);
-                            print("NO");
-                        $css->Coption();
-                        $sel=0;
-                        if($datos_proyecto["excluir_domingos"]==1){
-                            $sel=1;
-                        }
-                        $css->option("", "", "", "1", "", "",$sel);
-                            print("SI");
-                        $css->Coption();
-                    $css->Cselect();
-                $css->Cdiv();
-                $css->CrearDiv("", "col-md-3", "center", 1, 1);
-                    print("<strong>Excluir una fecha específica:</strong><br>");
-                    print('<div class="input-group input-group-md">
-                            <input id="fecha_excluida" type="date" class="form-control" style="line-height: 15px;">
-                                <span class="input-group-btn">
-                                  <button id="btn_excluir_fecha" type="button" class="btn btn-info btn-flat" onclick="agregar_fecha_excluida(`'.$proyecto_id.'`)" >Agregar</button>
-                                </span>
-                          </div>');
-                $css->CerrarDiv();
-                
-                $css->CrearDiv("div_fechas_excluidas", "col-md-5", "center", 1, 1);
-                    
-                $css->CerrarDiv();
-             
-            $css->Cdiv();
+            
             print("<br><br>");
             $css->CrearDiv("", "row", "center", 1, 1);
                 $css->CrearDiv("", "col-md-6", "center", 1, 1);
@@ -937,7 +840,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
             $db=$datos_empresa["db"];            
             $proyecto_id=$obCon->normalizar($_REQUEST["proyecto_id"]);
-            $sql="SELECT COUNT(ID) as total_items FROM $db.proyectos_tareas WHERE proyecto_id='$proyecto_id'";
+            $sql="SELECT COUNT(ID) as total_items  FROM $db.proyectos_tareas WHERE proyecto_id='$proyecto_id' and estado<10 ";
             $datos_totales=$obCon->FetchAssoc($obCon->Query($sql));
             
             
@@ -957,7 +860,7 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->div("external-events-list", "", "", "", "", "", "");
                         $css->div("accordion", "box-group", "", "", "", "", "");
                                                     
-                            $sql="SELECT * FROM $db.proyectos_tareas WHERE proyecto_id='$proyecto_id' and estado<=9";
+                            $sql="SELECT * FROM $db.proyectos_tareas WHERE proyecto_id='$proyecto_id' and estado<=9 order by ID ASC";
                             $Consulta=$obCon->Query($sql);
                             $i=0;
                             while($datos_consulta=$obCon->FetchAssoc($Consulta)){
@@ -977,7 +880,8 @@ if( !empty($_REQUEST["Accion"]) ){
                                                     <i class="fa fa-edit" style="color:orange;cursor:pointer;" onclick="frm_crear_editar_proyecto_tarea(`'.$datos_consulta["tarea_id"].'`,`'.$datos_consulta["proyecto_id"].'`)"  ></i>
                                                     <i class="fa fa-trash-o" style="color:red;cursor:pointer;" onclick=cambiar_estado(`2`,`'.$datos_consulta["tarea_id"].'`,`'.$datos_consulta["proyecto_id"].'`)></i>
                                                   </span><br>');
-                                            print('<small id="sp_horas_'.$datos_consulta["tarea_id"].'" class="label label-danger"><i class="fa fa-clock-o"></i> 2 Horas</small>');
+                                            print('<small id="sp_horas_'.$datos_consulta["tarea_id"].'" class="label label-primary"><i class="fa fa-clock-o"></i> '.number_format($datos_consulta["total_horas_planeadas"]).' Hrs</small>');
+                                            print(' <small id="sp_costos_'.$datos_consulta["tarea_id"].'" class="label label-danger"><i class="fa fa-dollar"></i> '.number_format($datos_consulta["costos_planeacion"]).'</small>');
                                             print('<div id="collapse_'.$datos_consulta["ID"].'" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">');
 
                                                 $css->div("div_actividades_".$tarea_id, "box-body", "", "", "", "", "");
@@ -985,7 +889,7 @@ if( !empty($_REQUEST["Accion"]) ){
                                                     
                                                     print("<h4>Actividades</h4>");
                                                     
-                                                    $sql="SELECT * FROM $db.proyectos_actividades WHERE tarea_id='$tarea_id' and estado<=9";
+                                                    $sql="SELECT * FROM $db.proyectos_actividades WHERE tarea_id='$tarea_id' and estado<=9 ORDER BY ID ASC";
                                                     $Consulta2=$obCon->Query($sql);
                                                     $css->CrearTabla();
                                                     while($datos_actividades=$obCon->FetchAssoc($Consulta2)){
@@ -1171,8 +1075,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         print('<i class="fa fa-list" style="color:purple;cursor:pointer;" onclick="frm_agregar_editar_recursos_actividad(`'.$datos_actividades["actividad_id"].'`)" ></i>');
                         print("<br>");
                         print('<i class="fa fa-trash-o" style="color:red;cursor:pointer;" onclick="cambiar_estado(`3`,`'.$datos_actividades["actividad_id"].'`,`'.$datos_actividades["proyecto_id"].'`)" ></i>');
-                                                            
-
+                           
                     print("</td>");
                     print("<td>");
                         print('<div id="'.$datos_actividades["actividad_id"].'" data-actividad_id="'.$datos_actividades["actividad_id"].'" data-tarea_id="'.$tarea_id.'" data-proyecto_id="'.$proyecto_id.'" title="click izquierdo para editar, click derecho para eliminar" class=" fc-event  external-event ui-draggable ui-draggable-handle" style="position: relative;color:white;background-color:'.$datos_actividades["color"].'">'.$datos_actividades["titulo_actividad"].'</div>');
@@ -1229,7 +1132,7 @@ if( !empty($_REQUEST["Accion"]) ){
                         
                         $css->ColTabla($idItem, 1);
                         $css->ColTabla($DatosConsulta["nombre_recurso"], 1);
-                        if($DatosConsulta["hora_fijo"]==1){
+                        if($DatosConsulta["hora_fijo"]==0){
                             $css->ColTabla("X Hora", 1);
                         }else{
                             $css->ColTabla("Fijo", 1);
@@ -1313,10 +1216,10 @@ if( !empty($_REQUEST["Accion"]) ){
                         $css->CrearDiv("", "col-md-2", "center", 1, 1);
                             print("<strong>Recurso</strong>");
                             $css->select("recurso_hora_fijo", "form-control", "recurso_hora_fijo", "", "", "", "");
-                                $css->option("", "", "", "1", "", "");
+                                $css->option("", "", "", "0", "", "");
                                     print("X Hora");
                                 $css->Coption();
-                                $css->option("", "", "", "0", "", "");
+                                $css->option("", "", "", "1", "", "");
                                     print("Fijo");
                                 $css->Coption();
                             $css->Cselect();

@@ -22,6 +22,6 @@ $result = $obRest->Query($sql);
 $json = [];
 $html="";
 while($row = $obRest->FetchAssoc($result)){
-    $html .= '<div style="width: 100%;border-top: 1px solid #d6d4d4;background-color:#f5f9f9"><a style="cursor:pointer;" class="suggest-element" data-recurso_nombre="'.utf8_encode($row['nombre_recurso']).'"  data-recurso_id="'.utf8_encode($row['recurso_id']).'" id="recurso_'.$row['ID'].'">'.utf8_encode($row['nombre_recurso']).' || '.utf8_encode($row['nombre_tipo_recurso']).'</a></div>';
+    $html .= '<div style="width: 100%;border-top: 1px solid #d6d4d4;background-color:#f5f9f9"><a style="cursor:pointer;" class="suggest-element" data-recurso_nombre="'.($row['nombre_recurso']).'"  data-recurso_id="'.($row['recurso_id']).'" id="recurso_'.$row['ID'].'">'.($row['nombre_recurso']).' || '.($row['nombre_tipo_recurso']).'</a></div>';
 }
 echo $html;

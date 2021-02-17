@@ -8,6 +8,7 @@ if (!isset($_SESSION['username'])){
 $idUser=$_SESSION['idUser'];
 
 include_once("../clases/proyectos.class.php");
+
 //include_once("../clases/inteligenciaExcel.class.php");
 //include_once("../clases/pdf_inteligencia.class.php");
 
@@ -76,17 +77,12 @@ if( !empty($_REQUEST["Accion"]) ){
             $datos_proyecto["proyecto_id"]=$obCon->normalizar($_REQUEST["proyecto_id"]);
             $datos_proyecto["cliente_id"]=$obCon->normalizar($_REQUEST["cliente_id"]);
             $datos_proyecto["nombre"]=$obCon->normalizar($_REQUEST["nombre_proyecto"]);
-            $datos_proyecto["horas_x_dia"]=$obCon->normalizar($_REQUEST["horas_x_dia"]);
-            $datos_proyecto["excluir_sabados"]=$obCon->normalizar($_REQUEST["excluir_sabados"]);
-            $datos_proyecto["excluir_domingos"]=$obCon->normalizar($_REQUEST["excluir_domingos"]);
             
             foreach ($datos_proyecto as $key => $value) {
                 if($value==''){
                     exit("E1;El campo $key no puede estar vacío;$key");
                 }
-                if($key=='horas_x_dia' and (!is_numeric($value) or $value<1 or $value>24)){
-                    exit("E1;Debe escribir un valor numerico entre 1 y 24 para el campo dias por hora;$key");
-                }
+                
             }
             $datos_proyecto["usuario_id"]=$idUser;
             
@@ -332,8 +328,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $obCon->crear_editar_evento($db, $datos_evento);
             $proyecto_id=$datos_evento["proyecto_id"];
             $obCon->actualizar_totales_proyecto($db, $proyecto_id);
-            
-            print("OK;Evento Registrado");
+            $tarea_id=$datos_actividad["tarea_id"];
+            print("OK;Evento Registrado;$tarea_id");
         break;//Fin caso 9
         
         case 10://obtengo los eventos
@@ -372,18 +368,21 @@ if( !empty($_REQUEST["Accion"]) ){
             $tabla_id=$obCon->normalizar($_REQUEST["tabla_id"]);
             $item_id=$obCon->normalizar($_REQUEST["cambiar_id"]);
             
-            if($tabla_id==1){
+            if($tabla_id==1){//Elimina un evento
                 $array_evento_id= explode("_", $item_id);
                 $item_id=$array_evento_id[1];
                 $tab="$db.proyectos_actividades_eventos";
                 $sql="UPDATE $tab SET estado=10 WHERE evento_id='$item_id'";
                 $obCon->Query($sql); 
-                exit("OK;Evento eliminado ");
+                $datos_evento=$obCon->DevuelveValores($tab, "evento_id", $item_id);
+                $proyecto_id=$datos_evento["proyecto_id"];
+                print("OK;Evento eliminado ");
             }
             
-            if($tabla_id==2){
+            if($tabla_id==2){//Elimina una tarea
                 
                 $tab="$db.proyectos_tareas";
+                $datos_tarea=$obCon->DevuelveValores($tab, "tarea_id", $item_id);
                 $sql="UPDATE $tab SET estado=10 WHERE tarea_id='$item_id'";
                 $obCon->Query($sql);
                 $tab="$db.proyectos_actividades_eventos";
@@ -391,10 +390,15 @@ if( !empty($_REQUEST["Accion"]) ){
                 $obCon->Query($sql);
                 $tab="$db.proyectos_actividades";
                 $sql="UPDATE $tab SET estado=10 WHERE tarea_id='$item_id'";
-                $obCon->Query($sql);    
-                exit("OK;Tarea Eliminada ");
+                $obCon->Query($sql); 
+                $tab="$db.proyectos_actividades_recursos";
+                $sql="UPDATE $tab SET estado=10 WHERE tarea_id='$item_id'";                
+                $obCon->Query($sql);
+                print("OK;Tarea Eliminada ");
+                
+                $proyecto_id=$datos_tarea["proyecto_id"];
             }
-            if($tabla_id==3){
+            if($tabla_id==3){//Elimina una actividad
                 
                 
                 $tab="$db.proyectos_actividades_eventos";
@@ -404,9 +408,14 @@ if( !empty($_REQUEST["Accion"]) ){
                 $datos_actividad=$obCon->DevuelveValores($tab, "actividad_id", $item_id);
                 $sql="UPDATE $tab SET estado=10 WHERE actividad_id='$item_id'";
                 $obCon->Query($sql);
-                exit("OK;Actividad eliminada;".$datos_actividad["tarea_id"]);
+                $tab="$db.proyectos_actividades_recursos";
+                $sql="UPDATE $tab SET estado=10 WHERE actividad_id='$item_id'";                
+                $obCon->Query($sql);
+                print("OK;Actividad eliminada;".$datos_actividad["tarea_id"]);
+                $proyecto_id=$datos_actividad["proyecto_id"];
             }
             
+            $obCon->actualizar_totales_proyecto($db, $proyecto_id);
             
         break;//Fin caso 11
     
@@ -462,8 +471,33 @@ if( !empty($_REQUEST["Accion"]) ){
             }
              
             $obCon->agregar_recurso_actividad($db, $proyecto_id, $tarea_id, $actividad_id,$tipo_recurso,$nombre_recurso, "", $hora_o_fijo, $recurso_id, $cantidad_recurso, $costo_unitario_recurso, $utilidad_recurso, $precio_venta, $precio_venta*$cantidad_recurso, $idUser);
+            $obCon->actualizar_totales_proyecto($db, $proyecto_id);
             print("OK;Recurso Agregado");
         break;//Fin caso 12
+        
+        case 13://Obtenga las horas y costos totales de una tarea
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];
+            $tarea_id=$obCon->normalizar($_REQUEST["tarea_id"]);
+            $sql="SELECT SUM(horas) as total_horas FROM $db.proyectos_actividades_eventos t1 WHERE t1.tarea_id='$tarea_id' AND t1.estado<10";
+            $datos_total_horas=$obCon->FetchAssoc($obCon->Query($sql));
+            $sql="SELECT SUM(total_costos_planeacion) as total_costos FROM $db.vista_proyectos_costos t2 WHERE t2.tarea_id='$tarea_id'";
+            $datos_total_costos=$obCon->FetchAssoc($obCon->Query($sql));
+            $total_horas= number_format($datos_total_horas["total_horas"]);
+            $total_costos=number_format($datos_total_costos["total_costos"]);
+            print("OK;$total_horas;$total_costos");
+        break;//fin caso 13
+    
+        case 14://genera el pdf del informe general del proyecto
+            include_once("../clases/pdf_proyectos.class.php");
+            $obPDF=new PDF_Proyectos($db);
+            $empresa_id=$obCon->normalizar($_REQUEST["empresa_id"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", $empresa_id);
+            $db=$datos_empresa["db"];
+            $proyecto_id=$obCon->normalizar($_REQUEST["proyecto_id"]);
+            $obPDF->pdf_informe_proyecto($db, $empresa_id, $proyecto_id);
+        break;//fin caso 14    
     }
     
     

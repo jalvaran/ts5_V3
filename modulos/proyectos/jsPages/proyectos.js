@@ -198,7 +198,7 @@ function frm_crear_editar_proyecto(proyecto_id='',Page){
         success: function(data){            
             document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
             terceros_select2();
-            dibuje_fechas_excluidas(proyecto_id);
+            
             add_events_dropzone_proyecto();
         },
         error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
@@ -375,10 +375,7 @@ function crear_editar_proyecto(){
     
     var cliente_id =document.getElementById("cliente_id").value;
     var nombre_proyecto =document.getElementById("nombre_proyecto").value;
-    var horas_x_dia =document.getElementById("horas_x_dia").value;
-    var excluir_sabados =document.getElementById("excluir_sabados").value;
-    var excluir_domingos =document.getElementById("excluir_domingos").value;
-         
+    
     var form_data = new FormData();
         
         form_data.append('Accion', 3);
@@ -387,9 +384,7 @@ function crear_editar_proyecto(){
         form_data.append('cliente_id', cliente_id);
         
         form_data.append('nombre_proyecto', nombre_proyecto);
-        form_data.append('horas_x_dia', horas_x_dia);
-        form_data.append('excluir_sabados', excluir_sabados);
-        form_data.append('excluir_domingos', excluir_domingos);
+        
                                 
         $.ajax({
         url: 'procesadores/proyectos.process.php',
@@ -1184,7 +1179,7 @@ function agrega_evento_actividad(evento_id,titulo,color,fecha_inicial,fecha_fina
             var respuestas = data.split(';');
             if(respuestas[0]=="OK"){
                 //alertify.success(respuestas[1]);               
-                
+                refrescar_spans_tareas(respuestas[2]);
             }else if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
                 
@@ -1298,6 +1293,7 @@ function agregar_recurso_actividad(proyecto_id,tarea_id,actividad_id){
                 $("#recurso_tarea").attr('data-id','');
                 $("#recurso_tarea").val('');
                 listar_recursos_actividad(actividad_id);
+                refrescar_spans_tareas(tarea_id);
             }else if(respuestas[0]=="E1"){
                 alertify.alert(respuestas[1]);
                 
@@ -1435,6 +1431,49 @@ function frm_agregar_editar_recursos_actividad(actividad_id){
 function inicialice_nombre_recurso(){
     $("#recurso_tarea").attr('data-id','');
     $("#recurso_tarea").val('');
+}
+
+function refrescar_spans_tareas(tarea_id){
+    var empresa_id =document.getElementById("empresa_id").value;
+    var sp_horas_id="sp_horas_"+tarea_id;  
+    var sp_costos_id="sp_costos_"+tarea_id;   
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 13);
+        form_data.append('empresa_id', empresa_id);  
+        form_data.append('tarea_id', tarea_id);  
+             
+                                
+        $.ajax({
+        url: 'procesadores/proyectos.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){
+                             
+                document.getElementById(sp_horas_id).innerHTML='<i class="fa fa-clock-o"></i> '+respuestas[1]+' Hrs' ;
+                document.getElementById(sp_costos_id).innerHTML='<i class="fa fa-dollar"></i> '+respuestas[2] ;
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+                
+            
+            }else{
+                alertify.alert(data);
+            }
+               
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      }) 
 }
 
 MostrarListadoSegunID();
