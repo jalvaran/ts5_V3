@@ -138,7 +138,7 @@ if( !empty($_REQUEST["Accion"]) ){
                                     </div>
                                   </div>');
                         }
-                        print('<div class="col-lg-3 col-xs-6">
+                        print('<div class="col-lg-2 col-xs-6">
                                 <!-- small box -->
                                 <div class="small-box bg-blue">
                                   <div class="inner">
@@ -147,7 +147,37 @@ if( !empty($_REQUEST["Accion"]) ){
                                     <p>Enviar un correo</p>
                                   </div>
                                   <div class="icon">
-                                    <i class="fa fa-send" style="cursor:pointer" onclick=DibujeRedactarCorreoClientes(`'.$CondicionBase64.'`); return false></i>
+                                    <i class="fa fa-send" id="btn_subir" style="cursor:pointer" onclick=DibujeRedactarCorreoClientes(`'.$CondicionBase64.'`); return false></i>
+                                  </div>
+                                  
+                                </div>
+                              </div>');
+                        
+                        print('<div class="col-lg-2 col-xs-6">
+                                <!-- small box -->
+                                <div class="small-box bg-orange">
+                                  <div class="inner">
+                                   
+                                    <h3>Bajar</h3>
+                                    <p>Clientes</p>
+                                  </div>
+                                  <div class="icon">
+                                    <i class="fa fa-cloud-download" id="btn_descargar" style="cursor:pointer" onclick="ConfirmaDescargarDesdeServidor();"></i>
+                                  </div>
+                                  
+                                </div>
+                              </div>');
+                        
+                        print('<div class="col-lg-2 col-xs-6">
+                                <!-- small box -->
+                                <div class="small-box bg-red">
+                                  <div class="inner">
+                                   
+                                    <h3>Subir</h3>
+                                    <p>Clientes</p>
+                                  </div>
+                                  <div class="icon">
+                                    <i class="fa fa-cloud-upload" style="cursor:pointer" onclick="ConfirmaCargarAlServidor();"></i>
                                   </div>
                                   
                                 </div>

@@ -551,4 +551,271 @@ function EnviarMailClientes(idCliente){
       })  
 }  
 
+
+
+function ConfirmaCargarAlServidor(){
+    alertify.confirm('Está seguro que desea Subir los clientes al servidor?',
+        function (e) {
+            if (e) {
+                
+                ObtengaTotalClientes();
+            }else{
+                alertify.error("Se canceló el proceso");
+
+                return;
+            }
+        });
+}
+
+function ObtengaTotalClientes(){
+    document.getElementById("DivMensajes").innerHTML="Obteniendo Total de Clientes a copiar";
+    var idBoton="btn_subir";
+    document.getElementById(idBoton).disabled=true;
+    var form_data = new FormData();
+        form_data.append('Accion', '6'); 
+        
+        
+        $.ajax({
+        url: './procesadores/inteligencia.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){
+                
+                alertify.success(respuestas[1]);                
+                var total_clientes=parseInt(respuestas[2]);
+               
+                if(total_clientes==0){
+                    document.getElementById(idBoton).disabled=false;
+                    return;
+                }else{
+                    CopiarClientesAServidor(1,total_clientes);
+                }
+                
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                document.getElementById(idBoton).disabled=false;
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                document.getElementById(idBoton).disabled=false;  
+                alertify.alert(data);
+                
+            }
+                   
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;   
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function CopiarClientesAServidor(page_clientes,total_clientes){
+    var idBoton="btn_subir";
+    var form_data = new FormData();
+        form_data.append('Accion', '7'); 
+        form_data.append('page_clientes', page_clientes); 
+        form_data.append('total_clientes', total_clientes); 
+        
+        $.ajax({
+        url: './procesadores/inteligencia.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){
+                
+                document.getElementById("DivMensajes").innerHTML=respuestas[1]; 
+                var page_clientes=parseInt(respuestas[2]);
+                CopiarClientesAServidor(page_clientes,total_clientes);                
+                
+            }else if(respuestas[0]=="END"){  
+                alertify.success(respuestas[1]);
+                document.getElementById("DivMensajes").innerHTML=respuestas[1]; 
+                
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                document.getElementById(idBoton).disabled=false;
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                document.getElementById(idBoton).disabled=false;  
+                alertify.alert(data);
+                
+            }
+                   
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;   
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function ConfirmaDescargarDesdeServidor(){
+    alertify.confirm('Está seguro que desea Actulizar productos desde el Servidor?',
+        function (e) {
+            if (e) {
+                
+                ObtengaTotalClientesDescargar();
+            }else{
+                alertify.error("Se canceló el proceso");
+
+                return;
+            }
+        });
+}
+
+function ObtengaTotalClientesDescargar(){
+    document.getElementById("DivMensajes").innerHTML="Obteniendo Total de Registros a copiar";
+    var idBoton="btn_descargar";
+    document.getElementById(idBoton).disabled=true;
+    var form_data = new FormData();
+        form_data.append('Accion', '8'); 
+        
+        
+        $.ajax({
+        url: './procesadores/inteligencia.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){
+                
+                alertify.success(respuestas[1]);                
+                var total_clientes=parseInt(respuestas[2]);
+                
+                if(total_clientes==0){
+                    document.getElementById(idBoton).disabled=false;
+                    return;
+                }else{
+                    CopiarClientesDesdeServidorExterno(1,total_clientes);
+                }
+                
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                document.getElementById(idBoton).disabled=false;
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                document.getElementById(idBoton).disabled=false;  
+                alertify.alert(data);
+                
+            }
+                   
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;   
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function CopiarClientesDesdeServidorExterno(page_clientes,total_clientes){
+    var idBoton="btn_descargar";
+    var form_data = new FormData();
+        form_data.append('Accion', '9'); 
+        form_data.append('page_clientes', page_clientes); 
+        form_data.append('total_clientes', total_clientes); 
+        
+        $.ajax({
+        url: './procesadores/inteligencia.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){
+                
+                document.getElementById("DivMensajes").innerHTML=respuestas[1]; 
+                var page_clientes=parseInt(respuestas[2]);
+                CopiarClientesDesdeServidorExterno(page_clientes,total_clientes);                
+                
+            }else if(respuestas[0]=="END"){  
+                alertify.success(respuestas[1]);
+                document.getElementById("DivMensajes").innerHTML=respuestas[1]; 
+                InsertarClientesNuevosDesdeTemporal();
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                document.getElementById(idBoton).disabled=false;
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                document.getElementById(idBoton).disabled=false;  
+                alertify.alert(data);
+                
+            }
+                   
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;   
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+
+function InsertarClientesNuevosDesdeTemporal(){
+    document.getElementById("DivMensajes").innerHTML="Insertando Registros"; 
+    var idBoton="btnDescargarProductos";
+    var form_data = new FormData();
+        form_data.append('Accion', '10'); 
+                
+        $.ajax({
+        url: './procesadores/inteligencia.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){
+                
+                document.getElementById("DivMensajes").innerHTML=respuestas[1]; 
+                MostrarListadoSegunID();               
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                document.getElementById(idBoton).disabled=false;
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                document.getElementById(idBoton).disabled=false;  
+                alertify.alert(data);
+                
+            }
+                   
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;   
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
 MostrarListadoSegunID();

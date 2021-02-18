@@ -67,7 +67,7 @@ $css->PageInit($myTitulo);
           <!-- /. box -->
           ');
                     
-                               
+                           
                 
             $css->Cdiv();
         
@@ -124,7 +124,9 @@ $css->PageInit($myTitulo);
                 $css->CrearDiv("", "col-md-2", "right", 1, 1); 
                     $css->CrearBotonEvento("btnGenerarListado", "Generar", 1, "onclick", "MostrarListadoSegunID();", "verde");
                 $css->CerrarDiv();   
-            
+                $css->CrearDiv("DivMensajes", "col-md-12", "left", 1, 1);
+                    //print("Esperando...");
+                $css->CerrarDiv(); 
             $css->CrearDiv("DivContenidoListado", "col-md-12", "left", 1, 1);
                             
                 $css->CrearDiv("DivGeneralDrawBox", "box box-primary", "left", 1, 1);

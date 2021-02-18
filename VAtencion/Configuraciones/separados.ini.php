@@ -1,6 +1,6 @@
 <?php
 
-$myTabla="separados";
+$myTabla="vista_separados_reportes";
 $MyID="ID";
 $myPage="separados.php";
 $myTitulo="Historial de Separados";

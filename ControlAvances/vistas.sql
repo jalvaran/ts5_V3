@@ -603,3 +603,11 @@ EXISTS
 
 
 
+DROP VIEW IF EXISTS `vista_separados_reportes`;
+CREATE VIEW vista_separados_reportes AS
+
+SELECT t1.ID,t1.Fecha,t1.Hora,t2.RazonSocial,t2.Num_Identificacion,t2.Direccion,t2.Telefono,
+       t1.Total,t1.Saldo,t1.Estado,t1.Observaciones,t1.idUsuarios,
+       DATE_ADD(t1.Fecha, INTERVAL 60 DAY)  as FechaVencimiento 
+    FROM  separados t1 inner join clientes t2 on t1.idCliente=t2.idClientes ;
+
