@@ -101,7 +101,7 @@ class PDF_Inteligencia extends Documento{
             Referencia,Nombre   
             FROM vista_productos_x_cliente
             WHERE FechaFactura>='$fecha_inicial' AND FechaFactura<='$fecha_final' 
-            GROUP BY Referencia ORDER BY total_items_vendidos DESC LIMIT 5
+            GROUP BY Referencia ORDER BY total_items_vendidos DESC LIMIT 20
             ";
         $consulta=($this->obCon->Query($sql));
         
