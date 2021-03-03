@@ -33,7 +33,9 @@ class InformesAdmnistracion extends Documento{
     //HTML Ventas discriminadas por departamentos
     public function HTML_VentasXDepartamentos($CondicionItems) {
         $html="";
-        $sql="SELECT Departamento as idDepartamento,(SELECT Nombre FROM prod_departamentos WHERE prod_departamentos.idDepartamentos=fi.Departamento LIMIT 1) AS NombreDepartamento, SUM(SubtotalItem) as Subtotal, SUM(IVAItem) as IVA, SUM(TotalItem) as Total, SUM(Cantidad) as Items"
+        $sql="SELECT Departamento as idDepartamento,
+                (SELECT Nombre FROM prod_departamentos WHERE prod_departamentos.idDepartamentos=fi.Departamento LIMIT 1) AS NombreDepartamento,
+                SUM(SubtotalItem) as Subtotal,sum(SubtotalCosto) as total_costos, SUM(IVAItem) as IVA, SUM(TotalItem) as Total, SUM(Cantidad) as Items"
             . " $CondicionItems GROUP BY Departamento";
         $Datos=$this->obCon->Query($sql);
         ////print($sql);
@@ -42,11 +44,12 @@ class InformesAdmnistracion extends Documento{
             </em></strong></span><BR><BR>
 
 
-            <table class="table table-responsive table-hover" border="1" cellspacing="2" align="center" >
+            <table id="tbl_ventas_departamento" class="table table-responsive table-hover" border="1" cellspacing="2" align="center" >
               <tr> 
                 <th><h3>Departamento</h3></th>
                     <th><h3>Nombre</h3></th>
                     <th><h3>Items</h3></th>
+                    <th><h3>TotalCostos</h3></th>
                     <th><h3>SubTotal</h3></th>
                     <th><h3>IVA</h3></th>
                     <th><h3>Total</h3></th>
@@ -57,12 +60,14 @@ class InformesAdmnistracion extends Documento{
             $TotalIVA=0;
             $TotalVentas=0;
             $TotalItems=0;
+            $total_costos=0;
             $flagQuery=0;   //para indicar si hay resultados
             $i=0;
             
             while($DatosVentas= $this->obCon->FetchArray($Datos)){
                 $flagQuery=1;	
                 $SubtotalUser=number_format($DatosVentas["Subtotal"]);
+                $TotalCostosUser=number_format($DatosVentas["total_costos"]);
                 $IVA=number_format($DatosVentas["IVA"]);
                 $Total=number_format($DatosVentas["Total"]);
                 $Items=number_format($DatosVentas["Items"]);
@@ -70,6 +75,7 @@ class InformesAdmnistracion extends Documento{
                 $NombreDep=$DatosVentas["NombreDepartamento"];
 
                 $Subtotal=$Subtotal+$DatosVentas["Subtotal"];
+                $total_costos=$total_costos+$DatosVentas["total_costos"];
                 $TotalIVA=$TotalIVA+$DatosVentas["IVA"];
                 $TotalVentas=$TotalVentas+$DatosVentas["Total"];
                 $TotalItems=$TotalItems+$DatosVentas["Items"];
@@ -79,6 +85,7 @@ class InformesAdmnistracion extends Documento{
                                 <td>'.$idDepartamentos.'</td>
                                 <td>'.$NombreDep.'</td>
                                 <td align="right">'.$Items.'</td>
+                                <td align="right">'.$TotalCostosUser.'</td>    
                                 <td align="right">'.$SubtotalUser.'</td>
                                 <td align="right">'.$IVA.'</td>
                                 <td align="right">'.$Total.'</td>
@@ -88,6 +95,7 @@ class InformesAdmnistracion extends Documento{
             if($flagQuery==1){
             $TotalItems=number_format($TotalItems);
             $Subtotal=number_format($Subtotal);
+            $total_costos=number_format($total_costos);
             $TotalIVA=number_format($TotalIVA);
             $TotalVentas=number_format($TotalVentas);
             $html.= ' 
@@ -96,6 +104,7 @@ class InformesAdmnistracion extends Documento{
               <td align="right"><h3>SUMATORIA</h3></td>
               <td><h3>NA</h3></td>
               <td align="right"><h3>'.$TotalItems.'</h3></td>
+              <td align="right"><h3>'.$total_costos.'</h3></td>
               <td align="right"><h3>'.$Subtotal.'</h3></td>
               <td align="right"><h3>'.$TotalIVA.'</h3></td>
               <td align="right"><h3>'.$TotalVentas.'</h3></td>
@@ -119,7 +128,7 @@ class InformesAdmnistracion extends Documento{
                 </em></strong></span><BR>
 
 
-                <table class="table table-responsive table-hover" border="1" cellspacing="2" align="center" >
+                <table id="tbl_ventas_usuario" class="table table-responsive table-hover" border="1" cellspacing="2" align="center" >
                   <tr> 
                     <th><h3>Usuario</h3></th>
                         <th><h3>TipoVenta</h3></th>

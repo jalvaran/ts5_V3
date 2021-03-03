@@ -191,7 +191,20 @@ class Factura_Electronica extends ProcesoVenta{
             "time": "'.$HoraFactura.'", 
             "type_document_id": '.$TipoDocumento.',
             "type_organization_id": '.$EmpresaTipoCompania.', 
-            "type_regime_id": '.$EmpresaTipoCompania.', 
+            "type_regime_id": '.$EmpresaTipoCompania.',';
+        
+        $datos_resolucion=$this->DevuelveValores("empresapro_resoluciones_facturacion", "ID", $DatosFactura["idResolucion"]);
+        if($datos_resolucion["resolucion_id_api"]>0){
+            $json_factura.='"resolution_id": '.$datos_resolucion["resolucion_id_api"].',';
+        }
+        if($DatosFactura["periodo_fecha_inicio"]<>'0000-00-00' and $DatosFactura["periodo_fecha_fin"]<>'0000-00-00'){
+            $json_factura.='"invoice_period":{
+                                                "start_date":"'.$DatosFactura["periodo_fecha_inicio"].'",
+                                                "end_date":"'.$DatosFactura["periodo_fecha_fin"].'"    
+                                             },';
+                                     
+        }
+        $json_factura.='
             "customer": {
                 "identification_number": '.$AdqNit.',
                 "type_organization_id": '.$AdqTipoPersona.',

@@ -371,6 +371,8 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                     print("<td>");
                         $css->input("date", "TxtFechaFactura", "form-control", "TxtFechaFactura", "Fecha de la Factura", date("Y-m-d"), "Fecha de la Factura", "", "", "", "", "", "style='line-height: 15px;'");
+                        $css->input("date", "periodo_fecha_inicial", "form-control", "TxtFechaFactura", "Periodo F. Inicial", '', "Periodo F. Inicial", "", "", "", "", "", "style='line-height: 15px;'");
+                        $css->input("date", "periodo_fecha_final", "form-control", "TxtFechaFactura", "Periodo F. Final", '', "Periodo F. Final", "", "", "", "", "", "style='line-height: 15px;'");
                     print("</td>");
                     
                     print("<td>");

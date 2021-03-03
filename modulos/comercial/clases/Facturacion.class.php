@@ -38,7 +38,7 @@ class Facturacion extends ProcesoVenta{
      * @param type $ReportarFacturaElectronica -> 0 para reportar a factura electronica 1 para no
      * @param type $Vector
      */
-    public function CrearFactura($idFactura,$Fecha,$Hora,$idResolucion,$OrdenCompra,$OrdenSalida,$FormaPago,$Subtotal,$IVA,$Total,$Descuentos,$SaldoFactura,$idCotizacion,$idEmpresa,$idCentroCostos,$idSucursal,$idUsuario,$idCliente,$TotalCostos,$Observaciones,$Efectivo,$Devuelta,$Cheques,$Otros,$Tarjetas,$idTarjetas,$ReportarFacturaElectronica,$Vector) {
+    public function CrearFactura($idFactura,$Fecha,$Hora,$idResolucion,$OrdenCompra,$OrdenSalida,$FormaPago,$Subtotal,$IVA,$Total,$Descuentos,$SaldoFactura,$idCotizacion,$idEmpresa,$idCentroCostos,$idSucursal,$idUsuario,$idCliente,$TotalCostos,$Observaciones,$Efectivo,$Devuelta,$Cheques,$Otros,$Tarjetas,$idTarjetas,$ReportarFacturaElectronica,$Vector,$periodo_fecha_inicial="",$periodo_fecha_final="") {
         if($idEmpresa==0 or $idEmpresa==''){
             $idEmpresa=1;
         }
@@ -97,6 +97,8 @@ class Facturacion extends ProcesoVenta{
         $Datos["Cheques"]=$Cheques;
         $Datos["Otros"]=$Otros;
         $Datos["Tarjetas"]=$Tarjetas;
+        $Datos["periodo_fecha_inicio"]=$periodo_fecha_inicial;
+        $Datos["periodo_fecha_fin"]=$periodo_fecha_final;
         $Datos["ReporteFacturaElectronica"]=$ReportarFacturaElectronica;
         
         $sql= $this->getSQLInsert("facturas", $Datos);

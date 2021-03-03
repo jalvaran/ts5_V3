@@ -298,3 +298,13 @@ INSERT INTO `proyectos_tareas_estados` (`ID`, `estado_tarea`, `Updated`, `Sync`)
 (10,	'Anulada',	'2021-02-23 22:20:56',	'0000-00-00 00:00:00');
 
 
+ALTER TABLE `empresapro_resoluciones_facturacion`
+ADD `resolucion_id_api` int NOT NULL COMMENT 'id de la resolucion en el api de facura electronica' AFTER `technical_key`;
+
+ALTER TABLE `facturas`
+ADD `periodo_fecha_inicio` date NOT NULL AFTER `ReporteFacturaElectronica`,
+ADD `periodo_fecha_fin` date NOT NULL AFTER `periodo_fecha_inicio`;
+
+ALTER TABLE `ori_facturas`
+ADD `periodo_fecha_inicio` date NOT NULL AFTER `ReporteFacturaElectronica`,
+ADD `periodo_fecha_fin` date NOT NULL AFTER `periodo_fecha_inicio`;

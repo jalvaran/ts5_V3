@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+@session_start();
 if (!isset($_SESSION['username'])){
   exit("<a href='../../index.php' ><img src='../images/401.png'>Iniciar Sesion </a>");
   
@@ -119,6 +119,8 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $idCotizacion=$obCon->normalizar($_REQUEST["idCotizacion"]);       
             $Fecha=$obCon->normalizar($_REQUEST["TxtFechaFactura"]);
+            $periodo_fecha_inicial=$obCon->normalizar($_REQUEST["periodo_fecha_inicial"]);
+            $periodo_fecha_final=$obCon->normalizar($_REQUEST["periodo_fecha_final"]);
             $idCentroCostos=$obCon->normalizar($_REQUEST["CmbCentroCostosFactura"]);
             $CmbResolucion=$obCon->normalizar($_REQUEST["CmbResolucion"]);
             $CmbFormaPago=$obCon->normalizar($_REQUEST["CmbFormaPago"]);
@@ -172,7 +174,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 
             }
             $idFactura=$obFactura->idFactura();
-            $NumFactura=$obFactura->CrearFactura($idFactura, $Fecha, $Hora, $CmbResolucion, $OrdenCompra, $OrdenSalida, $FormaPagoFactura, $Subtotal, $IVA, $Total, $Descuentos, $SaldoFactura, $idCotizacion, $idEmpresa, $idCentroCostos, $idSucursal, $idUser, $idCliente, $TotalCostos, $Observaciones, 0, 0, 0, 0, 0, 0, 0, "");
+            $NumFactura=$obFactura->CrearFactura($idFactura, $Fecha, $Hora, $CmbResolucion, $OrdenCompra, $OrdenSalida, $FormaPagoFactura, $Subtotal, $IVA, $Total, $Descuentos, $SaldoFactura, $idCotizacion, $idEmpresa, $idCentroCostos, $idSucursal, $idUser, $idCliente, $TotalCostos, $Observaciones, 0, 0, 0, 0, 0, 0, 0, "",$periodo_fecha_inicial,$periodo_fecha_final);
             if($NumFactura=="E1"){
                 $Mensaje="La Resolucion está completa";
                 print("E1;$Mensaje");

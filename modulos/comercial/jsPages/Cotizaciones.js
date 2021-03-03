@@ -833,6 +833,8 @@ function ConviertaCotizacionEnFactura(){
     var AnticiposCruzados = parseFloat(document.getElementById('AnticiposCruzados').value);
     var TxtTotalFactura = parseFloat(document.getElementById('TxtTotalFactura').value);
     var TxtTotalAnticipos = parseFloat(document.getElementById('TxtTotalAnticiposFactura').value);
+    var periodo_fecha_inicial = (document.getElementById('periodo_fecha_inicial').value);
+    var periodo_fecha_final = (document.getElementById('periodo_fecha_final').value);
     
     var CmbEmpresa = document.getElementById('CmbEmpresa').value;
     var CmbSucursal = document.getElementById('CmbSucursal').value;
@@ -892,6 +894,9 @@ function ConviertaCotizacionEnFactura(){
         form_data.append('CmbEmpresa', CmbEmpresa);
         form_data.append('CmbSucursal', CmbSucursal);
         form_data.append('AnticiposCruzados', AnticiposCruzados);
+        form_data.append('periodo_fecha_inicial', periodo_fecha_inicial);
+        form_data.append('periodo_fecha_final', periodo_fecha_final);
+        
         AnticiposCruzados=0;
         $.ajax({
         url: './procesadores/Cotizaciones.process.php',

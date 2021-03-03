@@ -89,7 +89,8 @@ $css->PageInit($myTitulo);
                 print("<a href='#'>Acciones</a>");
             $css->Clegend();          
         
-           $css->CrearBotonEvento("BtnCrearReporte", "Crear", 1, "onclick", "crear_informe_administrador()", "azul", "");
+           $css->CrearBotonEvento("BtnCrearReporte", "Crear PDF", 1, "onclick", "crear_informe_administrador()", "azul", "");
+           $css->CrearBotonEvento("BtnCrearReporteExcel", "Crear Excel", 1, "onclick", "crear_informe_administrador_excel()", "verde", "");
         $css->Cfieldset();
         $css->CerrarDiv();  
         
