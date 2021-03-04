@@ -400,14 +400,14 @@ if(isset($_REQUEST["Accion"])){
                     $TotalFacturasNegativas=$obCon->Sume("facturas", "Total", "WHERE Fecha>='$FechaInicial' AND Fecha<='$FechaFinal' AND Total<0");
                     $TotalFacturasNegativas=ABS($TotalFacturasNegativas);
                 }
-                $total_entrega=$DatosCierre["TotalEntrega"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$total_cruce_anticipos+$AbonosAcuerdoOtrosMetodos+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo+$AbonosAnticiposEncargosOtrosMetodos;
+                $total_entrega=$DatosCierre["TotalEntrega"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos+$AbonosAcuerdoOtrosMetodos+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo+$AbonosAnticiposEncargosOtrosMetodos;
                 $css->FilaTabla(16);
                         $css->ColTabla(" ", 1);
                         $css->ColTabla("TOTAL ENTREGA:", 1);
                         $css->ColTabla(number_format($total_entrega), 1);
                     $css->CierraFilaTabla();
                 
-                $SaldoEnCaja=$DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$total_cruce_anticipos+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo;
+                $SaldoEnCaja=$DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo;
                 $Diferencia=$DatosCierre["EfectivoRecaudado"]-$SaldoEnCaja;
                 $css->FilaTabla(16);
                         $css->ColTabla(" ", 1);

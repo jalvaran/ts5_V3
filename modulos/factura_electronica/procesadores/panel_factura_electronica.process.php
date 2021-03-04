@@ -8,6 +8,8 @@ if (!isset($_SESSION['username'])){
 $idUser=$_SESSION['idUser'];
 
 include_once("../clases/notas_credito.class.php");
+include_once("../../../general/clases/facturacion_electronica.class.php");
+include_once("../clases/pdf_documentos_electronicos.class.php");
 
 if( !empty($_REQUEST["Accion"]) ){
     $obCon = new NotasCredito($idUser);
@@ -116,7 +118,69 @@ if( !empty($_REQUEST["Accion"]) ){
             $obCon->ContabilizarNotaCredito($idNota);    
             
             exit("OK;Nota Credito No. $idNota creada");
-        break;//Fin caso 4    
+        break;//Fin caso 4   
+        
+        case 5:// envie un documento electronico por mail
+            //$documento_id=$obCon->normalizar($_REQUEST["idDocumento"]);
+            $obPDF = new PDF_Documentos_Electronicos($db);
+            $obFE = new Factura_Electronica($idUser);
+            $Tabla="facturas_electronicas_log";
+            $sql="SELECT ID,idFactura,UUID,RespuestaCompletaServidor FROM $Tabla  WHERE UUID<>'' and EnviadoPorMail=0 LIMIT 1";
+            $DatosLogFactura=$obCon->FetchAssoc($obCon->Query($sql));
+            $uuid=$DatosLogFactura["UUID"];
+            if($uuid==''){
+                exit("RE;No se encontraron Facturas a Enviar");
+            }
+            $datos_factura=$obCon->DevuelveValores("facturas", "idFacturas", $DatosLogFactura["idFactura"]);
+            $datos_cliente=$obCon->DevuelveValores("clientes", "idClientes", $datos_factura["Clientes_idClientes"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", 1);
+            
+            $datos_configuracion_general=$obCon->DevuelveValores("configuracion_general", "ID", 16); //Ruta donde se almacenan las facturas electronicas
+            
+            $ruta=$obPDF->pdf_factura_electronica($DatosLogFactura["idFactura"], 1,"../".$datos_configuracion_general["Valor"]);
+            $im = file_get_contents($ruta);
+            $pdfBase64Bytes = base64_encode($im);
+            
+                     
+            $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 112); //Ruta para enviar un mail     
+            $url=$DatosServidor["IP"];   
+
+            $url=$url.$uuid;
+            $body='{
+                    "to": [
+                      {
+                        "email": "'.$datos_cliente["Email"].'"
+                      }
+                    ],
+                    "cc": [
+                      {
+                        "email": "'.$datos_empresa["Email"].'"
+                      }
+                    ],
+                    
+                    "pdf_base64_bytes": "'.$pdfBase64Bytes.'"
+                    
+                  }';
+            $response = $obFE->callAPI('POST', $url, $body);
+            $array_respuesta= json_decode($response,1);
+            if(isset($array_respuesta["is_valid"])){
+                print("OK;Factura $DatosLogFactura[idFactura] Enviada");
+                $obCon->ActualizaRegistro($Tabla, "EnviadoPorMail", 1, "idFactura", $DatosLogFactura["idFactura"]);
+            }else{
+                print("E1;La Factura $DatosLogFactura[idFactura] No pudo ser enviada Enviada");
+            }
+            
+        break;//Fin caso 5
+        
+        case 6:// crea el pdf de la factura electronica
+            $documento_id=$obCon->normalizar($_REQUEST["documento_id"]);
+            $obPDF = new PDF_Documentos_Electronicos($db);
+            
+            $datos_configuracion_general=$obCon->DevuelveValores("configuracion_general", "ID", 16); //Ruta donde se almacenan las facturas electronicas
+            
+            $ruta=$obPDF->pdf_factura_electronica($documento_id, 1,"../".$datos_configuracion_general["Valor"]);
+            print("<a href='$ruta' target='_blank'>Ver Factura</a>");
+        break;//Fin caso 6
         
     }
     

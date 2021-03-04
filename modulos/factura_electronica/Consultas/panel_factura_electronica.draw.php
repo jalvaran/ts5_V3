@@ -263,6 +263,12 @@ if( !empty($_REQUEST["Accion"]) ){
                                     print("<i class='fa fa-fw fa-commenting' style='color:blue;cursor:pointer' onclick='ObtenerLogsDocumento(`$idItem`,`$TipoListado`)' title='Logs del documento'></i>");
                                 print("</td>"); 
                                 print("<td class='mailbox-date' style='text-align:center'>");
+                                    print("<i class='fa fa-send' style='color:blue;cursor:pointer' onclick='enviar_x_mail(`$idItem`,`$TipoListado`)' title='Enviar por Mail'></i>");
+                                print("</td>"); 
+                                print("<td class='mailbox-date' style='text-align:center'>");
+                                    print("<i class='fa fa-file-pdf-o' style='color:blue;cursor:pointer' onclick='ver_representacion_factura_electronica(`$idFactura`)' title='Ver PDF'></i>");
+                                print("</td>"); 
+                                print("<td class='mailbox-date' style='text-align:center'>");
                                     if($TipoListado==3){
                                         print("<i class='fa fa-fw fa-code' style='color:blue;cursor:pointer' onclick='VerJSONNotaCreditoFE(`$idItem`)' title='Ver JSON'></i>");
                                     }else{

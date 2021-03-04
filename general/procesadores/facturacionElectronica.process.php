@@ -551,6 +551,94 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;//Fin caso 10    
         
+        case 11:// envie un documento electronico por mail
+            $documento_id=$obCon->normalizar($_REQUEST["idDocumento"]);
+            
+            $Tabla="facturas_electronicas_log";
+            $sql="SELECT ID,idFactura,UUID,RespuestaCompletaServidor FROM $Tabla WHERE ID='$documento_id'";
+            $DatosLogFactura=$obCon->FetchAssoc($obCon->Query($sql));
+            $uuid=$DatosLogFactura["UUID"];
+            
+            //print($JSONFactura["zipBase64Bytes"]);
+            $im = file_get_contents('factura.pdf');
+            $pdfBase64Bytes = base64_encode($im);
+            
+            /*
+            $data = base64_decode($pdfBase64Bytes);
+            header('Content-Type: application/pdf');
+            echo $data;
+            */
+            //$base64_bytes=$JSONFactura["zipBase64Bytes"];
+            //$pdfBase64Bytes=$JSONFactura["pdfBase64Bytes"];
+            
+          
+            $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 112); //Ruta para enviar un mail     
+            $url=$DatosServidor["IP"];   
+
+            $url=$url.$uuid;
+            $body='{
+                    "to": [
+                      {
+                        "email": "andresmoncayovalencia@gmail.com"
+                      }
+                    ],
+                    "cc": [
+                      {
+                        "email": "jalvaran@gmail.com"
+                      }
+                    ],
+                    
+                    "pdf_base64_bytes": "'.$pdfBase64Bytes.'"
+                    
+                  }';
+            $response = $obCon->callAPI('POST', $url, $body);
+            $array_respuesta= json_decode($response,1);
+            
+            print("<pre>");
+            print_r($array_respuesta);
+            print("</pre>");
+            /*
+            $data = base64_decode($pdfBase64Bytes);
+            header('Content-Type: application/pdf');
+            echo $data;
+            
+            $data = base64_decode($base_64);
+            header('Content-Type: application/zip');
+            header('Content-disposition: filename="xml_file.zip"');
+            echo $data;
+            
+            //print_r($JSONFactura);
+            /*
+            print("<pre>");
+            print_r($JSONFactura["responseDian"]["Envelope"]["Body"]["SendBillSyncResponse"]["SendBillSyncResult"]["XmlBase64Bytes"]);
+            print("</pre>");
+            */
+            /*
+            if($uuid<>''){               
+                $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 111); //Ruta para ver los logs del documento       
+                $url=$DatosServidor["IP"];   
+                
+                $url=$url.$uuid;
+                $body="";
+                $response = $obCon->callAPI('POST', $url, $body);
+                $array_respuesta= json_decode($response,1);
+                /*
+                print("<pre>");
+                print_r($array_respuesta["responseDian"]["Envelope"]["Body"]["GetStatusResponse"]["GetStatusResult"]["XmlBase64Bytes"]);
+                print("</pre>");
+               
+                $base_64=$array_respuesta["responseDian"]["Envelope"]["Body"]["GetStatusResponse"]["GetStatusResult"]["XmlBase64Bytes"];
+                $data = base64_decode($base_64);
+                header('Content-Type: application/zip');
+                header('Content-disposition: filename="xml_file.zip"');
+                
+            }else{
+                print("El documento no tiene uuid");
+            }      
+              
+            */
+        break;//Fin caso 11    
+        
     }
     
     

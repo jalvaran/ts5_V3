@@ -308,3 +308,32 @@ ADD `periodo_fecha_fin` date NOT NULL AFTER `periodo_fecha_inicio`;
 ALTER TABLE `ori_facturas`
 ADD `periodo_fecha_inicio` date NOT NULL AFTER `ReporteFacturaElectronica`,
 ADD `periodo_fecha_fin` date NOT NULL AFTER `periodo_fecha_inicio`;
+
+
+
+ALTER TABLE `empresapro_regimenes`
+CHANGE `Regimen` `Regimen` varchar(45) COLLATE 'utf8_spanish_ci' NOT NULL AFTER `ID`;
+UPDATE `empresapro_regimenes` SET `Regimen` = 'Responsable de IVA' WHERE `ID` = '1';
+UPDATE `empresapro_regimenes` SET `Regimen` = 'No Responsable de IVA' WHERE `ID` = '2';
+
+
+UPDATE `cod_documentos` SET `Descripcion` = 'Cédula de ciudadanía ' WHERE `Codigo` = '13' AND `Descripcion` = 'C?dula de ciudadan?a ' AND `Descripcion` = 'C?dula de ciudadan?a ' COLLATE utf8mb4_bin AND `Updated` = '2020-07-25 09:35:02' AND `Sync` = '2020-07-25 09:35:02' LIMIT 1;
+UPDATE `cod_documentos` SET `Descripcion` = 'Certificado de la Registraduría para sucesiones ilíquidas de personas naturales que no tienen ningún documento de identificación. ' WHERE `Codigo` = '14' AND MD5(CONVERT(`Descripcion` USING utf8mb4)) = '2f88a9973a3adfc1a77cf12abde74748' AND `Updated` = '2020-07-25 09:35:02' AND `Sync` = '2020-07-25 09:35:02' LIMIT 1;
+UPDATE `cod_documentos` SET `Descripcion` = 'Tipo de documento que identifica una sucesión ilíquida, expedido por la notaria o por un juzgado' WHERE `Codigo` = '15' AND MD5(CONVERT(`Descripcion` USING utf8mb4)) = 'b86ea673b7cf73899494ee7b27e69699' AND `Updated` = '2020-07-25 09:35:02' AND `Sync` = '2020-07-25 09:35:02' LIMIT 1;
+UPDATE `cod_documentos` SET `Descripcion` = 'Tarjeta de extranjería' WHERE `Codigo` = '21' AND `Descripcion` = 'Tarjeta de extranjer' AND `Descripcion` = 'Tarjeta de extranjer' COLLATE utf8mb4_bin AND `Updated` = '2020-07-25 09:35:02' AND `Sync` = '2020-07-25 09:35:02' LIMIT 1;
+UPDATE `cod_documentos` SET `Descripcion` = 'Cédula de extranjería ' WHERE `Codigo` = '22' AND `Descripcion` = 'C?dula de extranjer?a ' AND `Descripcion` = 'C?dula de extranjer?a ' COLLATE utf8mb4_bin AND `Updated` = '2020-07-25 09:35:02' AND `Sync` = '2020-07-25 09:35:02' LIMIT 1;
+UPDATE `cod_documentos` SET `Descripcion` = 'Identificación de extranjeros diferente al NIT asignado DIAN' WHERE `Codigo` = '33' AND `Descripcion` = 'Identificaci?n de extranjeros diferente al NIT asignado DIAN' AND `Descripcion` = 'Identificaci?n de extranjeros diferente al NIT asignado DIAN' COLLATE utf8mb4_bin AND `Updated` = '2020-07-25 09:35:02' AND `Sync` = '2020-07-25 09:35:02' LIMIT 1;
+UPDATE `cod_documentos` SET `Descripcion` = 'Documento de identificación extranjero ' WHERE `Codigo` = '42' AND `Descripcion` = 'Documento de identificaci?n extranjero ' AND `Descripcion` = 'Documento de identificaci?n extranjero ' COLLATE utf8mb4_bin AND `Updated` = '2020-07-25 09:35:02' AND `Sync` = '2020-07-25 09:35:02' LIMIT 1;
+UPDATE `cod_documentos` SET `Descripcion` = 'Sin identificación del exterior o para uso definido por la DIAN. ' WHERE `Codigo` = '43' AND MD5(CONVERT(`Descripcion` USING utf8mb4)) = '2ce4e908bd019cf0741e2c230403692b' AND `Updated` = '2020-07-25 09:35:02' AND `Sync` = '2020-07-25 09:35:02' LIMIT 1;
+UPDATE `cod_documentos` SET `Descripcion` = 'Documento de Identificación extranjero Persona Jurídica ' WHERE `Codigo` = '44' AND `Descripcion` = 'Documento de Identificaci?n extranjero Persona Jur?dica ' AND `Descripcion` = 'Documento de Identificaci?n extranjero Persona Jur?dica ' COLLATE utf8mb4_bin AND `Updated` = '2020-07-25 09:35:02' AND `Sync` = '2020-07-25 09:35:02' LIMIT 1;
+UPDATE `cod_documentos` SET `Descripcion` = 'Carné Diplomótico: Documento expedido por el Ministerio de relaciones Exteriores a los miembros de la misiones diplomáticas y consulares, con el que se deben identificar ente las autoridades nacionales' WHERE `Codigo` = '46' AND MD5(CONVERT(`Descripcion` USING utf8mb4)) = '707523eaa180a0510b90672366ec5698' AND `Updated` = '2020-07-25 09:35:02' AND `Sync` = '2020-07-25 09:35:02' LIMIT 1;
+
+
+ALTER TABLE `facturas_electronicas_log`
+ADD INDEX `UUID` (`UUID`(45)),
+ADD INDEX `PDFCreado` (`PDFCreado`),
+ADD INDEX `ZIPCreado` (`ZIPCreado`),
+ADD INDEX `EnviadoPorMail` (`EnviadoPorMail`);
+
+
+update facturas_electronicas_log set EnviadoPorMail=1;
