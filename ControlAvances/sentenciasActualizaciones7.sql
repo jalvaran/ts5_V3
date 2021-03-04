@@ -337,3 +337,16 @@ ADD INDEX `EnviadoPorMail` (`EnviadoPorMail`);
 
 
 update facturas_electronicas_log set EnviadoPorMail=1;
+
+ALTER TABLE `notas_credito`
+ADD `error_api` text COLLATE 'utf8_spanish_ci' NOT NULL AFTER `LogsDocumento`;
+
+ALTER TABLE `notas_credito`
+ADD `EnviadoPorMail` int NOT NULL AFTER `LogsDocumento`;
+update notas_credito set EnviadoPorMail=1;
+
+ALTER TABLE `notas_credito`
+ADD INDEX `EnviadoPorMail` (`EnviadoPorMail`);
+
+
+

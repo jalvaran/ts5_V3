@@ -121,11 +121,28 @@ if( !empty($_REQUEST["Accion"]) ){
         break;//Fin caso 4   
         
         case 5:// envie un documento electronico por mail
-            //$documento_id=$obCon->normalizar($_REQUEST["idDocumento"]);
+            $documento_id='';
+            if(isset($_REQUEST["idDocumento"])){
+                $documento_id=$obCon->normalizar($_REQUEST["idDocumento"]);
+            }
+            $Tabla="facturas_electronicas_log";
+            if(isset($_REQUEST["TipoDocumento"])){
+                if($_REQUEST["TipoDocumento"]==1){
+                    $Tabla="notas_credito";
+                }
+                
+            }
+            
             $obPDF = new PDF_Documentos_Electronicos($db);
             $obFE = new Factura_Electronica($idUser);
-            $Tabla="facturas_electronicas_log";
-            $sql="SELECT ID,idFactura,UUID,RespuestaCompletaServidor FROM $Tabla  WHERE UUID<>'' and EnviadoPorMail=0 LIMIT 1";
+            
+            
+            if($documento_id==''){
+                $condicion="WHERE UUID<>'' and EnviadoPorMail=0 LIMIT 1";
+            }else{
+                $condicion="WHERE UUID<>'' and ID='$documento_id' LIMIT 1";
+            }
+            $sql="SELECT ID,idFactura,UUID,RespuestaCompletaServidor FROM $Tabla  $condicion";
             $DatosLogFactura=$obCon->FetchAssoc($obCon->Query($sql));
             $uuid=$DatosLogFactura["UUID"];
             if($uuid==''){
@@ -181,7 +198,168 @@ if( !empty($_REQUEST["Accion"]) ){
             $ruta=$obPDF->pdf_factura_electronica($documento_id, 1,"../".$datos_configuracion_general["Valor"]);
             print("<a href='$ruta' target='_blank'>Ver Factura</a>");
         break;//Fin caso 6
+    
+        case 7://Reporte las notas credito
+            $obFE=new Factura_Electronica($idUser);
+            $nota_id='';
+            if(isset($_REQUEST["idNota"])){
+                $nota_id=$obCon->normalizar($_REQUEST["idNota"]);
+            }
+            if($nota_id==''){
+                $sql="SELECT ID FROM notas_credito  
+                    WHERE Estado=0 LIMIT 1";
+            }else{
+                $sql="SELECT ID FROM notas_credito  
+                    WHERE ID='$nota_id' LIMIT 1";
+            }
+            
+
+            $DatosConsulta=$obCon->FetchAssoc($obCon->Query($sql));
+            $idNota=$DatosConsulta["ID"];
+            
+            if($idNota==''){
+                exit("RE;No hay Notas a Generar");
+            }
+            
+            $sql="SELECT COUNT(ID) AS TotalItems FROM notas_credito_items WHERE idNotaCredito='$idNota'";
+            $DatosTotal=$obCon->FetchAssoc($obCon->Query($sql));
+            $response="";
+            $Estado=0;
+
+            if($DatosTotal["TotalItems"]>0){ //Verifico que la nota tenga items
+                $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 105); //Ruta para enviar las notas credito            
+                $url=$DatosServidor["IP"];
+                $body=$obFE->JSONNotaCredito($idNota);
+                $response = $obFE->callAPI('POST', $url, $body);  
+                $response=str_replace(PHP_EOL, '', $response);
+                $response=str_replace("\n", '',$response);
+                $response=str_replace("\r", '',$response);
+                $response=str_replace("'", '',$response);
+                
+                $sql="UPDATE notas_credito SET RespuestaCompletaServidor='$response' WHERE ID='$idNota'";
+                $obCon->Query($sql);
+                $JsonRespuesta= json_decode($response);
+                if((property_exists($JsonRespuesta, "responseDian"))){
+                    $RespuestaReporte=$JsonRespuesta->responseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid;
+                    if($RespuestaReporte==true){
+                            
+                        $obCon->ActualizaRegistro("notas_credito", "Estado", 1, "ID", $idNota);
+                        
+                    }else{
+                        $obCon->ActualizaRegistro("notas_credito", "Estado", 11, "ID", $idNota);
+                    }    
+                }else{
+                    $obCon->ActualizaRegistro("notas_credito", "Estado", 11, "ID", $idNota);
+                }
+            }else{
+                $obCon->ActualizaRegistro("notas_credito", "Estado", 1, "ID", $idNota);
+                exit("OK;Nota Credito $idNota Enviada");
+            }
+        break;//fin caso 7 
         
+        case 8:// actualice uuid de las notas
+            $sql="SELECT * FROM notas_credito WHERE UUID='' ORDER BY ID DESC ";
+            $Consulta=$obCon->Query($sql);
+            
+            while($datos_consulta=$obCon->FetchAssoc($Consulta)){
+                $response=str_replace(PHP_EOL, '', $datos_consulta["RespuestaCompletaServidor"]);
+                $response=str_replace("\n", '',$response);
+                $response=str_replace("\r", '',$response);
+                $response=str_replace("'", '',$response);
+                $array_respuesta= json_decode($response,1);
+                if(isset($array_respuesta["uuid"])){
+                    $obCon->ActualizaRegistro("notas_credito", "UUID", $array_respuesta["uuid"], "ID", $datos_consulta["ID"]);
+                }else{
+                    $obCon->ActualizaRegistro("notas_credito", "Estado", 10, "ID", $datos_consulta["ID"]);
+                }
+                
+            }
+            
+            print("OK;UUID de las notas actualizados");
+        break;//Fin caso 8    
+        
+        case 9:// envie una nota credito por mail
+            $documento_id='';
+            if(isset($_REQUEST["idDocumento"])){
+                $documento_id=$obCon->normalizar($_REQUEST["idDocumento"]);
+            }
+            
+            $obPDF = new PDF_Documentos_Electronicos($db);
+            $obFE = new Factura_Electronica($idUser);
+            $Tabla="notas_credito";
+            
+            if($documento_id==''){
+                $condicion="WHERE UUID<>'' and EnviadoPorMail=0 ORDER BY ID DESC LIMIT 1";
+            }else{
+                $condicion="WHERE UUID<>'' and ID='$documento_id' LIMIT 1";
+            }
+            $sql="SELECT ID,idFactura,UUID,RespuestaCompletaServidor FROM $Tabla  $condicion";
+            $DatosLogFactura=$obCon->FetchAssoc($obCon->Query($sql));
+            $uuid=$DatosLogFactura["UUID"];
+            if($uuid==''){
+                exit("RE;No se encontraron Notas a Enviar X Email");
+            }
+            $datos_factura=$obCon->DevuelveValores("facturas", "idFacturas", $DatosLogFactura["idFactura"]);
+            $datos_cliente=$obCon->DevuelveValores("clientes", "idClientes", $datos_factura["Clientes_idClientes"]);
+            $datos_empresa=$obCon->DevuelveValores("empresapro", "idEmpresaPro", 1);
+            
+            $datos_configuracion_general=$obCon->DevuelveValores("configuracion_general", "ID", 16); //Ruta donde se almacenan las facturas electronicas
+            /*
+            $ruta=$obPDF->pdf_factura_electronica($DatosLogFactura["idFactura"], 1,"../".$datos_configuracion_general["Valor"]);
+            $im = file_get_contents($ruta);
+            $pdfBase64Bytes = base64_encode($im);
+            
+             * 
+             */
+                     
+            $DatosServidor=$obCon->DevuelveValores("servidores", "ID", 112); //Ruta para enviar un mail     
+            $url=$DatosServidor["IP"];   
+
+            $url=$url.$uuid;
+            /*
+            $body='{
+                    "to": [
+                      {
+                        "email": "'.$datos_cliente["Email"].'"
+                      }
+                    ],
+                    "cc": [
+                      {
+                        "email": "'.$datos_empresa["Email"].'"
+                      }
+                    ],
+                    
+                    "pdf_base64_bytes": "'.$pdfBase64Bytes.'"
+                    
+                  }';
+            
+             * 
+             */
+            $body='{
+                    "to": [
+                      {
+                        "email": "'.$datos_cliente["Email"].'"
+                      }
+                    ],
+                    "cc": [
+                      {
+                        "email": "'.$datos_empresa["Email"].'"
+                      }
+                    ]
+                    
+                  }';
+            $response = $obFE->callAPI('POST', $url, $body);
+            $array_respuesta= json_decode($response,1);
+           
+            if(isset($array_respuesta["is_valid"])){
+                print("OK;Nota $DatosLogFactura[ID] Enviada");
+                $obCon->ActualizaRegistro($Tabla, "EnviadoPorMail", 1, "ID", $DatosLogFactura["ID"]);
+            }else{
+                print("OK;Nota $DatosLogFactura[ID] No pudo ser Enviada");
+                $obCon->ActualizaRegistro($Tabla, "EnviadoPorMail", 2, "ID", $DatosLogFactura["ID"]);
+            }
+            
+        break;//Fin caso 9
     }
     
     

@@ -16,6 +16,7 @@ if( !empty($_REQUEST["Accion"]) ){
     switch ($_REQUEST["Accion"]) {
         case 1: //Dibuja el tablero de facturas electronicas
             $TipoListado=$obCon->normalizar($_REQUEST["TipoListado"]);
+            
             $sql="SELECT COUNT(ID) as Total FROM facturas_electronicas_log WHERE Estado=1";
             $DatosTotales=$obCon->FetchArray($obCon->Query($sql));            
             $TotalEmitidos=$DatosTotales["Total"];
@@ -154,7 +155,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             if($TipoListado==3 ){ //Notas credito pendientes
                 $TablaConsulta="vista_notas_credito_fe";
-                $Condicional.=" AND Estado=0 OR Estado=11";
+                $Condicional.=" AND Estado=0 OR (Estado>=10 AND Estado<20)";
                 $Titulo="Listado de Notas Credito Pendientes";
                 $ColorStatus="orange";
             }
@@ -265,9 +266,7 @@ if( !empty($_REQUEST["Accion"]) ){
                                 print("<td class='mailbox-date' style='text-align:center'>");
                                     print("<i class='fa fa-send' style='color:blue;cursor:pointer' onclick='enviar_x_mail(`$idItem`,`$TipoListado`)' title='Enviar por Mail'></i>");
                                 print("</td>"); 
-                                print("<td class='mailbox-date' style='text-align:center'>");
-                                    print("<i class='fa fa-file-pdf-o' style='color:blue;cursor:pointer' onclick='ver_representacion_factura_electronica(`$idFactura`)' title='Ver PDF'></i>");
-                                print("</td>"); 
+                                
                                 print("<td class='mailbox-date' style='text-align:center'>");
                                     if($TipoListado==3){
                                         print("<i class='fa fa-fw fa-code' style='color:blue;cursor:pointer' onclick='VerJSONNotaCreditoFE(`$idItem`)' title='Ver JSON'></i>");
@@ -326,7 +325,11 @@ if( !empty($_REQUEST["Accion"]) ){
                                     print(utf8_encode(number_format($DatosFacturas["Total"])));
                                 print("</td>");
                                 if($TipoListado==1 or $TipoListado==2){
-                                    
+                                    $accion=1;
+                                    if($TipoListado==2){
+                                        $accion=2;
+                                    }
+                                    $RutaPDF="Consultas/PDF_Documentos_Electronicos.draw.php?Accion=$accion&ID=".$idFactura."&item_id=$idItem";
                                     print("<td class='mailbox-date' style='text-align:center'>");
                                         print("<a href='$RutaPDF' target='_blank'><i class='fa fa-file-pdf-o' style='color:green;cursor:pointer;font-size:30px;'></i></a>");
                                     print("</td>"); 

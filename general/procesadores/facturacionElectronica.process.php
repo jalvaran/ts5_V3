@@ -328,7 +328,9 @@ if( !empty($_REQUEST["Accion"]) ){
                         }
                         
                         if($RespuestaReporte==true){
+                            
                             $obCon->ActualizaRegistro("notas_credito", "Estado", 1, "ID", $idNota);
+                            
                         }else{
                             $obCon->ActualizaRegistro("notas_credito", "Estado", 11, "ID", $idNota);
                         }
@@ -509,6 +511,10 @@ if( !empty($_REQUEST["Accion"]) ){
                             $url=$url.$uuid;
                             $body="";
                             $response2 = $obCon->callAPI('POST', $url, $body);
+                            $response2=str_replace(PHP_EOL, '', $response2);
+                            $response2=str_replace('\n', '', $response2);
+                            $response2=str_replace('\r', '', $response2);
+                            $response2=str_replace("'", '', $response2);
                             
                             
                             $sql="UPDATE $Tabla SET LogsDocumento='$response2' WHERE ID='$idDocumento'";

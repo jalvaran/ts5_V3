@@ -62,6 +62,7 @@ $('#CmbBusquedas').bind('change', function() {
 
 
 function VerTablero(){
+    console.log("mostrando tablero");
     var idDivDraw="DivDrawFE";
      
     var form_data = new FormData();
@@ -89,6 +90,7 @@ function VerTablero(){
 }
 
 function VerListado(Page=1){
+    console.log("mostrando listado");
     var idDivDraw="DivDrawListFE";
     //document.getElementById(idDivDraw).innerHTML='<div id="GifProcess">Procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
     
@@ -138,6 +140,7 @@ function MarqueErrorElemento(idElemento){
 }
 
 function GenereFacturasElectronicas(){
+    console.log("generando facturas");
     var idDivDraw="NotificacionProcesos";
     //document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
     var form_data = new FormData();
@@ -184,14 +187,15 @@ function GenereFacturasElectronicas(){
 
 
 function GenereNotasCreditoElectronicas(){
+    console.log("generando notas");
     var idDivDraw="NotificacionProcesos";
     //document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
     var form_data = new FormData();
-        form_data.append('Accion', 8);
+        form_data.append('Accion', 7);
                       
     $.ajax({
         //async:false,
-        url: '../../general/procesadores/facturacionElectronica.process.php',
+        url: 'procesadores/panel_factura_electronica.process.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -230,6 +234,7 @@ function GenereNotasCreditoElectronicas(){
 
 
 function VerifiqueFacturasElectronicas(){
+    console.log("verificando facturas electronicas");
     var idDivDraw="NotificacionProcesos";
     //document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
     var form_data = new FormData();
@@ -274,7 +279,9 @@ function VerifiqueFacturasElectronicas(){
 }
 
 function GenerePDFFacturasElectronicas(){
+    console.log("guardando pdf facturas");
     var idDivDraw="NotificacionProcesos";
+    console.log("Generando pdf facturas electronicas");
     //document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
     var form_data = new FormData();
         form_data.append('Accion', 3);
@@ -318,7 +325,9 @@ function GenerePDFFacturasElectronicas(){
 }
 
 function GenereXMLFacturasElectronicas(){
+    console.log("generando xml facturas");
     var idDivDraw="NotificacionProcesos";
+     console.log("Generando xml facturas electronicas");
     //document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
     var form_data = new FormData();
         form_data.append('Accion', 4);
@@ -362,6 +371,7 @@ function GenereXMLFacturasElectronicas(){
 }
 
 function VerificarAcuseReciboDocumentos(){
+     console.log("verificando acuse");
     var idDivDraw="NotificacionProcesosLargos";
     document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de verificacion de acuse de recibo</h3></a>';
     var form_data = new FormData();
@@ -541,6 +551,7 @@ function VerJSONNotaCreditoFE(idNota){
 
 function ReportarFacturaElectronica(idFactura){
     var idDivDraw="DivFrmModalAcciones";
+    console.log("reportando factura");
     AbreModal('ModalAcciones');
     document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
     var form_data = new FormData();
@@ -585,6 +596,7 @@ function ReportarFacturaElectronica(idFactura){
 }
 
 function ReportarNotaCreditoElectronica(idNota){
+    console.log("reportando nota credito");
     var idDivDraw="DivFrmModalAcciones";
     AbreModal('ModalAcciones');
     document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
@@ -895,10 +907,16 @@ function GuardarNotaCredito(idFacturaElectronica){
            if(respuestas[0]==="OK"){   
                 alertify.success(respuestas[1]);
                 document.getElementById(idDivDraw).innerHTML="<h1>"+respuestas[1]+"</h1>";
+                /*
                 TipoListado=2;
                 VerListado();
                 VerTablero();
-                                
+                  */
+                clearTimeout();
+                TipoListado=2;
+                VerListado();
+                VerTablero();
+                GenereFacturasElectronicas();
             }else if(respuestas[0]==="E1"){
                 MarqueErrorElemento(respuestas[2]);
                 alertify.error(respuestas[1]); 
@@ -921,6 +939,7 @@ function GuardarNotaCredito(idFacturaElectronica){
 
 
 function ObtenerLogsDocumento(idDocumento){
+    console.log("obteniendo logs");
     var idDivDraw="DivFrmModalAcciones";
     AbreModal('ModalAcciones'); 
     document.getElementById(idDivDraw).innerHTML='<a><h3>Obteniendo logs del documento</h3></a>';
@@ -967,16 +986,17 @@ function ObtenerLogsDocumento(idDocumento){
 }
 
 function enviar_x_mail(idDocumento,TipoListado){
+    console.log("enviando mail");
     var idDivDraw="DivFrmModalAcciones";
     AbreModal('ModalAcciones'); 
-    document.getElementById(idDivDraw).innerHTML='<a><h3>Obteniendo logs del documento</h3></a>';
+    document.getElementById(idDivDraw).innerHTML='<a><h3>Enviando Factura al Correo</h3></a>';
     var form_data = new FormData();
-        form_data.append('Accion', 11);
+        form_data.append('Accion', 5);
         form_data.append('TipoDocumento', TipoListado);
         form_data.append('idDocumento', idDocumento);
     $.ajax({
         //async:false,
-        url: '../../general/procesadores/facturacionElectronica.process.php',
+        url: 'procesadores/panel_factura_electronica.process.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -987,7 +1007,7 @@ function enviar_x_mail(idDocumento,TipoListado){
             var respuestas = data.split(';'); 
            if(respuestas[0]==="OK"){   
                 
-                document.getElementById(idDivDraw).innerHTML=respuestas[2];
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
                 
             }else if(respuestas[0]==="E1"){
                 
@@ -1014,6 +1034,7 @@ function enviar_x_mail(idDocumento,TipoListado){
 
 
 function envie_facturas_x_mail(){
+    console.log("enviando facturas por mail 2");
     var idDivDraw="NotificacionProcesos";
     //document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
     var form_data = new FormData();
@@ -1042,10 +1063,98 @@ function envie_facturas_x_mail(){
                 setTimeout(GenereFacturasElectronicas, 100000);           
             }else if(respuestas[0]==="RE"){
                 
+                actualice_uuid_notas();
+                                           
+            }else{
+                document.getElementById(idDivDraw).innerHTML=data;
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            setTimeout(GenereFacturasElectronicas, 600000);
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
+
+
+function actualice_uuid_notas(){
+    console.log("actualizando uuid notas");
+    var idDivDraw="NotificacionProcesos";
+    //document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
+    var form_data = new FormData();
+        form_data.append('Accion', 8);
+                        
+    $.ajax({
+        //async:false,
+        url: 'procesadores/panel_factura_electronica.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                
+                envie_notas_x_mail();
+            }else if(respuestas[0]==="E1"){
+                
                 document.getElementById(idDivDraw).innerHTML=respuestas[1];
                 VerTablero();
                 VerListado();
-                setTimeout(GenereFacturasElectronicas, 60000);
+                setTimeout(GenereFacturasElectronicas, 100000);           
+                                   
+            }else{
+                document.getElementById(idDivDraw).innerHTML=data;
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            setTimeout(GenereFacturasElectronicas, 600000);
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })
+}
+
+function envie_notas_x_mail(){
+    console.log("enviando notas por mail ");
+    var idDivDraw="NotificacionProcesos";
+    //document.getElementById(idDivDraw).innerHTML='<a><h3>Enviando notas</h3></a>';
+    var form_data = new FormData();
+        form_data.append('Accion', 9);
+                        
+    $.ajax({
+        //async:false,
+        url: 'procesadores/panel_factura_electronica.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+           if(respuestas[0]==="OK"){   
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                envie_notas_x_mail();
+            }else if(respuestas[0]==="E1"){
+                
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                VerTablero();
+                VerListado();
+                setTimeout(GenereFacturasElectronicas, 100000);           
+            }else if(respuestas[0]==="RE"){
+                document.getElementById(idDivDraw).innerHTML=respuestas[1];
+                VerTablero();
+                VerListado();
+                setTimeout(GenereFacturasElectronicas, 60000);  
                                            
             }else{
                 document.getElementById(idDivDraw).innerHTML=data;
@@ -1063,6 +1172,7 @@ function envie_facturas_x_mail(){
 
 
 function ver_representacion_factura_electronica(documento_id){
+    console.log("representacion grafica");
     var idDivDraw="NotificacionProcesos";
     //document.getElementById(idDivDraw).innerHTML='<a><h3>Iniciando Proceso de Generacion de Facturas Electronicas</h3></a>';
     var form_data = new FormData();

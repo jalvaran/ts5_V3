@@ -307,9 +307,9 @@ class PDF_Documentos_Electronicos extends Documento{
                 <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$ValorUnitario.'</td>
                 <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$Multiplicador.'</td>
                 <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">EA</td>   
-                <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosItemFactura["IVAItem"].'</td>
+                <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosItemFactura["IVAItem"]).'</td>
                 <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">0</td>
-                <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosItemFactura["ValorOtrosImpuestos"].'</td>
+                <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosItemFactura["ValorOtrosImpuestos"]).'</td>
                 <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$SubTotalItem.'</td>
             </tr>
 
@@ -342,6 +342,7 @@ class PDF_Documentos_Electronicos extends Documento{
         $TotalFactura=0;
         $TotalIVAFactura=0;
         $OtrosImpuestos=0;
+        $ObservacionesFactura= utf8_encode($ObservacionesFactura);
         while($TotalesFactura= $this->obCon->FetchArray($Consulta)){
             
             $OtrosImpuestos=$OtrosImpuestos+$TotalesFactura["ValorOtrosImpuestos"];
