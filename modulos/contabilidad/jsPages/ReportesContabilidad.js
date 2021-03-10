@@ -307,7 +307,7 @@ function GenereCertificaRetenciones(){
     
     
     var form_data = new FormData();
-        form_data.append('Accion', 4);
+        form_data.append('Accion', 4);   
         form_data.append('CmbCiudadPago', CmbCiudadPago);
         form_data.append('CmbCiudadRetencion', CmbCiudadRetencion);
         form_data.append('TxtFechaInicial', TxtFechaInicial);
@@ -326,9 +326,9 @@ function GenereCertificaRetenciones(){
         type: 'post',
         success: function(data){
             //console.log(data);
-            document.getElementById("DivOpcionesReportes").innerHTML="";
+            //document.getElementById("DivOpcionesReportes").innerHTML="";
             document.getElementById("DivReportesContables").innerHTML=data;
-            document.getElementById("LinkPDF").click();
+            //document.getElementById("LinkPDF").click();
             document.getElementById("DivPDFReportes").style.display="block";
           
         },
@@ -706,4 +706,62 @@ function GenereHTMLReportesFiscales(){
             alert(thrownError);
           }
       })        
+}
+
+
+function actualice_base_certificado(id){ 
+    var porcentaje_id="porcentaje_"+id;
+    var base_id="base_"+id;
+    var certificado_id=$("#"+porcentaje_id).attr("data-certificado_id");
+    var cuenta_puc=$("#"+porcentaje_id).attr("data-cuenta_puc");
+    var valor_retencion=$("#"+porcentaje_id).attr("data-valor_retencion");
+    var concepto=$("#"+porcentaje_id).attr("data-concepto");
+    var porcentaje = document.getElementById(porcentaje_id).value;
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 2);
+        form_data.append('certificado_id', certificado_id);
+        form_data.append('cuenta_puc', cuenta_puc);
+        form_data.append('porcentaje', porcentaje);
+        form_data.append('valor_retencion', valor_retencion);
+        form_data.append('concepto', concepto);
+    
+        $.ajax({
+        url: './procesadores/ReportesContables.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if (respuestas[0] == "OK"){    
+                document.getElementById(base_id).value=respuestas[1];
+                $("#sp_"+id).removeClass("fa fa-circle-o text-danger");
+                $("#sp_"+id).addClass("fa fa-check-square-o text-success");
+                
+               //alertify.success(respuestas[1]);
+                
+            }else if(respuestas[0] == "E1"){
+                document.getElementById(base_id).value="";
+                alertify.error(respuestas[1]);
+                $("#sp_"+id).removeClass("fa fa-check-square-o text-success");
+                $("#sp_"+id).addClass("fa fa-circle-o text-danger");
+                
+            }else{
+                alertify.alert(data);
+              
+          }
+          
+          
+          
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+
 }

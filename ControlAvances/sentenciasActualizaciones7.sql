@@ -349,4 +349,7 @@ ALTER TABLE `notas_credito`
 ADD INDEX `EnviadoPorMail` (`EnviadoPorMail`);
 
 
+INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `CuerpoFormato`, `NotasPiePagina`, `Updated`, `Sync`) VALUES
+(43,	'FACTURA ELECTRÓNICA DE VENTA',	'001',	'F-GA-013',	'2016-05-11',	'',	'***GRACIAS POR SU COMPRA***; Los productos en promocion no tienen Cambio',	'2020-07-25 10:03:57',	'2020-07-25 10:03:57');
+
 

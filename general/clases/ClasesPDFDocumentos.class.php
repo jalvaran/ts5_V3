@@ -1473,7 +1473,7 @@ EOD;
      * @param type $CmbCiudadPago
      * @param type $Vector
      */
-    public function PDF_Certificado_Retenciones($FechaInicial,$TxtFechaFinal,$CmbCentroCosto,$CmbEmpresa,$CmbTercero,$CmbCiudadRetencion,$CmbCiudadPago,$Vector) {
+    public function PDF_Certificado_Retenciones($FechaInicial,$TxtFechaFinal,$CmbCentroCosto,$CmbEmpresa,$CmbTercero,$CmbCiudadRetencion,$CmbCiudadPago,$comprobante_id) {
         $obCon= new ProcesoVenta(1);
         $FechaActual=date("Y-m-d");
         $NumeracionDocumento="Certificado de Retenciones periodo del $FechaInicial al $TxtFechaFinal";
@@ -1490,7 +1490,7 @@ EOD;
         $html.="<strong>CIUDAD DONDE SE PRACTICÓ LA RETENCIÓN:</strong> $CmbCiudadRetencion<BR>";
         $html.="<strong>CIUDAD DONDE SE PAGÓ LA RETENCIÓN:</strong> $CmbCiudadPago<BR>";
         $this->PDF_Write($html);
-        $html=$this->HTML_Items_Retencion($CmbTercero, $FechaInicial, $TxtFechaFinal, $CmbEmpresa, $CmbCentroCosto);
+        $html=$this->HTML_Items_Retencion($comprobante_id);
         $this->PDF_Write($html);
         $DatosFormatoCalidad=$this->obCon->DevuelveValores("formatos_calidad", "ID", 34);
         $html= $DatosFormatoCalidad["NotasPiePagina"];
@@ -1499,15 +1499,8 @@ EOD;
         $this->PDF_Output("Certificado.pdf");
     }
     
-    public function HTML_Items_Retencion($Tercero,$FechaInicial,$FechaFinal,$idEmpresa,$idCentroCostos) {
+    public function HTML_Items_Retencion($certificado_id) {
         $obCon= new ProcesoVenta(1);
-        $CondicionAdicional="";
-        if($idEmpresa<>'ALL'){
-            $CondicionAdicional.=" AND idEmpresa='$idEmpresa' ";
-        }
-        if($idCentroCostos<>'ALL'){
-            $CondicionAdicional.=" AND idCentroCostos='$idCentroCostos' ";
-        }
         
         $html='<table cellspacing="1" cellpadding="2" border="0">
                 <tr>
@@ -1518,16 +1511,15 @@ EOD;
                     <td align="center" ><strong>VR. RETENIDO</strong></td>
                     
                 </tr>';
-        $sql="SELECT CuentaPUC,Cuenta,PorcentajeRetenido,SUM(BaseRetencion) AS BaseRetencion,SUM(ValorRetencion) AS ValorRetencion"
-                . " FROM vista_retenciones WHERE Fecha >= '$FechaInicial' AND Fecha <= '$FechaFinal' AND Tercero='$Tercero' AND Estado<>'ANULADA' $CondicionAdicional GROUP BY CuentaPUC,PorcentajeRetenido";
+        $sql="SELECT * FROM contabilidad_certificados_rentenciones_movimientos WHERE certificado_id='$certificado_id'";
         $Consulta=$obCon->Query($sql);        
         $h=1;  
         $TotalBase=0;
         $TotalRetencion=0;
         while($DatosRetenciones=$obCon->FetchAssoc($Consulta)){
             
-            $TotalBase=$TotalBase+$DatosRetenciones["BaseRetencion"];
-            $TotalRetencion=$TotalRetencion+$DatosRetenciones["ValorRetencion"];
+            $TotalBase=$TotalBase+$DatosRetenciones["base"];
+            $TotalRetencion=$TotalRetencion+$DatosRetenciones["valor_retenido"];
             if($h==0){
                 $Back="#f2f2f2";
                 $h=1;
@@ -1538,11 +1530,11 @@ EOD;
 
             $html.='
             <tr>
-                <td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.' ;">'.$DatosRetenciones["CuentaPUC"].'</td>
-                <td align="left" colspan="3" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosRetenciones["Cuenta"].'</td>
-                <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosRetenciones["PorcentajeRetenido"].' %</td>
-                <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosRetenciones["BaseRetencion"]).'</td>
-                <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosRetenciones["ValorRetencion"]).'</td>
+                <td align="left" style="border-bottom: 1px solid #ddd;background-color: '.$Back.' ;">'.$DatosRetenciones["cuenta_puc"].'</td>
+                <td align="left" colspan="3" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosRetenciones["concepto"].'</td>
+                <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosRetenciones["porcentaje"].' %</td>
+                <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosRetenciones["base"]).'</td>
+                <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosRetenciones["valor_retenido"]).'</td>
             </tr>';        
 
         }

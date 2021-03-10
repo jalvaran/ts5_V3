@@ -1649,12 +1649,12 @@ public function CalculePesoRemision($idCotizacion)
      * 
      */
     
-    public function RegistreVentaRapida($idPreventa, $idCliente, $TipoPago, $Paga, $Devuelta, $CuentaDestino, $DatosVentaRapida){
+    public function RegistreVentaRapida($idPreventa, $idCliente, $TipoPago, $Paga, $Devuelta, $CuentaDestino, $DatosVentaRapida,$idFacturaBase=''){
   	
         $sql="SELECT * FROM preventa WHERE VestasActivas_idVestasActivas='$idPreventa'";
         $Consulta=$this->Query($sql);
         if($this->NumRows($Consulta)<1){
-            print("No hay articulos en la preventa");
+            print("No hay articulos en la preventa $idFacturaBase");
             exit();    
         }
         

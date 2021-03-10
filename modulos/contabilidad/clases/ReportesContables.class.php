@@ -3,7 +3,7 @@ if(file_exists("../../../modelo/php_conexion.php")){
     include_once("../../../modelo/php_conexion.php");
 }
 
-class Contabilidad extends conexion{
+class Contabilidad extends ProcesoVenta{
     /**
      * Crea la vista para el balance x terceros
      * @param type $Tipo
@@ -241,6 +241,32 @@ class Contabilidad extends conexion{
         $this->Query($sql);
     }
     
+    function agrega_retenciones_certificado($certificado_id,$cuenta_puc,$valor_retenido,$porcentaje,$base,$concepto,$user_id){
+        $tabla="contabilidad_certificados_rentenciones_movimientos";
+        
+        $sql="SELECT ID FROM $tabla WHERE cuenta_puc='$cuenta_puc' AND certificado_id='$certificado_id'";
+        $validacion=$this->FetchAssoc($this->Query($sql));
+        $actualiza=0;
+        if($validacion["ID"]>0){
+            $actualiza=1;
+            $ID=$validacion["ID"];
+        }
+        
+        $datos["certificado_id"]=$certificado_id;
+        $datos["concepto"]=$concepto;
+        $datos["cuenta_puc"]=$cuenta_puc;
+        $datos["valor_retenido"]=$valor_retenido;
+        $datos["porcentaje"]=$porcentaje;
+        $datos["base"]=$base;
+        $datos["user_id"]=$user_id;
+        if($actualiza==1){
+            $sql=$this->getSQLUpdate($tabla, $datos);
+            $sql.=" WHERE ID='$ID'";
+        }else{
+            $sql=$this->getSQLInsert($tabla, $datos);
+        }
+        $this->Query($sql);
+    }
     /**
      * Fin Clase
      */

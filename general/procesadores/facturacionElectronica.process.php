@@ -73,13 +73,17 @@ if( !empty($_REQUEST["Accion"]) ){
                     
                 }else{
                     $JSONFactura= json_decode($DatosLogFactura["RespuestaCompletaServidor"]);
-                    if((property_exists($JSONFactura, "uuid"))){
+                    if(is_object($JSONFactura) and (property_exists($JSONFactura, "uuid")) ){
                         $CUFE=$JSONFactura->uuid;
                         $obCon->ActualizaRegistro("facturas_electronicas_log", "UUID", $CUFE, "ID", $idLog);
+                    }else{
+                        $obCon->ActualizaRegistro("facturas_electronicas_log", "Estado", 13, "ID", $idLog);
+                        //$obCon->ActualizaRegistro("facturas_electronicas_log", "RespuestaCompletaServidor", 13, "ID", $idLog);
+                        exit("OK;Factura $idFactura con error");
                     }
                     
                     
-                    if((property_exists($JSONFactura, "responseDian"))){
+                    if( (property_exists($JSONFactura, "responseDian")) ){
                         $Parametros=$obCon->DevuelveValores("configuracion_general", "ID", 27); //Contiene el metodo de envio del documento a la DIAN
                         $MetodoEnvio=$Parametros["Valor"]; //1 sincrono 2 asincrono
                         if($MetodoEnvio==1){
@@ -121,8 +125,9 @@ if( !empty($_REQUEST["Accion"]) ){
                 $DatosLogFactura["RespuestaCompletaServidor"]=str_replace("\r", '', $DatosLogFactura["RespuestaCompletaServidor"]);
                 $DatosLogFactura["RespuestaCompletaServidor"]=str_replace("'", '', $DatosLogFactura["RespuestaCompletaServidor"]);
                 $JSONFactura= json_decode($DatosLogFactura["RespuestaCompletaServidor"]);
-                $NumeroFactura=$JSONFactura->number;
-                $Ruta=$obCon->CrearPDFDesdeBase64($JSONFactura->pdfBase64Bytes,$NumeroFactura);
+                //$NumeroFactura=$JSONFactura->number;
+                //$Ruta=$obCon->CrearPDFDesdeBase64($JSONFactura->pdfBase64Bytes,$NumeroFactura);
+                $Ruta="";
                 $obCon->ActualizaRegistro("facturas_electronicas_log", "PDFCreado", 1, "ID", $idLog);
                 $obCon->ActualizaRegistro("facturas_electronicas_log", "RutaPDF", $Ruta, "ID", $idLog);
                 exit("OK;PDF de la Factura Electronica $idFactura Creado Satisfactoriamente");
@@ -171,8 +176,9 @@ if( !empty($_REQUEST["Accion"]) ){
                 $DatosLogFactura["RespuestaCompletaServidor"]=str_replace("\r", '', $DatosLogFactura["RespuestaCompletaServidor"]);
                 $DatosLogFactura["RespuestaCompletaServidor"]=str_replace("'", '', $DatosLogFactura["RespuestaCompletaServidor"]);
                 $JSONFactura= json_decode($DatosLogFactura["RespuestaCompletaServidor"]);
-                $NumeroFactura=$JSONFactura->number;
-                $Ruta=$obCon->CrearZIPDesdeBase64($JSONFactura->zipBase64Bytes,$NumeroFactura);
+                //$NumeroFactura=$JSONFactura->number;
+                //$Ruta=$obCon->CrearZIPDesdeBase64($JSONFactura->zipBase64Bytes,$NumeroFactura);
+                $Ruta="";
                 $obCon->ActualizaRegistro("facturas_electronicas_log", "ZIPCreado", 1, "ID", $idLog);
                 $obCon->ActualizaRegistro("facturas_electronicas_log", "RutaXML", $Ruta, "ID", $idLog);
                 exit("OK;ZIP con XML de la Factura Electronica $idFactura Creado Satisfactoriamente");

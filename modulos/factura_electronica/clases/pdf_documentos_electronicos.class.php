@@ -11,7 +11,9 @@ class PDF_Documentos_Electronicos extends Documento{
         $VistaFactura=1;
         $empresa_id=1;
         $DatosFactura=$this->obCon->DevuelveValores("facturas", "idFacturas", $idFactura);
-        $datos_documento_electronico=$this->obCon->DevuelveValores("facturas_electronicas_log", "idFactura", $idFactura);
+        $sql="SELECT * FROM facturas_electronicas_log WHERE idFactura='$idFactura' AND UUID<>'' ";
+        $datos_documento_electronico=$this->obCon->FetchAssoc($this->obCon->Query($sql));
+        //$datos_documento_electronico=$this->obCon->DevuelveValores("facturas_electronicas_log", "idFactura", $idFactura);
         $datos_tercero=$this->obCon->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
         $DatosFactura["uuid"]=$datos_documento_electronico["UUID"];
         $CodigoFactura="$DatosFactura[Prefijo]-$DatosFactura[NumeroFactura]";
@@ -80,7 +82,7 @@ class PDF_Documentos_Electronicos extends Documento{
             ';
         $this->PDF->writeHTML($tbl, true, false, false, false, '');
         $this->PDF->SetFillColor(255, 255, 255);
-        $txt="<h3>".($DatosEmpresaPro["RazonSocial"])."<br>NIT ".$DatosEmpresaPro["NIT"]."</h3>";
+        $txt="<h3>".($DatosEmpresaPro["RazonSocial"])."<br>NIT ".$DatosEmpresaPro["NIT"]." - ".$DatosEmpresaPro["DigitoVerificacion"]."</h3>";
         $this->PDF->MultiCell(62, 5, $txt, 0, 'L', 1, 0, '', '', true,0, true, true, 10, 'M');
         $txt=$DatosEmpresaPro["Direccion"]."<br>".$DatosEmpresaPro["Telefono"]."<br>".$DatosEmpresaPro["Ciudad"]."<br>".$DatosEmpresaPro["WEB"];
         $this->PDF->MultiCell(62, 5, $txt, 0, 'C', 1, 0, '', '', true,0, true, true, 10, 'M');

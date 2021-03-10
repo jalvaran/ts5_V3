@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+@session_start();
 if (!isset($_SESSION['username'])){
   exit("<a href='../../index.php' ><img src='../images/401.png'>Iniciar Sesion </a>");
   
@@ -260,7 +260,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CrearDiv("DivAccion", "col-md-4", "center", 1, 1);
             $css->CerrarDiv();
         break; //Fin caso 3
-        case 4: //Crea la vista para el balance x tercero
+        case 4: //Crea el link para ver el certificado de retenciones
             
             $FechaInicial=$obCon->normalizar($_REQUEST["TxtFechaInicial"]);
             $FechaFinal=$obCon->normalizar($_REQUEST["TxtFechaFinal"]);
@@ -269,12 +269,79 @@ if( !empty($_REQUEST["Accion"]) ){
             $CmbTercero=$obCon->normalizar($_REQUEST["CmbTercero"]);
             $CmbCiudadRetencion=$obCon->normalizar($_REQUEST["CmbCiudadRetencion"]);
             $CmbCiudadPago=$obCon->normalizar($_REQUEST["CmbCiudadPago"]);
+            $fecha_id= str_replace("-", "", $FechaInicial.$FechaFinal);
+            $comprobante_id=$CmbTercero.$fecha_id;
+            $datos_tercero=$obCon->DevuelveValores("proveedores", "Num_Identificacion", $CmbTercero);
+                        
+            $css->CrearTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla("<strong>Tercero:</strong>", 1);
+                    $css->ColTabla("<strong>Periodo:</strong>", 1);
+                    $css->ColTabla("<strong>Ciudad donde se Practicó:</strong>", 1);
+                    $css->ColTabla("<strong>Ciudad donde se pagó:</strong>", 1);
+                    
+                $css->CierraFilaTabla();
+                $css->FilaTabla(16);
+                    $css->ColTabla($datos_tercero["RazonSocial"]." ".$datos_tercero["Num_Identificacion"], 1);
+                    $css->ColTabla("$FechaInicial - $FechaFinal", 1);
+                    $css->ColTabla("$CmbCiudadRetencion", 1);
+                    $css->ColTabla("$CmbCiudadPago", 1);
+                    
+                $css->CierraFilaTabla();
+            $css->CerrarTabla();
             
-            $page="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=34&TxtFechaInicial=$FechaInicial&TxtFechaFinal=$FechaFinal"; 
+            $css->div("", "row", "", "", "", "", "");
+                $css->div("div_cuentas_disponibles", "col-md-12", "", "", "", "", "");
+                    $sql="select t1.CuentaPUC,t1.Detalle,sum(t1.Credito) as Creditos,  sum(t1.Debito) as Debitos 
+                            FROM librodiario t1 INNER JOIN subcuentas t2 ON t1.CuentaPUC=t2.PUC 
+                            WHERE t2.SolicitaBase = '1' AND Tercero_Identificacion='$CmbTercero' 
+                                  AND t1.Fecha>='$FechaInicial' and  t1.Fecha<='$FechaFinal' 
+                            GROUP BY CuentaPUC";
+                    $Consulta=$obCon->Query($sql);
+                    $css->CrearTabla();
+                        $css->FilaTabla(16);
+                            $css->ColTabla("<strong>Cuenta</strong>", 1);
+                            $css->ColTabla("<strong>Concepto</strong>", 1);
+                            $css->ColTabla("<strong>Creditos</strong>", 1);
+                            $css->ColTabla("<strong>Debitos</strong>", 1);
+                            $css->ColTabla("<strong>Porcentaje</strong>", 1);
+                            $css->ColTabla("<strong>Base</strong>", 1);
+                            $css->ColTabla("<strong>Agregado</strong>", 1);
+                        $css->CierraFilaTabla();
+                        $i=0;
+                    while($datos_consulta=$obCon->FetchAssoc($Consulta)){
+                        $i++;
+                        $valor_retencion=abs($datos_consulta["Creditos"]-$datos_consulta["Debitos"]);
+                        $css->FilaTabla(16);
+                            $css->ColTabla($datos_consulta["CuentaPUC"], 1);
+                            $css->ColTabla(($datos_consulta["Detalle"]), 1);
+                            $css->ColTabla(number_format($datos_consulta["Creditos"]), 1);
+                            $css->ColTabla(number_format($datos_consulta["Debitos"]), 1);
+                            print("<td>");
+                                print('<input style="text-align:right" type="text" class="form-control" onkeyup="actualice_base_certificado('.$i.')" id="porcentaje_'.$i.'" data-concepto="'.$datos_consulta["Detalle"].'"  data-valor_retencion="'.$valor_retencion.'" data-id="porcentaje_'.$i.'" data-cuenta_puc="'.$datos_consulta["CuentaPUC"].'" data-certificado_id="'.$comprobante_id.'" value="" placeholder="Porcentaje"></input>');
+                            print("</td>");
+                            print("<td>");
+                                print('<input type="text" disabled=true class="form-control"  id="base_'.$i.'"  value="" placeholder="Base"></input>');
+                            print("</td>");
+                            print("<td style='text-align:center'>");
+                                print('<span id="sp_'.$i.'" class="fa fa-circle-o text-danger" style="text-size:25px;"></span>');
+                            print("</td>");
+                        $css->CierraFilaTabla();
+                    } 
+                    $css->CerrarTabla();
+                     
+                $css->Cdiv();
+                
+                
+            $css->Cdiv();
+            
+            $page="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=34&comprobante_id=$comprobante_id&TxtFechaInicial=$FechaInicial&TxtFechaFinal=$FechaFinal"; 
             $page.="&CmbEmpresa=$Empresa&CmbCentroCosto=$CentroCostos&CmbTercero=$CmbTercero&CmbCiudadPago=$CmbCiudadPago&CmbCiudadRetencion=$CmbCiudadRetencion";
             $Target="FramePDF";
             //$Target="_blank";
-            print("<a href='$page' id='LinkPDF' target='$Target'></a>");
+            
+            print("<a href='$page' class='btn btn-success' id='LinkPDF' target='$Target'>Generar PDF <li class='fa fa-file-pdf-o'></li></a><br><br><br><br>");
+            
         break; // fin caso 4
     
         case 5: //Crea las opciones para el reporte de estado de resultados

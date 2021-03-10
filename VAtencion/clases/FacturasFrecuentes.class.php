@@ -76,7 +76,7 @@ class FacturasFrecuentes extends ProcesoVenta{
         $DatosVentaRapida["ResolucionDian"]=$DatosCaja["idResolucionDian"];
         $DatosVentaRapida["Observaciones"]="";
         //$this->RegistreVentaRapida($idPreventa, $idCliente, $TipoPago, $Paga, $Devuelta, $CuentaDestino, $DatosVentaRapida);
-        $NumFactura=$this->RegistreVentaRapida($idPreventa, $DatosFacturaFrecuente["idCliente"], 15, 0, 0, $Parametros["CuentaPUC"], $DatosVentaRapida);
+        $NumFactura=$this->RegistreVentaRapida($idPreventa, $DatosFacturaFrecuente["idCliente"], 15, 0, 0, $Parametros["CuentaPUC"], $DatosVentaRapida,$idFacturaBase);
         
         
         $this->ActualizaRegistro("facturas_frecuentes", "Realizada", 1, "ID", $idFacturaFrecuente);

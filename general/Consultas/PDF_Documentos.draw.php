@@ -88,9 +88,10 @@ if(isset($_REQUEST["idDocumento"])){
             $CmbEmpresa=$obCon->normalizar($_REQUEST["CmbEmpresa"]);
             $CmbTercero=$obCon->normalizar($_REQUEST["CmbTercero"]);
             $CmbCiudadRetencion=$obCon->normalizar($_REQUEST["CmbCiudadRetencion"]);
+            $comprobante_id=$obCon->normalizar($_REQUEST["comprobante_id"]);
             $CmbCiudadPago="";
             $CmbCiudadPago=$obCon->normalizar($_REQUEST["CmbCiudadPago"]);
-            $obDoc->PDF_Certificado_Retenciones($FechaInicial, $TxtFechaFinal, $CmbCentroCosto, $CmbEmpresa, $CmbTercero, $CmbCiudadRetencion, $CmbCiudadPago, "");         
+            $obDoc->PDF_Certificado_Retenciones($FechaInicial, $TxtFechaFinal, $CmbCentroCosto, $CmbEmpresa, $CmbTercero, $CmbCiudadRetencion, $CmbCiudadPago, $comprobante_id);         
             break;//Fi caso 34
         
         case 35: //PDF de un comprobante de prestamo
