@@ -579,7 +579,7 @@ SELECT t1.idProductosVenta,t1.Referencia,t1.Nombre,t1.Existencias,t1.PrecioVenta
 
 DROP VIEW IF EXISTS `vista_pos_registro_descuentos`;
 CREATE VIEW vista_pos_registro_descuentos AS
-SELECT t1.ID,t1.Fecha,t2.NumeroFactura, t3.Referencia,t3.Nombre,t1.Cantidad,t1.ValorDescuento,t4.RazonSocial,t4.Num_Identificacion,t4.Telefono, t1.idUsuario  
+SELECT t1.ID,t1.Fecha,t2.NumeroFactura,t2.FormaPago, t3.Referencia,t3.Nombre,t1.Cantidad,t1.ValorDescuento,t4.RazonSocial,t4.Num_Identificacion,t4.Telefono, t1.idUsuario  
   FROM `pos_registro_descuentos` t1 INNER JOIN facturas t2 ON t1.idFactura=t2.idFacturas 
     INNER JOIN productosventa t3 ON t1.idProducto= t3.idProductosVenta 
     INNER JOIN clientes t4 ON t4.idClientes=t2.Clientes_idClientes ;

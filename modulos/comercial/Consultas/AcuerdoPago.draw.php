@@ -940,6 +940,11 @@ if( !empty($_REQUEST["Accion"]) ){
             $css->CrearTitulo("Crear Acuerdo de Pago para el Cliente <strong>$DatosCliente[RazonSocial] - $DatosCliente[Num_Identificacion] || Puntaje: $DatosCliente[Puntaje]</strong>");
             
             $css->CrearDiv("", "col-md-6", "left", 1, 1);
+            $ultima_actualizacion_cliente=$DatosCliente["actualizacion_datos"];
+            
+            $tiempo_actualizacion=$obCon->CalculeDiferenciaFechas($ultima_actualizacion_cliente, date("Y-m-d H:i:s"), "");
+           
+            
             $css->input("text", "idAcuerdoPago", "form-control", "idAcuerdoPago", "idAcuerdoPago", $idAcuerdo, "id Acuerdo", "off", "", " disabled");
             $css->input("hidden", "SaldoActualAcuerdoPago", "form-control", "SaldoActualAcuerdoPago", "SaldoActualAcuerdoPago", $SaldoActualCliente, "", "off", "", " disabled");
             $css->input("hidden", "NuevoSaldoAcuerdoPago", "form-control", "NuevoSaldoAcuerdoPago", "NuevoSaldoAcuerdoPago", $NuevoSaldo, "", "off", "", " disabled");
@@ -1004,7 +1009,11 @@ if( !empty($_REQUEST["Accion"]) ){
 
                 print("</td>");
                 $css->CierraFilaTabla();
-                
+                if($tiempo_actualizacion["Meses"]>=6){
+                    $css->Notificacion("Importante!", "<strong>Este Cliente Requiere Actualización de datos</strong>", "rojo", "", "");
+                    $css->CerrarTabla();
+                    exit();
+                }
                 if($NuevoSaldo>$Cupo){
                     $css->CrearTitulo("El Cliente no tiene cupo suficiente para realizar esta compra a credito", "rojo");
                     $css->CerrarTabla();

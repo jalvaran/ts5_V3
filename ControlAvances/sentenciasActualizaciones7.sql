@@ -353,3 +353,26 @@ INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `C
 (43,	'FACTURA ELECTRÓNICA DE VENTA',	'001',	'F-GA-013',	'2016-05-11',	'',	'***GRACIAS POR SU COMPRA***; Los productos en promocion no tienen Cambio',	'2020-07-25 10:03:57',	'2020-07-25 10:03:57');
 
 
+CREATE TABLE `contabilidad_certificados_rentenciones_movimientos` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `certificado_id` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `cuenta_puc` bigint(20) NOT NULL,
+  `concepto` tinytext COLLATE utf8_spanish_ci NOT NULL,
+  `valor_retenido` double NOT NULL,
+  `porcentaje` float NOT NULL,
+  `base` double NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `certificado_id` (`certificado_id`),
+  KEY `cuenta_puc` (`cuenta_puc`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+ALTER TABLE `clientes`
+ADD `actualizacion_datos` datetime NOT NULL AFTER `Estado`;
+
+ALTER TABLE `proveedores`
+ADD `actualizacion_datos` datetime NOT NULL AFTER `Estado`;
+
+update clientes set actualizacion_datos=Created;

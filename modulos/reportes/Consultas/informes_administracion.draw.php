@@ -61,6 +61,14 @@ if(isset($_REQUEST["Accion"])){
             
             $html.=$obDoc->HTML_VentasXUsuario($sql,$sql_devoluciones);
             
+            $sql="SELECT f.FormaPago as TipoVenta,sum(fi.`TotalItem`) as Total,sum(fi.`IVAItem`) as IVA,
+                sum(fi.`SubtotalItem`) as Subtotal,sum(fi.`SubtotalCosto`) as TotalCostos, sum(fi.`ValorOtrosImpuestos`) as Bolsas, 
+                SUM(fi.`Cantidad`) AS Items
+                FROM facturas f INNER JOIN facturas_items fi ON fi.`idFactura` = f.idFacturas 
+                WHERE Fecha >= '$FechaInicial' AND Fecha <= '$FechaFinal' 
+                GROUP BY f.FormaPago";
+            $html.=$obDoc->HTML_ventas_agrupadas_x_tipo($sql);
+            
             $html.=$obDoc->HTML_Uso_Resoluciones($CondicionFecha2);
             $html.=$obDoc->HTML_Egresos_Admin($CondicionFecha2);
             $html.=$obDoc->HTML_Abonos_Separados_Admin($CondicionFecha2);

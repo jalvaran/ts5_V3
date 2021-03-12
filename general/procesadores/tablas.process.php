@@ -31,10 +31,12 @@ if( !empty($_REQUEST["idAccion"]) ){
             $sql=$obCon->getSQLInsert($Tabla, $Datos);
             $obCon->Query($sql);
             if($Tabla=="clientes"){
+                $Datos["actualizacion_datos"]=date("Y-m-d");
                 $sql=$obCon->getSQLInsert("proveedores", $Datos);
                 $obCon->Query($sql);
             }
             if($Tabla=="proveedores"){
+                $Datos["actualizacion_datos"]=date("Y-m-d");
                 $sql=$obCon->getSQLInsert("clientes", $Datos);
                 $obCon->Query($sql);
             }
@@ -54,10 +56,16 @@ if( !empty($_REQUEST["idAccion"]) ){
                         if($value=="Password"){
                             $ValorEditado= md5($obCon->normalizar($_REQUEST["$value"]));
                         }
-                        $obCon->ActualizaRegistro($Tabla, $value, $ValorEditado, $Columnas["Field"][0], $idEditar,0); 
+                        $obCon->ActualizaRegistro($Tabla, $value, $ValorEditado, $Columnas["Field"][0], $idEditar,0);
+                        
                     }                  
                     
                 }
+            }
+            if($Tabla=="clientes" or $Tabla=="proveedores"){
+                
+                $obCon->ActualizaRegistro($Tabla, "actualizacion_datos", date("Y-m-d"), $Columnas["Field"][0], $idEditar,0); 
+                
             }
             
             print("OK");

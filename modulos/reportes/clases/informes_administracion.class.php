@@ -117,6 +117,89 @@ class InformesAdmnistracion extends Documento{
         return($html);
     }
     
+    public function HTML_ventas_agrupadas_x_tipo($sql) {
+        $html="";
+        
+        
+        $Datos= $this->obCon->Query($sql);
+        if($this->obCon->NumRows($Datos)){
+            $html='<br><span style="color:RED;font-family:Bookman Old Style;font-size:14px;"><strong><em>Total de Ventas Discriminadas por Tipo:
+                </em></strong></span><BR>
+
+
+                <table id="tbl_ventas_usuario" class="table table-responsive table-hover" border="1" cellspacing="2" align="center" >
+                  <tr> 
+                    
+                        <th><h3>TipoVenta</h3></th>
+                        <th><h3>Total Costos</h3></th>
+                        <th><h3>SubTotal</h3></th>
+                        <th><h3>IVA</h3></th>
+                        <th><h3>Bolsas</h3></th>
+                        <th><h3>Total</h3></th>
+                  </tr >
+
+                ';
+            $Subtotal=0;
+            $TotalIVA=0;
+            $TotalVentas=0;
+            $TotalCostos=0;
+            $TotalBolsas=0;
+            $flagQuery=0;
+            $i=0;
+            while($DatosVentas= $this->obCon->FetchArray($Datos)){
+                $flagQuery=1;
+                $SubtotalUser=number_format($DatosVentas["Subtotal"]);
+                $IVA=number_format($DatosVentas["IVA"]);
+                $Bolsas=number_format($DatosVentas["Bolsas"]);
+                $Total=number_format($DatosVentas["Total"]+$DatosVentas["Bolsas"]);
+                $Costos=number_format($DatosVentas["TotalCostos"]);
+                $TipoVenta=$DatosVentas["TipoVenta"];
+                $Subtotal=$Subtotal+$DatosVentas["Subtotal"];
+                $TotalIVA=$TotalIVA+$DatosVentas["IVA"];
+                $TotalBolsas=$TotalBolsas+$DatosVentas["Bolsas"];
+                $TotalVentas=$TotalVentas+$DatosVentas["Total"]+$DatosVentas["Bolsas"];
+                $TotalCostos=$TotalCostos+$DatosVentas["TotalCostos"];
+                //$idUser=$DatosVentas["IdUsuarios"];
+                $html.=' 
+                    
+                        <tr>
+                            
+                            <td>'.$TipoVenta.'</td>
+                            <td align="RIGHT">'.$Costos.'</td>
+                            <td align="RIGHT">'.$SubtotalUser.'</td>
+                            <td align="RIGHT">'.$IVA.'</td>
+                            <td align="RIGHT">'.$Bolsas.'</td>    
+                            <td align="RIGHT">'.$Total.'</td>
+                        </tr>
+                    
+                    ';
+            }
+            if($flagQuery==1){
+                $TotalCostos=number_format($TotalCostos);
+                $Subtotal=number_format($Subtotal);
+                $TotalIVA=number_format($TotalIVA);
+                $TotalVentas=number_format($TotalVentas);
+                $html.= '
+                    
+                        <tr>
+                            <td align="RIGHT"><h3>SUMATORIA</h3></td>
+                            
+                            <td align="RIGHT"><h3>'.$TotalCostos.'</h3></td>
+                            <td align="RIGHT"><h3>'.$Subtotal.'</h3></td>
+                            <td align="RIGHT"><h3>'.$TotalIVA.'</h3></td>
+                            <td align="RIGHT"><h3>'.number_format($TotalBolsas).'</h3></td>    
+                            <td align="RIGHT"><h3>'.$TotalVentas.'</h3></td>
+                        </tr>
+                    
+                ';
+            }
+        }
+        
+        $html.='</table>';
+        //Total de devoluciones
+        
+        return($html);
+    }
     
     public function HTML_VentasXUsuario($sql,$sql_devoluciones) {
         $html="";

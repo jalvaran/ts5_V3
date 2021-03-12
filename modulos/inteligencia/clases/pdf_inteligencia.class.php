@@ -142,6 +142,7 @@ class PDF_Inteligencia extends Documento{
         $sql="SELECT count( Total) TotalFacturas,Clientes_idClientes AS cliente_id,sum(Total) as total_comprado,FormaPago , 
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago='Contado' 
             GROUP BY Clientes_idClientes,FormaPago
@@ -152,10 +153,11 @@ class PDF_Inteligencia extends Documento{
         $Back="#CEE3F6";
         $html.='<table cellspacing="1" cellpadding="2" border="0">';
         $html.='<tr >';
-        $html.='<td colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>FRECUENCIA DE CLIENTES DE CONTADO</strong></td></tr>'; 
+        $html.='<td colspan="5" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>FRECUENCIA DE CLIENTES DE CONTADO</strong></td></tr>'; 
         $html.='<tr >';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Nombre</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Identificacion</strong></td>';
+            $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Telefono</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Frecuencia</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Total Comprado</strong></td>';
         $html.='</tr>';
@@ -164,6 +166,7 @@ class PDF_Inteligencia extends Documento{
             $html.='<tr >';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["RazonSocial"].'</td>';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Identificacion"].'</td>';
+                $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Telefono"].'</td>';
                 $html.='<td colspan="1" style="text-align:center;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["TotalFacturas"]).'</strong></td>';
                 $html.='<td colspan="1" style="text-align:rigth;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["total_comprado"]).'</strong></td>';
             $html.='</tr>';
@@ -177,6 +180,7 @@ class PDF_Inteligencia extends Documento{
         $sql="SELECT count( Total) TotalFacturas,Clientes_idClientes AS cliente_id,sum(Total) as total_comprado,FormaPago , 
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago='SisteCredito' 
             GROUP BY Clientes_idClientes,FormaPago
@@ -187,10 +191,11 @@ class PDF_Inteligencia extends Documento{
         $Back="#CEE3F6";
         $html.='<BR><BR><table cellspacing="1" cellpadding="2" border="0">';
         $html.='<tr >';
-        $html.='<td colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>FRECUENCIA DE CLIENTES SISTE CREDITO</strong></td></tr>'; 
+        $html.='<td colspan="5" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>FRECUENCIA DE CLIENTES SISTE CREDITO</strong></td></tr>'; 
         $html.='<tr >';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Nombre</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Identificacion</strong></td>';
+            $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Telefono</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Frecuencia</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Total Comprado</strong></td>';
         $html.='</tr>';
@@ -199,6 +204,7 @@ class PDF_Inteligencia extends Documento{
             $html.='<tr >';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["RazonSocial"].'</td>';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Identificacion"].'</td>';
+                $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Telefono"].'</td>';
                 $html.='<td colspan="1" style="text-align:center;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["TotalFacturas"]).'</strong></td>';
                 $html.='<td colspan="1" style="text-align:rigth;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["total_comprado"]).'</strong></td>';
             $html.='</tr>';
@@ -211,6 +217,7 @@ class PDF_Inteligencia extends Documento{
         $sql="SELECT count( Total) TotalFacturas,Clientes_idClientes AS cliente_id,sum(Total) as total_comprado,FormaPago , 
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago LIKE 'Acuerdo%' 
             GROUP BY Clientes_idClientes,FormaPago
@@ -221,10 +228,11 @@ class PDF_Inteligencia extends Documento{
         $Back="#CEE3F6";
         $html.='<BR><BR><table cellspacing="1" cellpadding="2" border="0">';
         $html.='<tr >';
-        $html.='<td colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>FRECUENCIA DE CLIENTES ACUERDO DE PAGO</strong></td></tr>'; 
+        $html.='<td colspan="5" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>FRECUENCIA DE CLIENTES ACUERDO DE PAGO</strong></td></tr>'; 
         $html.='<tr >';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Nombre</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Identificacion</strong></td>';
+            $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Telefono</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Frecuencia</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Total Comprado</strong></td>';
         $html.='</tr>';
@@ -233,6 +241,7 @@ class PDF_Inteligencia extends Documento{
             $html.='<tr >';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["RazonSocial"].'</td>';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Identificacion"].'</td>';
+                $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Telefono"].'</td>';
                 $html.='<td colspan="1" style="text-align:center;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["TotalFacturas"]).'</strong></td>';
                 $html.='<td colspan="1" style="text-align:rigth;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["total_comprado"]).'</strong></td>';
             $html.='</tr>';
@@ -245,6 +254,7 @@ class PDF_Inteligencia extends Documento{
         $sql="SELECT count( Total) TotalFacturas,Clientes_idClientes AS cliente_id,sum(Total) as total_comprado,FormaPago , 
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago LIKE 'Credito%' 
             GROUP BY Clientes_idClientes,FormaPago
@@ -255,10 +265,11 @@ class PDF_Inteligencia extends Documento{
         $Back="#CEE3F6";
         $html.='<BR><BR><table cellspacing="1" cellpadding="2" border="0">';
         $html.='<tr >';
-        $html.='<td colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>FRECUENCIA DE CLIENTES CREDITO</strong></td></tr>'; 
+        $html.='<td colspan="5" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>FRECUENCIA DE CLIENTES CREDITO</strong></td></tr>'; 
         $html.='<tr >';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Nombre</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Identificacion</strong></td>';
+            $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Telefono</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Frecuencia</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Total Comprado</strong></td>';
         $html.='</tr>';
@@ -267,6 +278,7 @@ class PDF_Inteligencia extends Documento{
             $html.='<tr >';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["RazonSocial"].'</td>';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Identificacion"].'</td>';
+                $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Telefono"].'</td>';
                 $html.='<td colspan="1" style="text-align:center;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["TotalFacturas"]).'</strong></td>';
                 $html.='<td colspan="1" style="text-align:rigth;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["total_comprado"]).'</strong></td>';
             $html.='</tr>';
@@ -280,6 +292,7 @@ class PDF_Inteligencia extends Documento{
         $sql="SELECT count( Total) TotalFacturas,Clientes_idClientes AS cliente_id,sum(Total) as total_comprado,FormaPago , 
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago LIKE 'Separado' 
             GROUP BY Clientes_idClientes,FormaPago
@@ -290,10 +303,11 @@ class PDF_Inteligencia extends Documento{
         $Back="#CEE3F6";
         $html.='<BR><BR><table cellspacing="1" cellpadding="2" border="0">';
         $html.='<tr >';
-        $html.='<td colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>FRECUENCIA DE CLIENTES SEPARADO</strong></td></tr>'; 
+        $html.='<td colspan="5" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>FRECUENCIA DE CLIENTES SEPARADO</strong></td></tr>'; 
         $html.='<tr >';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Nombre</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Identificacion</strong></td>';
+            $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Telefono</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Frecuencia</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Total Comprado</strong></td>';
         $html.='</tr>';
@@ -302,6 +316,7 @@ class PDF_Inteligencia extends Documento{
             $html.='<tr >';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["RazonSocial"].'</td>';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Identificacion"].'</td>';
+                $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Telefono"].'</td>';
                 $html.='<td colspan="1" style="text-align:center;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["TotalFacturas"]).'</strong></td>';
                 $html.='<td colspan="1" style="text-align:rigth;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["total_comprado"]).'</strong></td>';
             $html.='</tr>';
@@ -320,7 +335,8 @@ class PDF_Inteligencia extends Documento{
         $html="";
         $sql="SELECT SUM( Total) Total,Clientes_idClientes AS cliente_id,
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
-            (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion,
+            (SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' AND FormaPago='Contado'
             GROUP BY Clientes_idClientes  
@@ -331,10 +347,12 @@ class PDF_Inteligencia extends Documento{
             $datos_clientes_estrella["Contado"]["RazonSocial"]=$datos_consulta["RazonSocial"];
             $datos_clientes_estrella["Contado"]["Total"]=$datos_consulta["Total"];
             $datos_clientes_estrella["Contado"]["Identificacion"]=$datos_consulta["Identificacion"];
+            $datos_clientes_estrella["Contado"]["Telefono"]=$datos_consulta["Telefono"];
         }
         $sql="SELECT SUM( Total) Total,Clientes_idClientes AS cliente_id,
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' AND FormaPago='SisteCredito'
             GROUP BY Clientes_idClientes  
@@ -344,10 +362,12 @@ class PDF_Inteligencia extends Documento{
             $datos_clientes_estrella["SisteCredito"]["RazonSocial"]=$datos_consulta["RazonSocial"];
             $datos_clientes_estrella["SisteCredito"]["Total"]=$datos_consulta["Total"];
             $datos_clientes_estrella["SisteCredito"]["Identificacion"]=$datos_consulta["Identificacion"];
+            $datos_clientes_estrella["SisteCredito"]["Telefono"]=$datos_consulta["Telefono"];
         }
         $sql="SELECT SUM( Total) Total,Clientes_idClientes AS cliente_id,
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' AND FormaPago='Separado'
             GROUP BY Clientes_idClientes  
@@ -357,10 +377,12 @@ class PDF_Inteligencia extends Documento{
             $datos_clientes_estrella["Separado"]["RazonSocial"]=$datos_consulta["RazonSocial"];
             $datos_clientes_estrella["Separado"]["Total"]=$datos_consulta["Total"];
             $datos_clientes_estrella["Separado"]["Identificacion"]=$datos_consulta["Identificacion"];
+            $datos_clientes_estrella["Separado"]["Telefono"]=$datos_consulta["Telefono"];
         }
         $sql="SELECT SUM( Total) Total,Clientes_idClientes AS cliente_id,
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' AND FormaPago like 'Credito%'
             GROUP BY Clientes_idClientes  
@@ -370,11 +392,13 @@ class PDF_Inteligencia extends Documento{
             $datos_clientes_estrella["Credito"]["RazonSocial"]=$datos_consulta["RazonSocial"];
             $datos_clientes_estrella["Credito"]["Total"]=$datos_consulta["Total"];
             $datos_clientes_estrella["Credito"]["Identificacion"]=$datos_consulta["Identificacion"];
+            $datos_clientes_estrella["Credito"]["Telefono"]=$datos_consulta["Telefono"];
         }
         
         $sql="SELECT SUM( Total) Total,Clientes_idClientes AS cliente_id,
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' AND FormaPago like 'Acuerdo%'
             GROUP BY Clientes_idClientes  
@@ -384,11 +408,13 @@ class PDF_Inteligencia extends Documento{
             $datos_clientes_estrella["Acuerdo"]["RazonSocial"]=$datos_consulta["RazonSocial"];
             $datos_clientes_estrella["Acuerdo"]["Total"]=$datos_consulta["Total"];
             $datos_clientes_estrella["Acuerdo"]["Identificacion"]=$datos_consulta["Identificacion"];
+            $datos_clientes_estrella["Acuerdo"]["Telefono"]=$datos_consulta["Telefono"];
         }
         
         $sql="SELECT SUM( Total) Total,Clientes_idClientes AS cliente_id,
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' AND FormaPago like 'ANULADA'
             GROUP BY Clientes_idClientes  
@@ -398,16 +424,18 @@ class PDF_Inteligencia extends Documento{
             $datos_clientes_estrella["ANULADA"]["RazonSocial"]=$datos_consulta["RazonSocial"];
             $datos_clientes_estrella["ANULADA"]["Total"]=$datos_consulta["Total"];
             $datos_clientes_estrella["ANULADA"]["Identificacion"]=$datos_consulta["Identificacion"];
+            $datos_clientes_estrella["ANULADA"]["Telefono"]=$datos_consulta["Telefono"];
         }
         
         $Back="#CEE3F6";
         $html.='<table cellspacing="1" cellpadding="2" border="0">';
         $html.='<tr >';
-        $html.='<td colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Clientes Estrella Agrupados por Tipo de Factura</strong></td></tr>'; 
+        $html.='<td colspan="5" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Clientes Estrella Agrupados por Tipo de Factura</strong></td></tr>'; 
         $html.='<tr >';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Tipo de Factura</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Cliente</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Identificacion</strong></td>';
+            $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Teléfono</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Total</strong></td>';
             
         $html.='</tr>';
@@ -426,6 +454,7 @@ class PDF_Inteligencia extends Documento{
                     $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$key.'</td>';
                     $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$value["RazonSocial"].'</td>';
                     $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$value["Identificacion"].'</td>';
+                    $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$value["Telefono"].'</td>';
                     $html.='<td colspan="1" style="text-align:rigth;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($value["Total"]).'</strong></td>';
 
                 $html.='</tr>';
@@ -443,6 +472,8 @@ class PDF_Inteligencia extends Documento{
         $sql="SELECT count( Total) TotalFacturas,Clientes_idClientes AS cliente_id,sum(Total) as total_comprado,FormaPago , 
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
+            
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago='Contado' 
             GROUP BY Clientes_idClientes,FormaPago
@@ -453,10 +484,11 @@ class PDF_Inteligencia extends Documento{
         $Back="#CEE3F6";
         $html.='<table cellspacing="1" cellpadding="2" border="0">';
         $html.='<tr >';
-        $html.='<td colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>LISTA DE CLIENTES DE MAYOR VALOR COMPRADO DE CONTADO</strong></td></tr>'; 
+        $html.='<td colspan="5" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>LISTA DE CLIENTES DE MAYOR VALOR COMPRADO DE CONTADO</strong></td></tr>'; 
         $html.='<tr >';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Nombre</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Identificacion</strong></td>';
+            $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Telefono</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Frecuencia</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Total Comprado</strong></td>';
         $html.='</tr>';
@@ -465,6 +497,7 @@ class PDF_Inteligencia extends Documento{
             $html.='<tr >';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["RazonSocial"].'</td>';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Identificacion"].'</td>';
+                $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Telefono"].'</td>';
                 $html.='<td colspan="1" style="text-align:center;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["TotalFacturas"]).'</strong></td>';
                 $html.='<td colspan="1" style="text-align:rigth;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["total_comprado"]).'</strong></td>';
             $html.='</tr>';
@@ -478,6 +511,8 @@ class PDF_Inteligencia extends Documento{
         $sql="SELECT count( Total) TotalFacturas,Clientes_idClientes AS cliente_id,sum(Total) as total_comprado,FormaPago , 
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
+            
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago='SisteCredito' 
             GROUP BY Clientes_idClientes,FormaPago
@@ -488,10 +523,11 @@ class PDF_Inteligencia extends Documento{
         $Back="#CEE3F6";
         $html.='<BR><BR><table cellspacing="1" cellpadding="2" border="0">';
         $html.='<tr >';
-        $html.='<td colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>LISTA DE CLIENTES DE MAYOR VALOR COMPRADO SISTE CREDITO</strong></td></tr>'; 
+        $html.='<td colspan="5" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>LISTA DE CLIENTES DE MAYOR VALOR COMPRADO SISTE CREDITO</strong></td></tr>'; 
         $html.='<tr >';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Nombre</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Identificacion</strong></td>';
+            $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Telefono</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Frecuencia</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Total Comprado</strong></td>';
         $html.='</tr>';
@@ -500,6 +536,7 @@ class PDF_Inteligencia extends Documento{
             $html.='<tr >';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["RazonSocial"].'</td>';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Identificacion"].'</td>';
+                $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Telefono"].'</td>';
                 $html.='<td colspan="1" style="text-align:center;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["TotalFacturas"]).'</strong></td>';
                 $html.='<td colspan="1" style="text-align:rigth;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["total_comprado"]).'</strong></td>';
             $html.='</tr>';
@@ -512,6 +549,8 @@ class PDF_Inteligencia extends Documento{
         $sql="SELECT count( Total) TotalFacturas,Clientes_idClientes AS cliente_id,sum(Total) as total_comprado,FormaPago , 
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
+            
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago LIKE 'Acuerdo%' 
             GROUP BY Clientes_idClientes,FormaPago
@@ -522,10 +561,11 @@ class PDF_Inteligencia extends Documento{
         $Back="#CEE3F6";
         $html.='<BR><BR><table cellspacing="1" cellpadding="2" border="0">';
         $html.='<tr >';
-        $html.='<td colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>LISTA DE CLIENTES DE MAYOR VALOR COMPRADO ACUERDO DE PAGO</strong></td></tr>'; 
+        $html.='<td colspan="5" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>LISTA DE CLIENTES DE MAYOR VALOR COMPRADO ACUERDO DE PAGO</strong></td></tr>'; 
         $html.='<tr >';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Nombre</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Identificacion</strong></td>';
+            $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Telefono</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Frecuencia</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Total Comprado</strong></td>';
         $html.='</tr>';
@@ -534,6 +574,7 @@ class PDF_Inteligencia extends Documento{
             $html.='<tr >';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["RazonSocial"].'</td>';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Identificacion"].'</td>';
+                $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Telefono"].'</td>';
                 $html.='<td colspan="1" style="text-align:center;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["TotalFacturas"]).'</strong></td>';
                 $html.='<td colspan="1" style="text-align:rigth;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["total_comprado"]).'</strong></td>';
             $html.='</tr>';
@@ -546,6 +587,8 @@ class PDF_Inteligencia extends Documento{
         $sql="SELECT count( Total) TotalFacturas,Clientes_idClientes AS cliente_id,sum(Total) as total_comprado,FormaPago , 
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
+            
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago LIKE 'Credito%' 
             GROUP BY Clientes_idClientes,SUBSTRING(FormaPago,1,5) 
@@ -556,10 +599,11 @@ class PDF_Inteligencia extends Documento{
         $Back="#CEE3F6";
         $html.='<BR><BR><table cellspacing="1" cellpadding="2" border="0">';
         $html.='<tr >';
-        $html.='<td colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>LISTA DE CLIENTES DE MAYOR VALOR COMPRADO CREDITO</strong></td></tr>'; 
+        $html.='<td colspan="5" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>LISTA DE CLIENTES DE MAYOR VALOR COMPRADO CREDITO</strong></td></tr>'; 
         $html.='<tr >';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Nombre</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Identificacion</strong></td>';
+            $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Telefono</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Frecuencia</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Total Comprado</strong></td>';
         $html.='</tr>';
@@ -568,6 +612,7 @@ class PDF_Inteligencia extends Documento{
             $html.='<tr >';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["RazonSocial"].'</td>';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Identificacion"].'</td>';
+                $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Telefono"].'</td>';
                 $html.='<td colspan="1" style="text-align:center;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["TotalFacturas"]).'</strong></td>';
                 $html.='<td colspan="1" style="text-align:rigth;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["total_comprado"]).'</strong></td>';
             $html.='</tr>';
@@ -581,6 +626,8 @@ class PDF_Inteligencia extends Documento{
         $sql="SELECT count( Total) TotalFacturas,Clientes_idClientes AS cliente_id,sum(Total) as total_comprado,FormaPago , 
             (SELECT RazonSocial FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS RazonSocial,
             (SELECT Num_Identificacion FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Identificacion
+            ,(SELECT Telefono FROM clientes t2 WHERE t2.idClientes=(SELECT cliente_id) LIMIT 1) AS Telefono
+            
             FROM facturas
             WHERE Fecha>='$fecha_inicial' AND Fecha<='$fecha_final' and FormaPago LIKE 'Separado' 
             GROUP BY Clientes_idClientes,FormaPago
@@ -591,10 +638,11 @@ class PDF_Inteligencia extends Documento{
         $Back="#CEE3F6";
         $html.='<BR><BR><table cellspacing="1" cellpadding="2" border="0">';
         $html.='<tr >';
-        $html.='<td colspan="4" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>LISTA DE CLIENTES DE MAYOR VALOR COMPRADO SEPARADO</strong></td></tr>'; 
+        $html.='<td colspan="5" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>LISTA DE CLIENTES DE MAYOR VALOR COMPRADO SEPARADO</strong></td></tr>'; 
         $html.='<tr >';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Nombre</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Identificacion</strong></td>';
+            $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Telefono</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Frecuencia</strong></td>';
             $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>Total Comprado</strong></td>';
         $html.='</tr>';
@@ -603,6 +651,7 @@ class PDF_Inteligencia extends Documento{
             $html.='<tr >';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["RazonSocial"].'</td>';
                 $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Identificacion"].'</td>';
+                $html.='<td colspan="1" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$datos_consulta["Telefono"].'</td>';
                 $html.='<td colspan="1" style="text-align:center;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["TotalFacturas"]).'</strong></td>';
                 $html.='<td colspan="1" style="text-align:rigth;border-bottom: 1px solid #ddd;background-color: '.$Back.';"><strong>'.number_format($datos_consulta["total_comprado"]).'</strong></td>';
             $html.='</tr>';

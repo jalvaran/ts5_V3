@@ -47,6 +47,7 @@ if( !empty($_REQUEST["Accion"]) ){
             if(isset($_REQUEST['Responsabilidad'])){
                 $Datos["Responsabilidad"]=$obCon->normalizar($_REQUEST['Responsabilidad']); 
             }
+            $Datos["actualizacion_datos"]=date("Y-m-d H:i:s");
             $sqlClientes=$obCon->getSQLInsert("clientes", $Datos);
             $sqlProveedores=$obCon->getSQLInsert("proveedores", $Datos);
             $obCon->Query($sqlClientes);
@@ -112,6 +113,7 @@ if( !empty($_REQUEST["Accion"]) ){
             if(isset($_REQUEST['Responsabilidad'])){
                 $Datos["Responsabilidad"]=$obCon->normalizar($_REQUEST['Responsabilidad']); 
             }
+            $Datos["actualizacion_datos"]=date("Y-m-d H:i:s");
             $sqlUpdate=$obCon->getSQLUpdate($Tabla, $Datos);
             $idTabla="idClientes";
             if($Tabla=="proveedores"){

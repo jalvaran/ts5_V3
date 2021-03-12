@@ -35,7 +35,7 @@ class informesAcuerdoPago extends AcuerdoPago{
                 round(t2.SaldoAnterior) as SaldoAnterior,round(t2.SaldoInicial)  as SaldoInicial,t2.TotalAbonos,round(t2.SaldoFinal) as SaldoFinal,'0000-00-00 00:00:00' as Updated, '0000-00-00 00:00:00' as Sync 
                 FROM acuerdo_pago_proyeccion_pagos t1 
                 INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
-                WHERE t2.Estado=1 AND (t1.Estado=0 OR t1.Estado=2 OR t1.Estado=4) ORDER BY Tercero,Fecha ";
+                WHERE (t2.Estado=1 or t2.Estado=12) AND (t1.Estado=0 OR t1.Estado=2 OR t1.Estado=4) ORDER BY Tercero,Fecha ";
         $this->Query($sql);
         
         $sql="ALTER TABLE $HojaDeTrabajo ADD PRIMARY KEY(`ID`),
