@@ -17,6 +17,16 @@ class PageConstruct extends html_estruct_class{
      * @param type $Vector -> uso futuro
      */
     function __construct($Titulo,$Vector,$Angular='',$ng_app='',$CssFramework=1,$Inicializar=1){
+        
+        $idUser=$_SESSION["idUser"];
+        $this->obCon=new conexion($idUser);
+        $this->Titulo=$Titulo;
+        $this->usuario_id=$idUser;
+        $sql="SELECT Nombre,Apellido,Role,TipoUser FROM usuarios WHERE idUsuarios='$idUser'";
+        $Consulta=$this->obCon->Query($sql);
+        $this->DatosUsuario=$this->obCon->FetchAssoc($Consulta);
+        $this->NombreUsuario=$this->DatosUsuario["Nombre"]." ".$this->DatosUsuario["Apellido"];
+        
         if($Inicializar==1){
             $this->tipo_html();
             $this->html("es","","",$ng_app);
@@ -1273,7 +1283,70 @@ class PageConstruct extends html_estruct_class{
          * @param type $idUsuario
          * @param type $vector
          */
-        public function ConstruirMenuLateral($idUsuario,$vector) {
+        public function ConstruirMenuLateral() {
+        
+        $this->MenuLateralInit();    
+                $this->PanelInfoUser($this->NombreUsuario);
+                //$css->PanelBusqueda(); //uso futuro
+                $this->PanelLateralInit("<a href='../menu/Menu.php'>MENU GENERAL</a>");    
+            
+        $sql="SELECT t1.*,t3.ID as menu_id,t3.Nombre as menu_name,t3.CSS_Clase,t5.Ruta   
+                    FROM menu_submenus t1 
+                    INNER JOIN menu_pestanas t2 ON t1.idPestana=t2.ID 
+                    INNER JOIN menu t3 ON t3.ID=t2.idMenu 
+                    INNER JOIN menu_carpetas t5 ON t5.ID=t1.idCarpeta 
+                  WHERE t1.Estado=1  ";
+        
+        if($this->DatosUsuario["TipoUser"]<>"administrador"){
+            $sql.=" AND EXISTS (SELECT 1 FROM paginas_bloques t4 WHERE t4.TipoUsuario='".$this->DatosUsuario["TipoUser"]."' AND t4.Pagina=t1.Pagina)";
+        }
+        $sql.= "ORDER BY t3.Orden,t1.Orden ASC";
+        $Consulta=$this->obCon->Query($sql);
+        
+        while($DatosConsulta=$this->obCon->FetchAssoc($Consulta)){
+            $menu_id=$DatosConsulta["menu_id"];
+            $submenu_id=$DatosConsulta["ID"];
+            $DatosMenu[$menu_id]["name"]=$DatosConsulta["menu_name"];
+            $DatosMenu[$menu_id]["icon"]=$DatosConsulta["CSS_Clase"];
+            $DatosSubMenu[$menu_id][$submenu_id]=$DatosConsulta;
+        }
+        
+        
+        if(isset($DatosMenu)){
+            foreach ($DatosMenu as $keyMenu => $Menu) {
+                //$this->PanelMenuGeneralInit(utf8_encode($Menu["name"]),$Menu["icon"],0,"");
+                print('<li class="treeview">
+                        <a href="#">
+                          <i class="'.$Menu["icon"].'"></i> <span>'.utf8_encode($Menu["name"]).'</span>
+                          <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                          </span>
+                        </a>
+                        <ul class="treeview-menu" style="display: none;">
+                          
+                        ');
+                foreach ($DatosSubMenu[$keyMenu] as $keySubmenu => $SubMenu) {
+                    $SubMenu["Ruta"]= str_replace("../", "", $SubMenu["Ruta"]);
+                    $SubMenu["Ruta"]="../../".$SubMenu["Ruta"];
+                    print('<li><a href="'.$SubMenu["Ruta"].$SubMenu["Pagina"].'" target="'.$SubMenu["Target"].'"><i class="fa fa-circle-o"></i>'.utf8_encode($SubMenu["Nombre"]).'</a></li>');
+                    /*
+                    print('<li><a href="'.$SubMenu["Ruta"].$SubMenu["Pagina"].'" target="'.$SubMenu["Target"].'"><span>'.$SubMenu["Nombre"].'</span></a></li>
+
+                        ');
+                     * 
+                     */
+                }
+                
+               print('</ul>
+                      </li>');
+            }
+        }
+                        
+        $this->CPanelLateral();
+        $this->MenuLateralFin();
+    }
+    
+        public function ConstruirMenuLateralold($idUsuario,$vector) {
             $obCon=new conexion($idUsuario);
             $sql="SELECT Nombre,Apellido,Identificacion,TipoUser FROM usuarios WHERE idUsuarios='$idUsuario'";
             $Consulta=$obCon->Query($sql);

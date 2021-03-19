@@ -232,9 +232,11 @@ class Contabilidad extends ProcesoVenta{
             $Condicion.=" AND idCentroCosto = '$CentroCostos'";
         }
         $sql="CREATE VIEW vista_balance_comprobacion_terceros AS 
-                SELECT CuentaPUC,NombreCuenta, 
-                    Tercero_Identificacion,Tercero_DV,Tercero_Razon_Social,
-                    Tercero_Direccion,Tercero_Cod_Mcipio,
+                SELECT CuentaPUC,NombreCuenta, Tercero_Tipo_Documento,
+                    Tercero_Identificacion,Tercero_DV,
+                    Tercero_Primer_Apellido,Tercero_Segundo_Apellido,Tercero_Primer_Nombre,Tercero_Otros_Nombres,
+                    Tercero_Razon_Social,
+                    Tercero_Direccion,Tercero_Cod_Dpto,Tercero_Pais_Domicilio,Tercero_Cod_Mcipio,
                     SUM(Debito) as Debitos,SUM(Credito) as Creditos
                     FROM librodiario $Condicion 
                     GROUP BY CuentaPUC,Tercero_Identificacion;";         

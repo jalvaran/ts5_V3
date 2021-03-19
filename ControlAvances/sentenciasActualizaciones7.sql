@@ -376,3 +376,39 @@ ALTER TABLE `proveedores`
 ADD `actualizacion_datos` datetime NOT NULL AFTER `Estado`;
 
 update clientes set actualizacion_datos=Created;
+
+
+INSERT INTO `servidores` (`ID`, `IP`, `Nombre`, `Usuario`, `Password`, `DataBase`, `Puerto`, `TipoServidor`, `Observaciones`, `Updated`, `Sync`) VALUES
+(111,	'http://35.238.236.240/api/ubl2.1/status/document/',	'obtener el estado de una factura',	'',	'',	'',	0,	'REST',	'Esta ruta devuelve el log de un documento, debe acompañarse por el uuid, ver documentacion: http://35.238.236.240/api/ubl2.1/documentation',	'2021-03-03 17:08:51',	'2020-07-25 10:06:36'),
+(112,	'http://35.238.236.240/api/ubl2.1/mail/send/',	'Enviar Factura Electronica por mail',	'',	'',	'',	0,	'REST',	'Esta ruta devuelve el log de un documento, debe acompañarse por el uuid, ver documentacion: http://35.238.236.240/api/ubl2.1/documentation',	'2021-03-03 17:10:00',	'2020-07-25 10:06:36');
+
+DROP TABLE IF EXISTS `cod_documentos`;
+CREATE TABLE `cod_documentos` (
+  `Codigo` int(11) NOT NULL,
+  `Descripcion` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  KEY `Codigo` (`Codigo`),
+  KEY `Codigo_2` (`Codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `cod_documentos` (`Codigo`, `Descripcion`, `Updated`, `Sync`) VALUES
+(11,	'Registro civil de nacimiento ',	'2020-07-25 14:35:02',	'2020-07-25 09:35:02'),
+(12,	'Tarjeta de identidad ',	'2020-07-25 14:35:02',	'2020-07-25 09:35:02'),
+(13,	'Cédula de ciudadanía ',	'2021-03-04 04:22:04',	'2020-07-25 09:35:02'),
+(14,	'Certificado de la Registraduría para sucesiones ilíquidas de personas naturales que no tienen ningún documento de identificación. ',	'2021-03-04 04:22:04',	'2020-07-25 09:35:02'),
+(15,	'Tipo de documento que identifica una sucesión ilíquida, expedido por la notaria o por un juzgado',	'2021-03-04 04:22:04',	'2020-07-25 09:35:02'),
+(21,	'Tarjeta de extranjería',	'2021-03-04 04:22:04',	'2020-07-25 09:35:02'),
+(22,	'Cédula de extranjería ',	'2021-03-04 04:22:04',	'2020-07-25 09:35:02'),
+(31,	'NIT ',	'2020-07-25 14:35:02',	'2020-07-25 09:35:02'),
+(33,	'Identificación de extranjeros diferente al NIT asignado DIAN',	'2021-03-04 04:22:04',	'2020-07-25 09:35:02'),
+(41,	'Pasaporte ',	'2020-07-25 14:35:02',	'2020-07-25 09:35:02'),
+(42,	'Documento de identificación extranjero ',	'2021-03-04 04:22:04',	'2020-07-25 09:35:02'),
+(43,	'Sin identificación del exterior o para uso definido por la DIAN. ',	'2021-03-04 04:22:04',	'2020-07-25 09:35:02'),
+(44,	'Documento de Identificación extranjero Persona Jurídica ',	'2021-03-04 04:22:04',	'2020-07-25 09:35:02'),
+(46,	'Carné Diplomótico: Documento expedido por el Ministerio de relaciones Exteriores a los miembros de la misiones diplomáticas y consulares, con el que se deben identificar ente las autoridades nacionale',	'2021-03-04 04:22:04',	'2020-07-25 09:35:02');
+
+
+ALTER TABLE `facturas_electronicas_log`
+ADD `firma_digital` text COLLATE 'utf8_spanish_ci' NOT NULL AFTER `UUID`;
+

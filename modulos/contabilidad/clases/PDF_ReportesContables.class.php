@@ -434,9 +434,17 @@ class PDF_ReportesContables extends Documento{
         $html.='<tr style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">';        
             $html.='<th><strong>CUENTA</strong></th>';
             $html.='<th><strong>NOMBRE</strong></th>';
-            $html.='<th><strong>TERCERO</strong></th>';
+            $html.='<th><strong>TIPO DOCUMENTO</strong></th>';
+            $html.='<th><strong>IDENTIFICACION</strong></th>';
+            $html.='<th><strong>PRIMER NOMBRE</strong></th>';
+            $html.='<th><strong>SEGUNDO NOMBRE</strong></th>';
+            $html.='<th><strong>PRIMER APELLIDO</strong></th>';
+            $html.='<th><strong>SEGUNDO APELLIDO</strong></th>';
             $html.='<th><strong>RAZON SOCIAL</strong></th>';
             $html.='<th><strong>DIRECCION</strong></th>';
+            $html.='<th><strong>MUNICIPIO</strong></th>';
+            $html.='<th><strong>DEPARTAMENTO</strong></th>';
+            $html.='<th><strong>PAIS</strong></th>';
             $html.='<th><strong>DEBITO</strong></th>';
             $html.='<th><strong>CREDITO</strong></th>';
             $html.='<th><strong>SALDO</strong></th>';
@@ -454,9 +462,20 @@ class PDF_ReportesContables extends Documento{
             $html.='<tr style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">';
                 $html.='<td>'.$DatosConsulta["CuentaPUC"].'</td>';
                 $html.='<td>'.utf8_encode($DatosConsulta["NombreCuenta"]).'</td>';
+                $html.='<td>'.($DatosConsulta["Tercero_Tipo_Documento"]).'</td>';
                 $html.='<td>'.($DatosConsulta["Tercero_Identificacion"]).'</td>';
+                
+                $html.='<td>'.utf8_encode($DatosConsulta["Tercero_Primer_Nombre"]).'</td>';
+                $html.='<td>'.utf8_encode($DatosConsulta["Tercero_Otros_Nombres"]).'</td>';
+                $html.='<td>'.utf8_encode($DatosConsulta["Tercero_Primer_Apellido"]).'</td>';
+                $html.='<td>'.utf8_encode($DatosConsulta["Tercero_Segundo_Apellido"]).'</td>';
+                
                 $html.='<td>'.utf8_encode($DatosConsulta["Tercero_Razon_Social"]).'</td>';
                 $html.='<td>'.utf8_encode($DatosConsulta["Tercero_Direccion"]).'</td>';
+                
+                $html.='<td>'.($DatosConsulta["Tercero_Cod_Mcipio"]).'</td>';
+                $html.='<td>'.($DatosConsulta["Tercero_Cod_Dpto"]).'</td>';
+                $html.='<td>'.($DatosConsulta["Tercero_Pais_Domicilio"]).'</td>';
                 $html.='<td>'.number_format($DatosConsulta["Debitos"]).'</td>';
                 $html.='<td>'.number_format($DatosConsulta["Creditos"]).'</td>';
                 $html.='<td>'.number_format($DatosConsulta["Debitos"]-$DatosConsulta["Creditos"]).'</td>';

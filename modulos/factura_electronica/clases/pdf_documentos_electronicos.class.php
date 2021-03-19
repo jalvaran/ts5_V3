@@ -16,6 +16,7 @@ class PDF_Documentos_Electronicos extends Documento{
         //$datos_documento_electronico=$this->obCon->DevuelveValores("facturas_electronicas_log", "idFactura", $idFactura);
         $datos_tercero=$this->obCon->DevuelveValores("clientes", "idClientes", $DatosFactura["Clientes_idClientes"]);
         $DatosFactura["uuid"]=$datos_documento_electronico["UUID"];
+        $DatosFactura["firma_digital"]=$datos_documento_electronico["firma_digital"];
         $CodigoFactura="$DatosFactura[Prefijo]-$DatosFactura[NumeroFactura]";
         $Documento="";
         
@@ -55,6 +56,7 @@ class PDF_Documentos_Electronicos extends Documento{
     public function pdf_encabezado_documento_electronico($datos_tercero,$idEmpresa,$DatosFormatoCalidad,$datos_factura,$NumeracionDocumento="",$Patch='../../') {
         $DatosEmpresaPro=$this->obCon->DevuelveValores("empresapro", "idEmpresaPro", $idEmpresa);
         
+        
         $RutaLogo=$Patch."$DatosEmpresaPro[RutaImagen]";
         if(!file_exists($RutaLogo)){
             $DatosEmpresaPro1=$this->obCon->DevuelveValores("empresapro", "idEmpresaPro", 1);
@@ -62,6 +64,7 @@ class PDF_Documentos_Electronicos extends Documento{
         }
         $titulo="<h2><br><br>".$DatosFormatoCalidad["Nombre"]."<br>".$datos_factura["Prefijo"]."-".$datos_factura["NumeroFactura"]."</h2>";
         $titulo_cufe="<h4>CUFE: ".$datos_factura["uuid"]."</h4>";
+        $titulo_firma_digital="<h6>Firma Digital: ".$datos_factura["firma_digital"]."</h6>";
         ///////////////////////////////////////////////////////
         //////////////encabezado//////////////////
         ////////////////////////////////////////////////////////
@@ -76,9 +79,15 @@ class PDF_Documentos_Electronicos extends Documento{
                     <td width="183px" border="1" style="text-align: center;"></td>
                 </tr>
                 <tr border="1">
-                <td colspan="3">'.$titulo_cufe.'</td>
-                </tr>
-            </table>
+                    <td colspan="3">'.$titulo_cufe.'</td>
+                </tr>';
+            if($datos_factura["firma_digital"]<>''){
+                $tbl.='<tr border="1">
+                        <td colspan="3">'.$titulo_firma_digital.'</td>
+                    </tr>';
+            }
+        
+        $tbl.='</table>
             ';
         $this->PDF->writeHTML($tbl, true, false, false, false, '');
         $this->PDF->SetFillColor(255, 255, 255);

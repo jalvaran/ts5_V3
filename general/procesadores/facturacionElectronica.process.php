@@ -75,7 +75,9 @@ if( !empty($_REQUEST["Accion"]) ){
                     $JSONFactura= json_decode($DatosLogFactura["RespuestaCompletaServidor"]);
                     if(is_object($JSONFactura) and (property_exists($JSONFactura, "uuid")) ){
                         $CUFE=$JSONFactura->uuid;
+                        $firma_digital=$JSONFactura->signature;
                         $obCon->ActualizaRegistro("facturas_electronicas_log", "UUID", $CUFE, "ID", $idLog);
+                        $obCon->ActualizaRegistro("facturas_electronicas_log", "firma_digital", $firma_digital, "ID", $idLog);
                     }else{
                         $obCon->ActualizaRegistro("facturas_electronicas_log", "Estado", 13, "ID", $idLog);
                         //$obCon->ActualizaRegistro("facturas_electronicas_log", "RespuestaCompletaServidor", 13, "ID", $idLog);
