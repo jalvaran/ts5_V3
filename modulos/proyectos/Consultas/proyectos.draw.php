@@ -185,6 +185,8 @@ if( !empty($_REQUEST["Accion"]) ){
                                     print("<td>");
                                         print('<button title="Editar" type="button" class="btn btn-warning btn-flat" onclick=frm_crear_editar_proyecto(`'.$idItem.'`,`'.$Page.'`)><i class="fa fa-edit"></i></button>');
                                         print('<button title="Tareas" type="button" class="btn btn-primary btn-flat" onclick=mostrar_calendario_proyecto(`'.$idItem.'`)><i class="fa fa-calendar"></i></button>');
+                                        $link="procesadores/proyectos.process.php?Accion=15&empresa_id=$empresa_id&proyecto_id=$idItem";
+                                        print('<a href="'.$link.'" title="Cronograma" class="btn btn-success btn-flat" target="_blank"><i class="fa fa-calendar-check-o "></i></a>');
                                         $link="procesadores/proyectos.process.php?Accion=14&empresa_id=$empresa_id&proyecto_id=$idItem";
                                         print('<a href="'.$link.'" title="Informe" class="btn btn-danger btn-flat" target="_blank"><i class="fa fa-file-pdf-o"></i></a>');
                                     print("</td>");

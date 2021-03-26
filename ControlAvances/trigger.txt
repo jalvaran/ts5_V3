@@ -1,0 +1,30 @@
+DELIMITER ;;
+
+CREATE TRIGGER `InsertFacturaOri` AFTER INSERT ON `facturas` FOR EACH ROW
+BEGIN
+
+INSERT INTO ori_facturas SELECT * FROM facturas WHERE idFacturas=New.idFacturas;
+
+
+END;;
+
+CREATE TRIGGER `Actualiza_OriFacturas` AFTER UPDATE ON `facturas` FOR EACH ROW
+BEGIN
+
+REPLACE INTO ori_facturas SELECT * FROM facturas WHERE idFacturas=New.idFacturas;
+
+
+END;;
+
+DELIMITER ;
+
+DELIMITER ;;
+
+CREATE TRIGGER `InsertFacturasItems` AFTER INSERT ON `facturas_items` FOR EACH ROW
+BEGIN
+
+INSERT INTO ori_facturas_items SELECT * FROM facturas_items WHERE ID=New.ID;
+
+END;;
+
+DELIMITER ;

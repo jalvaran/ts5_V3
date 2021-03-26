@@ -587,11 +587,18 @@ class Factura_Electronica extends ProcesoVenta{
         $this->Query($sql);
     }
     
-    public function CrearPDFDesdeBase64($pdf_base64,$NumeroFactura) {
+    public function CrearPDFDesdeBase64($pdf_base64,$NumeroFactura,$ruta_pdf_xml="",$nombre_archivo="") {
         
         $DatosRuta=$this->DevuelveValores("configuracion_general", "ID", 16);
-        $Ruta=$DatosRuta["Valor"];
-        $NombreArchivo=$DatosRuta["Valor"].$NumeroFactura."_FE.pdf";
+        
+        if($ruta_pdf_xml==''){
+            $Ruta= $DatosRuta["Valor"];
+            
+            $NombreArchivo=$Ruta.$NumeroFactura.".pdf";
+        }else{
+            $NombreArchivo=$ruta_pdf_xml.$nombre_archivo.".pdf";
+        }
+        
         $pdf_decoded = base64_decode($pdf_base64);
         
         $pdf = fopen ($NombreArchivo,'w');
@@ -600,11 +607,12 @@ class Factura_Electronica extends ProcesoVenta{
         return($NombreArchivo);
     }
     
-    public function CrearZIPDesdeBase64($zip_base64,$NumeroFactura) {
-        
+    public function CrearZIPDesdeBase64($zip_base64,$NumeroFactura,$patch="../../") {
+        //print($patch);
         $DatosRuta=$this->DevuelveValores("configuracion_general", "ID", 16);
-        $Ruta=$DatosRuta["Valor"];
-        $NombreArchivo=$DatosRuta["Valor"].$NumeroFactura."_FE.zip";
+        $Ruta= str_replace("../", "", $DatosRuta["Valor"]);
+        $Ruta=$patch.$Ruta;
+        $NombreArchivo=$Ruta.$NumeroFactura.".zip";
         $pdf_decoded = base64_decode($zip_base64);
         
         $pdf = fopen ($NombreArchivo,'w');

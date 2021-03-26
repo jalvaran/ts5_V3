@@ -76,8 +76,13 @@ if( !empty($_REQUEST["Accion"]) ){
                     if(is_object($JSONFactura) and (property_exists($JSONFactura, "uuid")) ){
                         $CUFE=$JSONFactura->uuid;
                         $firma_digital=$JSONFactura->signature;
+                        //$link_aceptacion=$JSONFactura->urlAcceptance;
+                        //$link_rechazo=$JSONFactura->urlRejection;
                         $obCon->ActualizaRegistro("facturas_electronicas_log", "UUID", $CUFE, "ID", $idLog);
                         $obCon->ActualizaRegistro("facturas_electronicas_log", "firma_digital", $firma_digital, "ID", $idLog);
+                        //$obCon->ActualizaRegistro("facturas_electronicas_log", "link_aceptacion", $link_aceptacion, "ID", $idLog);
+                        //$obCon->ActualizaRegistro("facturas_electronicas_log", "link_rechazo", $link_rechazo, "ID", $idLog);
+                        
                     }else{
                         $obCon->ActualizaRegistro("facturas_electronicas_log", "Estado", 13, "ID", $idLog);
                         //$obCon->ActualizaRegistro("facturas_electronicas_log", "RespuestaCompletaServidor", 13, "ID", $idLog);
@@ -520,8 +525,8 @@ if( !empty($_REQUEST["Accion"]) ){
                             $body="";
                             $response2 = $obCon->callAPI('POST', $url, $body);
                             $response2=str_replace(PHP_EOL, '', $response2);
-                            $response2=str_replace('\n', '', $response2);
-                            $response2=str_replace('\r', '', $response2);
+                            //$response2=str_replace('\n', '', $response2);
+                            //$response2=str_replace('\r', '', $response2);
                             $response2=str_replace("'", '', $response2);
                             
                             

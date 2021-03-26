@@ -7,7 +7,7 @@ if(file_exists("../../../general/clases/ClasesPDFDocumentos.class.php")){
 class PDF_Documentos_Electronicos extends Documento{
       
     
-    public function pdf_factura_electronica($idFactura,$Guardar=0,$Ruta="../../tmp/") {
+    public function pdf_factura_electronica($idFactura,$Guardar=0,$Ruta="../../tmp/",$nombre_factura="factura") {
         $VistaFactura=1;
         $empresa_id=1;
         $DatosFactura=$this->obCon->DevuelveValores("facturas", "idFacturas", $idFactura);
@@ -49,8 +49,8 @@ class PDF_Documentos_Electronicos extends Documento{
             $this->PDF_Write($html);
         }
         
-        $this->PDF_Output("Factura_$CodigoFactura",$Guardar,$Ruta);
-        return($Ruta."Factura_$CodigoFactura".".pdf");
+        $this->PDF_Output("$nombre_factura",$Guardar,$Ruta);
+        return($Ruta."$nombre_factura".".pdf");
     }
     
     public function pdf_encabezado_documento_electronico($datos_tercero,$idEmpresa,$DatosFormatoCalidad,$datos_factura,$NumeracionDocumento="",$Patch='../../') {

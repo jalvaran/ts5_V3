@@ -2,6 +2,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
+use \Mailjet\Resources;
 
 if(file_exists("../../modelo/php_conexion.php")){
     include_once("../../modelo/php_conexion.php");
@@ -19,7 +20,7 @@ class TS_Mail extends ProcesoVenta{
         //$DatosParametrosFE=$this->DevuelveValores("facturas_electronicas_parametros", "ID", 4);
         
         //recipient
-        $to = strtolower($para);
+        $to = $para;
 
         //sender
         $from = $de;
@@ -43,15 +44,12 @@ class TS_Mail extends ProcesoVenta{
         //multipart boundary 
         $message = "--{$mime_boundary}\n" . "Content-Type: text/html; charset=\"UTF-8\"\n" .
         "Content-Transfer-Encoding: 7bit\n\n" . $htmlContent . "\n\n"; 
-        //$Adjuntos[0]="../clases/Factura.pdf";
+
         //preparing attachment
-        if(isset($Adjuntos[0]) and $Adjuntos[0]<>''){
+        if($Adjuntos<>''){
             foreach($Adjuntos as $file){
-                //print("Enviando: ".$file);
-                if(!empty($file)){
-                    
+                if(!empty($file) > 0){
                     if(is_file($file)){
-                        //print($file);
                         $message .= "--{$mime_boundary}\n";
                         $fp =    @fopen($file,"rb");
                         $data =  @fread($fp,filesize($file));
@@ -77,23 +75,27 @@ class TS_Mail extends ProcesoVenta{
         
     }
     
-    public function EnviarMailXPHPMailer($para,$de,$nombreRemitente, $asunto, $mensajeHTML, $Adjuntos='') {
+    public function EnviarMailXPHPMailer($datos_empresa,$para,$de,$nombreRemitente, $asunto, $mensajeHTML, $Adjuntos='') {
         
         require '../../../librerias/phpmailer/src/Exception.php';
         require '../../../librerias/phpmailer/src/PHPMailer.php';
         require '../../../librerias/phpmailer/src/SMTP.php';
-
+        $empresa_id=$datos_empresa["ID"];
         /*
         Primero, obtenemos el listado de e-mails
         desde nuestra base de datos y la incorporamos a un Array.
         */
-        $email=strtolower($para);
+        $email=$para;
         $name="";
         $email_from=$de;
         $name_from=$nombreRemitente;
         $mail = new PHPMailer(true);
+        $sql="SELECT * FROM configuracion_correos_smtp WHERE empresa_id='$empresa_id'";
+        $DatosSMTP=$this->FetchAssoc($this->Query($sql));
+        if($DatosSMTP["Username"]==''){
+            $DatosSMTP=$this->DevuelveValores("configuracion_correos_smtp", "ID", 1);
+        }
         
-        $DatosSMTP=$this->DevuelveValores("configuracion_correos_smtp", "ID", 1);
         $mail->IsSMTP();//telling the class to use SMTP
         $mail->SMTPAuth = true;//enable SMTP authentication
         $mail->SMTPSecure = $DatosSMTP["SMTPSecure"];//sets the prefix to the servier
@@ -113,7 +115,7 @@ class TS_Mail extends ProcesoVenta{
         $mail->IsHTML(true);
         $mail->Subject = $asunto;
         $mail->Body = $mensajeHTML;
-        if(isset($Adjuntos[0]) and $Adjuntos[0]<>''){
+        if($Adjuntos<>''){
             foreach ($Adjuntos as $value) {
                 $Vector=explode('/',$value);
                 $Total=count($Vector);
@@ -130,6 +132,52 @@ class TS_Mail extends ProcesoVenta{
             return("E1");
         }
         
+    }
+    
+    public function enviar_mail_mailjet($array_destinatarios, $asunto, $mensajeHTML, $Adjuntos='') {
+        require '../../../librerias/mailjet/vendor/autoload.php';
+  
+        $mj = new \Mailjet\Client('68d3fe4fcfa27fde0f361e4382fd7897','3eb8bbe05a61ba2d7d7fec27a5b8e332',true,['version' => 'v3.1']);
+        
+        $body["Messages"][0]["From"]["Email"]="notificaciones@technosoluciones.com.co";
+        $body["Messages"][0]["From"]["Name"]="Notificaciones TS";
+        $i=0;
+        foreach ($array_destinatarios as $key => $value) {
+            $body["Messages"][0]["To"][$i]["Email"]=$value["mail"];
+            $body["Messages"][0]["To"][$i]["Name"]=$value["name"];
+            $i=$i+1;
+        }
+        
+        $body["Messages"][0]["Subject"]=$asunto;
+        $body["Messages"][0]["TextPart"]="Notificaciones TS";
+        $body["Messages"][0]["HTMLPart"]=$mensajeHTML;
+        $body["Messages"][0]["CustomID"]="AppGettingStartedTest";
+        /*
+        $body["Messages"][0]["Attachments"][0]["ContentType"]="text/plain";
+        $body["Messages"][0]["Attachments"][0]["Filename"]="test.txt";
+        $body["Messages"][0]["Attachments"][0]["Base64Content"]="VGhpcyBpcyB5b3VyIGF0dGFjaGVkIGZpbGUhISEK";
+        */
+         
+        $i=0;
+        if(isset($Adjuntos[0])){
+            foreach ($Adjuntos as $key => $value) {
+                $body["Messages"][0]["Attachments"][$i]["ContentType"]=$value["ContentType"];
+                $body["Messages"][0]["Attachments"][$i]["Filename"]=$value["Filename"];
+                $body["Messages"][0]["Attachments"][$i]["Base64Content"]=$value["Base64Content"];
+                $i=$i+1;
+            }
+        }
+         
+        //print_r($body);
+        //exit();
+        $response = $mj->post(Resources::$Email, ['body' => $body]);
+        //$response->success() && var_dump($response->getData());
+        if($response->success()){
+            return("OK");
+        }else{
+            return("E1");
+        }
+        //$response->success() && var_dump($response->getData());
     }
     
     //Fin Clases
