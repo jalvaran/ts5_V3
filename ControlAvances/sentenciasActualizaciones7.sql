@@ -412,3 +412,6 @@ INSERT INTO `cod_documentos` (`Codigo`, `Descripcion`, `Updated`, `Sync`) VALUES
 ALTER TABLE `facturas_electronicas_log`
 ADD `firma_digital` text COLLATE 'utf8_spanish_ci' NOT NULL AFTER `UUID`;
 
+INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
+(5000,	'API Key SendinBlue',	'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',	'2020-11-11 10:12:59',	'2020-07-25 09:59:30');
+

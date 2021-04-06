@@ -140,6 +140,7 @@ class TS_Mail extends ProcesoVenta{
         $mj = new \Mailjet\Client('68d3fe4fcfa27fde0f361e4382fd7897','3eb8bbe05a61ba2d7d7fec27a5b8e332',true,['version' => 'v3.1']);
         
         $body["Messages"][0]["From"]["Email"]="notificaciones@technosoluciones.com.co";
+        //$body["Messages"][0]["From"]["Email"]="jalvaran@gmail.com";
         $body["Messages"][0]["From"]["Name"]="Notificaciones TS";
         $i=0;
         foreach ($array_destinatarios as $key => $value) {
@@ -171,13 +172,38 @@ class TS_Mail extends ProcesoVenta{
         //print_r($body);
         //exit();
         $response = $mj->post(Resources::$Email, ['body' => $body]);
-        //$response->success() && var_dump($response->getData());
+        $response->success() && var_dump($response->getData());
         if($response->success()){
             return("OK");
         }else{
             return("E1");
         }
         //$response->success() && var_dump($response->getData());
+    }
+    
+    public function enviar_mail_sendinblue($array_destinatarios, $asunto, $mensajeHTML, $adjuntos) {
+        require_once('../../../librerias/sendinblue/vendor/autoload.php');
+        $datos_configuracion=$this->DevuelveValores("configuracion_general", "ID", 5000);//lugar donde se aloja el api key de sendinblue
+        $credentials = SendinBlue\Client\Configuration::getDefaultConfiguration()->setApiKey('api-key', $datos_configuracion["Valor"]);
+        $apiInstance = new SendinBlue\Client\Api\TransactionalEmailsApi(new GuzzleHttp\Client(),$credentials);
+        
+        $sendSmtpEmail = new \SendinBlue\Client\Model\SendSmtpEmail([
+             'subject' => $asunto,
+             'sender' => ['name' => 'Notificaciones TS', 'email' => 'notificaciones@technosoluciones.com.co'],
+             'replyTo' => $array_destinatarios[1],
+             'to' => $array_destinatarios,
+             'htmlContent' => $mensajeHTML,
+             'params' => ['bodyMessage' => 'Techno Soluciones SAS'],
+                 'attachment' => $adjuntos
+        ]);
+
+        try {
+            $result = $apiInstance->sendTransacEmail($sendSmtpEmail);
+            return("OK");
+        } catch (Exception $e) {
+            //echo $e->getMessage(),PHP_EOL;
+            return("E1");
+        }
     }
     
     //Fin Clases

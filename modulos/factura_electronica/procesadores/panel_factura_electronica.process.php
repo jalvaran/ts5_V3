@@ -257,20 +257,6 @@ if( !empty($_REQUEST["Accion"]) ){
              * 
              */
             
-            $destinatarios[0]["mail"]=$datos_cliente["Email"];
-            $destinatarios[0]["name"]=$datos_cliente["RazonSocial"];
-            $destinatarios[1]["mail"]=$datos_empresa["Email"];
-            $destinatarios[1]["name"]=$datos_empresa["RazonSocial"];
-                        
-            $adjuntos[0]["ContentType"]="application/pdf";
-            $adjuntos[0]["Filename"]="$nombre_documento".".pdf";
-            $adjuntos[0]["Base64Content"]=$pdfBase64Bytes;
-            
-            $adjuntos[1]["ContentType"]="application/zip";
-            $adjuntos[1]["Filename"]="$nombre_archivos".".zip";
-            $adjuntos[1]["Base64Content"]=$zipBase64Bytes;
-            
-            
             
             $datos_parametros=$obCon->DevuelveValores("facturas_electronicas_parametros", "ID", 5);
             $mensajeHTML='<div style="box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,`Segoe UI`,Roboto,Helvetica,Arial,sans-serif,`Apple Color Emoji`,`Segoe UI Emoji`,`Segoe UI Symbol`;background-color:#ffffff;color:#718096;height:100%;line-height:1.4;margin:0;padding:0;width:100%!important">
@@ -351,7 +337,20 @@ if( !empty($_REQUEST["Accion"]) ){
             $mensajeHTML= str_replace("@link_aceptacion", $link_aceptacion, $mensajeHTML);
             $mensajeHTML= str_replace("@link_rechazo", $link_rechazo, $mensajeHTML);
             
-            $respuesta=$obMail->enviar_mail_mailjet($destinatarios, $asunto, $mensajeHTML,$adjuntos);
+            $destinatarios[0]["email"]=$datos_cliente["Email"];
+            $destinatarios[0]["name"]=$datos_cliente["RazonSocial"];
+            $destinatarios[1]["email"]=$datos_empresa["Email"];
+            $destinatarios[1]["name"]=$datos_empresa["RazonSocial"];
+                        
+            //$adjuntos[0]["ContentType"]="application/pdf";
+            $adjuntos[0]["name"]="$nombre_documento".".pdf";
+            $adjuntos[0]["content"]=$pdfBase64Bytes;
+            
+            //$adjuntos[1]["ContentType"]="application/zip";
+            $adjuntos[1]["name"]="$nombre_archivos".".zip";
+            $adjuntos[1]["content"]=$zipBase64Bytes;
+            
+            $respuesta=$obMail->enviar_mail_sendinblue($destinatarios, $asunto, $mensajeHTML,$adjuntos);
             if($respuesta=='OK'){
                 print("OK;Factura $DatosLogFactura[idFactura] Enviada");
                 $obCon->ActualizaRegistro($Tabla, "EnviadoPorMail", 1, "idFactura", $DatosLogFactura["idFactura"]);
