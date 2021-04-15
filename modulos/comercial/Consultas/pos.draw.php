@@ -156,7 +156,7 @@ if( !empty($_REQUEST["Accion"]) ){
                              $css->CrearBotonEvento("BtnFacturar", "Facturar", $habilitaBotones, "onclick", "MostrarOpcionesFacturacionPOS()", "naranja", "");
                             
                             print("<br><br>");
-                            $css->CrearBotonEvento("BtnCotizar", "Cotizar", $habilitaBotones, "onclick", "CotizarPOS()", "verde", "");
+                            $css->CrearBotonEvento("BtnCotizar", "Cotizar", $habilitaBotones, "onclick", "frm_crear_cotizacion()", "verde", "");
                         print("</td>");
                     $css->CierraFilaTabla();
                 $css->CerrarTabla(); 
@@ -1500,6 +1500,24 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;//Fin caso 20    
                
+        
+        case 21:// formulario para cerrar turno
+            
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 8, "", "", "", "");
+            $css->div("", "row", "", "", "", "", "");
+                
+                $css->div("", "col-md-12", "", "", "", "", "");
+                    $css->CrearTitulo("<strong>Observaciones para esta cotización:</strong>", "verde");
+                    $css->textarea("observaciones_cotizacion", "form-control", "observaciones_cotizacion", "", "Observaciones", "", "");
+                    
+                    $css->Ctextarea();
+                $css->Cdiv();
+                //$css->div("", "col-md-4", "", "", "", "", "");
+                //$css->Cdiv();
+            $css->Cdiv();    
+            
+        break;//Fin caso 21   
+        
     }
     
     

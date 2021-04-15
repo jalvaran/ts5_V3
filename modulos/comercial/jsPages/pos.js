@@ -758,6 +758,9 @@ function AccionesPOS(){
     if(idFormulario==7){
         CerrarTurno();
     }
+    if(idFormulario==8){
+        CotizarPOS();
+    }
     
     if(idFormulario==101){
         CrearProductoVenta(1);
@@ -1214,16 +1217,20 @@ function GuardarFactura(){
  * Crea y guarda una cotizacion a partir de una preventa
  * @returns {undefined}
  */
+
+
 function CotizarPOS(){
     
     
     var idPreventa=document.getElementById('idPreventa').value;
     var idCliente=document.getElementById('idCliente').value;
+    var observaciones=document.getElementById('observaciones_cotizacion').value;
     var form_data = new FormData();
         
         form_data.append('Accion', 8);
         form_data.append('idPreventa', idPreventa);
         form_data.append('idCliente', idCliente);
+        form_data.append('observaciones', observaciones);
         $.ajax({
         url: './procesadores/pos.process.php',
         //dataType: 'json',
@@ -1237,7 +1244,8 @@ function CotizarPOS(){
             document.getElementById("idCliente").value=1;
             document.getElementById("select2-idCliente-container").innerHTML="Clientes Varios";
             DibujePreventa();
-            posiciona('Codigo');           
+            posiciona('Codigo'); 
+            CierraModal('ModalAccionesPOS');
             
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -3097,6 +3105,35 @@ function actualiza_total_venta_turno_pos(){
           }
       })  
 }  
+
+function frm_crear_cotizacion(){
+        
+    $("#ModalAccionesPOS").modal();
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 21);
+               
+        
+        $.ajax({
+        url: './Consultas/pos.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivFrmPOS').innerHTML=data;
+                      
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
 
 
 actualiza_total_venta_turno_pos();

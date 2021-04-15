@@ -191,6 +191,7 @@ SELECT ID,idCliente,Periodo,FacturaBase,UltimaFactura, Realizada,
 (SELECT RazonSocial FROM clientes WHERE clientes.idClientes=facturas_frecuentes.idCliente) AS RazonSocial,
 (SELECT Direccion FROM clientes WHERE clientes.idClientes=facturas_frecuentes.idCliente) AS Direccion,
 (SELECT Fecha FROM facturas WHERE facturas.idFacturas=facturas_frecuentes.UltimaFactura) as UltimaFechaFacturacion,
+(SELECT NumeroFactura FROM facturas WHERE facturas.idFacturas=facturas_frecuentes.UltimaFactura) as NumeroUltimaFactura,
 (SELECT FormaPago FROM facturas WHERE facturas.idFacturas=facturas_frecuentes.FacturaBase) as FormaPago,
 (SELECT FormaPago FROM facturas WHERE facturas.idFacturas=facturas_frecuentes.UltimaFactura) as FormaPagoUltimaFactura,
 (SELECT DATE_ADD((SELECT UltimaFechaFacturacion), INTERVAL (SELECT Periodo) MONTH )) AS ProximaFechaFacturacion,
@@ -613,3 +614,10 @@ SELECT t1.ID,t1.Fecha,t1.Hora,t2.RazonSocial,t2.Num_Identificacion,t2.Direccion,
        DATE_ADD(t1.Fecha, INTERVAL 60 DAY)  as FechaVencimiento 
     FROM  separados t1 inner join clientes t2 on t1.idCliente=t2.idClientes ;
 
+
+DROP VIEW IF EXISTS `vista_documentos_equivalentes`;
+CREATE VIEW vista_documentos_equivalentes AS 
+SELECT t1.*,
+    (SELECT RazonSocial FROM proveedores t2 WHERE t1.tercero_id=t2.Num_Identificacion) as tercero_razon_social 
+
+    FROM documentos_equivalentes t1;

@@ -529,7 +529,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $obPrint = new PrintPos($idUser);            
             $fecha=date("Y-m-d");
             $idPreventa=$obCon->normalizar($_REQUEST['idPreventa']);
-            $Observaciones="";
+            $Observaciones=$obCon->normalizar($_REQUEST['observaciones']);
             $idCliente=$obCon->normalizar($_REQUEST['idCliente']);
             $idCotizacion=$obCon->CotizarDesdePreventa($idPreventa,$fecha,$idCliente,$Observaciones,"");
             $obCon->BorraReg("preventa","VestasActivas_idVestasActivas",$idPreventa);
