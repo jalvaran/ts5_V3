@@ -5,6 +5,7 @@ if(isset($_REQUEST["idDocumento"])){
     //include_once("../../modelo/PrintPos.php");
     include_once("../clases/ReportesContables.class.php");
     include_once("../clases/PDF_ReportesContables.class.php");
+    
     @session_start();
     $idUser=$_SESSION["idUser"];
     $obCon = new Contabilidad($idUser);
@@ -235,6 +236,18 @@ if(isset($_REQUEST["idDocumento"])){
     
             
         break;//Fin caso 8
+        
+        case 9:// documento equivalente
+            include_once("../clases/pdf_documentos_equivalentes.class.php");
+            include_once("../clases/documentos_equivalentes.class.php");
+            $obPDF=new PDF_Documentos_Equivalentes($db);  
+            $obCon=new DocumentosEquivalentes(1);
+            
+            $empresa_id=1;
+            $documento_id=$obCon->normalizar($_REQUEST["documento_id"]);
+            $totales_documento=$obCon->obtenga_totales_documento($documento_id);
+            $obPDF->pdf_documento_equivalente($db, $empresa_id, $documento_id,$totales_documento);
+        break;//Fin caso 9    
         
     }
 }else{

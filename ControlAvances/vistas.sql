@@ -618,6 +618,7 @@ SELECT t1.ID,t1.Fecha,t1.Hora,t2.RazonSocial,t2.Num_Identificacion,t2.Direccion,
 DROP VIEW IF EXISTS `vista_documentos_equivalentes`;
 CREATE VIEW vista_documentos_equivalentes AS 
 SELECT t1.*,
-    (SELECT RazonSocial FROM proveedores t2 WHERE t1.tercero_id=t2.Num_Identificacion) as tercero_razon_social 
-
+    (SELECT RazonSocial FROM proveedores t2 WHERE t1.tercero_id=t2.Num_Identificacion) as tercero_razon_social, 
+    (SELECT Direccion FROM proveedores t2 WHERE t1.tercero_id=t2.Num_Identificacion) as tercero_direccion,
+    (SELECT Telefono FROM proveedores t2 WHERE t1.tercero_id=t2.Num_Identificacion) as tercero_telefono 
     FROM documentos_equivalentes t1;

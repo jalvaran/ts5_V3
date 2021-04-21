@@ -57,6 +57,29 @@ class DocumentosEquivalentes extends ProcesoVenta{
         
     }
     
+    public function obtenga_totales_documento($idDocumento) {
+        $sql="SELECT SUM(total_item) as total_items FROM documentos_equivalentes_items WHERE documento_equivalente_id='$idDocumento' AND deleted='0000-00-00 00:00:00'";
+        $totales_documento=$this->FetchAssoc($this->Query($sql));
+        $base=$totales_documento["total_items"];
+        $sql="SELECT SUM(valor_retenido) as total_retenido,asumida FROM documentos_equivalentes_retenciones WHERE documento_equivalente_id='$idDocumento' AND deleted='0000-00-00 00:00:00' GROUP BY asumida";
+        $Consulta=$this->Query($sql);
+        $datos_totales["retenciones_asumidas"]=0;
+        $datos_totales["retenciones_no_asumidas"]=0;
+        while($datos_consulta=$this->FetchAssoc($Consulta)){
+            if($datos_consulta["asumida"]==1){
+                $datos_totales["retenciones_asumidas"]=$datos_totales["retenciones_asumidas"]+$datos_consulta["total_retenido"];
+            }
+            if($datos_consulta["asumida"]==0){
+                $datos_totales["retenciones_no_asumidas"]=$datos_totales["retenciones_no_asumidas"]+$datos_consulta["total_retenido"];
+            }
+        }
+        $totales_retencion=$this->FetchAssoc($this->Query($sql));
+        $datos_totales["base"]=$base;
+        $datos_totales["retenciones"]=$datos_totales["retenciones_asumidas"]+$datos_totales["retenciones_no_asumidas"];
+        $datos_totales["total"]=$base-$datos_totales["retenciones_no_asumidas"];
+        return($datos_totales);
+    }
+    
     /**
      * Agrega un movimiento contable a un documento
      * @param type $idDocumento
@@ -157,14 +180,46 @@ class DocumentosEquivalentes extends ProcesoVenta{
         
     }
     /**
-     * Guarda un documento contable
+     * Guarda un documento equivalente
      * @param type $idDocumento
      */
-    function GuardarDocumentoContable($idDocumento) {
-        $sql=$this->getSQLDocumentoContableLibroDiario($idDocumento);
-        //print($sql);
-        $this->Query($sql);
-        $this->ActualizaRegistro("documentos_contables_control", "Estado", "CERRADO", "ID", $idDocumento);
+    function guardar_documento_equivalente($idDocumento,$cuenta_destino) {
+        $datos_documento=$this->DevuelveValores("documentos_equivalentes", "ID", $idDocumento);
+        $sql="SELECT t1.*,(SELECT Nombre FROM subcuentas t2 WHERE t2.PUC=t1.cuenta_puc) as nombre_cuenta FROM documentos_equivalentes_items t1 WHERE t1.documento_equivalente_id='$idDocumento' AND deleted='0000-00-00 00:00:00'";
+        $Consulta=$this->Query($sql);
+        $total_items=0;
+        $Fecha=$datos_documento["fecha"];
+        $TipoDocInterno="DOCUMENTO EQUIVALENTE";
+        $idTercero=$datos_documento["tercero_id"];
+        $idCentroCostos=$datos_documento["centro_costos_id"];
+        $idSede=$datos_documento["sucursal_id"];
+        while($datos_consulta=$this->FetchAssoc($Consulta)){
+            $total_items=$total_items+$datos_consulta["total_item"];
+            $this->IngreseMovimientoLibroDiario($Fecha, $TipoDocInterno, $idDocumento, $idDocumento, $idTercero, $datos_consulta["cuenta_puc"], $datos_consulta["nombre_cuenta"], "Documento equivalente interno $idDocumento", "DB", $datos_consulta["total_item"], $datos_consulta["descripcion"], $idCentroCostos, $idSede, "");
+        }
+        $sql="SELECT t1.*,(SELECT Nombre FROM subcuentas t2 WHERE t2.PUC=t1.cuenta_puc) as nombre_cuenta FROM documentos_equivalentes_retenciones t1 WHERE t1.documento_equivalente_id='$idDocumento' AND deleted='0000-00-00 00:00:00'";
+        $Consulta2=$this->Query($sql);
+        $total_retenciones_asumidas=0;
+        $total_retenciones_no_asumidas=0;
+        
+        while($datos_consulta_retencion=$this->FetchAssoc($Consulta2)){
+            if($datos_consulta_retencion["asumida"]==1){
+                $total_retenciones_asumidas=$total_retenciones_asumidas+$datos_consulta_retencion["valor_retenido"];
+            }else{
+                $total_retenciones_no_asumidas=$total_retenciones_no_asumidas+$datos_consulta_retencion["valor_retenido"];
+            }
+            
+            $this->IngreseMovimientoLibroDiario($Fecha, $TipoDocInterno, $idDocumento, $idDocumento, $idTercero, $datos_consulta_retencion["cuenta_puc"], $datos_consulta_retencion["nombre_cuenta"], "Documento equivalente interno $idDocumento", "CR", $datos_consulta_retencion["valor_retenido"], "retencion", $idCentroCostos, $idSede, "");
+        }
+        
+        $datos_cuenta_destino=$this->DevuelveValores("subcuentas", "PUC", $cuenta_destino); 
+        $total_pago=$total_items-$total_retenciones_no_asumidas;
+        $this->IngreseMovimientoLibroDiario($Fecha, $TipoDocInterno, $idDocumento, $idDocumento, $idTercero, $cuenta_destino, $datos_cuenta_destino["Nombre"], "Documento equivalente interno $idDocumento", "CR", $total_pago, 'Pago de Documento equivalente No. '.$idDocumento, $idCentroCostos, $idSede, "");
+        if($total_retenciones_asumidas>0){
+            $parametros=$this->DevuelveValores("parametros_contables", "ID", 29);//Impuestos Asumidos
+            $this->IngreseMovimientoLibroDiario($Fecha, $TipoDocInterno, $idDocumento, $idDocumento, $idTercero, $parametros["CuentaPUC"], $parametros["NombreCuenta"], "Documento equivalente interno $idDocumento", "DB", $total_retenciones_asumidas, 'Impuestos Asumidos Documento equivalente No. '.$idDocumento, $idCentroCostos, $idSede, "");
+        }
+        $this->ActualizaRegistro("documentos_equivalentes", "estado", "2", "ID", $idDocumento);
     }
     
     public function CopiarItemsDocumento($TipoDocumento,$idDocumentoACopiar,$idDocumentoDestino) {

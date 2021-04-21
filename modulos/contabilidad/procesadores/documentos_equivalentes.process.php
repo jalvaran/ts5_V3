@@ -141,25 +141,23 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Retencion Agregada");
         break; //Fin caso 4
         
-        case 5: //Guardar un documento contable
+        case 5: //Guardar un documento equivalente
             $idDocumento=$obCon->normalizar($_REQUEST["idDocumento"]);
-            $DatosDocumento=$obCon->DevuelveValores("documentos_contables_control", "ID", $idDocumento);
+            $cuenta_total_documento=$obCon->normalizar($_REQUEST["cuenta_total_documento"]);
+            $DatosDocumento=$obCon->DevuelveValores("documentos_equivalentes", "ID", $idDocumento);
             
-            $Debitos=$obCon->Sume("documentos_contables_items", "Debito", "WHERE idDocumento='$idDocumento'");
-            $Creditos=$obCon->Sume("documentos_contables_items", "Credito", "WHERE idDocumento='$idDocumento'");
-            $Diferencia=$Debitos-$Creditos;
-            if($Diferencia<>0){
-                print("E1;El documento no está balanceado");
-                exit();
+            $totales_documento=$obCon->obtenga_totales_documento($idDocumento);
+            if($totales_documento["base"]==0){
+                exit("E1;El documento no tiene registros");
+                
             }
-            $obCon->GuardarDocumentoContable($idDocumento); 
-            
-            if($DatosDocumento["idDocumento"]==9){ //Verifico si es un cierre contable y cambio el estado en el control
-                $Anio=substr($DatosDocumento["Fecha"],0,4);                
-                $sql="UPDATE cierre_contable_control SET ContabilizarCierre=1, Estado=2 WHERE Anio='$Anio' AND ContabilizarCierre=0 AND Estado=1";
-                $obCon->Query($sql);                
+            if($cuenta_total_documento==''){
+                exit("E1;Seleccione una cuenta destino");
+                
             }
-            $Ruta="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=32&idDocumentoContable=$idDocumento";
+            $obCon->guardar_documento_equivalente($idDocumento,$cuenta_total_documento); 
+                        
+            $Ruta="Consultas/PDF_ReportesContables.draw.php?idDocumento=9&documento_id=$idDocumento";
             $Mensaje="Documento Guardado <a href='$Ruta' target='_blank'>Imprimir</>";
             print("OK;$Mensaje");
         break; //Fin caso 5

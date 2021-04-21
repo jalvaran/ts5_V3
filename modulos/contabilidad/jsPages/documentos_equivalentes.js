@@ -288,15 +288,15 @@ function GuardarDocumento(idDocumento=''){
     if(idDocumento==''){
         var idDocumento = document.getElementById('idDocumento').value;
     }
-        
+    var cuenta_total_documento = document.getElementById('cuenta_total_documento').value;    
     
     var form_data = new FormData();
         form_data.append('Accion', '5'); 
         form_data.append('idDocumento', idDocumento);
-        
+        form_data.append('cuenta_total_documento', cuenta_total_documento);
         
         $.ajax({
-        url: './procesadores/DocumentosContables.process.php',
+        url: './procesadores/documentos_equivalentes.process.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -306,27 +306,22 @@ function GuardarDocumento(idDocumento=''){
         success: function(data){
             var respuestas = data.split(';'); 
             if(respuestas[0]=="OK"){
-                
-                if ( $("#TxtBtnVerActivo").length ) {
-                    
-                    var idBtn=document.getElementById("TxtBtnVerActivo").value;
-                    document.getElementById(idBtn).click();
-                }
-                
+                     
                 var mensaje=respuestas[1];
-                LimpiarDivs();
+                
                 var x = document.getElementById("idDocumento");
                 x.remove(x.selectedIndex);
-                document.getElementById('BtnEditar').disabled=true;
-                alertify.alert(mensaje);
                 
+                alertify.alert(mensaje);
+            }else if(respuestas[0]=='E1'){
+                alertify.error(respuestas[1]);    
             }else{
                 alertify.alert("Error: <br>"+data);
                 document.getElementById('BtnGuardar').disabled=false;
                 document.getElementById('BtnGuardar').value="Guardar";
             }
             
-            //DibujeTotalesCompra(idCompra);
+            DibujeDocumento();
             
         },
         error: function (xhr, ajaxOptions, thrownError) {

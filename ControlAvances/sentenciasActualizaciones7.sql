@@ -415,3 +415,109 @@ ADD `firma_digital` text COLLATE 'utf8_spanish_ci' NOT NULL AFTER `UUID`;
 INSERT INTO `configuracion_general` (`ID`, `Descripcion`, `Valor`, `Updated`, `Sync`) VALUES
 (5000,	'API Key SendinBlue',	'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',	'2020-11-11 10:12:59',	'2020-07-25 09:59:30');
 
+UPDATE `parametros_contables` SET `Descripcion` = 'Impuestos asumidos, aplica para los impuestos que no se pueden descontar', `CuentaPUC` = '53152001' WHERE `ID` = '29';
+
+
+INSERT INTO `formatos_calidad` (`ID`, `Nombre`, `Version`, `Codigo`, `Fecha`, `CuerpoFormato`, `NotasPiePagina`, `Updated`, `Sync`) VALUES
+(44,	'DOCUMENTO EQUIVALENTE EQUIVALENTE A FACTURA DE COMPRA',	'001',	'F-GA-014',	'2021-04-11',	'',	'',	'2020-07-25 10:03:57',	'2020-07-25 10:03:57');
+
+INSERT INTO `configuracion_tablas_acciones_adicionales` (`ID`, `TablaDB`, `JavaScript`, `ClaseIcono`, `Titulo`, `Ruta`, `Target`, `Updated`, `Sync`) VALUES
+(9,	'vista_documentos_equivalentes',	'',	'fa fa-eye',	'Imprimir',	'Consultas/PDF_ReportesContables.draw.php?idDocumento=9&documento_id=',	'_BLANK',	'2020-07-25 09:59:43',	'2020-07-25 09:59:43');
+
+INSERT INTO `configuracion_control_tablas` (`ID`, `TablaDB`, `Agregar`, `Editar`, `Ver`, `LinkVer`, `Exportar`, `AccionesAdicionales`, `Eliminar`, `Updated`, `Sync`) VALUES
+(13,	'vista_documentos_equivalentes',	0,	0,	0,	'',	1,	1,	0,	'2021-04-19 10:41:04',	'2020-07-25 09:35:14');
+
+
+DROP TABLE IF EXISTS `documentos_equivalentes`;
+CREATE TABLE `documentos_equivalentes` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `consecutivo` bigint(20) NOT NULL,
+  `resolucion_id` int(11) NOT NULL,
+  `fecha` date NOT NULL,
+  `tercero_id` bigint(20) NOT NULL,
+  `concepto` text COLLATE utf8_spanish_ci NOT NULL,
+  `estado` int(11) NOT NULL,
+  `empresa_id` int(11) NOT NULL,
+  `centro_costos_id` int(11) NOT NULL,
+  `sucursal_id` int(11) NOT NULL,
+  `idUser` int(11) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `empresa_id` (`empresa_id`),
+  KEY `centro_costos_id` (`centro_costos_id`),
+  KEY `sucursal_id` (`sucursal_id`),
+  KEY `resolucion_id` (`resolucion_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+DROP TABLE IF EXISTS `documentos_equivalentes_estados`;
+CREATE TABLE `documentos_equivalentes_estados` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `documentos_equivalentes_estados` (`ID`, `nombre`, `Updated`, `Sync`) VALUES
+(1,	'Abierto',	'2021-04-06 03:51:31',	'0000-00-00 00:00:00'),
+(2,	'Cerrado',	'2021-04-06 03:51:31',	'0000-00-00 00:00:00'),
+(10,	'Anulado',	'2021-04-06 03:51:31',	'0000-00-00 00:00:00');
+
+DROP TABLE IF EXISTS `documentos_equivalentes_items`;
+CREATE TABLE `documentos_equivalentes_items` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `documento_equivalente_id` bigint(20) NOT NULL,
+  `descripcion` tinytext COLLATE utf8_spanish_ci NOT NULL,
+  `cantidad` double NOT NULL,
+  `valor_unitario` double NOT NULL,
+  `total_item` double NOT NULL,
+  `cuenta_puc` bigint(20) NOT NULL,
+  `deleted` datetime NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `documento_equivalente_id` (`documento_equivalente_id`),
+  KEY `cuenta_puc` (`cuenta_puc`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+DROP TABLE IF EXISTS `documentos_equivalentes_resoluciones`;
+CREATE TABLE `documentos_equivalentes_resoluciones` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre_interno` varchar(90) COLLATE utf8_spanish_ci NOT NULL,
+  `numero_resolucion` bigint(20) NOT NULL,
+  `fecha` date NOT NULL,
+  `prefijo` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `desde` bigint(20) NOT NULL,
+  `hasta` bigint(20) NOT NULL,
+  `fecha_inicial` date NOT NULL,
+  `fecha_final` date NOT NULL,
+  `estado` int(11) NOT NULL COMMENT '1 activa, 2 ocupada, 3 completada',
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+DROP TABLE IF EXISTS `documentos_equivalentes_retenciones`;
+CREATE TABLE `documentos_equivalentes_retenciones` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `documento_equivalente_id` bigint(20) NOT NULL,
+  `base` double NOT NULL,
+  `porcentaje` float NOT NULL,
+  `valor_retenido` double NOT NULL,
+  `cuenta_puc` bigint(20) NOT NULL,
+  `asumida` int(1) NOT NULL COMMENT '0 por tercero, por empresa',
+  `deleted` datetime NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `documento_equivalente_id` (`documento_equivalente_id`),
+  KEY `cuenta_puc` (`cuenta_puc`),
+  KEY `asumida` (`asumida`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
+('',	'Registrar un Documento Equivalente',	46,	10,	0,	'',	0,	'',	'documentos_equivalentes.php',	'_BLANK',	1,	'ordenessalida.png',	3,	'2020-07-25 10:05:03',	'2020-07-25 10:05:03');
