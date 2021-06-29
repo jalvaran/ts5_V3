@@ -51,6 +51,9 @@ function SeleccionaNuevaAccion(){
     if(Opcion==8){
         SeleccioneTablaDB(`vista_anticipos_clientes`);
     }
+    if(Opcion==9){
+        ModalCumplimientoMetas();
+    }
     
 }
 
@@ -3135,5 +3138,134 @@ function frm_crear_cotizacion(){
       })  
 }
 
+
+function ModalCumplimientoMetas(){
+    $("#ModalAccionesPOS").modal();
+    
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 6);
+        
+        $.ajax({
+        url: '../../modulos/inteligencia/Consultas/inteligencia.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById('DivFrmPOS').innerHTML=data;
+            obtener_datos_metas();
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+function obtener_datos_metas(){
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 11);        
+        
+        $.ajax({
+        url: '../../modulos/inteligencia/procesadores/inteligencia.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                document.getElementById('frase_meta').innerHTML=respuestas[1];
+                graphics_pie_draw("torta",'',respuestas[2],respuestas[3]);
+                graphics_pie_draw("torta_mes","",respuestas[6],respuestas[7]);
+                var json_metas=JSON.parse(respuestas[4]);
+                var json_metas_cumplimiento=JSON.parse(respuestas[5]);
+                graphics_bar_draw(json_metas,json_metas_cumplimiento);
+            }
+            if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
+function graphics_pie_draw(canvas_id,Frase,meta,cumplimiento){
+    var texto_diferencia="Faltante";
+    var diferencia=meta-cumplimiento;
+    var color_diferencia="red";
+    if(diferencia<0){
+        diferencia=Math.abs(diferencia);
+        texto_diferencia="Adicional";
+        color_diferencia="green";
+    }
+    var xValues = ["Ventas","Meta",texto_diferencia];
+    var yValues = [cumplimiento,meta,diferencia];
+    var barColors = ["orange","blue",color_diferencia];
+    
+    new Chart(canvas_id, {
+            type: "pie",
+            data: {
+              labels: xValues,
+              datasets: [{
+                backgroundColor: barColors,
+                data: yValues
+              }]
+            },
+            options: {
+              title: {
+                display: true,
+                text: Frase
+              }
+            }
+          });
+
+}
+
+function graphics_bar_draw(json_metas,json_metas_cumplimiento){
+    
+    var xValues = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    var barColors1 = ["green", "green","green","green","green","green","green", "green","green","green","green","green"];
+    var barColors2 = ["blue", "blue","blue","blue","blue","blue","blue", "blue","blue","blue","blue","blue"];
+    var valores_metas=JSON.stringify(json_metas,1);
+    //console.log(valores_metas);
+    var valores_metas_cumplimiento=JSON.stringify(json_metas_cumplimiento,1);
+    //console.log(valores_metas_cumplimiento);
+    new Chart("barras", {
+        type: "bar",
+        data: {
+          labels: xValues,
+          datasets: [{
+            data: json_metas,
+            backgroundColor: barColors2,
+            
+            fill: false
+          },{
+            data: json_metas_cumplimiento,
+            backgroundColor: barColors1,
+            fill: false
+          }]
+        },
+        options: {
+          legend: {display: false}
+        }
+      });
+
+}
 
 actualiza_total_venta_turno_pos();

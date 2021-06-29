@@ -86,7 +86,7 @@ $ipServer=$_SERVER['SERVER_ADDR'];
  * Deshabilitar para trabajar en la web
  */
 //if($ip==$ipServer){
-    print('<script src="../../general/js/backups.js"></script>');
+    //print('<script src="../../general/js/backups.js"></script>');
     //print('<script src="../../general/js/ProcesosConFacturas.js"></script>');
 //}
 

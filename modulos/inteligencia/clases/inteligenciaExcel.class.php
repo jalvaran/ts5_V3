@@ -210,6 +210,101 @@ class ExcelInteligencia extends ProcesoVenta{
    
     }
     
+    public function ListadoMetasDiariasExcel($Condicion) {
+        require_once('../../../librerias/Excel/PHPExcel2.php');
+        
+        $objPHPExcel = new Spreadsheet();
+        $objPHPExcel->getActiveSheet()->getStyle('C:F')->getNumberFormat()->setFormatCode('#,##0');
+        $styleTitle = [
+            'font' => [
+                'bold' => true,
+                'size' => 12
+            ]
+            
+        ];
+                
+        $Campos=["A","B","C","D","E","F","G","H","I","J","K","L","M",
+                 "N","O","P","Q","R","S","T","U","V","W","X","Y","Z","AA","AB"];
+        
+        $objPHPExcel->setActiveSheetIndex(0)
+            ->setCellValue("A1","LISTADO DE METAS DIARIAS")
+             
+                ;
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A1:M1');
+        //$objPHPExcel->getActiveSheet()->getStyle('B2')->getBorders()->getTop()->applyFromArray( [ 'borderStyle' => Border::BORDER_DASHDOT, 'color' => [ 'rgb' => '808080' ] ] ); 
+        //$objPHPExcel->getActiveSheet()->getStyle('A1:K1')->applyFromArray($styleTitle);
+        $objPHPExcel->getActiveSheet()->getStyle('A3:M3')->applyFromArray($styleTitle);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:M1')->applyFromArray($styleTitle);
+        $z=0;
+        $i=3;
+        $objPHPExcel->setActiveSheetIndex(0)
+            
+            ->setCellValue($Campos[$z++].$i,"ID")
+            ->setCellValue($Campos[$z++].$i,"Fecha")    
+            ->setCellValue($Campos[$z++].$i,"Meta")
+            ->setCellValue($Campos[$z++].$i,"Venta")
+            ->setCellValue($Campos[$z++].$i,"Diferencia")
+            ->setCellValue($Campos[$z++].$i,"Ventas Dia")
+            ->setCellValue($Campos[$z++].$i,"Cumplimiento")
+            
+                                                
+            ;
+            
+        $sql="SELECT * FROM metas_ventas_diarias $Condicion ORDER BY ID ASC";
+        $Consulta=$this->Query($sql);
+        $i=3;
+        while($DatosVista= $this->FetchAssoc($Consulta)){
+            
+            $i++;
+            $z=0;
+            $objPHPExcel->setActiveSheetIndex(0)
+
+                ->setCellValue($Campos[$z++].$i,($DatosVista["ID"]))
+                ->setCellValue($Campos[$z++].$i, ($DatosVista["fecha"]))
+                ->setCellValue($Campos[$z++].$i, ($DatosVista["meta"]))
+                ->setCellValue($Campos[$z++].$i,$DatosVista["total_ventas"])
+                ->setCellValue($Campos[$z++].$i,$DatosVista["diferencia"])
+                ->setCellValue($Campos[$z++].$i,$DatosVista["ventas_dia"])
+                ->setCellValue($Campos[$z++].$i,($DatosVista["cumplimiento"]))
+                
+
+                ;
+            
+        }
+        
+        
+        $objPHPExcel->getActiveSheet()->getStyle("A3:G3")->getAlignment()->setWrapText(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(1)->setWidth('5');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(2)->setWidth('15');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(3)->setWidth('15');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(4)->setWidth('15');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(5)->setWidth('15');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(6)->setWidth('15');
+        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn(7)->setWidth('15');
+        
+        
+        
+   //Informacion del excel
+   $objPHPExcel->
+    getProperties()
+        ->setCreator("www.technosoluciones.com.co")
+        ->setLastModifiedBy("www.technosoluciones.com.co")
+        ->setTitle("Lista de Metas Diarias")
+        ->setSubject("Metas")
+        ->setDescription("Documento generado por Techno Soluciones SAS")
+        ->setKeywords("techno soluciones sas")
+        ->setCategory("Lista de Clientes");    
+ 
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="'."MetasDiarias".'.xls"');
+    header('Cache-Control: max-age=0');
+    header('Cache-Control: cache, must-revalidate'); // HTTP/1.1
+    header('Pragma: public'); // HTTP/1.0
+    $objWriter=IOFactory::createWriter($objPHPExcel,'Xlsx');
+    $objWriter->save('php://output');
+    exit; 
+   
+    }
     
    //Fin Clases
 }

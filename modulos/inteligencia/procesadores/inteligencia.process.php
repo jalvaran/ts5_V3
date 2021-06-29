@@ -169,7 +169,103 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;//Fin caso 10
     
+        case 11://Obtener los valores de las metas
+            $fecha_inicial=date("Y-m-d");
+            $fecha_final=date("Y-m-d");
+            
+            if(isset($_REQUEST["fecha_inicial"]) and !empty($_REQUEST["fecha_inicial"]) ){
+                $fecha_inicial=$_REQUEST["fecha_inicial"];
+            }
+            if(isset($_REQUEST["fecha_final"]) and !empty($_REQUEST["fecha_final"]) ){
+                $fecha_final=$_REQUEST["fecha_final"];
+            }
+            
+            $datos_metas=$obCon->obtener_cumplimiento_metas($fecha_inicial, $fecha_final);
+            $cumplimiento_mes_actual=$datos_metas["cumplimiento_mes_actual"];
+            $cumplimiento_mes_meta=$datos_metas["cumplimiento_mes_meta"];
+            $cumplimiento_dia_actual=$datos_metas["cumplimiento_dia_actual"];
+            $cumplimiento_dia_meta=$datos_metas["cumplimiento_dia_meta"];
+            for ($i=1;$i<=12;$i++){
+                if(!isset($datos_metas[$i]["meta"])){
+                    $meta[$i]=0;
+                }else{
+                    $meta[$i]=$datos_metas[$i]["meta"];
+                }
+                if(!isset($datos_metas["ventas_anio"][$i]["total_venta_mes"])){
+                    $meta_ventas[$i]=0;
+                }else{
+                    $meta_ventas[$i]=$datos_metas["ventas_anio"][$i]["total_venta_mes"];
+                }
+            }
+            $array_meta=[$meta[1],$meta[2],$meta[3],$meta[4],$meta[5],$meta[6],$meta[7],$meta[8],$meta[9],$meta[10],$meta[11],$meta[12]];
+            $array_meta_ventas=[$meta_ventas[1],$meta_ventas[2],$meta_ventas[3],$meta_ventas[4],$meta_ventas[5],$meta_ventas[6],$meta_ventas[7],$meta_ventas[8],$meta_ventas[9],$meta_ventas[10],$meta_ventas[11],$meta_ventas[12]];
+            
+            $json_meta= json_encode($array_meta);
+            $json_meta_ventas= json_encode($array_meta_ventas);
+            
+            $frase_mes_actual=$datos_metas["frase_mes_actual"];
+            $valores_metas_cumplimiento=[];
+            print('OK;'.($frase_mes_actual).';'.$cumplimiento_dia_meta.';'.$cumplimiento_dia_actual.';'.$json_meta.';'.$json_meta_ventas.';'.$cumplimiento_mes_meta.';'.$cumplimiento_mes_actual);
+        break;//fin caso 11    
         
+        case 12: //editar un registro en una tabla del modulo
+            $tabla_id=$obCon->normalizar($_REQUEST["tabla_id"]);
+            $valor_nuevo=$obCon->normalizar($_REQUEST["valor_nuevo"]);
+            $item_id=$obCon->normalizar($_REQUEST["item_id"]);
+            $campo=$obCon->normalizar($_REQUEST["campo"]);
+            $tab="";
+            if($tabla_id==1){
+                $tab="metas_ventas";
+            }
+            if($tab<>''){
+                $sql="UPDATE $tab SET $campo='$valor_nuevo' WHERE ID='$item_id' ";
+                $obCon->Query($sql);
+            }
+            print("OK;Registro Actualizado");
+            
+        break;//Fin caso 12
+        
+        case 13: //inserta los registros para inicializar las metas de un año
+            $ano=$obCon->normalizar($_REQUEST["ano"]);
+            $validacion=$obCon->DevuelveValores("metas_ventas", "Anio", $ano);
+            if($ano<2010 or $ano>2050){
+                exit("E1;Año fuera de rango");
+            }
+            if($validacion["Anio"]>0){
+                exit("E1;ya existen metas para el año $ano");
+            }else{
+                $sql="INSERT INTO `metas_ventas` (`ID`, `Anio`, `Mes`) VALUES
+                    ('',	$ano,	1),
+                    ('',	$ano,	2),
+                    ('',	$ano,	3),
+                    ('',	$ano,	4),
+                    ('',	$ano,	5),
+                    ('',	$ano,	6),
+                    ('',	$ano,	7),
+                    ('',	$ano,	8),
+                    ('',	$ano,	9),
+                    ('',	$ano,	10),
+                    ('',	$ano,	11),
+                    ('',	$ano,	12);";
+                $obCon->Query($sql);
+            }
+            print("OK;Registros Inicializados");
+            
+        break;//Fin caso 13
+        
+        case 14://Agregar los registros de las metas diarias de acuerdo a la tabla metas_ventas
+            
+            $obCon->construir_metas_diarias();
+            print("OK;Tabla de metas diaras construida correctamente");
+        break;//fin caso 14
+    
+        case 15://Genere el excel con el listado de metas diarias
+            $obExcel= new ExcelInteligencia($idUser);
+            $Condicion= urldecode(base64_decode($_REQUEST["c"]));            
+            $obExcel->ListadoMetasDiariasExcel($Condicion);
+            print("OK;Metas Exportadas");
+        break;//fin caso 15
+    
     }
     
     

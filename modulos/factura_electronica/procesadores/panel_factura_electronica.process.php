@@ -338,9 +338,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $mensajeHTML= str_replace("@link_rechazo", $link_rechazo, $mensajeHTML);
             
             $destinatarios[0]["email"]=$datos_cliente["Email"];
-            $destinatarios[0]["name"]=$datos_cliente["RazonSocial"];
+            $destinatarios[0]["name"]= substr($datos_cliente["RazonSocial"],0,68);
             $destinatarios[1]["email"]=$datos_empresa["Email"];
-            $destinatarios[1]["name"]=$datos_empresa["RazonSocial"];
+            $destinatarios[1]["name"]=substr($datos_empresa["RazonSocial"],0,68);
                         
             //$adjuntos[0]["ContentType"]="application/pdf";
             $adjuntos[0]["name"]="$nombre_documento".".pdf";

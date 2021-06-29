@@ -73,7 +73,7 @@ class ExcelAcuerdoPago extends ProcesoVenta{
                         
             ;
             
-        $sql="SELECT * FROM acuerdo_pago_hoja_trabajo_informes $Condicion";
+        $sql="SELECT * FROM acuerdo_pago_hoja_trabajo_informes $Condicion ORDER BY RazonSocial ASC ";
         $Consulta=$this->Query($sql);
         $i=3;
         $Tercero="";

@@ -269,7 +269,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $Hora=date("H:i:s");
             
-            $sql="SELECT count(*) totalItems,SUM(ValorAcordado) AS Subtotal, SUM(Impuestos) AS IVA, SUM(TotalVenta) as Total,SUM(CostoUnitario*Cantidad) AS TotalCostos "
+            $sql="SELECT count(*) totalItems,SUM(ValorAcordado*Cantidad) AS Subtotal, SUM(Impuestos) AS IVA, SUM(TotalVenta) as Total,SUM(CostoUnitario*Cantidad) AS TotalCostos "
                     . "FROM preventa WHERE VestasActivas_idVestasActivas='$idPreventa'";
             $Consulta=$obCon->Query($sql);
             $DatosTotalesCotizacion=$obCon->FetchAssoc($Consulta);
@@ -277,6 +277,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit("E4;La factura no tiene items agregados");
             }
             $Subtotal=round($DatosTotalesCotizacion["Subtotal"],2);
+            
             $IVA=round($DatosTotalesCotizacion["IVA"],2);
             $Total=round($DatosTotalesCotizacion["Total"],2);
             $TotalCostos=$DatosTotalesCotizacion["TotalCostos"];
@@ -1067,7 +1068,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $idTerceroInteres, $Abono, "PlataformasPago", "Ingreso por Plataforma de Pago $CmbPlataforma", "CERRADO");
             $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $idTerceroInteres, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
             
-            $obCon->IngresoPlataformasPago($CmbPlataforma,$Fecha, $Hora, $Tercero, $Abono, $idComprobante, $idUser);
+            $obCon->IngresoPlataformasPago($CmbPlataforma,$cmb_metodo_pago,$Fecha, $Hora, $Tercero, $Abono, $idComprobante, $idUser);
             $obPrint->ComprobanteIngresoPOS($idComprobante, "", 1);
             print("OK;Ingreso registrado en Comprobante $idComprobante");
             

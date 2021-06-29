@@ -2156,6 +2156,9 @@ class PageConstruct extends html_estruct_class{
                 
         }
         
+        public function AgregaJSChart(){
+            print('<script src="../../componentes/charjs2/Chart.js"></script>');
+        }
         //////////////////////////////////FIN
 }
 	

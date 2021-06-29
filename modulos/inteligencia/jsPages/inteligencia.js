@@ -53,8 +53,57 @@ function MostrarListadoSegunID(){
     if(idListado==2){
         ListarProductosVendidos();
     }
+    if(idListado==3){
+        ListarMetaVentas();
+    }
+    if(idListado==4){
+        
+        ListarMetasDiarias();
+    }
+    if(idListado==5){
+        
+        reporte_grafico_metas();
+    }
     
 }
+
+function construir_metas_diarias(){
+    
+    document.getElementById("DivGeneralDraw").innerHTML='<div id="GifProcess">Procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 14);        
+        
+        
+        $.ajax({
+        url: './procesadores/inteligencia.process.php',
+        //dataType: 'json',
+        cache: false,
+        async: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                alertify.success(respuestas[1]);
+                
+            }else if(respuestas[0]=="E1"){
+                alertify.error(respuestas[1]);
+                MostrarListadoSegunID();
+            }else{
+                alertify.alert(data);
+            }
+                       
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}  
+  
 
 function CambiePagina(Funcion,Page=""){
     
@@ -70,6 +119,9 @@ function CambiePagina(Funcion,Page=""){
     }
     if(Funcion==2){
         ListarProductosVendidos(Page);
+    }
+    if(Funcion==4){
+        ListarMetasDiarias(Page);
     }
     
 }
@@ -816,6 +868,296 @@ function InsertarClientesNuevosDesdeTemporal(){
             alert(thrownError);
           }
       });
+}
+
+function ListarMetaVentas(Page=1){
+    var idDiv="DivGeneralDraw";
+    //document.getElementById(idDiv).innerHTML='<div id="GifProcess">procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 4);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        form_data.append('Page', Page);
+        
+                
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/inteligencia.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+                        
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function editar_registro_metas(tabla_id,item_id,campo,caja_id){
+    var valor_nuevo=document.getElementById(caja_id).value;
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '12'); 
+        form_data.append('tabla_id', tabla_id); 
+        form_data.append('valor_nuevo', valor_nuevo); 
+        form_data.append('item_id', item_id); 
+        form_data.append('campo', campo); 
+        
+        $.ajax({
+        url: './procesadores/inteligencia.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){
+                
+                alertify.success(respuestas[1]);
+                //MostrarListadoSegunID();               
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                
+                alertify.alert(data);
+                
+            }
+                   
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function crear_registros_iniciales_metas(ano){
+   
+    var form_data = new FormData();
+        form_data.append('Accion', '13'); 
+        form_data.append('ano', ano); 
+               
+        $.ajax({
+        url: './procesadores/inteligencia.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){
+                
+                alertify.success(respuestas[1]);
+                MostrarListadoSegunID();               
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                
+                
+                
+            }else{
+                
+                alertify.alert(data);
+                
+            }
+                   
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function ListarMetasDiarias(Page=1){
+    var idDiv="DivGeneralDraw";
+    //document.getElementById(idDiv).innerHTML='<div id="GifProcess">procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+   
+    var FechaInicialRangos =document.getElementById("FechaInicialRangos").value;
+    var FechaFinalRangos =document.getElementById("FechaFinalRangos").value;
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 5);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        form_data.append('Page', Page);
+        
+        form_data.append('FechaInicialRangos', FechaInicialRangos);
+        form_data.append('FechaFinalRangos', FechaFinalRangos);
+                
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/inteligencia.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+                        
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function reporte_grafico_metas(){
+    var div_id="DivGeneralDraw";  
+    var FechaInicialRangos =document.getElementById("FechaInicialRangos").value;
+    var FechaFinalRangos =document.getElementById("FechaFinalRangos").value;   
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 6);
+        
+        form_data.append('fecha_inicial', FechaInicialRangos);
+        form_data.append('fecha_final', FechaFinalRangos);
+        
+        $.ajax({
+        url: '../../modulos/inteligencia/Consultas/inteligencia.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(div_id).innerHTML=data;
+            obtener_datos_metas();
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+function obtener_datos_metas(){
+    var FechaInicialRangos =document.getElementById("FechaInicialRangos").value;
+    var FechaFinalRangos =document.getElementById("FechaFinalRangos").value;
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 11);        
+        form_data.append('fecha_inicial', FechaInicialRangos);
+        form_data.append('fecha_final', FechaFinalRangos);
+        $.ajax({
+        url: '../../modulos/inteligencia/procesadores/inteligencia.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); 
+            if(respuestas[0]=="OK"){
+                document.getElementById('frase_meta').innerHTML=respuestas[1];
+                graphics_pie_draw("torta",'',respuestas[2],respuestas[3]);
+                graphics_pie_draw("torta_mes","",respuestas[6],respuestas[7]);
+                var json_metas=JSON.parse(respuestas[4]);
+                var json_metas_cumplimiento=JSON.parse(respuestas[5]);
+                graphics_bar_draw(json_metas,json_metas_cumplimiento);
+            }else if(respuestas[0]=="E1"){
+                alertify.alert(respuestas[1]);
+            }else{
+                alertify.alert(data);
+            }
+            
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+    
+}
+
+function graphics_pie_draw(canvas_id,Frase,meta,cumplimiento){
+    var texto_diferencia="Faltante";
+    var diferencia=meta-cumplimiento;
+    var color_diferencia="red";
+    if(diferencia<0){
+        diferencia=Math.abs(diferencia);
+        texto_diferencia="Adicional";
+        color_diferencia="green";
+    }
+    var xValues = ["Ventas","Meta",texto_diferencia];
+    var yValues = [cumplimiento,meta,diferencia];
+    var barColors = ["orange","blue",color_diferencia];
+    
+    new Chart(canvas_id, {
+            type: "pie",
+            data: {
+              labels: xValues,
+              datasets: [{
+                backgroundColor: barColors,
+                data: yValues
+              }]
+            },
+            options: {
+              title: {
+                display: true,
+                text: Frase
+              }
+            }
+          });
+
+}
+
+function graphics_bar_draw(json_metas,json_metas_cumplimiento){
+    
+    var xValues = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    var barColors1 = ["green", "green","green","green","green","green","green", "green","green","green","green","green"];
+    var barColors2 = ["blue", "blue","blue","blue","blue","blue","blue", "blue","blue","blue","blue","blue"];
+    var valores_metas=JSON.stringify(json_metas,1);
+    //console.log(valores_metas);
+    var valores_metas_cumplimiento=JSON.stringify(json_metas_cumplimiento,1);
+    //console.log(valores_metas_cumplimiento);
+    new Chart("barras", {
+        type: "bar",
+        data: {
+          labels: xValues,
+          datasets: [{            
+            data: json_metas,
+            backgroundColor: barColors2,
+            
+            fill: false
+          },{
+            data: json_metas_cumplimiento,
+            backgroundColor: barColors1,
+            fill: false
+          }]
+        },
+        options: {
+          legend: {display: false}
+        }
+      });
+
 }
 
 MostrarListadoSegunID();

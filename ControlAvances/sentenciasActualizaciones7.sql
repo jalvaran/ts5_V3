@@ -521,3 +521,42 @@ CREATE TABLE `documentos_equivalentes_retenciones` (
 
 INSERT INTO `menu_submenus` (`ID`, `Nombre`, `idPestana`, `idCarpeta`, `idMenu`, `TablaAsociada`, `TipoLink`, `JavaScript`, `Pagina`, `Target`, `Estado`, `Image`, `Orden`, `Updated`, `Sync`) VALUES
 ('',	'Registrar un Documento Equivalente',	46,	10,	0,	'',	0,	'',	'documentos_equivalentes.php',	'_BLANK',	1,	'ordenessalida.png',	3,	'2020-07-25 10:05:03',	'2020-07-25 10:05:03');
+
+
+CREATE TABLE `metas_ventas` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Anio` int(11) NOT NULL,
+  `Mes` int(11) NOT NULL,
+  `Meta` double NOT NULL,
+  `Frase` tinytext COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`),
+  KEY `Anio` (`Anio`),
+  KEY `Mes` (`Mes`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+DROP TABLE IF EXISTS `metas_ventas_diarias`;
+CREATE TABLE `metas_ventas_diarias` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `fecha` date NOT NULL,
+  `meta` double NOT NULL,
+  `total_ventas` double NOT NULL,
+  `diferencia` double NOT NULL,
+  `cumplimiento` double NOT NULL,
+  `ventas_dia` double NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+ALTER TABLE `traslados_items`
+ADD `Deleted` datetime NOT NULL AFTER `idCierre`;
+ALTER TABLE `traslados_items`
+ADD INDEX `idTraslado` (`idTraslado`),
+ADD INDEX `Referencia` (`Referencia`),
+ADD INDEX `CodigoBarras` (`CodigoBarras`),
+ADD INDEX `Destino` (`Destino`),
+ADD INDEX `Estado` (`Estado`);
+

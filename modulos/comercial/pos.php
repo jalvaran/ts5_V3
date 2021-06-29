@@ -154,6 +154,9 @@ $css->PageInit($myTitulo);
                         $css->option("", "", "", 8, "", "");
                             print("Historial de anticipos por Encargo");
                         $css->Coption();
+                        $css->option("", "", "", 9, "", "");
+                            print("Cumplimiento de Metas");
+                        $css->Coption();
                     $css->Cselect();
                     print('<div class="input-group-btn">');                
                         $css->CrearBotonEvento("BtnNuevaOpcion", "+", 1, "onclick", "SeleccionaNuevaAccion()", "verde");
@@ -344,6 +347,7 @@ $css->PageInit($myTitulo);
     $css->Cdiv();
     print("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>");
 $css->PageFin();
+$css->AgregaJSChart();
 print('<script src="../../componentes/shortcuts.js"></script>');  //script propio de la pagina
 
 print('<script src="jsPages/AcuerdoPago.js"></script>');  //script propio de la pagina

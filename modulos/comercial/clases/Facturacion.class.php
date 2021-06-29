@@ -643,7 +643,7 @@ class Facturacion extends ProcesoVenta{
         return($sqlFactura);
     }
     
-    public function IngresoPlataformasPago($idPlataforma,$Fecha,$Hora,$Tercero,$Valor,$idComprobanteIngreso,$idUser,$Inicial=0) {
+    public function IngresoPlataformasPago($idPlataforma,$metodo_pago_id,$Fecha,$Hora,$Tercero,$Valor,$idComprobanteIngreso,$idUser,$Inicial=0) {
         
         $Datos["Fecha"]=$Fecha;
         $Datos["Hora"]=$Hora;
@@ -653,6 +653,7 @@ class Facturacion extends ProcesoVenta{
         $Datos["idUser"]=$idUser;
         $Datos["Inicial"]=$Inicial;
         $Datos["idPlataformaPago"]=$idPlataforma;
+        $Datos["metodo_pago_id"]=$metodo_pago_id;
         
         $sql=$this->getSQLInsert("comercial_plataformas_pago_ingresos", $Datos);
         $this->Query($sql);

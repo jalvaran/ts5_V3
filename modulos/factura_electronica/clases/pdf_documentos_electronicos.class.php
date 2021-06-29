@@ -11,6 +11,7 @@ class PDF_Documentos_Electronicos extends Documento{
         $VistaFactura=1;
         $empresa_id=1;
         $DatosFactura=$this->obCon->DevuelveValores("facturas", "idFacturas", $idFactura);
+        $DatosEmpresaPro=$this->obCon->DevuelveValores("empresapro", "idEmpresaPro", 1);
         $sql="SELECT * FROM facturas_electronicas_log WHERE idFactura='$idFactura' AND UUID<>'' ";
         $datos_documento_electronico=$this->obCon->FetchAssoc($this->obCon->Query($sql));
         //$datos_documento_electronico=$this->obCon->DevuelveValores("facturas_electronicas_log", "idFactura", $idFactura);
@@ -26,7 +27,7 @@ class PDF_Documentos_Electronicos extends Documento{
         $DatosFormatoCalidad["Nombre"]= utf8_encode($DatosFormatoCalidad["Nombre"]);
         //$this->PDF_Encabezado($DatosFactura["Fecha"],1, $idFormato, "",$Documento);
         $this->pdf_encabezado_documento_electronico($datos_tercero,$empresa_id, $DatosFormatoCalidad, $DatosFactura,$Documento,"../../../");
-        $DatosEmpresaPro=$this->informacion_general($DatosFactura,$datos_tercero);
+        $this->informacion_general($DatosFactura,$datos_tercero);
         $Position=$this->PDF->GetY();
         //$this->PDF->SetY($Position+35);
         $html= $this->HTML_Items_Factura($idFactura);
@@ -353,6 +354,7 @@ class PDF_Documentos_Electronicos extends Documento{
         $TotalFactura=0;
         $TotalIVAFactura=0;
         $OtrosImpuestos=0;
+        //print($ObservacionesLegales);
         $ObservacionesFactura= utf8_encode($ObservacionesFactura);
         while($TotalesFactura= $this->obCon->FetchArray($Consulta)){
             

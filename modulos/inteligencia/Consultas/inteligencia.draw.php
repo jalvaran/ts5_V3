@@ -565,7 +565,323 @@ if( !empty($_REQUEST["Accion"]) ){
                 $css->Cdiv();
             $css->Cdiv();        
         break;//Fin caso 3    
+        case 4://Dibuja la tabla de metas
+            
+            $sql="SELECT * FROM metas_ventas ORDER BY Anio DESC, Mes ASC";
+            
+            $consulta=$obCon->Query($sql);
+            $ano_actual=date("Y");
+            
+            $css->CrearBotonEvento("btn_inicializar_ano", "Crear Tabla Metas $ano_actual", 1, "onclick", "crear_registros_iniciales_metas($ano_actual)", "azul");
+            $cabecera=1;
+            $r="";
+            while($datos_consulta=$obCon->FetchAssoc($consulta)){
+                
+                $item_id=$datos_consulta["ID"];
+                if($r<>$datos_consulta["Anio"]){
+                    $r=$datos_consulta["Anio"];
+                    $cabecera=1;
+                }
+                if($cabecera==1){
+                    $css->CrearTabla();
+                        $css->FilaTabla(14);
+                            $css->ColTabla("<h2>Meta Mensual para el Año ".$datos_consulta["Anio"]."</h2>", 4,"C");
+                        $css->CierraFilaTabla();    
+                        $css->FilaTabla(14);                            
+                            $css->ColTabla("Mes", 1);
+                            $css->ColTabla("Meta", 1);
+                            $css->ColTabla("Frase", 2);
+                        $css->CierraFilaTabla();
+                    $cabecera=0;
+                }
+                
+                $css->FilaTabla(14);
+                    $css->ColTabla($datos_consulta["Mes"], 1);
+                    print("<td>");
+                        $id="caja_meta_".$item_id;
+                        $css->input("text", $id, "form-control", $id, "", $datos_consulta["Meta"], "Meta", "off", "", "onchange=editar_registro_metas(`1`,`$item_id`,`Meta`,`$id`)");
+                    print("</td>");
+                                  
+                    print("<td>");
+                        $id="frase_meta_".$item_id;
+                        $css->textarea($id, "form-control", $id, "", "Frase de motivacion", "", "onchange=editar_registro_metas(`1`,`$item_id`,`Frase`,`$id`)");
+                            print(($datos_consulta["Frase"]));
+                        $css->Ctextarea();
+                        
+                    print("</td>");
+                $css->CierraFilaTabla();
+                
+            }
+            
+                
+            
+            
+        break;//Fin caso 4    
         
+        case 5: //dibuja el listado de metas diarias
+            
+            $Limit=100;
+            $Page=$obCon->normalizar($_REQUEST["Page"]);
+            
+            $FechaInicialRangos=$obCon->normalizar($_REQUEST["FechaInicialRangos"]);
+            $FechaFinalRangos=$obCon->normalizar($_REQUEST["FechaFinalRangos"]);
+            $NumPage=$obCon->normalizar($_REQUEST["Page"]);
+            if($Page==''){
+                $Page=1;
+                $NumPage=1;
+            }
+            
+                        
+            $Condicion=" WHERE ID>0 ";
+            
+            if($FechaInicialRangos<>''){
+                $Condicion.=" AND fecha >= '$FechaInicialRangos' ";
+            }
+
+            if($FechaFinalRangos<>''){
+                $Condicion.=" AND fecha <= '$FechaFinalRangos' ";
+            }
+                
+           
+            
+            $PuntoInicio = ($Page * $Limit) - $Limit;
+            
+            $sql = "SELECT COUNT(*) as Items  
+                   FROM metas_ventas_diarias t1 $Condicion;";
+            
+            $Consulta=$obCon->Query($sql);
+            $totales = $obCon->FetchAssoc($Consulta);
+            $ResultadosTotales = $totales['Items'];
+                        
+            $sql="SELECT * 
+                  FROM metas_ventas_diarias $Condicion ORDER BY fecha ASC LIMIT $PuntoInicio,$Limit;";
+            $Consulta=$obCon->Query($sql);
+            
+            
+            $css->CrearTitulo("<strong>Cumplimiento de Metas Diarias</strong>", "azul");
+            
+            $css->div("", "box-body no-padding", "", "", "", "", "");
+                $css->div("", "mailbox-controls", "", "", "", "", "");
+                    $css->CrearDiv("", "row", "left", 1, 1);
+                        print('<div class="col-lg-3 col-xs-6">
+                                <!-- small box -->
+                                <div class="small-box bg-aqua">
+                                  <div class="inner">
+                                    <h3>'.$ResultadosTotales.'</h3>
+
+                                    <p>Cumplimiento Metas</p>
+                                  </div>
+                                  <div class="icon">
+                                    <i class="fa fa-list-alt"></i>
+                                  </div>
+                                  
+                                </div>
+                              </div>');
+                        $CondicionBase64= base64_encode(urlencode($Condicion));
+                        $Link="procesadores/inteligencia.process.php?Accion=15&c=$CondicionBase64";
+                        if($TipoUser=="administrador"){
+                            print('<div class="col-lg-3 col-xs-6">
+                                    <!-- small box -->
+                                    <div class="small-box bg-green">
+                                      <div class="inner">
+                                        <h3>Exportar</h3>
+
+                                        <p>Cumplimiento de Metas</p>
+                                      </div>
+                                      <div class="icon">
+                                        <a href="'.$Link.'" target="_blank" class="fa fa-file-excel-o" style="cursor:pointer" ></a>
+                                      </div>
+
+                                    </div>
+                                  </div>');
+                        }
+                        
+                        
+                    $css->Cdiv();
+                     
+                                       
+                    $css->div("", "pull-left", "", "", "", "", "");
+                        if($ResultadosTotales>$Limit){
+                            $TotalPaginas= ceil($ResultadosTotales/$Limit);                               
+                            print('<div class="input-group" style=width:150px>');
+                            if($NumPage>1){
+                                $NumPage1=$NumPage-1;
+                            print('<span class="input-group-addon" onclick=CambiePagina(`4`,`'.$NumPage1.'`) style=cursor:pointer><i class="fa fa-chevron-left"></i></span>');
+                            }
+                            $FuncionJS="onchange=CambiePagina(`4`);";
+                            $css->select("CmbPage", "form-control", "CmbPage", "", "", $FuncionJS, "");
+
+                                for($p=1;$p<=$TotalPaginas;$p++){
+                                    if($p==$NumPage){
+                                        $sel=1;
+                                    }else{
+                                        $sel=0;
+                                    }
+
+                                    $css->option("", "", "", $p, "", "",$sel);
+                                        print($p);
+                                    $css->Coption();
+
+                                }
+
+                            $css->Cselect();
+                            if($ResultadosTotales>($PuntoInicio+$Limit)){
+                                $NumPage1=$NumPage+1;
+                            print('<span class="input-group-addon" onclick=CambiePagina(`4`,`'.$NumPage1.'`) style=cursor:pointer><i class="fa fa-chevron-right" ></i></span>');
+                            }
+                            print("</div>");
+                        }    
+                    $css->Cdiv();
+                    $css->Cdiv();
+                $css->Cdiv();
+                   
+                $css->CrearDiv("", "table-responsive mailbox-messages", "", 1, 1);
+                    print('<table class="table table-hover table-striped">');
+                        print('<thead>');  
+                            $css->FilaTabla(16);    
+                                print("<td colspan='10' style='width:100%'>");
+                                        
+                                print("</td>");
+                            $css->CierraFilaTabla();
+                            $css->FilaTabla(16);    
+                                $css->ColTabla("<strong>ID</strong>", 1,"C");
+                                $css->ColTabla("<strong>Fecha</strong>", 1,"C");
+                                $css->ColTabla("<strong>Meta</strong>", 1,"C");
+                                $css->ColTabla("<strong>Venta</strong>", 1,"C");                                
+                                $css->ColTabla("<strong>Diferencia</strong>", 1,"C");
+                                $css->ColTabla("<strong>Venta Día</strong>", 1,"C");
+                                $css->ColTabla("<strong>Cumplimiento</strong>", 1,"C");
+                                
+                                
+                            $css->CierraFilaTabla();
+                        print('<t/head>');
+                        print('<tbody>');
+                            while($RegistrosTabla=$obCon->FetchAssoc($Consulta)){
+                                
+                                $idItem=$RegistrosTabla["ID"];
+                                
+                                print('<tr>');
+                                    
+                                    print("<td class='mailbox-subject' >");
+                                        print("<strong>".$RegistrosTabla["ID"]."</strong>");
+                                    print("</td>");
+                                    print("<td class='mailbox-subject'>");
+                                        print($RegistrosTabla["fecha"]);
+                                    print("</td>");
+                                    print("<td class='mailbox-subject' style=text-align:right>");
+                                        print("<strong>".number_format($RegistrosTabla["meta"])."</strong>");
+                                    print("</td>");
+                                    print("<td class='mailbox-subject' style=text-align:right>");
+                                        print("".number_format($RegistrosTabla["total_ventas"])."");
+                                    print("</td>");
+                                    print("<td class='mailbox-subject' style=text-align:right>");
+                                        print("".number_format($RegistrosTabla["diferencia"])."");
+                                    print("</td>");
+                                    print("<td class='mailbox-subject' style=text-align:right>");
+                                        print("".number_format($RegistrosTabla["ventas_dia"])."");
+                                    print("</td>");
+                                    print("<td class='mailbox-subject' style=text-align:right>");
+                                        print("<strong>".($RegistrosTabla["cumplimiento"])."</strong>");
+                                    print("</td>");
+                                    
+                                                                                                            
+                                print('</tr>');
+
+                            }
+
+                        print('</tbody>');
+                    print('</table>');
+                $css->Cdiv();
+            $css->Cdiv();
+            
+        break; //Fin caso 5
+        
+        case 6:// Dibuja los espacios para las graficas de cumplimiento de metas
+            $fecha_inicial=date("Y-m-d");
+            $fecha_final=date("Y-m-d");
+            
+            if(isset($_REQUEST["fecha_inicial"]) and !empty($_REQUEST["fecha_inicial"]) ){
+                $fecha_inicial=$_REQUEST["fecha_inicial"];
+            }
+            if(isset($_REQUEST["fecha_final"]) and !empty($_REQUEST["fecha_final"]) ){
+                $fecha_final=$_REQUEST["fecha_final"];
+            }
+            
+            $mes_ano_fecha_inicial=substr($fecha_inicial, 0,7);
+            $mes_ano_fecha_final=substr($fecha_final, 0,7);
+            if($mes_ano_fecha_inicial<>$mes_ano_fecha_final){
+                $css->Notificacion("Error", "Debe elegir el mismo mes y un mismo año", "rojo", "", "");
+                exit();
+            }
+            if($fecha_inicial>$fecha_final){
+                $css->Notificacion("Error", "La fecha inicial no puede ser mayor a la final", "rojo", "", "");
+                exit();
+            }
+            $html=('<div class="row">
+                <div class="col-md-12">
+                    <h3>Metas del '.$fecha_inicial.' al '.$fecha_final.' </h3>
+                    <div id="frase_meta" style="font-size:30px"></div>
+                </div>
+                <div class="col-md-6">
+                    <h3>Meta Diaria</h3>
+                    <canvas id="torta" style="width:100%;max-width:700px"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <h3>Meta Mensual</h3>
+                    <canvas id="torta_mes" style="width:100%;max-width:700px"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <h3>Metas Discriminadas por mes</h3>
+                    <span class="btn btn-primary">Meta</span>
+                    <span class="btn btn-success">Cumplimiento</span>
+                    <br><br>
+                    <canvas id="barras" style="width:100%;max-width:700px"></canvas>
+                </div>
+                
+              
+              ');  
+            
+            $ano_mes_consulta_inicial=$mes_ano_fecha_inicial.'-01';
+            $sql="SELECT SUM(Total) as Total
+                    FROM facturas
+                    WHERE Fecha>='$ano_mes_consulta_inicial' AND Fecha<='$fecha_final' AND FormaPago<>'ANULADA' LIMIT 1";
+            $Consulta=$obCon->Query($sql);
+            $array_total=$obCon->FetchAssoc($Consulta);
+            $total_ventas=$array_total["Total"];
+            $sql="SELECT SUM(Total) as Total, FormaPago
+                    FROM facturas
+                    WHERE Fecha>='$ano_mes_consulta_inicial' AND Fecha<='$fecha_final' AND FormaPago<>'ANULADA' GROUP BY  FormaPago ";
+            $Consulta=$obCon->Query($sql);
+            
+            $html.='<div class="col-md-6"><h3>Ventas X Tipo de Factura</h3>';
+                
+                $html.='<table class="table table-hover table-striped">';
+                    $html.='<tr>';
+                        $html.='<td><strong>TIPO DE FACTURA</strong></td>';
+                        $html.='<td><strong>TOTAL</strong></td>';
+                        $html.='<td><strong>PORCENTAJE</strong></td>';
+                    $html.='</tr>';
+                    $total=0;
+                    while($datos_consulta=$obCon->FetchAssoc($Consulta)){
+                        $total=$total+$datos_consulta["Total"];
+                        $porcentaje=round((100/$total_ventas)*$datos_consulta["Total"],2);
+                        $html.='<tr>';
+                            $html.='<td>'.$datos_consulta["FormaPago"].'</td>';
+                            $html.='<td style="text-align:right">'.number_format($datos_consulta["Total"]).'</td>';
+                            $html.='<td style="text-align:right">'.($porcentaje).'</td>';
+                        $html.='</tr>';
+                    }
+                    $html.='<tr>';
+                        $html.='<td style="text-align:right"><strong>TOTAL:</strong></td>';
+                        $html.='<td style="text-align:right">'.number_format($total).'</td>';
+                    $html.='</tr>';
+                $html.='</table>';
+                
+            $html.='</div>';
+            
+            $html.='</div>';
+            print($html);
+        break;//Fin caso 6
     }
     
     

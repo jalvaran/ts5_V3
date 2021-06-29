@@ -1276,6 +1276,12 @@ class PrintPos extends ProcesoVenta{
     $DatosInicialSiste=$this->FetchAssoc($this->Query($sql));
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"INICIALES SISTE CREDITO    ".str_pad("$".number_format($DatosInicialSiste["TotalIniciales"]),14," ",STR_PAD_LEFT));
+    $sql="SELECT SUM(Valor) as Total_efectivo FROM comercial_plataformas_pago_ingresos WHERE idPlataformaPago=1 AND metodo_pago_id=1 AND idCierre='$idCierre'";
+    $TotalesSisteCredito=$this->FetchAssoc($this->Query($sql));
+    $total_ingresos_siste_efectivo=$TotalesSisteCredito["Total_efectivo"];
+    $sql="SELECT SUM(Valor) as Total_no_efectivo FROM comercial_plataformas_pago_ingresos WHERE idPlataformaPago=1 AND metodo_pago_id<>1 AND idCierre='$idCierre'";
+    $TotalesSisteCredito=$this->FetchAssoc($this->Query($sql));
+    $total_ingresos_siste_no_efectivo=$TotalesSisteCredito["Total_no_efectivo"];
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     $this->SeparadorHorizontal($handle, "_", 37);
@@ -1431,7 +1437,9 @@ class PrintPos extends ProcesoVenta{
     fwrite($handle,"ABONOS CRED BONOS    ".str_pad("$".number_format($AbonosCreditoOtros),20," ",STR_PAD_LEFT));
     
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle,"ABONOS SISTECREDITO  ".str_pad("$".number_format($DatosCierre["AbonosSisteCredito"]),20," ",STR_PAD_LEFT));
+    fwrite($handle,"ABONOS SISTECREDITO EFECTIVO".str_pad("$".number_format($total_ingresos_siste_efectivo),13," ",STR_PAD_LEFT));
+    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+    fwrite($handle,"ABONOS SISTECREDITO NO EFECTIVO".str_pad("$".number_format($total_ingresos_siste_no_efectivo),10," ",STR_PAD_LEFT));
     
     $sql="SELECT SUM(ValorPago) as Total FROM acuerdo_pago_cuotas_pagadas WHERE idCierre='$idCierre' AND MetodoPago=1 AND Estado<10";
     $DatosPagosAcuerdo= $this->FetchAssoc($this->Query($sql));
@@ -1532,7 +1540,7 @@ class PrintPos extends ProcesoVenta{
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"TOTAL ENTREGA        ".str_pad("$".number_format($DatosCierre["TotalEntrega"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$total_cruce_anticipos+$AbonosAcuerdoOtrosMetodos+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo+$AbonosAnticiposEncargosOtrosMetodos),20," ",STR_PAD_LEFT));
     
-    $SaldoEnCaja=$DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$total_cruce_anticipos+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo;
+    $SaldoEnCaja=$DatosCierre["TotalEfectivo"]+$TotalOtrosImpuestos+$TotalInteresesSisteCredito+$TotalAnticiposRecibidos-$total_cruce_anticipos+$TotalFacturasNegativas+$InteresesAcuerdoEfectivo+$InteresesAcuerdoOtrosMetodos+$AbonosAnticiposEncargosEfectivo-$total_ingresos_siste_no_efectivo;
     $Diferencia=$DatosCierre["EfectivoRecaudado"]-$SaldoEnCaja;
     fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
     fwrite($handle,"EFECTIVO EN CAJA     ".str_pad("$".number_format($DatosCierre["EfectivoRecaudado"]),20," ",STR_PAD_LEFT));
@@ -2811,14 +2819,14 @@ fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
         fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
-    fwrite($handle, chr(29). chr(86). chr(49));//CORTA PAPEL
-    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(29). chr(86). chr(49));//CORTA PAPEL
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
             
         
         
-    }
-    fclose($handle); // cierra el fichero PRN
-    $salida = shell_exec('lpr $COMPrinter');
+        }
+        fclose($handle); // cierra el fichero PRN
+        $salida = shell_exec('lpr $COMPrinter');
     }
     
     
