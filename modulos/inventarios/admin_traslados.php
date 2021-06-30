@@ -67,9 +67,12 @@ $css->PageInit($myTitulo);
                 </li>
                 <li>
                     <a href="#" onclick="idListado=4;Filtro=``;MostrarListadoSegunID();">
-                        <i class="fa fa-th-list"></i>Historial Detallado</a>
+                        <i class="fa  fa-check-square-o"></i>Pendientes por Verificar</a>
                 </li>
-                              
+                <li>
+                    <a href="#" onclick="idListado=5;Filtro=``;MostrarListadoSegunID();">
+                        <i class="fa fa-th-list"></i>Historial Detallado</a>
+                </li>              
                
                
               </ul>
@@ -86,12 +89,26 @@ $css->PageInit($myTitulo);
             
             $css->CrearDiv("DivContenidoFiltros", "col-md-10", "left", 1, 1);
                       
-            $css->CrearDiv("DivMensajes", "col-md-4", "left", 1, 1);
+            $css->CrearDiv("DivMensajes", "col-md-2", "left", 1, 1);
+                $sql="SELECT * FROM traslados_estados";
+                $Consulta=$obCon->Query($sql);
+                
+                $css->select("cmb_estado_traslado", "form-control", "cmb_estado_traslado", "", "", "onchange=MostrarListadoSegunID();", "");
+                    $css->option("", "", "", "", "", "");
+                        print("Filtrar Estados");
+                    $css->Coption();
+                    while($datos_consulta=$obCon->FetchAssoc($Consulta)){
+                        $css->option("", "", "", $datos_consulta["Estado"], "", "");
+                            print($datos_consulta["Estado"]);
+                        $css->Coption();
+                    }
+                $css->Cselect();
+            $css->CerrarDiv();
+            $css->CrearDiv("DivMensajes", "col-md-2", "left", 1, 1);
                 print("<strong>Rango de fechas</strong>");
             $css->CerrarDiv();
-            
             $css->CrearDiv("", "col-md-2", "right", 1, 1); 
-
+                    
                     $css->input("date", "FechaInicialRangos", "form-control", "FechaInicialRangos", "Fecha", "", "Fecha Inicial", "off", "", "onchange=MostrarListadoSegunID();","style='line-height: 15px;'");
 
                 $css->CerrarDiv();

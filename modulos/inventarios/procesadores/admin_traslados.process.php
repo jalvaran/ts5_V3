@@ -110,11 +110,44 @@ if( !empty($_REQUEST["Accion"]) ){
         case 6:// Sube un traslado           
             
             $traslado_id=$obCon->normalizar($_REQUEST["traslado_id"]);
+            $datos_traslado=$obCon->DevuelveValores("traslados_mercancia", "ID", $traslado_id);
+            if($datos_traslado["ServerSincronizado"]<>'0000-00-00 00:00:00'){
+                $fecha_envio=$datos_traslado["ServerSincronizado"];
+                exit("E1;El traslado ya ha sido enviado el $fecha_envio");
+            }
             $obCon->subir_traslado($traslado_id);
-            print("OK;Traslado $traslado_id Subido");
+            print("OK;Traslado $traslado_id Enviado");
             
         break;//Fin caso 6
         
+        case 7:// Sube un traslado           
+            
+            $traslado_id=$obCon->normalizar($_REQUEST["traslado_id"]);
+            $DatosServer=$obCon->DevuelveValores("servidores", "ID", 1);
+            $base_datos=$DatosServer["DataBase"];
+            $sql="SELECT (DestinoSincronizado) AS DestinoSincronizado FROM traslados_mercancia WHERE ID='$traslado_id'";
+            $Consulta=$obCon->QueryExterno($sql, $DatosServer["IP"], $DatosServer["Usuario"], $DatosServer["Password"], $DatosServer["DataBase"], "");
+            $datos_consulta=$obCon->FetchAssoc($Consulta);
+            
+            if($datos_consulta["DestinoSincronizado"]<>'0000-00-00 00:00:00'){
+                $fecha_envio=$datos_consulta["DestinoSincronizado"];
+                exit("E1;El traslado ya ha sido descargado el $fecha_envio");
+            }
+            $obCon->descargar_traslado($traslado_id);
+            print("OK;Traslado $traslado_id Descargado");
+            
+        break;//Fin caso 7
+        
+        case 8://Validar un traslado
+            $traslado_id=$obCon->normalizar($_REQUEST["traslado_id"]);
+            $datos_traslado=$obCon->DevuelveValores("traslados_mercancia", "ID", $traslado_id);
+            if($datos_traslado["Estado"]=='VERIFICADO'){
+                
+                exit("E1;El traslado ya ha sido Verificado");
+            }
+            $obCon->verificar_traslado($traslado_id);
+            print("OK;Traslado Verificado");
+        break;//Fin caso 8
        
     }
     

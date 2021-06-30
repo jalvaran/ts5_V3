@@ -2944,8 +2944,6 @@ public function CalculePesoRemision($idCotizacion)
             $ai=1;
         }
             
-        
-        
         ////Armo el sql de los items
         $tb=$Tabla;
         //$tb="librodiario";

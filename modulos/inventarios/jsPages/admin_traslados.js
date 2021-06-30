@@ -92,17 +92,15 @@ function MostrarListadoSegunID(){
         ListarPendientesSubir();
     }
     if(idListado==3){
-        ListarTraslados();
+        ListarPendientesDescargar();
     }
     if(idListado==4){
-        ListarInsumos();
+        ListarPendientesValidar();
     }
     if(idListado==5){
-        ListarKardex();
+        ListarTrasladosItems();
     }
-    if(idListado==6){
-        ListarSeparados();
-    }
+    
 }
 
 function CambiePagina(Funcion,Page=""){
@@ -121,17 +119,15 @@ function CambiePagina(Funcion,Page=""){
         ListarPendientesSubir(Page);
     }
     if(Funcion==3){
-        ListarTraslados(Page);
+        ListarPendientesDescargar(Page);
     }
     if(Funcion==4){
-        ListarInsumos(Page);
+        ListarPendientesValidar(Page);
     }
     if(Funcion==5){
-        ListarKardex(Page);
+        ListarTrasladosItems(Page);
     }
-    if(Funcion==6){
-        ListarSeparados(Page);
-    }
+    
     
 }
 
@@ -145,7 +141,7 @@ function SeleccioneAccionFormularios(){
 
 
 /**
- * Lista los productos para la venta
+ * Lista los traslados
  * @param {type} Page
  * @returns {undefined}
  */
@@ -154,12 +150,14 @@ function ListarTraslados(Page=1){
     //document.getElementById(idDiv).innerHTML='<div id="GifProcess">procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
     
     var Busquedas =document.getElementById("TxtBusquedas").value;
+    var cmb_estado_traslado =document.getElementById("cmb_estado_traslado").value;
     
     var form_data = new FormData();
         form_data.append('Accion', 1);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
         form_data.append('Page', Page);
         form_data.append('Filtro', Filtro);
         form_data.append('Busquedas', Busquedas);
+        form_data.append('cmb_estado_traslado', cmb_estado_traslado);
                 
        $.ajax({// se arma un objecto por medio de ajax  
         url: 'Consultas/admin_traslados.draw.php',// se indica donde llegara la informacion del objecto
@@ -569,9 +567,259 @@ function iniciar_subir_traslado(traslado_id){
 function subir_traslado(traslado_id){
    
     var idDiv="DivGeneralDraw";
-       
+    
     var form_data = new FormData();
         form_data.append('Accion', '6'); 
+        form_data.append('traslado_id', traslado_id); 
+                        
+        $.ajax({
+        url: './procesadores/admin_traslados.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){
+                
+                alertify.success(respuestas[1]);
+                
+                MostrarListadoSegunID();
+                
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                
+                MostrarListadoSegunID();
+                
+                
+            }else{
+                
+                alertify.alert(data);
+                MostrarListadoSegunID();
+               
+            }
+                   
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            MostrarListadoSegunID();
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function ListarPendientesDescargar(Page=1){
+    var idDiv="DivGeneralDraw";
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess">procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var Busquedas =document.getElementById("TxtBusquedas").value;
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 6);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        form_data.append('Page', Page);
+        form_data.append('Filtro', Filtro);
+        form_data.append('Busquedas', Busquedas);
+                
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/admin_traslados.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+                       
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function iniciar_descarga_traslado(traslado_id){
+   
+    var idDiv="DivGeneralDraw";
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess"><img   src="imagenes/procesando.gif" alt="Cargando" ></div>';
+    
+        
+    var form_data = new FormData();
+        form_data.append('Accion', '5'); 
+        form_data.append('traslado_id', traslado_id); 
+                        
+        $.ajax({
+        url: './procesadores/admin_traslados.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){
+                
+                alertify.success(respuestas[1]);
+                descargar_traslado(traslado_id);
+                
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                
+                alertify.alert(data);
+                
+            }
+                   
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+              
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function descargar_traslado(traslado_id){
+   
+    var form_data = new FormData();
+        form_data.append('Accion', '7'); 
+        form_data.append('traslado_id', traslado_id); 
+                        
+        $.ajax({
+        url: './procesadores/admin_traslados.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){
+                
+                alertify.success(respuestas[1]);
+                
+                MostrarListadoSegunID();
+                
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                
+                MostrarListadoSegunID();
+                
+                
+            }else{
+                
+                alertify.alert(data);
+                MostrarListadoSegunID();
+               
+            }
+                   
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            MostrarListadoSegunID();
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function ListarPendientesValidar(Page=1){
+    var idDiv="DivGeneralDraw";
+    //document.getElementById(idDiv).innerHTML='<div id="GifProcess">procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var Busquedas =document.getElementById("TxtBusquedas").value;
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 7);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        form_data.append('Page', Page);
+        form_data.append('Filtro', Filtro);
+        form_data.append('Busquedas', Busquedas);
+                
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/admin_traslados.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+                       
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function frm_validar_traslado(traslado_id){
+    var idDiv="DivGeneralDraw";
+    //document.getElementById(idDiv).innerHTML='<div id="GifProcess">procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+        
+    var form_data = new FormData();
+        form_data.append('Accion', 8);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        form_data.append('traslado_id', traslado_id);
+                        
+        $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/admin_traslados.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+                       
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function confirma_validar_traslado(traslado_id){
+    alertify.confirm('Está seguro que desea Verificar este Traslado?',
+        function (e) {
+            if (e) {
+                
+                verificar_traslado(traslado_id);
+            }else{
+                alertify.error("Se canceló el proceso");
+
+                return;
+            }
+        });
+}
+
+function verificar_traslado(traslado_id){
+   
+    var idBoton="btn_guardar_traslado";
+    document.getElementById(idBoton).disabled=true;
+        
+    var form_data = new FormData();
+        form_data.append('Accion', '8'); 
         form_data.append('traslado_id', traslado_id); 
                         
         $.ajax({
@@ -591,18 +839,52 @@ function subir_traslado(traslado_id){
                 
             }else if(respuestas[0]=="E1"){  
                 alertify.error(respuestas[1]);
-                MostrarListadoSegunID();
-                
+                document.getElementById(idBoton).disabled=false;
+                MarqueErrorElemento(respuestas[2]);
                 
             }else{
-                
+                document.getElementById(idBoton).disabled=false;  
                 alertify.alert(data);
-                MostrarListadoSegunID();
+                
             }
                    
         },
         error: function (xhr, ajaxOptions, thrownError) {
-            MostrarListadoSegunID();
+            document.getElementById(idBoton).disabled=false;   
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function ListarTrasladosItems(Page=1){
+    var idDiv="DivGeneralDraw";
+    //document.getElementById(idDiv).innerHTML='<div id="GifProcess">procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var Busquedas =document.getElementById("TxtBusquedas").value;
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 9);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        form_data.append('Page', Page);
+        form_data.append('Filtro', Filtro);
+        form_data.append('Busquedas', Busquedas);
+                
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/admin_traslados.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+                       
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            
             alert(xhr.status);
             alert(thrownError);
           }
