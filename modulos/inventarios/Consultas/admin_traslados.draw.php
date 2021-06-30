@@ -27,16 +27,25 @@ if( !empty($_REQUEST["Accion"]) ){
                 $NumPage=1;
             }
             $Busquedas=$obCon->normalizar($_REQUEST["Busquedas"]);
+            $FechaInicialRangos=$obCon->normalizar($_REQUEST["FechaInicialRangos"]);
+            $FechaFinalRangos=$obCon->normalizar($_REQUEST["FechaFinalRangos"]);
             $Estado=$obCon->normalizar($_REQUEST["cmb_estado_traslado"]);            
             $Condicion=" WHERE ID<>'' ";
             
             if($Busquedas<>''){
                 $Condicion.=" AND (ID like '$Busquedas%')";
             }
+            
             if($Estado<>''){
                 $Condicion.=" AND (Estado like '$Estado')";
             }
-                        
+            if($FechaInicialRangos<>''){
+                $Condicion.=" AND (Fecha >= '$FechaInicialRangos')";
+            }
+            if($FechaFinalRangos<>''){
+                $Condicion.=" AND (Fecha <= '$FechaFinalRangos')";
+            }
+            
             $PuntoInicio = ($Page * $Limit) - $Limit;
             
             $sql = "SELECT COUNT(*) as Items  

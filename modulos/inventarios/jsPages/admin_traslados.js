@@ -150,6 +150,8 @@ function ListarTraslados(Page=1){
     //document.getElementById(idDiv).innerHTML='<div id="GifProcess">procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
     
     var Busquedas =document.getElementById("TxtBusquedas").value;
+    var FechaInicialRangos =document.getElementById("FechaInicialRangos").value;
+    var FechaFinalRangos =document.getElementById("FechaFinalRangos").value;
     var cmb_estado_traslado =document.getElementById("cmb_estado_traslado").value;
     
     var form_data = new FormData();
@@ -157,6 +159,8 @@ function ListarTraslados(Page=1){
         form_data.append('Page', Page);
         form_data.append('Filtro', Filtro);
         form_data.append('Busquedas', Busquedas);
+        form_data.append('FechaInicialRangos', FechaInicialRangos);
+        form_data.append('FechaFinalRangos', FechaFinalRangos);
         form_data.append('cmb_estado_traslado', cmb_estado_traslado);
                 
        $.ajax({// se arma un objecto por medio de ajax  

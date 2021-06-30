@@ -301,8 +301,8 @@ class Inventarios extends ProcesoVenta{
         $DatosServer=$this->DevuelveValores("servidores", "ID", 1); 
         $FechaSinc=date("Y-m-d H:i:s");
         
-        $CondicionTraslado=" WHERE ID = '$traslado_id' AND Estado='PREPARADO' AND ServerSincronizado='0000-00-00 00:00:00'";
-        $CondicionItems=" WHERE idTraslado = '$traslado_id' AND Estado='PREPARADO' AND ServerSincronizado='0000-00-00 00:00:00'";
+        $CondicionTraslado=" WHERE ID = '$traslado_id' AND Estado='PREPARADO' ";
+        $CondicionItems=" WHERE idTraslado = '$traslado_id' AND Estado='PREPARADO' ";
         $sql1=$this->ArmeSqlInsert("traslados_mercancia", DB, $CondicionTraslado,$DatosServer["DataBase"],$FechaSinc, $VectorAS);
         $VectorAS["AI"]=1; //Indicamos que la tabla tiene id con autoincrement
         $sql2=$this->ArmeSqlInsert("traslados_items", DB, $CondicionItems,$DatosServer["DataBase"],$FechaSinc, $VectorAS);
@@ -316,8 +316,9 @@ class Inventarios extends ProcesoVenta{
             
         }
         
-        $this->update("traslados_mercancia", "ServerSincronizado", $FechaSinc, $CondicionTraslado); 
         $this->update("traslados_mercancia", "Estado", 'ENVIADO', $CondicionTraslado); 
+        $this->update("traslados_mercancia", "ServerSincronizado", $FechaSinc, $CondicionTraslado); 
+        
         $this->update("traslados_items", "ServerSincronizado", $FechaSinc, $CondicionItems); 
         $this->update("traslados_items", "Estado", 'ENVIADO', "WHERE idTraslado = '$traslado_id'"); 
                
