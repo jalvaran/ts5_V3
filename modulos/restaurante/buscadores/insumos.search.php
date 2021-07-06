@@ -1,7 +1,7 @@
 <?php
 
 include_once("../../../modelo/php_conexion.php");
-@session_start();
+session_start();
 $idUser=$_SESSION['idUser'];
 if($idUser==''){
     $json[0]['id']="";
@@ -12,14 +12,14 @@ if($idUser==''){
 $obRest=new ProcesoVenta($idUser);
 $key=$obRest->normalizar($_REQUEST['q']);
 
-$sql = "SELECT ct.ID,cl.RazonSocial,cl.Num_Identificacion,cl.Telefono FROM cotizacionesv5 ct INNER JOIN clientes cl ON cl.idClientes=ct.Clientes_idClientes 
-		WHERE cl.RazonSocial LIKE '%$key%' or ct.ID = '$key' or cl.Telefono like '%$key%' or cl.Num_Identificacion='$key' ORDER BY ID DESC 
-		LIMIT 50"; 
+$sql = "SELECT * FROM insumos 
+		WHERE Nombre LIKE '%$key%' or ID = '$key' OR  Referencia = '$key'
+		LIMIT 10"; 
 $result = $obRest->Query($sql);
 $json = [];
 
 while($row = $obRest->FetchAssoc($result)){
-    $Texto=$row['ID']." // ".$row['RazonSocial']." // ".$row['Num_Identificacion']." // ".$row['Telefono'];
+    $Texto=$row['Nombre']." // ".$row['ID']." // ".$row['Referencia']." // ".number_format($row['Existencia']);
      $json[] = ['id'=>$row['ID'], 'text'=>$Texto];
 }
 echo json_encode($json);

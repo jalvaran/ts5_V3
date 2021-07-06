@@ -622,3 +622,17 @@ SELECT t1.*,
     (SELECT Direccion FROM proveedores t2 WHERE t1.tercero_id=t2.Num_Identificacion) as tercero_direccion,
     (SELECT Telefono FROM proveedores t2 WHERE t1.tercero_id=t2.Num_Identificacion) as tercero_telefono 
     FROM documentos_equivalentes t1;
+
+
+DROP VIEW IF EXISTS `vista_traslados_verificacion`;
+CREATE VIEW vista_traslados_verificacion AS
+SELECT t1.`idTraslado`,t1.`Referencia`,t1.`Nombre`,SUM(`Cantidad`) as Cantidad,
+(SELECT COUNT(*) from kardexmercancias t2 WHERE  t2.idDocumento=t1.idTraslado ) as TotalRegistrosKardex  
+FROM `traslados_items` t1 
+GROUP BY t1.`idTraslado`;
+
+DROP VIEW IF EXISTS `vista_traslados_verificacion2`;
+CREATE VIEW vista_traslados_verificacion2 AS
+SELECT t1.`ID`,
+(SELECT COUNT(*) from traslados_items t2 WHERE  t1.ID=t2.idTraslado ) as Total  
+FROM `traslados_mercancia` t1;

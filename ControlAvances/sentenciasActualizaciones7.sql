@@ -560,3 +560,26 @@ ADD INDEX `CodigoBarras` (`CodigoBarras`),
 ADD INDEX `Destino` (`Destino`),
 ADD INDEX `Estado` (`Estado`);
 
+
+DROP TABLE IF EXISTS `traslados_estados`;
+CREATE TABLE `traslados_estados` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Estado` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Descripcion` text COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `traslados_estados` (`ID`, `Estado`, `Descripcion`, `Updated`, `Sync`) VALUES
+(1,	'EN DESARROLLO',	'Estado que identifica un traslado cuando esta realizandose para agregar items',	'2021-06-28 21:10:13',	'0000-00-00 00:00:00'),
+(2,	'PREPARADO',	'Traslado cerrado',	'2021-06-28 21:10:13',	'0000-00-00 00:00:00'),
+(3,	'VERIFICADO',	'Cuando se valida por un traslado recibido',	'2021-06-28 21:10:13',	'0000-00-00 00:00:00'),
+(4,	'ENVIADO',	'Cuando se envia el traslado',	'2021-06-28 21:10:13',	'0000-00-00 00:00:00'),
+(5,	'RECIBIDO',	'Cuando se recibe un traslado',	'2021-06-28 21:10:13',	'0000-00-00 00:00:00');
+
+ALTER TABLE `kardexmercancias`
+ADD INDEX `Movimiento` (`Movimiento`),
+ADD INDEX `idDocumento` (`idDocumento`),
+ADD INDEX `ProductosVenta_idProductosVenta` (`ProductosVenta_idProductosVenta`);
+
