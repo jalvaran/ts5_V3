@@ -64,7 +64,7 @@ if( !empty($_REQUEST["Accion"]) ){
             $DatosPedido=$obCon->DevuelveValores("restaurante_pedidos", "ID", $idPedido);
             if($DatosPedido["Tipo"]==1){//Imprime pedido mesa
                 $DatosConfiguracion=$obCon->DevuelveValores("configuracion_general", "ID", 10);
-                $obPrint->ImprimePedidoRestaurante($idPedido,"",$DatosConfiguracion["Valor"],"");
+                $obCon->imprime_pedido_restaurante($idPedido,"",$DatosConfiguracion["Valor"],"");
             }
             if($DatosPedido["Tipo"]==2 or $DatosPedido["Tipo"]==3){//Imprime un domicilio o un para llevar
                 $DatosConfiguracion=$obCon->DevuelveValores("configuracion_general", "ID", 10);
@@ -464,6 +464,29 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Producto Agregado");
             
         break; //fin caso 16
+        
+        case 17: //editar un favorito
+            $favorito_id=$obCon->normalizar($_REQUEST["favorito_id"]);
+            $product_id_favorite=$obCon->normalizar($_REQUEST["product_id_favorite"]);
+            
+            if($product_id_favorite==''){
+                exit("E1;No se recibió el item");
+            }
+            
+            $sql="UPDATE restaurante_productos_favoritos SET producto_id='$product_id_favorite' WHERE ID='$favorito_id'";
+            $obCon->Query($sql);
+            print("OK;Favorito editado");
+        break;//Fin caso 17
+        
+        case 18: //preparar item
+            $item_id=$obCon->normalizar($_REQUEST["item_id"]);
+            
+            if($item_id==''){
+                exit("E1;No se recibió el item");
+            }
+            $obCon->preparar_item_pedido($item_id);
+            print("OK;Item preparado");
+        break;//Fin caso 18
         
     }
     

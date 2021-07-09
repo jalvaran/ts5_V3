@@ -583,3 +583,24 @@ ADD INDEX `Movimiento` (`Movimiento`),
 ADD INDEX `idDocumento` (`idDocumento`),
 ADD INDEX `ProductosVenta_idProductosVenta` (`ProductosVenta_idProductosVenta`);
 
+
+ALTER TABLE `restaurante_pedidos_items`
+ADD `deleted_at` datetime NOT NULL AFTER `Updated`;
+ALTER TABLE `restaurante_pedidos_items`
+ADD `created_at` datetime NOT NULL AFTER `deleted_at`;
+
+DROP TABLE IF EXISTS `restaurante_estados_pedidos_items`;
+CREATE TABLE `restaurante_estados_pedidos_items` (
+  `ID` int(11) NOT NULL,
+  `NombreEstado` varchar(25) COLLATE utf8_spanish_ci NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `restaurante_estados_pedidos_items` (`ID`, `NombreEstado`, `Updated`, `Sync`) VALUES
+(1,	'SOLICITADO',	'2021-07-08 20:08:37',	'0000-00-00 00:00:00'),
+(2,	'PREPARADO',	'2021-07-08 20:09:44',	'0000-00-00 00:00:00'),
+(3,	'ENTREGADO',	'2021-07-08 20:09:44',	'0000-00-00 00:00:00');
+
+

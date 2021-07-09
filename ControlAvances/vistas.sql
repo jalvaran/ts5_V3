@@ -636,3 +636,18 @@ CREATE VIEW vista_traslados_verificacion2 AS
 SELECT t1.`ID`,
 (SELECT COUNT(*) from traslados_items t2 WHERE  t1.ID=t2.idTraslado ) as Total  
 FROM `traslados_mercancia` t1;
+
+
+DROP VIEW IF EXISTS `vista_restaurante_pendiente_preparar`;
+CREATE VIEW vista_restaurante_pendiente_preparar AS
+
+SELECT t1.ID as pedido_id, t2.ID as item_id, t1.Fecha as fecha_pedido, t1.Hora as hora_pedido, 
+    t1.idUsuario as pedido_usuario_id,t1.idMesa as mesa_id, t1.Tipo as tipo_pedido,t1.NombreCliente, 
+    t1.FechaCreacion,t2.created_at as creacion_item,
+    (SELECT Nombre from restaurante_mesas t3 where t3.ID=t1.idMesa) as nombre_mesa,
+    (SELECT Nombre from restaurante_tipos_pedido t4 where t4.ID=t1.Tipo) as nombre_tipo_pedido,
+    (SELECT CONCAT(Nombre, ' ', Apellido) FROM usuarios t5 WHERE t1.idUsuario=t5.idUsuarios) as nombre_usuario,
+    t2.idProducto as producto_id,t2.NombreProducto as nombre_producto, t2.Cantidad as cantidad, t2.Subtotal as subtotal,
+    t2.IVA as iva,t2.Total as total,t2.Observaciones as observaciones,t2.Estado as estado_item   
+    FROM  restaurante_pedidos t1 inner join restaurante_pedidos_items t2 on t1.ID=t2.idPedido
+    WHERE (t1.Estado=1 or t1.Estado=3) and (t2.Estado=1 or t2.Estado='AB') ORDER BY t1.ID ASC, t2.ID ASC  ;
