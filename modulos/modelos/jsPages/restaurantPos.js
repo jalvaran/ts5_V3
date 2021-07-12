@@ -1,6 +1,6 @@
 /**
- * Controlador para el pos de restobares
- * JULIAN ALVARAN 2021-07-07
+ * Controlador para el pos de restaurantes
+ * JULIAN ALVARAN 2020-01-30
  * TECHNO SOLUCIONES SAS 
  * 317 774 0609
  */
@@ -9,9 +9,6 @@
  * @type Number|
  */
 var idPedidoActivo=0;
-var observaciones_activas="";
-var codigo_activo="";
-var TipoPedido=1;
 var Timer1;
 /*
  * Eventos iniciales
@@ -65,7 +62,13 @@ $('#idCliente').select2({
 /**
  * le agrego una funcion al campo codigo para detectar si se oprime el enter
  */
-    
+    $("#Codigo").keypress(function(e) {
+        
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            AgregarItem();
+        }
+    });
 
   
   /*
@@ -96,7 +99,7 @@ function MuestraOculta(id){
  */
 
 function posiciona(id){
-   //document.getElementById(id).focus();
+   document.getElementById(id).focus();
 }
 /*
  * Determina la funcion que debe hacer el boton guardar de la venta modal
@@ -112,12 +115,6 @@ function AccionesPOS(){
     }
     if(Accion==3){
         AgregarItemComplementos();
-    }
-    if(Accion==4){
-        editar_favorito();
-    }
-    if(Accion==5){
-        CrearEgreso();
     }
     if(Accion==100){
         CrearTercero('ModalAccionesPOS','BntModalPOS');
@@ -141,7 +138,7 @@ function EditarTerceroPOS(){
  * @returns {undefined}
  */
 function FormularioCrearPedido(){
-    
+    var TipoPedido = document.getElementById("TipoPedido").value;
     if(TipoPedido==1){ //Pedidos para mesas
         FormularioPedidoMesa();
     }
@@ -156,7 +153,8 @@ function FormularioCrearPedido(){
 function FormularioPedidoMesa(){
     
     $("#ModalAccionesPOS").modal();
-        
+    var TipoPedido = document.getElementById("TipoPedido").value;
+    
     var form_data = new FormData();
         
         form_data.append('Accion', 1);
@@ -188,7 +186,8 @@ function FormularioPedidoMesa(){
 function FormularioDomicilioLlevar(){
     
     $("#ModalAccionesPOS").modal();
-        
+    var TipoPedido = document.getElementById("TipoPedido").value;
+    
     var form_data = new FormData();
         
         form_data.append('Accion', 7);
@@ -263,7 +262,7 @@ function CrearDomicilioLlevar(){
     var NombrePedido=document.getElementById("NombrePedido").value;    
     var DireccionPedido=document.getElementById("DireccionPedido").value;    
     var ObservacionesPedido=document.getElementById("ObservacionesPedido").value;  
-    
+    var TipoPedido=document.getElementById("TipoPedido").value; 
     
     var form_data = new FormData();
         form_data.append('Accion', '12'); 
@@ -307,15 +306,14 @@ function CrearDomicilioLlevar(){
     
     
 }
-
-
 /**
  * Dibuja el pedido que esté activo
  * @returns {undefined}
  */
 
 function DibujePedidoActivo(){
-    DibujeAreaFormularioPedido();
+    DibujeInformacionGeneralPedidoActivo();
+    DibujeItemsPedido();
 }
 
 
@@ -327,7 +325,7 @@ function DibujeInformacionGeneralPedidoActivo(){
         form_data.append('idPedido', idPedidoActivo);
         
         $.ajax({
-        url: './Consultas/restobarpos.draw.php',
+        url: './Consultas/restaurantPos.draw.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -336,7 +334,7 @@ function DibujeInformacionGeneralPedidoActivo(){
         type: 'post',
         success: function(data){
             document.getElementById(idDiv).innerHTML=data;
-            
+            posiciona('Codigo');      
             
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -354,7 +352,7 @@ function DibujeItemsPedido(){
         form_data.append('idPedido', idPedidoActivo);
         
         $.ajax({
-        url: './Consultas/restobarpos.draw.php',
+        url: './Consultas/restaurantPos.draw.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -407,7 +405,7 @@ function AgregarItem(){
     var idBoton="BtnAgregarItem";
     document.getElementById(idBoton).disabled=true;
     var Codigo=document.getElementById("Codigo").value;    
-    var Cantidad = 1;
+    var Cantidad = (document.getElementById('Cantidad').value);
     var Observaciones = document.getElementById('Observaciones').value; 
     
     var form_data = new FormData();
@@ -429,12 +427,8 @@ function AgregarItem(){
             var respuestas = data.split(';'); 
             if(respuestas[0]=="OK"){
                 
-                
+                document.getElementById('Cantidad').value=1;
                 document.getElementById('Codigo').value="";
-                if(document.getElementById('select2-Codigo-container')){
-                    document.getElementById('select2-Codigo-container').innerHTML="Seleccione un Producto";
-                }
-                
                 document.getElementById('Observaciones').value="";  
                 alertify.success(respuestas[1]);
                 DibujeItemsPedido();
@@ -442,9 +436,8 @@ function AgregarItem(){
                 
                 alertify.alert(respuestas[1]);
             }else if(respuestas[0]=="E2"){
-                codigo_activo=Codigo;
-                observaciones_activas=Observaciones;
-                DibujeComplementos(Codigo);
+                
+                DibujeComplementos();
                 
             }else{
                 alertify.alert(data);
@@ -605,7 +598,7 @@ function AbrirOpcionesFacturacion(idPedido=''){
         
                 
         $.ajax({
-        url: './Consultas/restobarpos.draw.php',
+        url: './Consultas/restaurantPos.draw.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -717,7 +710,7 @@ function FacturarPedido(idPedido='',Options=0){
                 CierraModal('ModalAccionesPOS');
                 idPedidoActivo=0;
                 document.getElementById("vinculoInicio").click();
-                CambiarListaPedidos();
+                DibujePedidoActivo();
                 
             }else if(respuestas[0]=="E1"){
                 var mensaje=respuestas[1];
@@ -748,8 +741,8 @@ function FacturarPedido(idPedido='',Options=0){
  * @returns {undefined}
  */
 function DibujeListaPedidos(){
-    var idDiv="list_"+TipoPedido;
-    //var TipoPedido=document.getElementById("TipoPedido").value;
+    var idDiv="DivListadoPedidos";
+    var TipoPedido=document.getElementById("TipoPedido").value;
     
     var form_data = new FormData();
         
@@ -757,7 +750,7 @@ function DibujeListaPedidos(){
         form_data.append('TipoPedido', TipoPedido);
         
         $.ajax({
-        url: './Consultas/restobarpos.draw.php',
+        url: './Consultas/restaurantPos.draw.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -882,7 +875,7 @@ function FormularioCerrarTurno(){
         form_data.append('Accion', '8');        
                         
         $.ajax({
-        url: './Consultas/restobarpos.draw.php',
+        url: './Consultas/restaurantPos.draw.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -891,7 +884,7 @@ function FormularioCerrarTurno(){
         type: 'post',
         success: function(data){
             document.getElementById('DivFrmPOS').innerHTML=data;
-            //Number_Format_Input();
+            
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.status);
@@ -999,7 +992,7 @@ function EnviaAnularPedido(idPedido){
                 var mensaje=respuestas[1];            
                 alertify.success(mensaje);
                 idPedidoActivo=0;
-                DibujeListaPedidos();
+                DibujePedidoActivo();
             }else if(respuestas[0]=="E1"){
                 var mensaje=respuestas[1];
                 alertify.alert(mensaje);
@@ -1061,17 +1054,18 @@ function EditarPrecioVenta(idItem,idCajaTexto){
 /*
  * Dibuja el formulario para crear un pedido a una mesa
  */
-function DibujeComplementos(Codigo){
+function DibujeComplementos(){
     
     $("#ModalAccionesPOS").modal();
-        
+    var Codigo = document.getElementById("Codigo").value;
+    
     var form_data = new FormData();
         
         form_data.append('Accion', 9);
         form_data.append('Codigo', Codigo);
         
         $.ajax({
-        url: './Consultas/restobarpos.draw.php',
+        url: './Consultas/restaurantPos.draw.php',
         //dataType: 'json',
         cache: false,
         contentType: false,
@@ -1093,9 +1087,9 @@ function DibujeComplementos(Codigo){
 function AgregarItemComplementos(){
     var idBoton="BtnAgregarItem";
     document.getElementById(idBoton).disabled=true;
-    var Codigo=codigo_activo;    
-    var Cantidad = 1;
-    var Observaciones = observaciones_activas; 
+    var Codigo=document.getElementById("Codigo").value;    
+    var Cantidad = (document.getElementById('Cantidad').value);
+    var Observaciones = document.getElementById('Observaciones').value; 
     var jsonComplementos=$('#frm_complementos').serialize();
     //console.log(jsonComplementos);
     var form_data = new FormData();
@@ -1117,7 +1111,8 @@ function AgregarItemComplementos(){
         success: function(data){
             var respuestas = data.split(';'); 
             if(respuestas[0]=="OK"){
-                $('#select2-Codigo-container').html('Seleccione un producto');
+                
+                document.getElementById('Cantidad').value=1;
                 document.getElementById('Codigo').value="";
                 document.getElementById('Observaciones').value="";  
                 alertify.success(respuestas[1]);
@@ -1128,7 +1123,7 @@ function AgregarItemComplementos(){
                 alertify.alert(respuestas[1]);
             }else if(respuestas[0]=="E2"){
                 
-                DibujeComplementos(Codigo);
+                DibujeComplementos();
                 
             }else{
                 alertify.alert(data);
@@ -1145,650 +1140,4 @@ function AgregarItemComplementos(){
           }
       });
 }
-
-function DibujeAreaFormularioPedido(){
-    stopTimer1();
-    var idDiv="list_"+TipoPedido;
-    var form_data = new FormData();
-        
-        form_data.append('Accion', 10);
-        form_data.append('idPedido', idPedidoActivo);
-        
-        $.ajax({
-        url: './Consultas/restobarpos.draw.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            $('.ts_list_forms').html('');
-            document.getElementById(idDiv).innerHTML=data;
-            DibujeInformacionGeneralPedidoActivo();
-            DibujeItemsPedido();
-            listar_productos_favoritos();
-            $('#Codigo').select2({
-		  
-                placeholder: 'Selecciona un producto',
-
-                ajax: {
-                  url: 'buscadores/productosventa.search.php',
-                  dataType: 'json',
-                  delay: 250,
-                  processResults: function (data) {
-
-                    return {                     
-                      results: data
-                    };
-                  },
-                 cache: true
-                }
-              });
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      })  
-}
-
-function listar_productos_favoritos(){
-    //stopTimer1();
-    var idDiv="div_form_add_items";
-    var form_data = new FormData();
-        
-        form_data.append('Accion', 11);
-        form_data.append('idPedido', idPedidoActivo);
-        
-        $.ajax({
-        url: './Consultas/restobarpos.draw.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            document.getElementById(idDiv).innerHTML=data;
-            DibujeInformacionGeneralPedidoActivo();
-            DibujeItemsPedido();
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      })  
-}
-
-
-function agregar_item(favorito_id,Codigo,Cantidad=1){
-    if(Codigo==0){
-        alertify.error('Codigo Incorrecto');
-    }
-    var idBoton="div_"+favorito_id;
-    document.getElementById(idBoton).disabled=true;   
-    var observaciones_id="Observaciones_"+favorito_id;
-    var Observaciones = document.getElementById(observaciones_id).value; 
-    
-    var form_data = new FormData();
-        form_data.append('Accion', '2'); 
-        form_data.append('idProducto', Codigo);
-        form_data.append('idPedido', idPedidoActivo);
-        form_data.append('Cantidad', Cantidad);
-        form_data.append('Observaciones', Observaciones);
-                
-        $.ajax({
-        url: './procesadores/restaurantPos.process.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            var respuestas = data.split(';'); 
-            if(respuestas[0]=="OK"){
-                
-                                
-                document.getElementById(observaciones_id).value="";  
-                alertify.success(respuestas[1]);
-                DibujeItemsPedido();
-            }else if(respuestas[0]=="E1"){
-                
-                alertify.alert(respuestas[1]);
-            }else if(respuestas[0]=="E2"){
-                codigo_activo=Codigo;
-                observaciones_activas=Observaciones;
-                DibujeComplementos(Codigo);
-                
-            }else{
-                alertify.alert(data);
-                              
-            }
-            document.getElementById(idBoton).disabled=false;
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            document.getElementById(idBoton).disabled=false;
-            alert(xhr.status);
-            alert(thrownError);
-            
-          }
-      });
-}
-
-function frm_editar_favorito(favorito_id){
-    
-    $("#ModalAccionesPOSSmall").modal();
-        
-    var form_data = new FormData();
-        
-        form_data.append('Accion', 12);
-        form_data.append('favorito_id', favorito_id);
-        
-        $.ajax({
-        url: './Consultas/restobarpos.draw.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            document.getElementById('DivFrmPOSSmall').innerHTML=data;
-            $('#product_id_favorite').select2({
-		  
-                placeholder: 'Selecciona un producto',
-
-                ajax: {
-                  url: 'buscadores/productosventa.search.php',
-                  dataType: 'json',
-                  delay: 250,
-                  processResults: function (data) {
-
-                    return {                     
-                      results: data
-                    };
-                  },
-                 cache: true
-                }
-              });      
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      })  
-} 
-
-function editar_favorito(){
-    
-    var favorito_id=document.getElementById("favorito_id").value;    
-    var product_id_favorite = (document.getElementById('product_id_favorite').value);
-    
-    var form_data = new FormData();
-        form_data.append('Accion', '17'); 
-        form_data.append('favorito_id', favorito_id);
-        form_data.append('product_id_favorite', product_id_favorite);
-        
-        
-        $.ajax({
-        url: './procesadores/restaurantPos.process.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            var respuestas = data.split(';'); 
-            if(respuestas[0]=="OK"){
-                alertify.success(respuestas[1]);
-                CierraModal('ModalAccionesPOSSmall');
-                listar_productos_favoritos();
-            }else if(respuestas[0]=="E1"){
-                
-                alertify.alert(respuestas[1]);
-            
-            }else{
-                alertify.alert(data);
-                              
-            }
-            
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            
-            alert(xhr.status);
-            alert(thrownError);
-            
-          }
-      });
-}
-
-function change_input_item_search(){
-    var boton_id=$('#btn_change_input_items').data('id');
-    if(boton_id==1){
-        document.getElementById("div_select_items").innerHTML="";
-        $("#div_select_items").append('<input type="number" id="Codigo" class="form-control" value="" placeholder="Código Barras" style="width:300px;"></input>');
-        
-        $("#Codigo").keypress(function(e) {
-        
-            var code = (e.keyCode ? e.keyCode : e.which);
-            if(code==13){
-                AgregarItem();
-            }
-        });
-        $('#btn_change_input_items').data('id','2').html('<i class="fa fa-search"></i>');
-    }
-    
-    if(boton_id==2){
-        document.getElementById("div_select_items").innerHTML="";
-        $("#div_select_items").append('<select type="number" id="Codigo" value="" placeholder="Seleccionar producto" class="form-control" style="width:300px;" ><option value="">Seleccione un producto</option></select>');
-        
-        $('#Codigo').select2({		  
-                placeholder: 'Selecciona un producto',
-
-                ajax: {
-                  url: 'buscadores/productosventa.search.php',
-                  dataType: 'json',
-                  delay: 250,
-                  processResults: function (data) {
-
-                    return {                     
-                      results: data
-                    };
-                  },
-                 cache: true
-                }
-              });   
-        $('#btn_change_input_items').data('id','1').html('<i class="fa fa-barcode"></i>');
-    }
-    
-    
-}
-
-function lista_pendientes_preparacion(){
-    stopTimer1();
-    var idDiv="div_preparacion";
-       
-    var form_data = new FormData();
-        
-        form_data.append('Accion', 13);
-        
-        
-        $.ajax({
-        url: './Consultas/restobarpos.draw.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            document.getElementById(idDiv).innerHTML=data;
-            Timer1=setTimeout(lista_pendientes_preparacion, 3000); 
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      })  
-}
-
-
-function preparar_item(item_id){
-      
-    var form_data = new FormData();
-        form_data.append('Accion', '18'); 
-        form_data.append('item_id', item_id);
-        
-        $.ajax({
-        url: './procesadores/restaurantPos.process.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            var respuestas = data.split(';'); 
-            if(respuestas[0]=="OK"){
-                alertify.success(respuestas[1]);
-                lista_pendientes_preparacion();
-            }else if(respuestas[0]=="E1"){
-                
-                alertify.alert(respuestas[1]);
-            
-            }else{
-                alertify.alert(data);
-                              
-            }
-            
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            
-            alert(xhr.status);
-            alert(thrownError);
-            
-          }
-      });
-}
-
-function frm_cambiar_cantidad(item_id){
-    
-    $("#ModalAccionesPOSSmall").modal();
-        
-    var form_data = new FormData();
-        
-        form_data.append('Accion', 14);
-        form_data.append('item_id', item_id);
-        
-        $.ajax({
-        url: './Consultas/restobarpos.draw.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            document.getElementById('DivFrmPOSSmall').innerHTML=data;
-              
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      })  
-} 
-
-function editar_cantidad(item_id,accion){
-    var cantidad_id="sp_cantidad_"+item_id;   
-    var total_id="sp_total_"+item_id;   
-    var form_data = new FormData();
-        form_data.append('Accion', '19'); 
-        form_data.append('item_id', item_id);
-        form_data.append('accion_id', accion);
-        
-        $.ajax({
-        url: './procesadores/restaurantPos.process.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            var respuestas = data.split(';'); 
-            if(respuestas[0]=="OK"){
-                //alertify.success(respuestas[1]);
-                 var cantidad=respuestas[2];      
-                 var total=respuestas[3];      
-                 $('#'+cantidad_id).html(cantidad);
-                 $('#'+total_id).html(total);
-                 DibujeTotalesPedido();
-            }else if(respuestas[0]=="E1"){
-                
-                alertify.error(respuestas[1]);
-               
-            }else{
-                alertify.alert(data);
-                              
-            }
-            
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            
-            alert(xhr.status);
-            alert(thrownError);
-            
-          }
-      });
-}
-
-function cambie_option_complemento(item_id){
-    document.getElementById(item_id).click();
-}
-
-
-function lista_opciones(){
-    stopTimer1();
-    var idDiv="div_opciones";
-       
-    var form_data = new FormData();
-        
-        form_data.append('Accion', 14);
-        
-        
-        $.ajax({
-        url: './Consultas/restobarpos.draw.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            document.getElementById(idDiv).innerHTML=data;
-                        
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      })  
-}
-
-/**
- * Abre el modal con el formulario para crear un egreso
- * @returns {undefined}
- */
-function ModalCrearEgreso(){
-    
-    $("#ModalAccionesPOS").modal();
-    
-    var form_data = new FormData();
-        
-        form_data.append('Accion', 15);
-        
-        $.ajax({
-        url: './Consultas/restobarpos.draw.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            document.getElementById('DivFrmPOS').innerHTML=data;
-            Number_Format_Input();
-            $("#TotalEgreso_Format_Number").prop('disabled', true);
-            $('#TipoEgreso').select2();
-            $('#CmbTerceroEgreso').select2({
-		  
-                placeholder: 'Selecciona un Tercero',
-                ajax: {
-                  url: 'buscadores/proveedores.search.php',
-                  dataType: 'json',
-                  delay: 250,
-                  processResults: function (data) {
-                      
-                    return {                     
-                      results: data
-                    };
-                  },
-                 cache: true
-                }
-              });
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      })  
-}  
-
-
-function CrearEgreso(){
-    var CuentaPUC=document.getElementById('TipoEgreso').value;
-    var Tercero=document.getElementById('CmbTerceroEgreso').value;
-    var SubtotalEgreso=parseFloat(document.getElementById('SubtotalEgreso').value);
-    var IVAEgreso=parseFloat(document.getElementById('IVAEgreso').value);
-    var TotalEgreso=parseFloat(document.getElementById('TotalEgreso').value);
-    var TxtNumeroSoporteEgreso=(document.getElementById('TxtNumeroSoporteEgreso').value);
-    var TxtConcepto=document.getElementById('TxtConcepto').value;
-    
-    if(Tercero==''){        
-        alertify.error("Debe seleccionar un tercero");
-        document.getElementById("select2-CmbTerceroEgreso-container").style.backgroundColor="pink";   
-        document.getElementById("BntModalPOS").disabled=false;        
-        return;
-    }else{
-        document.getElementById("select2-CmbTerceroEgreso-container").style.backgroundColor="white";
-    }
-    
-    if(TxtConcepto==''){        
-        alertify.error("El campo Concepto no puede estar vacío");
-        document.getElementById("TxtConcepto").style.backgroundColor="pink";   
-        document.getElementById("BntModalPOS").disabled=false;        
-        return;
-    }else{
-        document.getElementById("TxtConcepto").style.backgroundColor="white";
-    }
-    
-    if(TxtNumeroSoporteEgreso==''){        
-        alertify.error("El campo Número de Soporte no puede estar vacío");
-        document.getElementById("TxtNumeroSoporteEgreso").style.backgroundColor="pink";   
-        document.getElementById("BntModalPOS").disabled=false;        
-        return;
-    }else{
-        document.getElementById("TxtNumeroSoporteEgreso").style.backgroundColor="white";
-    }
-    
-      
-    if(!$.isNumeric(SubtotalEgreso) ||  SubtotalEgreso<0){
-        
-        alertify.error("El Subtotal debe ser un número mayor o igual a cero");
-        document.getElementById("SubtotalEgreso").style.backgroundColor="pink";
-        document.getElementById("BntModalPOS").disabled=false;
-        posiciona('SubtotalEgreso'); 
-        return;
-    }else{
-        document.getElementById("SubtotalEgreso").style.backgroundColor="white";
-    }
-    
-    if(!$.isNumeric(TotalEgreso) ||  TotalEgreso<0){
-        
-        alertify.error("El Total debe ser un número mayor o igual a cero");
-        document.getElementById("TotalEgreso").style.backgroundColor="pink";
-        document.getElementById("BntModalPOS").disabled=false;
-        posiciona('SubtotalEgreso'); 
-        return;
-    }else{
-        document.getElementById("TotalEgreso").style.backgroundColor="white";
-    }
-    
-    if(!$.isNumeric(IVAEgreso) ||  IVAEgreso<0){
-        
-        alertify.error("El IVA debe ser un número mayor o igual a cero");
-        document.getElementById("IVAEgreso").style.backgroundColor="pink";
-        document.getElementById("BntModalPOS").disabled=false;
-        posiciona('IVAEgreso'); 
-        return;
-    }else{
-        document.getElementById("IVAEgreso").style.backgroundColor="white";
-    }
-    
-    document.getElementById('SubtotalEgreso').value='';
-    var form_data = new FormData();
-        
-        form_data.append('Accion', 20);
-        form_data.append('CuentaPUC', CuentaPUC); 
-        form_data.append('Tercero', Tercero); 
-        form_data.append('SubtotalEgreso', SubtotalEgreso); 
-        form_data.append('IVAEgreso', IVAEgreso); 
-        form_data.append('TotalEgreso', TotalEgreso); 
-        form_data.append('TxtNumeroSoporteEgreso', TxtNumeroSoporteEgreso); 
-        form_data.append('TxtConcepto', TxtConcepto); 
-        
-        $.ajax({
-        url: '../../modulos/comercial/procesadores/pos.process.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            var respuestas = data.split(';');
-            if(respuestas[0]=="E1"){
-                alertify.alert(respuestas[1]);
-                
-            }else if(respuestas[0]=="OK"){
-                alertify.success(respuestas[1]);
-                CierraModal('ModalAccionesPOS');                
-            }else{
-                alertify.alert(data);
-            }
-            document.getElementById("BntModalPOS").disabled=false;
-            
-            posiciona('Codigo');       
-            
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      })  
-}
-
-function CalculeTotalEgreso(){
-    setTimeout(escriba_total_egreso, 100);    
-}
-
-function escriba_total_egreso(){
-    
-    
-    var subtotal=parseFloat(document.getElementById('SubtotalEgreso').value);
-    var iva=parseFloat(document.getElementById('IVAEgreso').value);
-    
-    document.getElementById('TotalEgreso').value=subtotal+iva;
-    document.getElementById('TotalEgreso_Format_Number').value=number_format(subtotal+iva);
-}
-
-function listar_resumen(){
-    stopTimer1();
-    var idDiv="div_resumen";
-       
-    var form_data = new FormData();
-        
-        form_data.append('Accion', 16);
-        
-        
-        $.ajax({
-        url: './Consultas/restobarpos.draw.php',
-        //dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: form_data,
-        type: 'post',
-        success: function(data){
-            document.getElementById(idDiv).innerHTML=data;
-                        
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-          }
-      })  
-}
-
 DibujeListaPedidos();

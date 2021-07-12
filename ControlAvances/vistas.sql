@@ -651,3 +651,44 @@ SELECT t1.ID as pedido_id, t2.ID as item_id, t1.Fecha as fecha_pedido, t1.Hora a
     t2.IVA as iva,t2.Total as total,t2.Observaciones as observaciones,t2.Estado as estado_item   
     FROM  restaurante_pedidos t1 inner join restaurante_pedidos_items t2 on t1.ID=t2.idPedido
     WHERE (t1.Estado=1 or t1.Estado=3) and (t2.Estado=1 or t2.Estado='AB') ORDER BY t1.ID ASC, t2.ID ASC  ;
+
+DROP VIEW IF EXISTS `vista_facturas_notas`;
+CREATE VIEW vista_facturas_notas AS
+SELECT t1.*,
+(SELECT ID from notas_credito t2 WHERE  t1.idFacturas=t2.idFactura LIMIT 1 ) as nota_credito_id,
+(SELECT Fecha from notas_credito t2 WHERE  t1.idFacturas=t2.idFactura LIMIT 1) as fecha_nota_credito,
+(SELECT Observaciones from notas_credito t2 WHERE  t1.idFacturas=t2.idFactura LIMIT 1) as observaciones_nota_credito,
+(SELECT sum(TotalItem) from notas_credito_items t3 WHERE  t3.idNotaCredito=(select nota_credito_id) LIMIT 1 ) as total_nota_credito
+  
+FROM `facturas` t1;
+
+DROP VIEW IF EXISTS `vista_notas_credito_general`;
+CREATE VIEW vista_notas_credito_general AS
+SELECT t1.*,
+(SELECT round(sum(SubtotalItem),2) from notas_credito_items t3 WHERE  t3.idNotaCredito=t1.ID LIMIT 1 ) as subtotal_nota_credito,
+(SELECT round(sum(IVAItem),2) from notas_credito_items t3 WHERE  t3.idNotaCredito=t1.ID LIMIT 1 ) as iva_nota_credito,
+
+(SELECT round(sum(TotalItem),2) from notas_credito_items t3 WHERE  t3.idNotaCredito=t1.ID LIMIT 1 ) as total_nota_credito
+  
+FROM `notas_credito` t1;
+
+DROP VIEW IF EXISTS `vista_restaurante_pedidos_resumen`;
+CREATE VIEW vista_restaurante_pedidos_resumen AS
+SELECT t1.ID,t1.Estado,t1.Tipo,t1.idCierre,count(DISTINCT t1.ID) as total_pedidos,
+(SELECT NombreEstado from restaurante_estados_pedidos t3 WHERE t3.ID=t1.Estado LIMIT 1) as nombre_estado,
+(SELECT Nombre from restaurante_tipos_pedido t3 WHERE t3.ID=t1.Tipo LIMIT 1) as nombre_tipo_pedido,
+sum(t2.Subtotal) as subtotal,
+sum(t2.IVA) as iva,
+sum(t2.Total) as total
+  
+FROM `restaurante_pedidos` t1 
+ INNER JOIN restaurante_pedidos_items t2 ON t1.ID=t2.idPedido 
+group by t1.Tipo,t1.Estado,t1.idCierre ;
+
+DROP VIEW IF EXISTS `vista_restaurante_pedidos_items_resumen`;
+CREATE VIEW vista_restaurante_pedidos_items_resumen AS
+SELECT t1.idProducto,t1.NombreProducto,t1.idCierre,
+sum(Cantidad) as cantidad,sum(Subtotal) as subtotal,sum(IVA) as iva,sum(Total) as total 
+    
+FROM `restaurante_pedidos_items` t1 group by t1.idProducto,t1.idCierre ;
+

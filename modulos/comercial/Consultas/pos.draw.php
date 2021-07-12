@@ -1461,7 +1461,7 @@ if( !empty($_REQUEST["Accion"]) ){
         break;// Fin caso 19
         
         case 20:// formulario para cerrar turno
-            
+            /*
             $datos_configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 37);//Determina si se deben consultar los traslados para poder cerrar turno
             if($datos_configuracion["Valor"]==1){
                 $datos_sucursal=$obCon->DevuelveValores("empresa_pro_sucursales", "Actual", 1);
@@ -1485,6 +1485,8 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->Notificacion("Error", "hay traslados pendientes por descargar", "rojo", "", "");
                 }
             }
+             * 
+             */
             $css->input("hidden", "idFormulario", "", "idFormulario", "", 7, "", "", "", "");
             $css->div("", "row", "", "", "", "", "");
                 $css->div("", "col-md-4", "", "", "", "", "");

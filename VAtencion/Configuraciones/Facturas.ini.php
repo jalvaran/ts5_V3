@@ -1,6 +1,6 @@
 <?php
 
-$myTabla="facturas";
+$myTabla="vista_facturas_notas";
 $MyID="idFacturas";
 $myPage="facturas.php";
 $myTitulo="Facturas";
@@ -14,7 +14,8 @@ $myTitulo="Facturas";
 $Vector["Tabla"]=$myTabla;          //Tabla
 $Vector["Titulo"]=$myTitulo;        //Titulo
 $Vector["VerDesde"]=$startpoint;    //Punto desde donde empieza
-$Vector["Limit"]=$limit;            //Numero de Registros a mostrar
+$Vector["Limit"]=$limit;   
+$Vector["MyPage"]=$myPage;   //Numero de Registros a mostrar
 
 /*
  * Opciones en Acciones
@@ -23,7 +24,7 @@ $Vector["Limit"]=$limit;            //Numero de Registros a mostrar
 
 $Vector["NuevoRegistro"]["Deshabilitado"]=1;            
 //$Vector["VerRegistro"]["Deshabilitado"]=1;                      
-//$Vector["EditarRegistro"]["Deshabilitado"]=1; 
+$Vector["EditarRegistro"]["Deshabilitado"]=1; 
 
 //Link para la accion ver
 $Ruta="PDF_Factura.php?ImgPrintFactura=";

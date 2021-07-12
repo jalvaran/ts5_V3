@@ -43,9 +43,10 @@ $css->PageInit($myTitulo);
                 print('<li class="active" onclick="TipoPedido=1;CambiarListaPedidos();"><a href="#tab_list_1" data-toggle="tab" aria-expanded="true">Mesas</a></li>');
                 print('<li class="" onclick="TipoPedido=2;CambiarListaPedidos();"></span><a href="#tab_list_2" data-toggle="tab" aria-expanded="false">Domicilios</a></li>');
                 print('<li class="" onclick="TipoPedido=3;CambiarListaPedidos();"><a href="#tab_list_3" data-toggle="tab" aria-expanded="false">Llevar</a></li>');
-                print('<li class="" onclick="lista_pendientes_preparacion()"><a href="#tab_list_4" data-toggle="tab" aria-expanded="false">Preparación</a></li>');               
-                print('<li class="" onclick="lista_opciones()"><a href="#tab_list_5" data-toggle="tab" aria-expanded="false">Opciones</a></li>');
-                print('<li class="" onclick="listar_resumen()"><a href="#tab_list_6" data-toggle="tab" aria-expanded="false">Resumen</a></li>');
+                print('<li class="" onclick="lista_pendientes_preparacion()"><a href="#tab_list_4" data-toggle="tab" aria-expanded="false">Preparación</a></li>');
+                print('<li class=""><a href="#tab_list_5" data-toggle="tab" aria-expanded="false">Servicios</a></li>');
+                print('<li class=""><a href="#tab_list_6" data-toggle="tab" aria-expanded="false">Resumen</a></li>');
+                print('<li class=""><a href="#tab_list_7" data-toggle="tab" aria-expanded="false">Opciones</a></li>');
             print('</ul>');
             
             print('<div class="tab-content">');
@@ -78,20 +79,14 @@ $css->PageInit($myTitulo);
                     print('</div>');    
                 print('</div>');
                 print('<div id="tab_list_5" class="tab-pane">');
-                    print('<div class="row">');
-                        print('<div id="div_opciones" class="col-md-12 ts_list_forms">');
-                            
-                        print('</div>');
-                    print('</div>');   
+                    print("idv5");
                 print('</div>');
                 print('<div id="tab_list_6" class="tab-pane">');
-                    print('<div class="row">');
-                        print('<div id="div_resumen" class="col-md-12 ts_list_forms">');
-                            
-                        print('</div>');
-                    print('</div>');
+                    print("idv6");
                 print('</div>');
-                
+                print('<div id="tab_list_7" class="tab-pane">');
+                    print("idv7");
+                print('</div>');
             print('</div>');  //Fin content
         print('</div>');  //Fin tabs    
         

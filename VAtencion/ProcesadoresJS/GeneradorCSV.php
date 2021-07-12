@@ -3,7 +3,7 @@ if(isset($_REQUEST["Opcion"])){
     $myPage="GeneradorCSV.php";
     include_once("../../modelo/php_conexion.php");
     
-    session_start();    
+    @session_start();    
     $idUser=$_SESSION['idUser'];
     $obVenta = new ProcesoVenta($idUser);
     $DatosRuta=$obVenta->DevuelveValores("configuracion_general", "ID", 1);
@@ -17,8 +17,10 @@ if(isset($_REQUEST["Opcion"])){
     
     switch ($Opcion){
         case 1: //Exportar CSV 
+            if(is_file($Link)){
+                unlink($Link);
+            }
             
-            unlink($Link);
             $Tabla=$obVenta->normalizar(base64_decode($_REQUEST["TxtT"]));
             $statement=$obVenta->normalizar(urldecode($_REQUEST["TxtL"]));
             $Columnas=$obVenta->ShowColums($Tabla);

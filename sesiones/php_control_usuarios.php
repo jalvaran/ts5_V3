@@ -1,6 +1,11 @@
 <?php
 ob_start();
+ini_set('session.gc_maxlifetime', 10800);
+ini_set('session.gc_probability', 1);
+ini_set('session.gc_divisor', 100);
+
 @session_start();
+
 if (!isset($_SESSION['username'])){
   exit("<a href='../../index.php' ><img src='../../images/401.png'>Iniciar Sesion </a>");
   
@@ -19,5 +24,7 @@ if ($Permiso==0){
   exit("<a href='../index.php' ><img src='../../images/401.png'>Iniciar Sesion </a>");
   
 }
+
+
 
 ?>
