@@ -10,14 +10,9 @@ class Servicios extends ProcesoVenta{
         $Tiempo=$DatosServicios["Tiempo"];
         $Estado=0;
         $servicios_key[1]="valor_servicio_20";
-        $servicios_key[2]="valor_servicio_30";
-        $servicios_key[3]="valor_servicio_60";
-        $servicios_key[4]="show";
-        $servicios_key[5]="masaje";
-        
         //print($TipoServicio);
         if($TipoServicio<=4){
-            $keyValorModelo=$servicios_key[$TipoServicio];
+            $keyValorModelo="ValorServicio".$TipoServicio;
             $ValorModelo=$DatosModelos[$keyValorModelo];
            
             if($Valor>$DatosServicios["Valor"]){
@@ -29,16 +24,15 @@ class Servicios extends ProcesoVenta{
             
         }
         
-        if($TipoServicio==6){// Multas
+        if($TipoServicio==4){// Multas
             $Estado=0;
             $ValorModelo=0;
             $ValorCasa=$Valor;
         }
         
-        if($TipoServicio==4){ // Shows
+        if($TipoServicio==5){ // Shows
             
             $ValorModelo=$DatosServicios["ValorModelo"];
-            
             $ValorCasa=$Valor-$ValorModelo;
         }
         

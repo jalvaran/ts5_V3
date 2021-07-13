@@ -1,21 +1,9 @@
 <?php
-
-include_once("../../comercial/clases/Facturacion.class.php");
-class VentasRestaurantePOS extends Facturacion{
-    /**
-     * Crea una compra
-     * @param type $Fecha
-     * @param type $idTercero
-     * @param type $Observaciones
-     * @param type $CentroCostos
-     * @param type $idSucursal
-     * @param type $idUser
-     * @param type $TipoCompra
-     * @param type $NumeroFactura
-     * @param type $Concepto
-     * @param type $Vector
-     * @return type
-     */
+if(file_exists("../../../modelo/php_conexion.php")){
+    include_once("../../../modelo/php_conexion.php");
+}
+class Modelos extends ProcesoVenta{
+    
     public function CrearPedido($idMesa,$idCliente,$NombreCliente, $DireccionEnvio,$Telefono,$Observaciones, $idUser,$Tipo=1 ) {
         $Fecha=date("Y-m-d");
         $Hora=date("H:i:s");

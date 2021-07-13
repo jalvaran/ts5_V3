@@ -604,3 +604,17 @@ INSERT INTO `restaurante_estados_pedidos_items` (`ID`, `NombreEstado`, `Updated`
 (3,	'ENTREGADO',	'2021-07-08 20:09:44',	'0000-00-00 00:00:00');
 
 
+ALTER TABLE `modelos_db`
+CHANGE `ValorServicio1` `valor_servicio_20` double NOT NULL COMMENT '20 minutos' AFTER `Telefono`,
+CHANGE `ValorServicio2` `valor_servicio_30` double NOT NULL COMMENT '30 minutos' AFTER `valor_servicio_20`,
+CHANGE `ValorServicio3` `valor_servicio_60` double NOT NULL COMMENT '1 hora' AFTER `valor_servicio_30`,
+ADD `show` double NOT NULL COMMENT 'valor por show' AFTER `valor_servicio_60`,
+ADD `masaje` double NOT NULL COMMENT 'valor por masaje' AFTER `show`,
+ENGINE='MyISAM';
+
+ALTER TABLE `modelos_db`
+CHANGE `Estado` `Estado` varchar(1) COLLATE 'utf8_spanish_ci' NOT NULL DEFAULT 'A' COMMENT 'A activo, I Inactivo' AFTER `masaje`;
+
+ALTER TABLE `modelos_db`
+ADD INDEX `Estado` (`Estado`);
+

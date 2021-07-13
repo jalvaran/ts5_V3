@@ -1,7 +1,7 @@
 <?php
 
 include_once("../../../modelo/php_conexion.php");
-session_start();
+@session_start();
 $idUser=$_SESSION['idUser'];
 if($idUser==''){
     $json[0]['id']="";
@@ -9,17 +9,16 @@ if($idUser==''){
     echo json_encode($json);
     exit();
 }
-$obRest=new ProcesoVenta($idUser);
+$obRest=new conexion($idUser);
 $key=$obRest->normalizar($_REQUEST['q']);
 
-$sql = "SELECT * FROM insumos 
-		WHERE Nombre LIKE '%$key%' or ID = '$key' OR  Referencia = '$key'
-		LIMIT 10"; 
+$sql = "SELECT NombreArtistico,ID FROM modelos_db 
+		WHERE Estado='A' and (NombreArtistico LIKE '%$key%' OR Identificacion = '$key'  OR ID = '$key')  ORDER BY NombreArtistico ASC LIMIT 100"; 
 $result = $obRest->Query($sql);
 $json = [];
 
 while($row = $obRest->FetchAssoc($result)){
-    $Texto=$row['Nombre']." // ".$row['ID']." // ".$row['Referencia']." // ".number_format($row['Existencia']);
-     $json[] = ['id'=>$row['ID'], 'text'=>$Texto];
+    $Texto= utf8_encode($row['NombreArtistico']." // ".$row['ID']);
+    $json[] = ['id'=>$row['ID'], 'text'=>$Texto];
 }
 echo json_encode($json);

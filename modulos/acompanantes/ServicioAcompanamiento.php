@@ -44,6 +44,7 @@ $css->PageInit($myTitulo);
         
         $css->TabPaneInit("Tab_1", 1);
             $css->section("", "contentTab1", "", "");
+                print('<div class="row">');
                 $css->CrearDiv("", "col-md-12", "center", 1, 1);
                     $css->CrearTitulo("<strong>Registro de Servicios</strong>", "azul");
                     $css->CrearTabla();
@@ -102,11 +103,13 @@ $css->PageInit($myTitulo);
                     $css->CerrarDiv();
                     
                 $css->CerrarDiv();
+                $css->CerrarDiv();
             $css->Csection();
         $css->TabPaneEnd();
         
         $css->TabPaneInit("Tab_2", 0);
             $css->section("", "contentTab2", "", "");
+                print('<div class="row">');
                 $css->CrearDiv("", "col-md-12", "center", 1, 1);
                     $css->CrearTitulo("<strong>Resumen de servicios en este turno</strong>", "verde");
 
@@ -114,11 +117,13 @@ $css->PageInit($myTitulo);
                     
                     $css->CerrarDiv();
                 $css->CerrarDiv();
+                $css->CerrarDiv();
             $css->Csection();
         $css->TabPaneEnd();
         
         $css->TabPaneInit("Tab_3", 0);
             $css->section("", "contentTab2", "", "");
+                print('<div class="row">');
                 $css->CrearDiv("", "col-md-12", "center", 1, 1);
                     $css->CrearTitulo("<strong>Cuentas por Pagar</strong>", "naranja");
 
@@ -126,7 +131,7 @@ $css->PageInit($myTitulo);
                     
                     $css->CerrarDiv();
                 $css->CerrarDiv();
-                
+                $css->CerrarDiv();
                 
             $css->Csection();
         $css->TabPaneEnd();

@@ -54,11 +54,12 @@ class PageConstruct extends html_estruct_class{
                 print('<link rel="stylesheet" href="../../componentes/techno/css/checkts.css">');
                 print('<link rel="stylesheet" href="../../componentes/techno/css/css_ts.css">');                 
                 print('<link rel="stylesheet" href="../../componentes/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">'); 
+                print('<link rel="stylesheet" href="../../componentes/bootstrap-toggle/css/bootstrap2-toggle.min.css" >');
                 print("<link rel='stylesheet' href='../../componentes/alertify/themes/alertify.core.css' />");
                 print("<link rel='stylesheet' href='../../componentes/alertify/themes/alertify.default.css' id='toggleCSS' />");
                 print('<link rel="stylesheet" href="../../componentes/select2/dist/css/select2.min.css">');       
                 print('<link rel="stylesheet" href="../../componentes/dropzone/dropzone.min.css">');       
-
+                
             $this->Chead();
             $this->body("", "hold-transition skin-blue sidebar-mini");
             $this->CrearDiv("wrapper", "", "", 1, 1);
@@ -718,6 +719,7 @@ class PageConstruct extends html_estruct_class{
         print('<script src="../../componentes/jquery/dist/jquery.min.js"></script>');
         print('<script src="../../componentes/jquery/dist/jquery.mask.min.js"></script>');
         print('<script src="../../componentes/bootstrap/dist/js/bootstrap.min.js"></script>');
+        print('<script src="../../componentes/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>');
         print('<script src="../../componentes/datatables.net/js/jquery.dataTables.min.js"></script>');
         print('<script src="../../componentes/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>');
         print('<script src="../../componentes/jquery-slimscroll/jquery.slimscroll.min.js"></script>');
