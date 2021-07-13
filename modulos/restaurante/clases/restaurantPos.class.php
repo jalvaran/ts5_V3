@@ -445,14 +445,14 @@ class VentasRestaurantePOS extends Facturacion{
         $idCierre=$this->ObtenerMAX($tab,"ID", 1,"");
         $this->update("restaurante_pedidos", "idCierre", $idCierre, " WHERE idCierre=0 AND Estado<>'1'");
         $this->update("restaurante_pedidos_items", "idCierre", $idCierre, " WHERE idCierre=0 AND Estado<>'1' ");
-        //$this->update("traslados_items", "idCierre", $idCierre, " WHERE idCierre=0");
+        $this->update("traslados_items", "idCierre", $idCierre, " WHERE idCierre=0");
         $this->update("restaurante_registro_propinas", "idCierre", $idCierre, " WHERE idCierre=0;");
         $this->update("restaurante_registro_ventas_mesero", "idCierre", $idCierre, " WHERE idCierre=0;");
         $this->update("inventario_comprobante_movimientos_items", "idCierre", $idCierre, " WHERE idCierre=0;");
         
-        //$this->update("modelos_pagos_realizados", "idCierre", $idCierre, " WHERE idCierre=0;");
-        //$this->update("modelos_agenda", "idCierre", $idCierre, " WHERE idCierre=0;");
-        //$this->update("librodiario", "idCierre", $idCierre, " WHERE idCierre=0;"); //Ojo para este caso se cierra sin tener en cuenta el id del usuario
+        $this->update("modelos_pagos_realizados", "idCierre", $idCierre, " WHERE idCierre=0;");
+        $this->update("modelos_agenda", "idCierre", $idCierre, " WHERE idCierre=0;");
+        $this->update("librodiario", "idCierre", $idCierre, " WHERE idCierre=0;"); //Ojo para este caso se cierra sin tener en cuenta el id del usuario
         $this->update("facturas", "CerradoDiario", $idCierre, "WHERE (CerradoDiario='0' or CerradoDiario='' ) ");
         $this->update("facturas_items", "idCierre", $idCierre, "WHERE (idCierre='0' or idCierre='')");
         $this->update("factura_compra_items", "idCierre", $idCierre, "WHERE (idCierre='0' or idCierre='') ");
@@ -471,8 +471,8 @@ class VentasRestaurantePOS extends Facturacion{
               SELECT '$Fecha',t1.idProductosVenta,t1.Nombre,
                (SELECT IFNULL((SELECT SUM(Cantidad) FROM factura_compra_items fci WHERE t1.idProductosVenta=fci.idProducto AND idCierre='$idCierre'),0)) AS ItemsCompras,
                (SELECT IFNULL((SELECT SUM(Cantidad) FROM facturas_items fi WHERE t1.Referencia=fi.Referencia AND idCierre='$idCierre'),0)) as ItemsVentas,
-               (SELECT IFNULL((SELECT SUM(Cantidad) FROM traslados_items ti WHERE CONVERT(ti.Referencia USING utf8)=CONVERT(t1.Referencia USING utf8 ) AND Destino='$SedeActual' AND idCierre='$idCierre'),0)) as TrasladosRecibidos,
-               (SELECT IFNULL((SELECT SUM(Cantidad) FROM traslados_items ti WHERE CONVERT(ti.Referencia USING utf8)=CONVERT(t1.Referencia USING utf8 ) AND Destino<>'$SedeActual' AND idCierre='$idCierre' AND Estado='PREPARADO'),0)) as TrasladosEnviados,
+               (SELECT IFNULL((SELECT SUM(Cantidad) FROM traslados_items ti WHERE ti.Referencia=t1.Referencia AND Destino='$SedeActual' AND idCierre='$idCierre'),0)) as TrasladosRecibidos,
+               (SELECT IFNULL((SELECT SUM(Cantidad) FROM traslados_items ti WHERE ti.Referencia=t1.Referencia AND Destino<>'$SedeActual' AND idCierre='$idCierre' AND Estado='PREPARADO'),0)) as TrasladosEnviados,
                (SELECT IFNULL((SELECT SUM(Cantidad) FROM inventario_comprobante_movimientos_items icm WHERE t1.idProductosVenta=icm.idProducto AND TablaOrigen='productosventa' AND TipoMovimiento='BAJA' AND idCierre='$idCierre'),0)) AS TotalBajas,
                (SELECT IFNULL((SELECT SUM(Cantidad) FROM inventario_comprobante_movimientos_items icm WHERE t1.idProductosVenta=icm.idProducto AND TablaOrigen='productosventa' AND TipoMovimiento='ALTA' AND idCierre='$idCierre'),0)) AS TotalAltas,
                (t1.Existencias - (SELECT ItemsCompras) + (SELECT TrasladosEnviados) - (SELECT TrasladosRecibidos) + (SELECT TotalBajas) - (SELECT TotalAltas) + (SELECT ItemsVentas)) AS CantidadRecibida, 

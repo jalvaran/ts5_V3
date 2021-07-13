@@ -46,6 +46,7 @@ $css->PageInit($myTitulo);
                 print('<li class="" onclick="lista_pendientes_preparacion()"><a href="#tab_list_4" data-toggle="tab" aria-expanded="false">Preparación</a></li>');               
                 print('<li class="" onclick="lista_opciones()"><a href="#tab_list_5" data-toggle="tab" aria-expanded="false">Opciones</a></li>');
                 print('<li class="" onclick="listar_resumen()"><a href="#tab_list_6" data-toggle="tab" aria-expanded="false">Resumen</a></li>');
+                print('<li class="" onclick="listar_resumen_detallado()"><a href="#tab_list_7" data-toggle="tab" aria-expanded="false">Resumen Detallado</a></li>');
             print('</ul>');
             
             print('<div class="tab-content">');
@@ -87,6 +88,13 @@ $css->PageInit($myTitulo);
                 print('<div id="tab_list_6" class="tab-pane">');
                     print('<div class="row">');
                         print('<div id="div_resumen" class="col-md-12 ts_list_forms">');
+                            
+                        print('</div>');
+                    print('</div>');
+                print('</div>');
+                print('<div id="tab_list_7" class="tab-pane">');
+                    print('<div class="row">');
+                        print('<div id="div_resumen_detallado" class="col-md-12 ts_list_forms">');
                             
                         print('</div>');
                     print('</div>');

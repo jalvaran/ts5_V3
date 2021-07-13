@@ -58,7 +58,7 @@ $css->PageInit($myTitulo);
                 print('<li class="" onclick="listado_id=3;ver_listado_segun_id();"><a href="#tab_list_3" data-toggle="tab" aria-expanded="false">Base de datos Modelos</a></li>');
                 print('<li class="" onclick="idPestana=3;DibujeCuentasXPagarServicios();"><a href="#tab_list_4" data-toggle="tab" aria-expanded="false">Cuentas X Pagar</a></li>');                                
                 print('<li class="" onclick="idPestana=2;DibujeResumenTurno();"><a href="#tab_list_5" data-toggle="tab" aria-expanded="false">Resumen</a></li>');
-                print('<li class="" onclick="idPestana=3;DibujeCuentasXPagarServicios();"><a href="#tab_list_6" data-toggle="tab" aria-expanded="false">Opciones</a></li>');
+               // print('<li class="" onclick="idPestana=3;DibujeCuentasXPagarServicios();"><a href="#tab_list_6" data-toggle="tab" aria-expanded="false">Opciones</a></li>');
             print('</ul>');
             
             print('<div class="tab-content">');
@@ -165,12 +165,7 @@ $css->PageInit($myTitulo);
                         $css->CerrarDiv();
                     $css->CerrarDiv();
                 print('</div>');
-                print('<div id="tab_list_6" class="tab-pane">');
-                    print("idv6");
-                print('</div>');
-                print('<div id="tab_list_7" class="tab-pane">');
-                    print("idv7");
-                print('</div>');
+                
             print('</div>');  //Fin content
         print('</div>');  //Fin tabs    
         

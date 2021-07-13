@@ -42,7 +42,7 @@ class Servicios extends ProcesoVenta{
             $ValorCasa=$Valor-$ValorModelo;
         }
         
-        if($TipoServicio==6){ //fichas
+        if($TipoServicio==5){ //masajes
             
             $ValorModelo=$Valor;
             $ValorCasa=0;

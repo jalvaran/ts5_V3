@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+@session_start();
 if (!isset($_SESSION['username'])){
   exit("<a href='../../index.php' ><img src='../images/401.png'>Iniciar Sesion </a>");
   
@@ -291,9 +291,18 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit("E1;No es posible cerrar el turno, hay pedidos que aún no se han facturado");
             }
             $idCierre=$obCon->CierreTurnoRestaurantePos($TxtObservaciones,$idUser,$EfectivoEnCaja);
-            //$obCon->RegistreResumenCierre($idCierre, $idUser);
-            $obPrint->ImprimirCierreRestaurantePos($idCierre,"",1,"");
-            print("OK;Se ha Cerrado el turno $idCierre");
+            
+            $Link="";
+            $valida=$obCon->DevuelveValores("configuracion_general", "ID", 39);
+            if($valida["Valor"]==1){
+                $obCon->RegistreResumenCierre($idCierre, $idUser);
+                $obPrint->ImprimirCierreRestaurantePos($idCierre,"",1,"");
+                $Ruta="../../general/consultas/PDF_Documentos.draw.php?idDocumento=36&ID=$idCierre";
+                $Link="<a href='$Ruta' target='_BLANK'><h1>Imprimir Cierre $idCierre</h1></a>";
+            }
+            
+            print("OK;Se ha Cerrado el turno $idCierre;$Link");
+            
         break; //Fin caso 9
         
         case 10://Crear un egreso

@@ -905,6 +905,7 @@ function FormularioCerrarTurno(){
 function CerrarTurno(){
     var idBoton="BntModalPOS";
     document.getElementById(idBoton).disabled=true;
+    document.getElementById("div_mensajes_frm_cerrar_turno").innerHTML='<div id="GifProcess"><img   src="../../images/loader.gif" alt="Cargando" height="20" width="20"></div>';
     
     var idDivMensajes='DivFrmPOS';
     var EfectivoEnCaja=document.getElementById("EfectivoEnCaja").value; 
@@ -932,6 +933,8 @@ function CerrarTurno(){
                 document.getElementById(idBoton).disabled=false;
     
                 CierraModal('ModalAccionesPOS');
+                document.getElementById('div_mensajes_opciones').innerHTML=respuestas[2];
+                
             }else if(respuestas[0]=="E1"){
                 alertify.error(respuestas[1],0);
                 MarqueErrorElemento(respuestas[2]);
@@ -1789,6 +1792,44 @@ function listar_resumen(){
             alert(thrownError);
           }
       })  
+}
+
+function listar_resumen_detallado(){
+    stopTimer1();
+    var idDiv="div_resumen_detallado";
+       
+    var form_data = new FormData();
+        
+        form_data.append('Accion', 17);
+        
+        
+        $.ajax({
+        url: './Consultas/restobarpos.draw.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idDiv).innerHTML=data;
+                        
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      })  
+}
+
+
+function ExportarTablaToExcel(idTabla){
+    excel = new ExcelGen({
+        "src_id": idTabla,
+        "show_header": true,
+        "type": "table"
+    });
+    excel.generate();
 }
 
 DibujeListaPedidos();

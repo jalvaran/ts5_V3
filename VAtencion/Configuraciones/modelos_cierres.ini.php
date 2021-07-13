@@ -1,6 +1,6 @@
 <?php
 
-$myTabla="modelos_cierres";
+$myTabla="restaurante_cierres";
 $myPage="modelos_cierres.php";
 $myTitulo="Historial de cierres";
 $idTabla="ID";
@@ -14,12 +14,13 @@ $Vector["Tabla"]=$myTabla;          //Tabla
 $Vector["Titulo"]=$myTitulo;        //Titulo
 $Vector["VerDesde"]=$startpoint;    //Punto desde donde empieza
 $Vector["Limit"]=$limit;            //Numero de Registros a mostrar
+$Vector["MyPage"]=$myPage;
 /*
  * Deshabilito Acciones
  * 
  */
   //Link para la accion ver
-$Ruta="$myPage?idCierre=";
+$Ruta="../general/consultas/PDF_Documentos.draw.php?idDocumento=36&ID=";
 $Vector["VerRegistro"]["Link"]=$Ruta;
 $Vector["VerRegistro"]["ColumnaLink"]="ID";
 

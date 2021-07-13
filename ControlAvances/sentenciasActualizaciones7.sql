@@ -618,3 +618,36 @@ CHANGE `Estado` `Estado` varchar(1) COLLATE 'utf8_spanish_ci' NOT NULL DEFAULT '
 ALTER TABLE `modelos_db`
 ADD INDEX `Estado` (`Estado`);
 
+CREATE TABLE `restaurante_productos_favoritos` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `producto_id` bigint(20) NOT NULL,
+  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Sync` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+INSERT INTO `restaurante_productos_favoritos` (`ID`, `producto_id`, `Updated`, `Sync`) VALUES
+(1,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(2,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(3,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(4,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(5,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(6,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(7,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(8,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(9,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(10,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(11,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(12,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(13,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(14,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00'),
+(15,	0,	'2021-07-13 13:20:11',	'0000-00-00 00:00:00');
+
+
+INSERT INTO `menu_carpetas` (`ID`, `Ruta`, `Updated`, `Sync`) VALUES
+(18,	'../modulos/modelos/',	'2020-07-25 10:05:02',	'2019-07-25 10:05:02');
+
+UPDATE `menu_submenus` SET `idCarpeta` = '18', `Pagina` = 'modelos.php' WHERE `Nombre` = 'Administrar Tiempos' ;
+
+UPDATE `menu_submenus` SET `Pagina` = 'restobarpos.php' WHERE `Nombre` = 'Ventas';
+
