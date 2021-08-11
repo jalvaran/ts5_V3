@@ -185,6 +185,15 @@ print("<body>");
                 $css->CrearOptionSelect($DatosIVA["Valor"], $DatosIVA["Nombre"], $sel);
             }
             $css->CerrarSelect();
+            
+            $css->CrearSelect("cmb_unidad_medida", "");
+            $consulta=$obVenta->ConsultarTabla("unit_measures", " WHERE status=1");
+            $css->CrearOptionSelect("", "Unidad de Medida", "");
+            while($datos_consulta=$obVenta->FetchArray($consulta)){
+                
+                $css->CrearOptionSelect($datos_consulta["ID"], $datos_consulta["name"], 0);
+            }
+            $css->CerrarSelect();
             print("</td>");
             print("<td colspan='1' style='text-align:center'>");
             $VarSelect["Ancho"]="200";

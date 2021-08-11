@@ -418,7 +418,7 @@ if( !empty($_REQUEST["Accion"]) ){
         break;//Fin caso 9    
         
         case 10://Validar los acuse de recibo de los documentos 
-            
+            exit("OK;Verificacion de acuse de recibo terminado");
             $Tabla="facturas_electronicas_log";
             $sql="SELECT ID,idFactura,RespuestaCompletaServidor as Respuesta,UUID FROM $Tabla WHERE AcuseRecibo=''";
             $Consulta=($obCon->Query($sql));

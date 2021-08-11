@@ -22,7 +22,7 @@ if(isset($_REQUEST["Opcion"])){
             }
             
             $Tabla=$obVenta->normalizar(base64_decode($_REQUEST["TxtT"]));
-            $statement=$obVenta->normalizar(urldecode($_REQUEST["TxtL"]));
+            $statement=(urldecode($_REQUEST["TxtL"]));
             $Columnas=$obVenta->ShowColums($Tabla);
             $sqlColumnas="SELECT ";
             $CamposShow="";

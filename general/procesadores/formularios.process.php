@@ -40,10 +40,18 @@ if( !empty($_REQUEST["Accion"]) ){
             $Datos["Telefono"]=$obCon->normalizar($_REQUEST['Telefono']);             
             $Datos["Ciudad"]=$DatosCiudad["Ciudad"];    
             $Datos["Email"]=$obCon->normalizar($_REQUEST['Email']); 
-            $Datos["Cupo"]=$obCon->normalizar($_REQUEST['Cupo']);    
-            $Datos["CodigoTarjeta"]=$obCon->normalizar($_REQUEST['CodigoTarjeta']); 
-            $Datos["DiaNacimiento"]=$obCon->normalizar($_REQUEST['DiaNacimiento']); 
-            $Datos["MesNacimiento"]=$obCon->normalizar($_REQUEST['MesNacimiento']); 
+            $Datos["Cupo"]=$obCon->normalizar($_REQUEST['Cupo']);
+            if(isset($_REQUEST['CodigoTarjeta']) or $_REQUEST['CodigoTarjeta']<>''){
+           
+                $Datos["CodigoTarjeta"]=$obCon->normalizar($_REQUEST['CodigoTarjeta']); 
+            }
+            if(isset($_REQUEST['DiaNacimiento']) or $_REQUEST['DiaNacimiento']<>''){
+                $Datos["DiaNacimiento"]=$obCon->normalizar($_REQUEST['DiaNacimiento']); 
+            }
+            if(isset($_REQUEST['MesNacimiento']) or $_REQUEST['MesNacimiento']<>''){
+                $Datos["MesNacimiento"]=$obCon->normalizar($_REQUEST['MesNacimiento']); 
+            }
+            
             if(isset($_REQUEST['Responsabilidad'])){
                 $Datos["Responsabilidad"]=$obCon->normalizar($_REQUEST['Responsabilidad']); 
             }

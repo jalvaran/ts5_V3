@@ -289,8 +289,12 @@ class PDF_Documentos_Electronicos extends Documento{
 
         ';
 
-        $sql="SELECT fi.Dias, fi.Referencia,fi.IVAItem,fi.ValorOtrosImpuestos, fi.Nombre, fi.ValorUnitarioItem, fi.Cantidad, fi.SubtotalItem"
-                . " FROM facturas_items fi WHERE fi.idFactura='$idFactura'";
+        $sql="SELECT fi.Dias, fi.Referencia,fi.IVAItem,fi.ValorOtrosImpuestos, fi.Nombre, fi.ValorUnitarioItem, fi.Cantidad, fi.SubtotalItem,  
+                (SELECT unidad_medida FROM productosventa t2 WHERE t2.Referencia=fi.Referencia LIMIT 1 ) as unidad_medida,
+                (SELECT abbreviation FROM unit_measures t3 WHERE t3.ID=(SELECT unidad_medida) LIMIT 1) nombre_unidad_medida 
+                
+                
+                FROM facturas_items fi WHERE fi.idFactura='$idFactura'";
         $Consulta= $this->obCon->Query($sql);
         $h=1;  
         $i=0;
@@ -318,7 +322,7 @@ class PDF_Documentos_Electronicos extends Documento{
                 <td align="left" colspan="3" style="font-size:8px;border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosItemFactura["Nombre"].'</td>
                 <td align="right" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$ValorUnitario.'</td>
                 <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$Multiplicador.'</td>
-                <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">EA</td>   
+                <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.$DatosItemFactura["nombre_unidad_medida"].'</td>   
                 <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosItemFactura["IVAItem"]).'</td>
                 <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">0</td>
                 <td align="center" style="border-bottom: 1px solid #ddd;background-color: '.$Back.';">'.number_format($DatosItemFactura["ValorOtrosImpuestos"]).'</td>

@@ -155,7 +155,8 @@ if( !empty($_REQUEST["Accion"]) ){
                 $Encabezado=0;
             }
             $link="procesadores/ReportesContables.process.php?Accion=1&Opciones=$CmbOpciones&Encabezado=$Encabezado";
-            $html="<a id='LinkExport' href='$link' target='_BLANK' >Ver</a>";
+            $html=('<a href="'.$link.'" target="_BLANK">Descargar<br><img src="../../images/download.gif"></a>');
+            //$html="<a id='LinkExport' href='$link' target='_BLANK' >Ver</a>";
             print($html);
         break; 
     

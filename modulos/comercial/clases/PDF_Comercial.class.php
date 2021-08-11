@@ -28,6 +28,23 @@ class PDF_Comercial extends Documento{
         $this->PDF_Output("Comprobante_Ingreso_$comprobante_id");
     }
     
+    public function PDF_cierre_turno($cierre_id) {
+        $obCon=new ProcesoVenta(1);
+        $idEmpresaEncabezado=1;
+        $datos_cierre=$obCon->DevuelveValores("cajas_aperturas_cierres", "ID", $cierre_id);
+        $FechaReporte=$datos_cierre["Fecha"];
+        
+        
+        $this->PDF_Ini("Cierre de Turno", 8, "",1,"../../../");
+        $this->PDF_Encabezado($FechaReporte,$idEmpresaEncabezado, 45, "","","../../../");
+        //$TotalClases=$this->ArmeTemporalSubCuentas($TipoReporte,$FechaFinal,$FechaInicial,$CentroCosto,$idEmpresa,$Vector);
+        $html="";
+        //$html= $this->HTMLEstadoResultadosDetallado($TotalClases,$FechaReporte);
+        $this->PDF_Write($html);
+             
+        $this->PDF_Output("Cierre_Turno_$cierre_id");
+    }
+    
     
     /**
      * Fin Clase

@@ -1,4 +1,5 @@
 <?php
+
 include_once("php_conexion.php");
 
 /*
@@ -787,10 +788,12 @@ public function VerifiqueExport($Vector)  {
  $a=0;
  foreach($Columnas as $NombreCol){ 
      if(!isset($Vector["Excluir"][$NombreCol])){
-        $objPHPExcel->setActiveSheetIndex(0)
-            ->setCellValue($this->Campos[$a]."1",$NombreCol);
-        $VisualizarRegistro[$i]=1;
-        $a++;	
+        if(isset($this->Campos[$a])){
+            $objPHPExcel->setActiveSheetIndex(0)
+                ->setCellValue($this->Campos[$a]."1",$NombreCol);
+                $VisualizarRegistro[$i]=1;
+                $a++;	
+        }
      }
      if(isset($Vector[$NombreCol]["Vinculo"])){
                 $VinculoRegistro[$i]["Vinculado"]=1;

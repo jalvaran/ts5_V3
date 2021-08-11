@@ -1,6 +1,7 @@
 <?php
 //include_once 'php_serial.class.php';
 include_once 'php_mysql_i.php';
+
         
 //////////////////////////////////////////////////////////////////////////
 ////////////Clase para manejar los procesos mas relevantes ///////////////////////////////////
@@ -5731,8 +5732,12 @@ public function VerificaPermisos($VectorPermisos) {
         if(isset($Vector["Sub6"])){
             $Sub6=$Vector["Sub6"];
         }
+        $unidad_medida=642;
+        if(isset($Vector["unidad_medida"])){
+            $unidad_medida=$Vector["unidad_medida"];
+        }
         $tab="productosventa";	
-        $NumRegistros=22;
+        $NumRegistros=23;
         
         $Columnas[0]="idProductosVenta";$Valores[0]=$idProductoVenta;
         $Columnas[1]="CodigoBarras";	$Valores[1]=$idProductoVenta;
@@ -5756,6 +5761,7 @@ public function VerificaPermisos($VectorPermisos) {
         $Columnas[19]="CostoUnitarioPromedio";	$Valores[19]=$CostoUnitario;
         $Columnas[20]="CostoTotalPromedio";	$Valores[20]=$CostoUnitario*$Existencias;
         $Columnas[21]="Sub6";		$Valores[21]=$Sub6;
+        $Columnas[22]="unidad_medida";		$Valores[22]=$unidad_medida;
         $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);
         if($idProductoVenta==""){
             $ID=$this->ObtenerMAX($tab,"idProductosVenta", 1,"");

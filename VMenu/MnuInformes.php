@@ -1,5 +1,5 @@
 <?php
-$myPage="MnuFacturacion.php";
+$myPage="MnuInformes.php";
 include_once("../sesiones/php_control.php");
 ?>
 <!DOCTYPE html>

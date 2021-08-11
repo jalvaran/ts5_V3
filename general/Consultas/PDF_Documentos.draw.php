@@ -4,7 +4,7 @@ if(isset($_REQUEST["idDocumento"])){
     include_once("../../modelo/php_conexion.php");
     include_once("../../modelo/PrintPos.php");
     include_once("../clases/ClasesPDFDocumentos.class.php");
-    session_start();
+    @session_start();
     $idUser=$_SESSION["idUser"];
     $obCon = new conexion($idUser);
     $obPrint=new PrintPos($idUser);

@@ -8,10 +8,10 @@ if (!isset($_SESSION['username'])){
 $idUser=$_SESSION['idUser'];
 
 include_once("../clases/ServicioAcompanamiento.class.php");
-
+include_once("../../../modelo/PrintPos.php");
 if( !empty($_REQUEST["Accion"]) ){
     $obCon = new Servicios($idUser);
-    
+    $obPrint = new PrintPos($idUser); 
     switch ($_REQUEST["Accion"]) {
         
         case 1: //obtiene el valor por defecto de un servicio
@@ -84,7 +84,8 @@ if( !empty($_REQUEST["Accion"]) ){
             if($ValorPago>$DatosModelo["Saldo"]){
                 exit("E1;El valor a pagar no puede superar el saldo");
             }
-            $obCon->PagoAModelo($FechaPago, $idModelo, $ValorPago,$idUser);
+            $id=$obCon->PagoAModelo($FechaPago, $idModelo, $ValorPago,$idUser);
+            $obPrint->print_comprobante_abono_modelo($id, 1, "");
             print("OK;Pago Registrado a al modelo $idModelo");
             
         break;  //Fin caso 4

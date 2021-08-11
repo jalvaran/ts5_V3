@@ -263,7 +263,7 @@ class Facturacion extends ProcesoVenta{
         $DatosProduto=$this->FetchArray($consulta);
         
         if($DatosProduto["Cantidad"]>0){ //Si ya hay un producto agregado
-            if($DatosProductoGeneral["IVA"]=="E"){
+            if($DatosProductoGeneral["IVA"]=="E" or $DatosProductoGeneral["IVA"]=="" ){
                 $DatosProductoGeneral["IVA"]=0;
             }
             
@@ -284,8 +284,11 @@ class Facturacion extends ProcesoVenta{
                 $DatosProductoGeneral["IVA"]=0;
             }
             $impuesto=$DatosProductoGeneral["IVA"];
+            if(!is_numeric($impuesto)){
+                $impuesto=0;
+            }
             $PorcentajeIVA=$impuesto;
-            $DatosImpuestosAdicionales["ValorImpuesto"];
+            
             $impuesto=$impuesto+1;
             if($ValorAcordado>0){
                 $DatosProductoGeneral["PrecioVenta"]=$ValorAcordado;
@@ -620,7 +623,7 @@ class Facturacion extends ProcesoVenta{
                 $Credito=0;
                 $Neto=$TotalCostosM;
 
-                $sqlFactura.="('$Fecha','FACTURA','$idFactura','','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
+                $sqlFactura.="('$Fecha','FACTURA','$idFactura','$NumeroFactura','$TerceroTipoDocumento','$NIT','$DV','$TerceroNombre1','$TerceroNombre2','$TerceroNombre3','$TerceroNombre4','$RazonSocial','$Direccion','$CodDepartamento','$CodMunicipo','$codPais','Ventas','$CuentaPUC','$NombreCuenta',	'Ventas',$Debito,$Credito,$Neto,'NO','NO',$idCentroCostos,$idEmpresa,$idSucursal,'',$idUser),";
          
                 ///////////////////////Ajustamos el inventario
                 $Parametros=$this->DevuelveValores("parametros_contables", "ID", 4);
@@ -834,6 +837,7 @@ class Facturacion extends ProcesoVenta{
         $this->update("acuerdo_recargos_intereses", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'");  
         $this->update("anticipos_encargos_abonos", "idCierre", $idCierre, "WHERE idCierre='0' AND idUser='$idUser'"); 
         $this->update("librodiario", "idCierre", $idCierre, "WHERE idCierre='0' AND idUsuario='$idUser'");  
+        $this->update("cot_itemscotizaciones", "cierre_id", $idCierre, "WHERE cierre_id='0' AND user_id='$idUser'");  
         return ($idCierre);
         
     }
@@ -927,7 +931,11 @@ class Facturacion extends ProcesoVenta{
                 }
             }
             $TotalSubtotal=$TotalSubtotal+$SubtotalItem; //se realiza la sumatoria del subtotal
+            if($DatosProducto["IVA"]==''){
+                $DatosProducto["IVA"]=0;
+            }
             $MultiplicadorIVA=$DatosProducto["IVA"];
+            
             if($DatosProducto["IVA"]=='E'){
                 $MultiplicadorIVA=0;
             }
@@ -1134,6 +1142,40 @@ class Facturacion extends ProcesoVenta{
         return($id);
     }
     
+    
+    public function DescargueCotizacionInventariosV2($cotizacion_id,$Vector) {
+        include_once("../../compras/clases/Recetas.class.php");
+        $consulta=$this->ConsultarTabla("cot_itemscotizaciones", "WHERE NumCotizacion='$cotizacion_id'");
+        while($DatosItems=$this->FetchArray($consulta)){
+            
+            if($DatosItems["TipoItem"]=="PR" AND $DatosItems["TablaOrigen"]=="productosventa"){
+                $DatosProducto=$this->DevuelveValores($DatosItems["TablaOrigen"], "Referencia", $DatosItems["Referencia"]);
+                if($DatosProducto['Existencias']<$DatosItems['Cantidad']){
+                    $DatosReceta=$this->DevuelveValores("recetas_relaciones", "ReferenciaProducto", $DatosProducto['Referencia']);  
+                    if($DatosReceta["ID"]<>''){
+                        $Diferencia=$DatosItems['Cantidad']-$DatosProducto['Existencias'];
+                        $obReceta=new Recetas(1);
+                        $obReceta->FabricarProducto($DatosProducto["idProductosVenta"], $Diferencia, "");
+                        $DatosProducto['Existencias']=$DatosProducto['Existencias']+$Diferencia;
+                    }
+                }  
+                $DatosKardex["Cantidad"]=$DatosItems['Cantidad'];
+                $DatosKardex["idProductosVenta"]=$DatosProducto["idProductosVenta"];
+                $DatosKardex["CostoUnitario"]=$DatosProducto['CostoUnitario'];
+                $DatosKardex["Existencias"]=$DatosProducto['Existencias'];
+                $DatosKardex["Detalle"]="Cotizacion";
+                $DatosKardex["idDocumento"]=$cotizacion_id;
+                $DatosKardex["TotalCosto"]=$DatosItems["SubtotalCosto"];
+                $DatosKardex["CostoUnitarioPromedio"]=$DatosProducto["CostoUnitarioPromedio"];
+                $DatosKardex["CostoTotalPromedio"]=$DatosProducto["CostoUnitarioPromedio"]*$DatosKardex["Cantidad"];
+                $DatosKardex["Movimiento"]="SALIDA";
+                
+                $this->InserteKardex($DatosKardex);
+               }
+        }
+        
+     }
+     
     /**
      * Fin Clase
      */

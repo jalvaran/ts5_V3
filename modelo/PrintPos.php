@@ -3246,5 +3246,70 @@ fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
     //$this->ImprimeCierreDepartamentos($idUser,$VectorCierre,$COMPrinter,$Copias);
     }
     
+    public function print_comprobante_abono_modelo($abono_id,$Copias,$Vector) {
+        $DatosImpresora=$this->DevuelveValores("config_puertos", "ID", 1);   
+        if($DatosImpresora["Habilitado"]<>"SI"){
+            return;
+        }
+        $COMPrinter= $this->COMPrinter;
+        if(($handle = @fopen("$COMPrinter", "w")) === FALSE){
+            die('ERROR:\nNo se puedo Imprimir, Verifique la conexion de la IMPRESORA');
+        }
+        $Titulo="Comprobante de Abono. $abono_id";
+        $DatosComprobante=$this->DevuelveValores("modelos_pagos_realizados", "ID", $abono_id);
+        $Fecha=$DatosComprobante["Fecha"];
+        $Valor=$DatosComprobante["ValorPagado"];
+        $idUsuario=$DatosComprobante["idUser"];
+        $modelo_id=$DatosComprobante["idModelo"];
+        $datos_modelo=$this->DevuelveValores("modelos_db", "ID", $modelo_id);
+        $datos_usuario=$this->DevuelveValores("usuarios", "idUsuarios", $idUsuario);
+        for($i=1; $i<=$Copias;$i++){
+        fwrite($handle,chr(27). chr(64));//REINICIO
+        
+        fwrite($handle, chr(27). chr(100). chr(0));// SALTO DE CARRO VACIO
+        fwrite($handle, chr(27). chr(33). chr(8));// NEGRITA
+        fwrite($handle, chr(27). chr(97). chr(1));// CENTRADO
+        fwrite($handle,"*************************************");
+        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        fwrite($handle,$Titulo); // Titulo
+        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        fwrite($handle,"*************************************");
+        
+        fwrite($handle, chr(27). chr(100). chr(1));// SALTO DE LINEA
+        fwrite($handle, chr(27). chr(97). chr(0));// IZQUIERDA
+        fwrite($handle,"FECHA: $Fecha");
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"*************************************");
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        
+        //fwrite($handle,"Total Modelo: $DatosAgenda[HoraInicial] // ");
+        fwrite($handle,"Pago a : ".$datos_modelo["Nombre"]." CC ".$datos_modelo["Identificacion"]);
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"Valor: ".number_format($DatosComprobante["ValorPagado"]));
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"Usuario que Paga / ".$datos_usuario["Nombre"]." ".$datos_usuario["Apellido"]);
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea    
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea    
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea    
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle,"Firma Modelo  __________________________ ");
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea    
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+        fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+    fwrite($handle, chr(29). chr(86). chr(49));//CORTA PAPEL
+    fwrite($handle, chr(27). chr(100). chr(1));//salto de linea
+            
+        
+        
+    }
+    fclose($handle); // cierra el fichero PRN
+    $salida = shell_exec('lpr $COMPrinter');
+    }
+    
     //Fin Clases
 }

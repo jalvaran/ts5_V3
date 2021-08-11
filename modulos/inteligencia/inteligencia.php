@@ -14,7 +14,7 @@ $myPage="inteligencia.php";  // identifica la pagina para poder controlar el acc
 $myTitulo="Inteligencia de Negocios";  //Titulo en la pestaña del navegador
 include_once("../../sesiones/php_control_usuarios.php"); //Controla los permisos de los usuarios
 include_once("../../constructores/paginas_constructor.php"); //Construye la pagina, estan las herramientas para construir los objetos de la pagina
-
+$tipo_user=$_SESSION["tipouser"];
 $css =  new PageConstruct($myTitulo, ""); //instancia para el objeto con las funciones del html
 
 $obCon = new conexion($idUser); //instancia para Conexion a la base de datos
@@ -53,8 +53,9 @@ $css->PageInit($myTitulo);
                 <li>
                     <a href="#" onclick="idListado=1;Filtro=``;MostrarListadoSegunID();">
                         <i class="fa fa-list-ol"></i>Clientes</a>
-                </li>
-                <li>
+                </li>');
+    if($tipo_user=="administrador"){
+        print(' <li>
                     <a href="#" onclick="idListado=2;Filtro=``;MostrarListadoSegunID();">
                         <i class="fa fa-indent"></i>Productos Vendidos</a>
                 </li>
@@ -69,9 +70,9 @@ $css->PageInit($myTitulo);
                 <li>
                     <a href="#" onclick="idListado=5;Filtro=``;MostrarListadoSegunID();">
                         <i class="fa fa-indent"></i>Reporte Gráfico Metas</a>
-                </li>
-                                               
-              </ul>
+                </li>');
+        }                                       
+        print('</ul>
             </div>
             <!-- /.box-body -->
           </div>

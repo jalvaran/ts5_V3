@@ -290,7 +290,9 @@ class Factura_Electronica extends ProcesoVenta{
             
             $json_factura.='"invoice_lines":[';
             
-            $sql="SELECT * FROM facturas_items WHERE idFactura='$idFactura'";
+            $sql="SELECT t1.*, 
+                      (SELECT unidad_medida FROM productosventa t2 WHERE t2.Referencia=t1.Referencia LIMIT 1 ) as unit_measure_id 
+                      FROM facturas_items t1 WHERE idFactura='$idFactura'";
             $Consulta= $this->Query($sql);
             while($DatosItemsFactura = $this->FetchAssoc($Consulta)){
                 $PorcentajeIVA=$DatosItemsFactura["PorcentajeIVA"];
@@ -328,8 +330,11 @@ class Factura_Electronica extends ProcesoVenta{
                 $ReferenciaItem= str_replace('"', "", $DatosItemsFactura["Referencia"]);
                 $ReferenciaItem= str_replace("'", "", $ReferenciaItem);
                 $ReferenciaItem= str_replace("*", "", $ReferenciaItem);
+                if($DatosItemsFactura["unit_measure_id"]==''){
+                    $DatosItemsFactura["unit_measure_id"]=642;
+                }
                 $json_factura.='{ 
-                    "unit_measure_id": 642, 
+                    "unit_measure_id": '.$DatosItemsFactura["unit_measure_id"].', 
                     "invoiced_quantity": "'.round($DatosItemsFactura["Cantidad"]*$DatosItemsFactura["Dias"],6).'", 
                     "line_extension_amount": "'.round($DatosItemsFactura["SubtotalItem"],2).'", 
                     "free_of_charge_indicator": false,
@@ -390,6 +395,12 @@ class Factura_Electronica extends ProcesoVenta{
         if($DatosTiposDocumento["ID"]<>''){
             $adq_tipo_documento=$DatosTiposDocumento["ID"];
         }
+        $CodigoDane=$DatosCliente["Cod_Dpto"].$DatosCliente["Cod_Mcipio"];
+        $DatosMunicipos= $this->DevuelveValores("catalogo_municipios", "CodigoDANE", $CodigoDane);
+        $municipio_id=$DatosMunicipos["ID"];
+        if($municipio_id==''){
+            $municipio_id=1006;
+        }
         $adqNumTipoRegimen=0;
         $AdqRazonSocial= str_replace("'", "", $DatosCliente["RazonSocial"]);
         $AdqRazonSocial= str_replace('"', "", $AdqRazonSocial);
@@ -443,6 +454,7 @@ class Factura_Electronica extends ProcesoVenta{
                 "phone": "'.$AdqContactoTelefono.'",
                 "address": "'.$AdqDireccion.'",
                 "email": "'.$AdqContactoMail.'",
+                "municipality_id": "'.$municipio_id.'",    
                 "merchant_registration": "NA"
             },
             

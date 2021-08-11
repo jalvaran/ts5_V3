@@ -486,7 +486,8 @@ t2.CicloPagos,
 (SELECT t8.NombreCiclo FROM acuerdo_pago_ciclos_pagos t8 WHERE t8.ID=t2.CicloPagos LIMIT 1 ) AS NombreCicloPagos,
 t2.Estado as EstadoAcuerdo,
 (SELECT t7.NombreEstado FROM acuerdo_pago_estados t7 WHERE t7.ID=t2.Estado) as NombreEstadoAcuerdo,t1.idCierre,
-t1.Created,t1.Estado as estado_cuota  
+t1.Created,t1.Estado as estado_cuota,
+(SELECT CONCAT(Nombre,' ',Apellido) FROM usuarios t8 WHERE t8.idUsuarios=t1.idUser LIMIT 1)  as nombre_usuario_recauda   
 FROM acuerdo_pago_cuotas_pagadas t1 
 INNER JOIN acuerdo_pago t2 ON t1.idAcuerdoPago=t2.idAcuerdoPago 
 ORDER BY Tercero,t1.Created DESC;
@@ -655,6 +656,8 @@ SELECT t1.ID as pedido_id, t2.ID as item_id, t1.Fecha as fecha_pedido, t1.Hora a
 DROP VIEW IF EXISTS `vista_facturas_notas`;
 CREATE VIEW vista_facturas_notas AS
 SELECT t1.*,
+(SELECT Num_Identificacion FROM clientes t3 WHERE t3.idClientes=t1.Clientes_idClientes LIMIT 1) AS nit_tercero,
+(SELECT RazonSocial FROM clientes t3 WHERE t3.idClientes=t1.Clientes_idClientes LIMIT 1) AS razon_tercero,
 (SELECT ID from notas_credito t2 WHERE  t1.idFacturas=t2.idFactura LIMIT 1 ) as nota_credito_id,
 (SELECT Fecha from notas_credito t2 WHERE  t1.idFacturas=t2.idFactura LIMIT 1) as fecha_nota_credito,
 (SELECT Observaciones from notas_credito t2 WHERE  t1.idFacturas=t2.idFactura LIMIT 1) as observaciones_nota_credito,
@@ -665,6 +668,7 @@ FROM `facturas` t1;
 DROP VIEW IF EXISTS `vista_notas_credito_general`;
 CREATE VIEW vista_notas_credito_general AS
 SELECT t1.*,
+(SELECT NumeroFactura from facturas t2 WHERE  t2.idFacturas=t1.idFactura LIMIT 1 ) as numero_factura,
 (SELECT round(sum(SubtotalItem),2) from notas_credito_items t3 WHERE  t3.idNotaCredito=t1.ID LIMIT 1 ) as subtotal_nota_credito,
 (SELECT round(sum(IVAItem),2) from notas_credito_items t3 WHERE  t3.idNotaCredito=t1.ID LIMIT 1 ) as iva_nota_credito,
 
@@ -691,4 +695,27 @@ SELECT t1.idProducto,t1.NombreProducto,t1.idCierre,
 sum(Cantidad) as cantidad,sum(Subtotal) as subtotal,sum(IVA) as iva,sum(Total) as total 
     
 FROM `restaurante_pedidos_items` t1 group by t1.idProducto,t1.idCierre ;
+
+DROP VIEW IF EXISTS `vista_facturas_acuerdos_validacion`;
+CREATE VIEW vista_facturas_acuerdos_validacion AS
+SELECT t1.`idFacturas`,
+(SELECT COUNT(*) from acuerdo_pago t2 WHERE  t1.idFacturas=t2.idFactura ) as Total  
+FROM `facturas` t1 where t1.FormaPago='ACUERDO';
+
+DROP VIEW IF EXISTS `vista_facturas_acuerdos_abonos_validacion`;
+CREATE VIEW vista_facturas_acuerdos_abonos_validacion AS
+SELECT t1.ID,t1.Fecha, t1.Tercero,SUBSTRING(t1.`Concepto`,29,45) as acuerdo_id, t1.Valor, 
+(SELECT COUNT(*) from acuerdo_pago_cuotas_pagadas t2 WHERE  t2.idAcuerdoPago=(select acuerdo_id) ) as Total,
+(SELECT COUNT(*) from comprobantes_ingreso t3 WHERE  SUBSTRING(t3.`Concepto`,29,45)=(select acuerdo_id) ) as numero_abonos_comprobrantes,
+(SELECT sum(t2.ValorPago) from acuerdo_pago_cuotas_pagadas t2 WHERE  t2.idAcuerdoPago=(select acuerdo_id) ) as total_pagos_abonos,
+(SELECT sum(t3.Valor) from comprobantes_ingreso t3 WHERE  SUBSTRING(t3.`Concepto`,29,45)=(select acuerdo_id) ) as total_pagos_comprobantes       
+FROM `comprobantes_ingreso` t1 where t1.Concepto like 'Ingreso por Acuerdo de Pago%';
+
+
+DROP VIEW IF EXISTS `vista_kardex`;
+CREATE TABLE `vista_kardex` (`ID` bigint(20), `Fecha` date, `Movimiento` varchar(45), `Detalle` varchar(400), `idDocumento` varchar(100), `Cantidad` double, `ValorUnitario` double, `ValorTotal` double, `ProductosVenta_idProductosVenta` bigint(20), `Referencia` varchar(200), `Nombre` varchar(70), `Existencias` double, `CostoUnitario` double, `CostoTotal` double, `IVA` varchar(10), `Departamento` varchar(45), `Sub1` varchar(45), `Sub2` varchar(45), `Sub3` varchar(45), `Sub4` varchar(45), `Sub5` varchar(45), `Updated` timestamp, `Sync` datetime);
+
+
+DROP TABLE IF EXISTS `vista_kardex`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_kardex` AS select `k`.`idKardexMercancias` AS `ID`,`k`.`Fecha` AS `Fecha`,`k`.`Movimiento` AS `Movimiento`,`k`.`Detalle` AS `Detalle`,`k`.`idDocumento` AS `idDocumento`,`k`.`Cantidad` AS `Cantidad`,`k`.`ValorUnitario` AS `ValorUnitario`,`k`.`ValorTotal` AS `ValorTotal`,`k`.`ProductosVenta_idProductosVenta` AS `ProductosVenta_idProductosVenta`,`pv`.`Referencia` AS `Referencia`,`pv`.`Nombre` AS `Nombre`,`pv`.`Existencias` AS `Existencias`,`pv`.`CostoUnitario` AS `CostoUnitario`,`pv`.`CostoTotal` AS `CostoTotal`,`pv`.`IVA` AS `IVA`,`pv`.`Departamento` AS `Departamento`,`pv`.`Sub1` AS `Sub1`,`pv`.`Sub2` AS `Sub2`,`pv`.`Sub3` AS `Sub3`,`pv`.`Sub4` AS `Sub4`,`pv`.`Sub5` AS `Sub5`,`k`.`Updated` AS `Updated`,`k`.`Sync` AS `Sync` from (`kardexmercancias` `k` join `productosventa` `pv` on((`k`.`ProductosVenta_idProductosVenta` = `pv`.`idProductosVenta`)));
 

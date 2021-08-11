@@ -29,13 +29,14 @@ class Servicios extends ProcesoVenta{
             
         }
         
+        
         if($TipoServicio==6){// Multas
             $Estado=0;
             $ValorModelo=0;
             $ValorCasa=$Valor;
         }
         
-        if($TipoServicio==4){ // Shows
+        if($TipoServicio==4 or $TipoServicio>=7){ // Shows
             
             $ValorModelo=$DatosServicios["ValorModelo"];
             
@@ -44,8 +45,15 @@ class Servicios extends ProcesoVenta{
         
         if($TipoServicio==5){ //masajes
             
-            $ValorModelo=$Valor;
-            $ValorCasa=0;
+            $keyValorModelo=$servicios_key[$TipoServicio];
+            $ValorModelo=$DatosModelos[$keyValorModelo];
+           
+            if($Valor>$DatosServicios["Valor"]){
+                $ValorRestante=$Valor-$DatosServicios["Valor"];
+                $ValorModelo=$ValorModelo+$ValorRestante;
+            }
+             
+            $ValorCasa=$Valor-$ValorModelo;
         }
         
         
@@ -81,6 +89,8 @@ class Servicios extends ProcesoVenta{
         $Datos["idUser"]=$idUser;
         $sql=$this->getSQLInsert("modelos_pagos_realizados", $Datos);
         $this->Query($sql);
+        $id=$this->ObtenerMAX("modelos_pagos_realizados", "ID", 1, "");
+        return($id);
     }
         
     /**

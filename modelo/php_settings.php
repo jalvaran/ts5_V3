@@ -6,9 +6,9 @@
 $host="localhost";
 $user="root";
 $pw="pirlo1985";
-$db="ts5_dinas_club";
+$db="techno_ts5_humbert";
  
-const HOST="localhost", USER="root",PW="pirlo1985",DB="ts5_dinas_club";//para uso 
+const HOST="localhost", USER="root",PW="pirlo1985",DB="techno_ts5_humbert";//para uso 
 
 /* Para un servidor la combinacion deberá ser $TipoPC="Server"; $TipoKardex="Caja";
  * Para una Caja la combinacion deberá ser $TipoPC="Caja"; $TipoKardex="Caja";

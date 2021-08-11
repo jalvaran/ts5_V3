@@ -32,8 +32,16 @@ $Vector["VerRegistro"]["Link"]=$Ruta;
 $Vector["VerRegistro"]["ColumnaLink"]="ID";
 
 // Nueva Accion
+$Ruta="../modulos/comercial/procesadores/comercial_pdf.process.php?Accion=1&cierre_id=";
+$Vector["NuevaAccionLink"][2]="pdf";
+$Vector["NuevaAccion"]["pdf"]["Titulo"]=" PDF ";
+$Vector["NuevaAccion"]["pdf"]["Link"]=$Ruta;
+$Vector["NuevaAccion"]["pdf"]["ColumnaLink"]="ID";
+$Vector["NuevaAccion"]["pdf"]["Target"]="_blank";
+
+// Nueva Accion
 $Ruta="ProcesadoresJS/GeneradorExcel.php?idDocumento=2&idCierre=";
-$Vector["NuevaAccionLink"][2]="Resumen";
+$Vector["NuevaAccionLink"][3]="Resumen";
 $Vector["NuevaAccion"]["Resumen"]["Titulo"]=" Resumen ";
 $Vector["NuevaAccion"]["Resumen"]["Link"]=$Ruta;
 $Vector["NuevaAccion"]["Resumen"]["ColumnaLink"]="ID";

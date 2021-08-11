@@ -1,5 +1,4 @@
 <?php
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
 /* 
  * Clase donde se realizaran la generacion de informes.
  * Julian Alvaran
@@ -11,7 +10,6 @@ class TS5_Excel extends Tabla{
     // Clase para generar excel de un balance de comprobacion
     
     public function GenerarBalanceComprobacionExcel($TipoReporte,$FechaInicial,$FechaFinal,$FechaCorte,$idEmpresa,$CentroCosto,$Vector) {
-        
         require_once '../librerias/Excel/PHPExcel.php';
         $Condicion=" WHERE ";
         $Condicion2=" WHERE ";
@@ -55,10 +53,7 @@ class TS5_Excel extends Tabla{
             
             ;
             
-   $sql="SELECT SUBSTRING(`CuentaPUC`,1,1) AS clase_cuenta ,
-          (SELECT Clase FROM clasecuenta WHERE clasecuenta.PUC=(SELECT clase_cuenta) LIMIT 1) as nombre_clase, 
-         
-           sum(`Debito`) as Debitos, sum(`Credito`) as Creditos, sum(`Neto`) as Neto, (SELECT SUM(`Neto`) as SaldoTotal FROM `librodiario` $Condicion2  SUBSTRING(`CuentaPUC`,1,1)=clase_cuenta) AS Total FROM `librodiario` $Condicion GROUP BY SUBSTRING(`CuentaPUC`,1,1)";
+   $sql="SELECT SUBSTRING(`CuentaPUC`,1,1) AS Clase ,sum(`Debito`) as Debitos, sum(`Credito`) as Creditos, sum(`Neto`) as Neto, (SELECT SUM(`Neto`) as SaldoTotal FROM `librodiario` $Condicion2  SUBSTRING(`CuentaPUC`,1,1)=Clase) AS Total FROM `librodiario` $Condicion GROUP BY SUBSTRING(`CuentaPUC`,1,1)";
         $Consulta=$this->obCon->Query($sql);
         $i=0;
         $DebitosGeneral=0;
@@ -73,11 +68,11 @@ class TS5_Excel extends Tabla{
             $TotalCreditos=$TotalCreditos+$ClaseCuenta["Creditos"];
             $Total=$Total+$ClaseCuenta["Total"];
             $i++;
-            $Clase=$ClaseCuenta["clase_cuenta"];
-            $NoClasesCuentas[$i]=$ClaseCuenta["clase_cuenta"];
-            //$DatosCuenta=  $this->obCon->DevuelveValores("clasecuenta", "PUC", $Clase);
-            $Balance["ClaseCuenta"][$Clase]["Nombre"]=$ClaseCuenta["nombre_clase"];
-            $Balance["ClaseCuenta"][$Clase]["Clases"]=$ClaseCuenta["clase_cuenta"];
+            $Clase=$ClaseCuenta["Clase"];
+            $NoClasesCuentas[$i]=$ClaseCuenta["Clase"];
+            $DatosCuenta=  $this->obCon->DevuelveValores("clasecuenta", "PUC", $Clase);
+            $Balance["ClaseCuenta"][$Clase]["Nombre"]=$DatosCuenta["Clase"];
+            $Balance["ClaseCuenta"][$Clase]["Clases"]=$ClaseCuenta["Clase"];
             $Balance["ClaseCuenta"][$Clase]["Debitos"]=$ClaseCuenta["Debitos"];
             $Balance["ClaseCuenta"][$Clase]["Creditos"]=$ClaseCuenta["Creditos"];
             $Balance["ClaseCuenta"][$Clase]["NuevoSaldo"]=$ClaseCuenta["Debitos"]-$ClaseCuenta["Creditos"]+$ClaseCuenta["Total"];
@@ -86,10 +81,7 @@ class TS5_Excel extends Tabla{
         $Diferencia=$TotalDebitos-$TotalCreditos;
         //Guardo en un Vector los resultados de la consulta por Grupo
         
-        $sql="SELECT SUBSTRING(`CuentaPUC`,1,2) AS Grupo ,
-                (SELECT Nombre FROM gupocuentas WHERE gupocuentas.PUC=(SELECT Grupo) LIMIT 1) as nombre_grupo, 
-         
-                sum(`Debito`) as Debitos, sum(`Credito`) as Creditos,(SELECT SUM(`Neto`) as SaldoTotal FROM `librodiario` $Condicion2  SUBSTRING(`CuentaPUC`,1,2)=Grupo) AS Total FROM `librodiario` $Condicion GROUP BY SUBSTRING(`CuentaPUC`,1,2)";
+        $sql="SELECT SUBSTRING(`CuentaPUC`,1,2) AS Grupo ,sum(`Debito`) as Debitos, sum(`Credito`) as Creditos,(SELECT SUM(`Neto`) as SaldoTotal FROM `librodiario` $Condicion2  SUBSTRING(`CuentaPUC`,1,2)=Grupo) AS Total FROM `librodiario` $Condicion GROUP BY SUBSTRING(`CuentaPUC`,1,2)";
         $Consulta=$this->obCon->Query($sql);
         $i=0;
         
@@ -97,8 +89,8 @@ class TS5_Excel extends Tabla{
             $i++;
             $Grupo=$ClaseCuentaGrupo["Grupo"];
             $NoGrupos[$i]=$ClaseCuentaGrupo["Grupo"];
-            
-            $Balance["GrupoCuenta"][$Grupo]["Nombre"]=$ClaseCuentaGrupo["nombre_grupo"];
+            $DatosCuenta=  $this->obCon->DevuelveValores("gupocuentas", "PUC", $Grupo);
+            $Balance["GrupoCuenta"][$Grupo]["Nombre"]=$DatosCuenta["Nombre"];
             $Balance["GrupoCuenta"][$Grupo]["Grupos"]=$ClaseCuentaGrupo["Grupo"];
             $Balance["GrupoCuenta"][$Grupo]["Debitos"]=$ClaseCuentaGrupo["Debitos"];
             $Balance["GrupoCuenta"][$Grupo]["Creditos"]=$ClaseCuentaGrupo["Creditos"];
@@ -108,10 +100,7 @@ class TS5_Excel extends Tabla{
         
         //Guardo en un Vector los resultados de la consulta por Cuenta
         
-        $sql="SELECT SUBSTRING(`CuentaPUC`,1,4) AS Cuenta ,
-                (SELECT Nombre FROM cuentas WHERE cuentas.idPUC=(SELECT Cuenta) LIMIT 1) as nombre_cuenta, 
-         
-                sum(`Debito`) as Debitos, sum(`Credito`) as Creditos,(SELECT SUM(`Neto`) as SaldoTotal FROM `librodiario` $Condicion2  SUBSTRING(`CuentaPUC`,1,4)=Cuenta) as Total FROM `librodiario` $Condicion GROUP BY SUBSTRING(`CuentaPUC`,1,4)";
+        $sql="SELECT SUBSTRING(`CuentaPUC`,1,4) AS Cuenta ,sum(`Debito`) as Debitos, sum(`Credito`) as Creditos,(SELECT SUM(`Neto`) as SaldoTotal FROM `librodiario` $Condicion2  SUBSTRING(`CuentaPUC`,1,4)=Cuenta) as Total FROM `librodiario` $Condicion GROUP BY SUBSTRING(`CuentaPUC`,1,4)";
         $Consulta=$this->obCon->Query($sql);
         $i=0;
         
@@ -119,8 +108,8 @@ class TS5_Excel extends Tabla{
             $i++;
             $Cuenta=$ClaseCuentaCuenta["Cuenta"];
             $NoCuentas[$i]=$ClaseCuentaCuenta["Cuenta"];
-            
-            $Balance["Cuenta"][$Cuenta]["Nombre"]=$ClaseCuentaCuenta["nombre_cuenta"];
+            $DatosCuenta=  $this->obCon->DevuelveValores("cuentas", "idPUC", $Cuenta);
+            $Balance["Cuenta"][$Cuenta]["Nombre"]=$DatosCuenta["Nombre"];
             $Balance["Cuenta"][$Cuenta]["Cuentas"]=$ClaseCuentaCuenta["Cuenta"];
             $Balance["Cuenta"][$Cuenta]["Debitos"]=$ClaseCuentaCuenta["Debitos"];
             $Balance["Cuenta"][$Cuenta]["Creditos"]=$ClaseCuentaCuenta["Creditos"];
@@ -130,24 +119,24 @@ class TS5_Excel extends Tabla{
         
         //Guardo en un Vector los resultados de la consulta por SubCuenta
         
-        $sql="SELECT SUBSTRING(`CuentaPUC`,1,6) AS Auxiliar, 
-                (SELECT Nombre FROM subcuentas WHERE subcuentas.PUC=(SELECT Auxiliar) LIMIT 1) as nombre_subcuenta 
+        $sql="SELECT SUBSTRING(`CuentaPUC`,1,6) AS SubCuenta, 
+                (SELECT Nombre FROM subcuentas WHERE subcuentas.PUC=(SELECT SubCuenta) LIMIT 1) as nombre_subcuenta,
          
-                ,sum(`Debito`) as Debitos, sum(`Credito`) as Creditos,(SELECT SUM(`Neto`) as SaldoTotal FROM `librodiario` $Condicion2  SUBSTRING(`CuentaPUC`,1,6)=Auxiliar) as Total FROM `librodiario` $Condicion GROUP BY SUBSTRING(`CuentaPUC`,1,6)";
+                ,sum(`Debito`) as Debitos, sum(`Credito`) as Creditos,(SELECT SUM(`Neto`) as SaldoTotal FROM `librodiario` $Condicion2  SUBSTRING(`CuentaPUC`,1,6)=Cuenta) as Total FROM `librodiario` $Condicion GROUP BY SUBSTRING(`CuentaPUC`,1,6)";
         $Consulta=$this->obCon->Query($sql);
         $i=0;
         
         while($ClaseCuentaCuenta=$this->obCon->FetchArray($Consulta)){
             $i++;
-            $Auxiliar=$ClaseCuentaCuenta["Auxiliar"];
-            $NoAuxiliares[$i]=$ClaseCuentaCuenta["Auxiliar"];
+            $Cuenta=$ClaseCuentaCuenta["SubCuenta"];
+            $NoCuentas[$i]=$ClaseCuentaCuenta["SubCuenta"];
             
-            $Balance["subcuenta_total"][$Auxiliar]["Nombre"]=$ClaseCuentaCuenta["nombre_subcuenta"];
-            $Balance["subcuenta_total"][$Auxiliar]["Auxiliar"]=$ClaseCuentaCuenta["Auxiliar"];
-            $Balance["subcuenta_total"][$Auxiliar]["Debitos"]=$ClaseCuentaCuenta["Debitos"];
-            $Balance["subcuenta_total"][$Auxiliar]["Creditos"]=$ClaseCuentaCuenta["Creditos"];
-            $Balance["subcuenta_total"][$Auxiliar]["NuevoSaldo"]=$ClaseCuentaCuenta["Debitos"]-$ClaseCuentaCuenta["Creditos"]+$ClaseCuentaCuenta["Total"];
-            $Balance["subcuenta_total"][$Auxiliar]["SaldoAnterior"]=$ClaseCuentaCuenta["Total"];
+            $Balance["subcuenta_total"][$Cuenta]["Nombre"]=$ClaseCuentaCuenta["nombre_subcuenta"];
+            $Balance["subcuenta_total"][$Cuenta]["Cuentas"]=$ClaseCuentaCuenta["Cuenta"];
+            $Balance["subcuenta_total"][$Cuenta]["Debitos"]=$ClaseCuentaCuenta["Debitos"];
+            $Balance["subcuenta_total"][$Cuenta]["Creditos"]=$ClaseCuentaCuenta["Creditos"];
+            $Balance["subcuenta_total"][$Cuenta]["NuevoSaldo"]=$ClaseCuentaCuenta["Debitos"]-$ClaseCuentaCuenta["Creditos"]+$ClaseCuentaCuenta["Total"];
+            $Balance["subcuenta_total"][$Cuenta]["SaldoAnterior"]=$ClaseCuentaCuenta["Total"];
         }
         
         //Guardo en un Vector los resultados de la consulta por SubCuenta
@@ -217,24 +206,10 @@ class TS5_Excel extends Tabla{
                             ->setCellValue($this->Campos[5].$f,$Balance["Cuenta"][$Cuentas]["NuevoSaldo"])
                             ;    
                          //Consulto los valores dentro de la Cuenta
-                        
-                    foreach($NoAuxiliares as $Auxiliares){//Auxiliares
-                   
-                    if(substr($Balance["subcuenta_total"][$Auxiliares]["Auxiliar"], 0, 4)==$Cuentas){
-                        $f++;
-                        $objPHPExcel->setActiveSheetIndex(0)
-                            ->setCellValue($this->Campos[0].$f,$Auxiliares)
-                            ->setCellValue($this->Campos[1].$f,$Balance["subcuenta_total"][$Auxiliares]["Nombre"])
-                            ->setCellValue($this->Campos[2].$f,$Balance["subcuenta_total"][$Auxiliares]["SaldoAnterior"])
-                            ->setCellValue($this->Campos[3].$f,$Balance["subcuenta_total"][$Auxiliares]["Debitos"])
-                            ->setCellValue($this->Campos[4].$f,$Balance["subcuenta_total"][$Auxiliares]["Creditos"])
-                            ->setCellValue($this->Campos[5].$f,$Balance["subcuenta_total"][$Auxiliares]["NuevoSaldo"])
-                            ;    
-                         //Consulto los valores dentro de la Cuenta    
                    
                    foreach($NoSubCuentas as $SubCuentas){
                        
-                    if(substr($Balance["SubCuenta"][$SubCuentas]["Subcuenta"], 0, 6)==$Auxiliares){
+                    if(substr($Balance["SubCuenta"][$SubCuentas]["Subcuenta"], 0, 4)==$Cuentas){
                         $f++;
                         $objPHPExcel->setActiveSheetIndex(0)
                             ->setCellValue($this->Campos[0].$f,$Balance["SubCuenta"][$SubCuentas]["Subcuenta"])
@@ -244,19 +219,17 @@ class TS5_Excel extends Tabla{
                             ->setCellValue($this->Campos[4].$f,$Balance["SubCuenta"][$SubCuentas]["Creditos"])
                             ->setCellValue($this->Campos[5].$f,$Balance["SubCuenta"][$SubCuentas]["NuevoSaldo"])
                             ;  
-                    }//Fin If subcuentas
-                  }//Fin Subcuentas
+                    }
+                  }
                          
-                 }//Fin if Cuentas
-                }//Fin cuentas
-                }//Fin IF Auxiliares
-                }//Fin Auxiliares
-              }//Fin If Grupos
-             }//Fin Grupos
+                 }
+                }
+              }
+             }
              $f++; //Salto de linea para clase cuenta
-            }//Fin IF Clases 
+            } 
             
-        }//Fin clases
+        }
     
         $objPHPExcel->setActiveSheetIndex(0)
             ->setCellValue($this->Campos[2].$f,"Totales")

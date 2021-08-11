@@ -297,7 +297,10 @@ if( !empty($_REQUEST["Accion"]) ){
                                             $Icon="fa fa-check";
                                             $Color="success";
                                         }
-                                        print('<button type="button" class="btn btn-'.$Color.' btn-sm" onclick=CambieEstadoCliente(`'.$idItem.'`)><i class="'.$Icon.'"></i></button>');
+                                        if($TipoUser=='administrador'){
+                                            print('<button type="button" class="btn btn-'.$Color.' btn-sm" onclick=CambieEstadoCliente(`'.$idItem.'`)><i class="'.$Icon.'"></i></button>');
+                                        }
+                                        
                                     print("</td>");
                                                                                                             
                                 print('</tr>');

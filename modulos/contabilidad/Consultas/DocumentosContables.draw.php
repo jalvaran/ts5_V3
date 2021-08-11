@@ -252,10 +252,10 @@ if( !empty($_REQUEST["Accion"]) ){
                     $css->ColTabla("<strong>ACCIÓNES</strong>", 1);
                 $css->CierraFilaTabla();
                 $sql="SELECT *,"
-                        . "(SELECT Base FROM documentos_contables_registro_bases WHERE documentos_contables_items.ID=documentos_contables_registro_bases.idItemDocumentoContable) AS Base,"
-                        . "(SELECT Porcentaje FROM documentos_contables_registro_bases WHERE documentos_contables_items.ID=documentos_contables_registro_bases.idItemDocumentoContable) AS Porcentaje,"
-                        . "(SELECT Valor FROM documentos_contables_registro_bases WHERE documentos_contables_items.ID=documentos_contables_registro_bases.idItemDocumentoContable) AS Valor,"
-                        . "(SELECT ID FROM documentos_contables_registro_bases WHERE documentos_contables_items.ID=documentos_contables_registro_bases.idItemDocumentoContable) AS idBase"
+                        . "(SELECT Base FROM documentos_contables_registro_bases WHERE documentos_contables_items.ID=documentos_contables_registro_bases.idItemDocumentoContable LIMIT 1) AS Base,"
+                        . "(SELECT Porcentaje FROM documentos_contables_registro_bases WHERE documentos_contables_items.ID=documentos_contables_registro_bases.idItemDocumentoContable LIMIT 1) AS Porcentaje,"
+                        . "(SELECT Valor FROM documentos_contables_registro_bases WHERE documentos_contables_items.ID=documentos_contables_registro_bases.idItemDocumentoContable LIMIT 1) AS Valor,"
+                        . "(SELECT ID FROM documentos_contables_registro_bases WHERE documentos_contables_items.ID=documentos_contables_registro_bases.idItemDocumentoContable LIMIT 1) AS idBase"
                         
                         . " FROM documentos_contables_items WHERE idDocumento='$idDocumento' ORDER BY ID DESC";
                 $Consulta=$obCon->Query($sql);

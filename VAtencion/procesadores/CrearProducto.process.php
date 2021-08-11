@@ -22,6 +22,11 @@ if(!empty($_REQUEST["BtnCrearPV"])){
     $IVA=$obVenta->normalizar($_REQUEST["CmbIVA"]);
     $CuentaPUC=$obVenta->normalizar($_REQUEST["TxtCuentaPUC"]);
     $PrecioMayor=$obVenta->normalizar($_REQUEST["TxtPrecioMayorista"]);
+    $unidad_medida="642";
+    if(isset($_REQUEST["cmb_unidad_medida"])){
+        $unidad_medida=$obVenta->normalizar($_REQUEST["cmb_unidad_medida"]);
+    }
+    $VectorProducto["unidad_medida"]=$unidad_medida;
     $Referencia="";
     $CodigoBarras="";
     $Sub5="";
@@ -46,6 +51,7 @@ if(!empty($_REQUEST["BtnCrearPV"])){
             }
             $ReferenciaTalla=$Referencia."-".$DatosSub5["NombreSub5"];
             $NombreTalla=$Nombre." ".$DatosSub5["NombreSub5"];
+            
             $idProducto=$obVenta->CrearProductoVenta($NombreTalla,"",$ReferenciaTalla,$PrecioVenta,$PrecioMayor,$Existencias,$CostoUnitario,$IVA,$idDepartamento,$Sub1,$Sub2,$Sub3,$Sub4,$Sub5,$CuentaPUC,$VectorProducto);
             $consulta=$obVenta->ConsultarTabla("productos_lista_precios", "");
             while($DatosListas=$obVenta->FetchArray($consulta)){

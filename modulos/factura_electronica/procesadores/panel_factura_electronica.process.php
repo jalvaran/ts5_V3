@@ -120,7 +120,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             exit("OK;Nota Credito No. $idNota creada");
         break;//Fin caso 4   
-        
+        /*
         case 5:// envie un documento electronico por mail
             
             if(isset($_REQUEST["idDocumento"])){
@@ -158,11 +158,12 @@ if( !empty($_REQUEST["Accion"]) ){
             //print("<pre> Array: ");
             //print_r($array_documento);
             //print("</pre>");
-            
+            /*
             $link_aceptacion=$array_documento["urlAcceptance"];
             $link_rechazo=$array_documento["urlRejection"];
-            
-            
+          
+            $link_aceptacion="";
+            $link_rechazo="";
             
             $datos_factura=$obCon->DevuelveValores("facturas", "idFacturas", $DatosLogFactura["idFactura"]);
             $datos_cliente=$obCon->DevuelveValores("clientes", "idClientes", $datos_factura["Clientes_idClientes"]);
@@ -254,8 +255,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             exit();
             
-             * 
-             */
+             
             
             
             $datos_parametros=$obCon->DevuelveValores("facturas_electronicas_parametros", "ID", 5);
@@ -285,12 +285,13 @@ if( !empty($_REQUEST["Accion"]) ){
                         <ul style="box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,`Segoe UI`,Roboto,Helvetica,Arial,sans-serif,`Apple Color Emoji`,`Segoe UI Emoji`,`Segoe UI Symbol`;line-height:1.4;text-align:left">
                         <li style="box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,`Segoe UI`,Roboto,Helvetica,Arial,sans-serif,`Apple Color Emoji`,`Segoe UI Emoji`,`Segoe UI Symbol`">Archivo PDF en donde encontrará: Representación Gráfica del documento electrónico N° @numero_documento y un archivo Zip con el correspondiente XML y PDF.
                         <br>
+                        <!--
                         <strong>Acuse de recibido:</strong><br>
 
                         <a href="@link_aceptacion" style="box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,`Segoe UI`,Roboto,Helvetica,Arial,sans-serif,`Apple Color Emoji`,`Segoe UI Emoji`,`Segoe UI Symbol`;border-radius:4px;color:#fff;display:inline-block;overflow:hidden;text-decoration:none;background-color:#48bb78;border-bottom:8px solid #48bb78;border-left:18px solid #48bb78;border-right:18px solid #48bb78;border-top:8px solid #48bb78" target="_blank" data-saferedirecturl="https://www.google.com/url?q=http://35.238.236.240/api/ubl2.1/document-received/3bffba2c732ec3120f601586fdd78c1440832ee5bb1b5c49b16c284c6d304fdf4be4ba263373009638c3754a82b379eb/1?expires%3D1615099973%26signature%3D379053754af082267049eeb14644fa19ba81ee7a11bdd28c938bcc355ce8944c&amp;source=gmail&amp;ust=1616862643869000&amp;usg=AFQjCNGh_M98j88BlgYjmqOQuY_ufcEGyw">Aceptar</a>
                         <a href="@link_rechazo" style="box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,`Segoe UI`,Roboto,Helvetica,Arial,sans-serif,`Apple Color Emoji`,`Segoe UI Emoji`,`Segoe UI Symbol`;border-radius:4px;color:#fff;display:inline-block;overflow:hidden;text-decoration:none;background-color:#e53e3e;border-bottom:8px solid #e53e3e;border-left:18px solid #e53e3e;border-right:18px solid #e53e3e;border-top:8px solid #e53e3e" target="_blank" data-saferedirecturl="https://www.google.com/url?q=http://35.238.236.240/api/ubl2.1/document-received/3bffba2c732ec3120f601586fdd78c1440832ee5bb1b5c49b16c284c6d304fdf4be4ba263373009638c3754a82b379eb/0?expires%3D1615099973%26signature%3De2ea519e500cd2a6fe91a9828ea2c566d88fcf5db0680cbf37f863ac4a733e7d&amp;source=gmail&amp;ust=1616862643869000&amp;usg=AFQjCNFdnBuynIM5TzS9t5GgWIDZ5dwB3g">Rechazar</a>
                         </li>
-
+                        -->
                         </ul>
 
 
@@ -359,8 +360,8 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             
         break;//Fin caso 5
-        
-        /*  usar para enviar el mail desde el api fe directamente 
+        */
+        //  usar para enviar el mail desde el api fe directamente 
         case 5:// envie un documento electronico por mail
             
             if(isset($_REQUEST["idDocumento"])){
@@ -439,8 +440,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;//Fin caso 5
         
-         * 
-         */
+        
         case 6:// crea el pdf de la factura electronica
             $documento_id=$obCon->normalizar($_REQUEST["documento_id"]);
             $obPDF = new PDF_Documentos_Electronicos($db);

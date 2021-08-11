@@ -381,6 +381,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $obFactura->ContabilizaGananciaOcasionalPOS($idFactura,$Total,$CmbCuentaIngresoFactura,$idUser);
             }
             $obFactura->DescargueFacturaInventariosV2($idFactura, "");
+            $idComprobanteAbono="";
             if($CmbFormaPago<>'Contado'){
                 $obFactura->IngreseCartera($idFactura, $Fecha, $idCliente, $CmbFormaPago, $SaldoFactura, "");
                 //Se verifica si se recibió una cuota unicial
@@ -399,10 +400,7 @@ if( !empty($_REQUEST["Accion"]) ){
 
                         $DatosImpresora=$obCon->DevuelveValores("config_puertos", "ID", 1);
 
-                        if($DatosImpresora["Habilitado"]=="SI"){
-                            $obPrint->ImprimeComprobanteAbonoFactura($idComprobanteAbono, $DatosImpresora["Puerto"], 1);
-
-                        }
+                        
 
                     }else{
                         if($CmbFormaPago=='SisteCredito'){
@@ -421,8 +419,8 @@ if( !empty($_REQUEST["Accion"]) ){
                         if($Abono>0){
                             $idComprobante=$obContabilidad->CrearComprobanteIngreso($Fecha, "", $idTerceroInteres, $Abono, "PlataformasPago", "Ingreso por Plataforma de Pago $CmbPlataforma", "CERRADO");
                             $obContabilidad->ContabilizarComprobanteIngreso($idComprobante, $idTerceroInteres, $CuentaDestino, $Parametros["CuentaPUC"], $DatosCaja["idEmpresa"], $DatosCaja["idSucursal"], $DatosCaja["CentroCostos"]);
-
-                            $obCon->IngresoPlataformasPago($CmbPlataforma,$Fecha, $Hora, $Tercero, $Abono, $idComprobante, $idUser,1);
+                            //$obCon->IngresoPlataformasPago($idPlataforma, $metodo_pago_id, $Fecha, $Hora, $Tercero, $Valor, $idComprobanteIngreso, $idUser);
+                            $obCon->IngresoPlataformasPago($CmbPlataforma,1,$Fecha, $Hora, $Tercero, $Abono, $idComprobante, $idUser,1);
                         }
                     }
                 }    
@@ -453,16 +451,8 @@ if( !empty($_REQUEST["Accion"]) ){
                 if($CmbFormaPago=="Acuerdo"){
                     //$Copias=2;
                 }
-                $obPrint->ImprimeFacturaPOS($idFactura,$DatosImpresora["Puerto"],$Copias);
-                $DatosTikete=$obCon->DevuelveValores("config_tiketes_promocion", "ID", 1);
-                if($Total>=$DatosTikete["Tope"] AND $DatosTikete["Activo"]=="SI"){
-                    $VectorTiket["F"]=0;
-                    $Copias=1;
-                    if($DatosTikete["Multiple"]=="SI"){
-                        $Copias=floor($Total/$DatosTikete["Tope"]);
-                    }
-                    $obPrint->ImprimirTiketePromo($idFactura,$DatosTikete["NombreTiket"],$DatosImpresora["Puerto"],$Copias,$VectorTiket);
-                }
+                //$obPrint->ImprimeFacturaPOS($idFactura,$DatosImpresora["Puerto"],1);
+                
             }
             
             $sql="INSERT INTO pos_registro_descuentos (Fecha,idFactura,TablaItem,idProducto,Cantidad,ValorDescuento,idUsuario) "
@@ -472,7 +462,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             
             $Mensaje2="";
-            
+            $idAcuerdoPago="";
             if($CmbFormaPago=="Acuerdo"){
                 $obPrintAcuerdo = new AcuerdoPagoPrint($idUser);
                 $idAcuerdoPago=$obCon->normalizar($_REQUEST["idAcuerdoPago"]);
@@ -508,7 +498,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 $NuevoIdAcuerdo=$obAcuerdo->getId("ap_");
                 $obAcuerdo->ActualizaRegistro("vestasactivas", "IdentificadorUnico", $NuevoIdAcuerdo, "idVestasActivas", $idPreventa);
                 $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);
-                $obPrintAcuerdo->PrintAcuerdoPago($idAcuerdoPago, 2, 0);
+                
                 $LinkAcuerdo="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=37&idAcuerdo=$idAcuerdoPago&EstadoGeneral=0";
                 $Mensaje2="<br><strong>Acuerdo de Pago Creado Correctamente </strong><a href='$LinkAcuerdo'  target='blank'> Imprimir</a>";
                 
@@ -522,7 +512,25 @@ if( !empty($_REQUEST["Accion"]) ){
             $obFactura->BorraReg("preventa", "VestasActivas_idVestasActivas", $idPreventa);
             print("OK;$Mensaje.$Mensaje2.$MensajeDevuelta.$MensajeMail");
             
+            $obPrint->ImprimeFacturaPOS($idFactura,$DatosImpresora["Puerto"],1);
+            if($DatosImpresora["Habilitado"]=="SI" and $idComprobanteAbono>0){
+                $obPrint->ImprimeComprobanteAbonoFactura($idComprobanteAbono, $DatosImpresora["Puerto"], 1);
+                
+            }
             
+            $DatosTikete=$obCon->DevuelveValores("config_tiketes_promocion", "ID", 1);
+            if($Total>=$DatosTikete["Tope"] AND $DatosTikete["Activo"]=="SI"){
+                $VectorTiket["F"]=0;
+                $Copias=1;
+                if($DatosTikete["Multiple"]=="SI"){
+                    $Copias=floor($Total/$DatosTikete["Tope"]);
+                }
+                $obPrint->ImprimirTiketePromo($idFactura,$DatosTikete["NombreTiket"],$DatosImpresora["Puerto"],$Copias,$VectorTiket);
+            }
+            
+            if($idAcuerdoPago<>''){
+                $obPrintAcuerdo->PrintAcuerdoPago($idAcuerdoPago, 2, 0);
+            }
             
         break;//fin case 7
         

@@ -509,6 +509,120 @@ if( !empty($_REQUEST["Accion"]) ){
                 
             $css->CerrarTabla();
         break;//Fin caso 3
+        
+        case 4://formulario para crear un tercero desde una tablet o celular
+            $css->input("hidden", "idFormulario", "", "idFormulario", "", 100, "", "", "", ""); //100 sirve para indicarle al sistema que debe guardar el formulario de crear un tercero
+            
+            $css->input("hidden", "CodigoTarjeta", "", "CodigoTarjeta", "", "", "", "", "", ""); //100 sirve para indicarle al sistema que debe guardar el formulario de crear un tercero
+            $css->input("hidden", "cmbDiaCumple", "", "cmbDiaCumple", "", "", "", "", "", ""); //100 sirve para indicarle al sistema que debe guardar el formulario de crear un tercero
+            
+            $css->input("hidden", "cmbMesCumple", "", "cmbMesCumple", "", "", "", "", "", ""); //100 sirve para indicarle al sistema que debe guardar el formulario de crear un tercero
+            
+            $css->input("hidden", "Responsabilidad", "", "Responsabilidad", "", "", "", "", "", ""); //100 sirve para indicarle al sistema que debe guardar el formulario de crear un tercero
+            
+                     
+            print('<div class="row">');
+                print('<div class="col-md-12">');
+                print('<div class="box box-primary">
+                        <div class="box-header">
+                          <h3 class="box-title">Datos Generales</h3>
+                        </div>
+                        <div class="box-body">');
+                print('<div class="row">');         
+                print('<div class="col-md-3"><label>Tipo de Documento:</label><br>');
+                    $css->select("TipoDocumento", "form-control input-lg", "TipoDocumento", "", "", "", "style=width:235px");
+                        $Consulta=$obCon->ConsultarTabla("cod_documentos", " WHERE Codigo=13 or Codigo=31");
+                        while($DatosTipoDocumento=$obCon->FetchAssoc($Consulta)){
+                            $sel=0;
+                            if($DatosTipoDocumento["Codigo"]==13){
+                                $sel=1;
+                            }
+                            $css->option("", "", "", $DatosTipoDocumento["Codigo"], "", "", $sel);
+                                print($DatosTipoDocumento["Codigo"]." ".utf8_decode($DatosTipoDocumento["Descripcion"]));
+                            $css->Coption();
+                        }    
+                        $css->Cselect();
+                print('</div>');
+                
+                print('<div class="col-md-3"><label>Número de Documento:</label><br>');
+                    $css->input("number", "Num_Identificacion", "form-control input-lg", "Num_Identificacion", "", "", "Identificación", "off", "", "onchange=VerificaNIT()");
+                print('</div>');
+                
+                print('<div class="col-md-3"><label>Ciudad:</label><br>');
+                    $css->select("CodigoMunicipio", "form-control input-lg", "CodigoMunicipio", "", "", "","style=width:235px");
+                            $Consulta=$obCon->ConsultarTabla("cod_municipios_dptos", "");
+                            while($DatosMunicipios=$obCon->FetchAssoc($Consulta)){
+                                $sel=0;
+                                if($DatosMunicipios["ID"]==1011){
+                                    $sel=1;
+                                }
+                                $css->option("", "", "", $DatosMunicipios["ID"], "", "", $sel);
+                                    print($DatosMunicipios["Ciudad"]." ".$DatosMunicipios["Cod_mcipio"]);
+                                $css->Coption();
+                            }    
+                        $css->Cselect();
+                print('</div>');
+                
+                print('<div class="col-md-3"><label>Teléfono:</label><br>');
+                    $css->input("text", "Telefono", "form-control input-lg", "Telefono", "", "", "Teléfono", "off", "", "");
+                print('</div>');
+                
+                print('</div>');                
+                print('<div class="row">');
+                
+                
+                print('<div class="col-md-3"><label>Primer Nombre:</label><br>');
+                    $css->input("text", "PrimerNombre", "form-control input-lg", "PrimerNombre", "Primer Nombre", "", "Primer Nombre", "off", "", "onkeyup=CompletaRazonSocial()", "");
+                print('</div>');
+                
+                print('<div class="col-md-3"><label>Otros Nombres:</label><br>');
+                    $css->input("text", "OtrosNombres", "form-control input-lg", "OtrosNombres", "Otros Nombres", "", "Otros Nombres", "off", "", "onkeyup=CompletaRazonSocial()", "");
+                    
+                print('</div>');
+                
+                print('<div class="col-md-3"><label>Primer Apellido:</label><br>');
+                    $css->input("text", "PrimerApellido", "form-control input-lg", "PrimerApellido", "Primer Apellido", "", "Primer Apellido", "off", "", "onkeyup=CompletaRazonSocial()", "");
+                print('</div>');
+                
+                print('<div class="col-md-3"><label>Segundo Apellido:</label><br>');
+                    $css->input("text", "SegundoApellido", "form-control input-lg", "SegundoApellido", "Segundo Apellido", "", "Segundo Apellido", "off", "", "onkeyup=CompletaRazonSocial()", "");
+                print('</div>');
+                
+                print('</div>');                
+                print('<div class="row">');
+                    print('<div class="col-md-12"><label>Razón Social:</label><br>');
+                        $css->input("text", "RazonSocial", "form-control input-lg", "RazonSocial", "Razon Social", "", "RazonSocial", "off", "", "", "");
+                    print('</div>');
+                print('</div>'); 
+                
+                print('<div class="row">');
+                
+                    print('<div class="col-md-5"><label>Dirección:</label><br>');
+                        $css->input("text", "Direccion", "form-control input-lg", "Direccion", "Direccion", "", "Dirección", "off", "", "", "");
+                        
+                    print('</div>');
+
+                    print('<div class="col-md-5"><label>Email:</label><br>');
+                        $css->input("text", "Email", "form-control input-lg", "Email", "Email", "", "Email", "off", "", "", "");
+                    
+                       
+                    print('</div>');
+
+                    print('<div class="col-md-2"><label>Cupo Credito:</label><br>');
+                         $css->input_number_format("number", "Cupo", "form-control input-lg", "Cupo", "Cupo", 0, "Cupo Crédito", "off", "", "", "");
+                        
+                    print('</div>');
+
+                    
+                    
+                print('</div>');
+                
+                print('</div>');
+            print('</div>');
+            print('</div>');
+            
+            
+        break;//Fin caso 4    
     }
     
     

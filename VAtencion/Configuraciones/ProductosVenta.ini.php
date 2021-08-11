@@ -111,6 +111,7 @@ $Vector["Sub5"]["Vinculo"]=1;   //Indico que esta columna tendra un vinculo
 $Vector["Sub5"]["TablaVinculo"]="prod_sub5";  //tabla de donde se vincula
 $Vector["Sub5"]["IDTabla"]="idSub5"; //id de la tabla que se vincula
 $Vector["Sub5"]["Display"]="NombreSub5";                    //Columna que quiero mostrar
+
 ///Filtros y orden
 if($DatosEmpresa["Regimen"]=="COMUN"){
     $Vector["IVA"]["Predeterminado"]='0.19';
