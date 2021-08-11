@@ -6214,6 +6214,8 @@ public function VerificaPermisos($VectorPermisos) {
      
      //Crear Cotizacion desde una preventa
      public function CotizarDesdePreventa($idPreventa,$fecha,$idCliente,$Observaciones,$Vector) {
+        $user_id=$_SESSION["idUser"];
+         
         $tab="cotizacionesv5";
         $NumRegistros=7;  
 
@@ -6234,7 +6236,7 @@ public function VerificaPermisos($VectorPermisos) {
         while($DatosPrecoti=$this->FetchArray($Consulta)){
             $DatosProducto=$this->DevuelveValores($DatosPrecoti["TablaItem"], "idProductosVenta", $DatosPrecoti["ProductosVenta_idProductosVenta"]);
             $tab="cot_itemscotizaciones";
-            $NumRegistros=15;  
+            $NumRegistros=16;  
 
             $Columnas[0]="NumCotizacion";			$Valores[0]=$NumCotizacion;
             $Columnas[1]="Descripcion";				$Valores[1]=$DatosProducto["Nombre"];
@@ -6251,7 +6253,7 @@ public function VerificaPermisos($VectorPermisos) {
             $Columnas[12]="CuentaPUC";				$Valores[12]=$DatosProducto["CuentaPUC"];
             $Columnas[13]="idCliente";				$Valores[13]=$idCliente;
             $Columnas[14]="Multiplicador";                      $Valores[14]=1;
-
+            $Columnas[15]="user_id";                            $Valores[15]=$user_id;
             $this->InsertarRegistro($tab,$NumRegistros,$Columnas,$Valores);	
 
         }

@@ -47,6 +47,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $idPreventa=$obCon->normalizar($_REQUEST["idPreventa"]);       
             $Fecha=date("Y-m-d");
             $DatosCaja=$obCon->DevuelveValores("cajas", "idUsuario", $idUser);
+            if($DatosCaja["ID"]==''){
+                exit("E1;No tiene una caja asignada para facturar");
+            }
             $idCentroCostos=$DatosCaja["CentroCostos"];
             $CmbResolucion=$DatosCaja["idResolucionDian"];
             $CmbFormaPago=$obCon->normalizar($_REQUEST["CmbTipoPago"]);
@@ -274,7 +277,14 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             
             $idCierre=$obCon->CierreTurnoPos($idUser,$idCaja,$TotalEfectivoRecaudado);
-            print("OK;Se ha cerrado el turno de usuario $idUser");
+            
+            $RutaPrintCot="procesadores/comercial_pdf.process.php?Accion=1&cierre_id=".$idCierre;
+            $Mensaje='<a href="'.$RutaPrintCot.'" target="blank" class="btn btn-block btn-social btn-github btn-lg">
+                        <i class="fa fa-file-pdf-o"></i> Cierre '.$idCierre.' Creado Correctamente
+                      </a>';
+            print("OK;$Mensaje");
+            
+            
         break;//Fin caso 7
     
         
